@@ -10,6 +10,7 @@
 
   --gold:      #e8b84b;
   --gold2:     #f5d78e;
+  --yellow:    #facc15;
   --green:     #4caf7d;
   --amber:     #f0a63a;
   --red:       #e05c5c;
@@ -255,7 +256,7 @@ body {
   border-color: var(--border2);
 }
 .card-item.type-minor  { --accent: var(--amber); }
-.card-item.type-occupation { --accent: var(--gold); }
+.card-item.type-occupation { --accent: var(--yellow); }
 .card-item.type-both   { --accent: var(--red); }
 
 .card-item::before {
@@ -318,7 +319,7 @@ body {
   letter-spacing: .04em;
 }
 .badge-minor    { background: rgba(240,166,58,.15); color: var(--amber); }
-.badge-occupation { background: rgba(232,184,75,.15); color: var(--gold); }
+.badge-occupation { background: rgba(250,204,21,.15); color: var(--yellow); }
 .badge-both     { background: rgba(224,92,92,.15); color: var(--red); }
 
 .card-desc {
