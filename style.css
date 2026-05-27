@@ -439,14 +439,13 @@ body {
   display: block;
 }
 .modal-badge {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
   font-size: .75rem;
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 100px;
-  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
 .modal-info {
@@ -455,12 +454,18 @@ body {
   flex-direction: column;
   gap: 14px;
 }
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 32px;
+}
 .modal-title {
   font-size: 1.55rem;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
-  padding-right: 40px;
 }
 .modal-id {
   font-family: 'Courier New', monospace;
