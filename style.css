@@ -254,9 +254,9 @@ body {
   box-shadow: var(--shadow);
   border-color: var(--border2);
 }
-.card-item.type-minor  { --accent: var(--green); }
-.card-item.type-occupation { --accent: var(--blue); }
-.card-item.type-both   { --accent: var(--amber); }
+.card-item.type-minor  { --accent: var(--amber); }
+.card-item.type-occupation { --accent: var(--gold); }
+.card-item.type-both   { --accent: var(--red); }
 
 .card-item::before {
   content: '';
@@ -317,9 +317,9 @@ body {
   border-radius: 100px;
   letter-spacing: .04em;
 }
-.badge-minor    { background: rgba(76,175,125,.15); color: var(--green); }
-.badge-occupation { background: rgba(91,141,238,.15); color: var(--blue); }
-.badge-both     { background: rgba(240,166,58,.15); color: var(--amber); }
+.badge-minor    { background: rgba(240,166,58,.15); color: var(--amber); }
+.badge-occupation { background: rgba(232,184,75,.15); color: var(--gold); }
+.badge-both     { background: rgba(224,92,92,.15); color: var(--red); }
 
 .card-desc {
   font-size: .78rem;
