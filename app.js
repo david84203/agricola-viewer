@@ -1,0 +1,288 @@
+/* ══════════════════════════════════════════════════
+   農家樂 Agricola Card Viewer — app.js
+   ══════════════════════════════════════════════════ */
+
+const IMG_BASE = './images/';
+const GRID_COLS = 3;
+const GRID_ROWS = 3;
+
+// Calibrated crop offsets (pixels in original image resolution)
+const CROP = {
+  offsetTop:    113,
+  offsetBottom: 99,
+  offsetLeft:   182,
+  offsetRight:  164,
+};
+
+let allCards = [];
+let filteredCards = [];
+let imageCache = {};
+
+// ── Load Data ──────────────────────────────────────
+async function loadCards() {
+  const res = await fetch('./cards.json');
+  allCards = await res.json();
+
+  populateDeckFilter();
+  document.getElementById('totalCount').textContent = allCards.length;
+  applyFilters();
+}
+
+// ── Deck filter options ────────────────────────────
+function populateDeckFilter() {
+  const decks = [...new Set(allCards.map(c => c['牌組'] || '').filter(Boolean))].sort();
+  const sel = document.getElementById('deckSelect');
+  decks.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = `${d} 牌組`;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Filters ────────────────────────────────────────
+let activeType = 'all';
+let activeDeck = 'all';
+let searchQuery = '';
+
+function applyFilters() {
+  const q = searchQuery.toLowerCase();
+
+  filteredCards = allCards.filter(c => {
+    // type filter
+    if (activeType !== 'all' && c.card_type !== activeType) return false;
+    // deck filter
+    if (activeDeck !== 'all' && c['牌組'] !== activeDeck) return false;
+    // search
+    if (q) {
+      const haystack = [c['牌名'], c['卡片ID'], c['說明'], c['先決條件'], c['費用']].join(' ').toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  renderGrid();
+  document.getElementById('resultsInfo').textContent =
+    filteredCards.length === allCards.length
+      ? `共 ${allCards.length} 張卡牌`
+      : `顯示 ${filteredCards.length} / ${allCards.length} 張`;
+}
+
+// ── Render Grid ────────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+
+  if (filteredCards.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌾</div>
+        <p>找不到符合條件的卡牌</p>
+      </div>`;
+    return;
+  }
+
+  filteredCards.forEach((card, idx) => {
+    const el = createCardEl(card, idx);
+    grid.appendChild(el);
+  });
+}
+
+// ── Create Card Element ────────────────────────────
+function createCardEl(card, idx) {
+  const typeClass = `type-${card.card_type}`;
+  const typeBadgeClass = `badge-${card.card_type}`;
+  const typeName = card.card_type === 'minor' ? '次要發展卡'
+                 : card.card_type === 'occupation' ? '職業卡'
+                 : '雙色卡';
+
+  const div = document.createElement('div');
+  div.className = `card-item ${typeClass}`;
+  div.dataset.idx = idx;
+
+  // Tags
+  const vp = card['勝利點數'] && card['勝利點數'] !== '無';
+  const bonus = card['紅利分數'] === '有';
+  const pass = card['是否傳遞'] === '是';
+  const tagsHtml = [
+    vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
+    bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
+    pass  ? `<span class="tag tag-pass">傳遞</span>` : '',
+  ].join('');
+
+  div.innerHTML = `
+    <div class="card-thumb-wrap">
+      <canvas class="card-canvas" data-img="${card.source_image}"
+        data-col="${card.grid_col}" data-row="${card.grid_row}"></canvas>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-type-badge ${typeBadgeClass}">${typeName}</span>
+        <span class="card-id">${card['卡片ID'] || ''}</span>
+      </div>
+      <div class="card-name">${card['牌名'] || '—'}</div>
+      <div class="card-desc">${card['說明'] || ''}</div>
+      ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
+    </div>
+  `;
+
+  div.addEventListener('click', () => openModal(card));
+
+  // Lazy-draw after element is appended
+  requestAnimationFrame(() => {
+    const canvas = div.querySelector('.card-canvas');
+    if (canvas) drawCrop(canvas, card.source_image, card.grid_col, card.grid_row);
+  });
+
+  return div;
+}
+
+// ── Canvas Crop ────────────────────────────────────
+// Each source image is a 3×3 grid of cards (sometimes fewer in last row).
+// We draw the specific cell onto a canvas so it's natively responsive.
+function drawCrop(canvas, imgFile, col, row) {
+  const key = IMG_BASE + imgFile;
+
+  const draw = (img) => {
+    const usableW = img.naturalWidth  - CROP.offsetLeft - CROP.offsetRight;
+    const usableH = img.naturalHeight - CROP.offsetTop  - CROP.offsetBottom;
+    const cellW = usableW / GRID_COLS;
+    const cellH = usableH / GRID_ROWS;
+    const sx = CROP.offsetLeft + col * cellW;
+    const sy = CROP.offsetTop  + row * cellH;
+
+    canvas.width  = cellW;
+    canvas.height = cellH;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
+  };
+
+  if (imageCache[key]) {
+    draw(imageCache[key]);
+  } else {
+    const img = new Image();
+    img.onload = () => {
+      imageCache[key] = img;
+      draw(img);
+    };
+    img.onerror = () => {
+      // Draw placeholder
+      canvas.width = 300; canvas.height = 220;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#1d2437';
+      ctx.fillRect(0,0,300,220);
+      ctx.fillStyle = '#3d4f70';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('圖片未找到', 150, 110);
+      ctx.fillText(imgFile, 150, 130);
+    };
+    img.src = key;
+  }
+}
+
+// ── Modal ──────────────────────────────────────────
+function openModal(card) {
+  const overlay = document.getElementById('modalOverlay');
+  const typeName = card.card_type === 'minor' ? '次要發展卡'
+                 : card.card_type === 'occupation' ? '職業卡'
+                 : '次要發展卡及主要發展卡';
+  const typeBadgeClass = `badge-${card.card_type}`;
+
+  document.getElementById('modalTitle').textContent = card['牌名'] || '—';
+  document.getElementById('modalId').textContent = card['卡片ID'] || '';
+  document.getElementById('modalBadge').className = `modal-badge ${typeBadgeClass}`;
+  document.getElementById('modalBadge').textContent = typeName;
+  document.getElementById('modalDesc').textContent = card['說明'] || '—';
+
+  // Fields
+  const fieldsEl = document.getElementById('modalFields');
+  fieldsEl.innerHTML = '';
+
+  const fieldDefs = card.card_type === 'occupation'
+    ? [
+        ['需求人數', card['需求人數']],
+        ['紅利分數', card['紅利分數']],
+        ['牌組', card['牌組']],
+      ]
+    : [
+        ['先決條件', card['先決條件']],
+        ['費用', card['費用']],
+        ['是否傳遞', card['是否傳遞']],
+        ['勝利點數', card['勝利點數'], 'vp'],
+        ['紅利分數', card['紅利分數'], 'bonus'],
+        ['牌組', card['牌組']],
+      ];
+
+  fieldDefs.forEach(([label, value, highlight]) => {
+    if (!value) return;
+    const row = document.createElement('div');
+    row.className = 'field-row';
+    const cls = highlight === 'vp' && value !== '無' ? 'highlight-vp'
+              : highlight === 'bonus' && value === '有' ? 'highlight-bonus'
+              : '';
+    row.innerHTML = `
+      <div class="field-label">${label}</div>
+      <div class="field-value ${cls}">${value}</div>
+    `;
+    fieldsEl.appendChild(row);
+  });
+
+  // Draw modal canvas
+  const modalCanvas = document.getElementById('modalCanvas');
+  drawCrop(modalCanvas, card.source_image, card.grid_col, card.grid_row);
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── Event Listeners ────────────────────────────────
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Filter chips
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeType = chip.dataset.filter;
+    applyFilters();
+  });
+});
+
+// Deck select
+document.getElementById('deckSelect').addEventListener('change', e => {
+  activeDeck = e.target.value;
+  applyFilters();
+});
+
+// Search
+const searchInput = document.getElementById('searchInput');
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchQuery = searchInput.value.trim();
+    applyFilters();
+  }, 250);
+});
+
+document.getElementById('clearSearch').addEventListener('click', () => {
+  searchInput.value = '';
+  searchQuery = '';
+  applyFilters();
+});
+
+// ── Init ───────────────────────────────────────────
+loadCards();

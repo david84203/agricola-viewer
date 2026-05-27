@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<title>裁切校準工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b27; --surface: #1d2437;
+    --border: #2e3a55; --gold: #e8b84b; --text: #e8ecf4;
+    --text2: #a8b3cc; --text3: #6b7a99; --green: #4caf7d; --red: #e05c5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .top-bar {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 14px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .top-bar h1 { font-size: 1rem; color: var(--gold); white-space: nowrap; }
+
+  .control-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .control-group label { font-size: .78rem; color: var(--text3); white-space: nowrap; }
+  input[type=number] {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 5px 8px; width: 70px; font-size: .85rem;
+    outline: none; font-family: inherit;
+  }
+  input[type=number]:focus { border-color: var(--gold); }
+  input[type=file] { font-size: .82rem; color: var(--text2); }
+
+  select {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 5px 10px; font-size: .85rem; outline: none; font-family: inherit;
+  }
+  select:focus { border-color: var(--gold); }
+
+  .btn {
+    background: var(--gold); color: #1a1000; border: none; border-radius: 6px;
+    padding: 6px 16px; font-size: .85rem; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-outline {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 0;
+    height: calc(100vh - 58px);
+  }
+  .sidebar {
+    background: var(--bg2); border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .sidebar h2 { font-size: .85rem; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
+
+  .params-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .param-item { display: flex; flex-direction: column; gap: 4px; }
+  .param-item label { font-size: .72rem; color: var(--text3); }
+  .param-item input { width: 100%; }
+
+  .image-select { display: flex; flex-direction: column; gap: 6px; }
+  .image-select label { font-size: .72rem; color: var(--text3); }
+
+  .crop-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-top: 6px;
+  }
+  .crop-cell {
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    background: var(--surface); cursor: pointer;
+    transition: border-color .15s, transform .15s;
+    position: relative;
+  }
+  .crop-cell:hover { border-color: var(--gold); transform: scale(1.03); }
+  .crop-cell.selected { border-color: var(--green); border-width: 2px; }
+  .crop-cell canvas { width: 100%; display: block; }
+  .crop-cell .cell-label {
+    font-size: .62rem; color: var(--text3); text-align: center;
+    padding: 3px 0; background: var(--bg);
+  }
+
+  .main-preview {
+    display: flex; flex-direction: column; gap: 0; overflow: hidden;
+  }
+  .preview-header {
+    padding: 14px 20px; background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .preview-header h2 { font-size: .9rem; color: var(--text2); flex: 1; }
+  .card-info-badge {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px;
+    font-size: .82rem; color: var(--text2); min-width: 160px;
+    line-height: 1.5;
+  }
+  .card-info-badge strong { color: var(--gold); }
+
+  .preview-body {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    padding: 20px; overflow-y: auto; align-items: start;
+  }
+  .preview-panel { display: flex; flex-direction: column; gap: 10px; }
+  .preview-panel h3 { font-size: .78rem; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
+
+  .original-wrap {
+    position: relative; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: var(--surface);
+  }
+  #originalImg { width: 100%; display: block; }
+  #overlayCanvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  .cropped-wrap {
+    border: 2px solid var(--green); border-radius: 10px;
+    overflow: hidden; background: var(--surface);
+    box-shadow: 0 0 20px rgba(76,175,125,.2);
+  }
+  #croppedCanvas { width: 100%; display: block; }
+
+  .status-bar {
+    padding: 6px 20px; background: var(--surface); border-top: 1px solid var(--border);
+    font-size: .75rem; color: var(--text3); display: flex; gap: 20px; align-items: center;
+  }
+  .status-ok  { color: var(--green); }
+  .status-err { color: var(--red); }
+
+  .copy-btn {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text3); padding: 4px 12px; font-size: .75rem; cursor: pointer;
+    font-family: inherit; transition: all .15s;
+  }
+  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>🌾 裁切校準工具</h1>
+  <div class="control-group">
+    <label>選擇圖片：</label>
+    <select id="imgSelect"></select>
+  </div>
+  <div class="control-group">
+    <label>或上傳：</label>
+    <input type="file" id="fileInput" accept="image/*" />
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <h2 style="margin-bottom:12px">裁切參數</h2>
+      <div class="params-grid">
+        <div class="param-item">
+          <label>上邊界偏移 (px)</label>
+          <input type="number" id="offsetTop" value="0" step="1"/>
+        </div>
+        <div class="param-item">
+          <label>下邊界偏移 (px)</label>
+          <input type="number" id="offsetBottom" value="0" step="1"/>
+        </div>
+        <div class="param-item">
+          <label>左邊界偏移 (px)</label>
+          <input type="number" id="offsetLeft" value="0" step="1"/>
+        </div>
+        <div class="param-item">
+          <label>右邊界偏移 (px)</label>
+          <input type="number" id="offsetRight" value="0" step="1"/>
+        </div>
+        <div class="param-item">
+          <label>欄數</label>
+          <input type="number" id="gridCols" value="3" min="1" max="6"/>
+        </div>
+        <div class="param-item">
+          <label>列數</label>
+          <input type="number" id="gridRows" value="3" min="1" max="6"/>
+        </div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <button class="btn" onclick="redrawAll()">重新預覽</button>
+        <button class="copy-btn" onclick="copyParams()">複製參數</button>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:10px">9格縮圖預覽</h2>
+      <div class="crop-grid" id="cropGrid"></div>
+    </div>
+
+    <div style="padding: 12px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+      <h2 style="margin-bottom:8px">最終參數</h2>
+      <pre id="paramsOutput" style="font-size:.72rem; color: var(--text2); white-space:pre-wrap; line-height:1.6;">—</pre>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-preview">
+    <div class="preview-header">
+      <h2>選取格子：<span id="selectedCellLabel" style="color:var(--gold)">點左側縮圖選擇</span></h2>
+      <div class="card-info-badge" id="cardInfoBadge">—</div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-panel">
+        <h3>原圖（含格線標示）</h3>
+        <div class="original-wrap">
+          <img id="originalImg" src="" alt="" style="display:none"/>
+          <canvas id="overlayCanvas"></canvas>
+        </div>
+      </div>
+      <div class="preview-panel">
+        <h3>裁切結果</h3>
+        <div class="cropped-wrap">
+          <canvas id="croppedCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <span id="imgInfo">尚未載入圖片</span>
+      <span id="cropInfo">—</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load cards.json to map image → card names
+let cardsData = [];
+fetch('./cards.json').then(r=>r.json()).then(d=>{ cardsData = d; }).catch(()=>{});
+
+// Image files list (from the images/ directory)
+const IMAGE_FILES = [
+  '001.jpg','002.jpg','003.jpg','004.jpg','005.jpg','006.jpg','007.jpg',
+  '010.jpg','011.jpg','012.jpg','013.jpg','014.jpg','015.jpg','016.jpg','017.jpg',
+  '101.jpg','102.jpg','103.jpg','104.jpg','105.jpg','106.jpg','107.jpg','108.jpg',
+  '109.jpg','110.jpg','111.jpg','112.jpg',
+  'AYm1.jpg','AYo1.jpg',
+  'B01.jpg','B02.jpg','B03.jpg','B04.jpg','B05.jpg','B06.jpg','B07.jpg',
+  'B101.jpg','B102.jpg','B103.jpg','B104.jpg','B105.jpg','B106.jpg','B107.jpg',
+  'C01.jpg','C02.jpg','C03.jpg','C04.jpg','C05.jpg','C06.jpg','C07.jpg',
+  'Cz01.jpg',
+  'D001.jpg','D002.jpg','D003.jpg','D004.jpg','D005.jpg','D006.jpg','D007.jpg',
+  'D101.jpg','D102.jpg','D103.jpg','D104.jpg','D105.jpg','D106.jpg',
+  'E01.jpg','E02.jpg','E03.jpg','E04.jpg','E05.jpg','E06.jpg','E07.jpg','E08.jpg','E09.jpg','E010.jpg',
+  'FL1.jpg',
+];
+
+const sel = document.getElementById('imgSelect');
+IMAGE_FILES.forEach(f => {
+  const o = document.createElement('option');
+  o.value = f; o.textContent = f;
+  sel.appendChild(o);
+});
+
+let currentImg = null;
+let selectedCell = { col: 0, row: 0 };
+
+// Params
+const getP = () => ({
+  offsetTop:    parseInt(document.getElementById('offsetTop').value)    || 0,
+  offsetBottom: parseInt(document.getElementById('offsetBottom').value) || 0,
+  offsetLeft:   parseInt(document.getElementById('offsetLeft').value)   || 0,
+  offsetRight:  parseInt(document.getElementById('offsetRight').value)  || 0,
+  cols: parseInt(document.getElementById('gridCols').value) || 3,
+  rows: parseInt(document.getElementById('gridRows').value) || 3,
+});
+
+function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+async function loadFromSelect() {
+  const f = sel.value;
+  try {
+    currentImg = await loadImage('./images/' + f);
+    document.getElementById('imgInfo').textContent = `${f}  |  ${currentImg.naturalWidth} × ${currentImg.naturalHeight}px`;
+    redrawAll();
+  } catch(e) {
+    document.getElementById('imgInfo').className = 'status-err';
+    document.getElementById('imgInfo').textContent = '圖片載入失敗：' + f;
+  }
+}
+
+document.getElementById('imgSelect').addEventListener('change', loadFromSelect);
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  loadImage(url).then(img => {
+    currentImg = img;
+    document.getElementById('imgInfo').textContent = `${file.name}  |  ${img.naturalWidth} × ${img.naturalHeight}px`;
+    redrawAll();
+  });
+});
+
+// Add listeners for param inputs (auto-redraw)
+['offsetTop','offsetBottom','offsetLeft','offsetRight','gridCols','gridRows'].forEach(id => {
+  document.getElementById(id).addEventListener('input', redrawAll);
+});
+
+function getCellRect(img, col, row, p) {
+  const usableW = img.naturalWidth  - p.offsetLeft - p.offsetRight;
+  const usableH = img.naturalHeight - p.offsetTop  - p.offsetBottom;
+  const cellW = usableW / p.cols;
+  const cellH = usableH / p.rows;
+  return {
+    x: p.offsetLeft + col * cellW,
+    y: p.offsetTop  + row * cellH,
+    w: cellW,
+    h: cellH,
+  };
+}
+
+function redrawAll() {
+  if (!currentImg) return;
+  const p = getP();
+  updateOverlay(p);
+  updateCroppedPreview(p);
+  updateThumbGrid(p);
+  updateParams(p);
+}
+
+function updateOverlay(p) {
+  const img = currentImg;
+  const canvas = document.getElementById('overlayCanvas');
+  const displayW = canvas.parentElement.clientWidth || 600;
+  const scale = displayW / img.naturalWidth;
+
+  canvas.width  = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  canvas.style.width  = '100%';
+  canvas.style.height = 'auto';
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+
+  // Draw grid lines
+  for (let c = 0; c <= p.cols; c++) {
+    const x = p.offsetLeft + c * (img.naturalWidth - p.offsetLeft - p.offsetRight) / p.cols;
+    ctx.beginPath();
+    ctx.moveTo(x, 0); ctx.lineTo(x, img.naturalHeight);
+    ctx.strokeStyle = 'rgba(232,184,75,0.7)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+  for (let r = 0; r <= p.rows; r++) {
+    const y = p.offsetTop + r * (img.naturalHeight - p.offsetTop - p.offsetBottom) / p.rows;
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(img.naturalWidth, y);
+    ctx.strokeStyle = 'rgba(232,184,75,0.7)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  // Highlight selected cell
+  const rect = getCellRect(img, selectedCell.col, selectedCell.row, p);
+  ctx.fillStyle = 'rgba(76,175,125,0.25)';
+  ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+  ctx.strokeStyle = '#4caf7d';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(rect.x + 2, rect.y + 2, rect.w - 4, rect.h - 4);
+
+  // Draw cell numbers
+  for (let r = 0; r < p.rows; r++) {
+    for (let c = 0; c < p.cols; c++) {
+      const rc = getCellRect(img, c, r, p);
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillStyle = 'rgba(232,184,75,0.9)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${r*p.cols+c+1}`, rc.x + rc.w/2, rc.y + 28);
+    }
+  }
+}
+
+function updateCroppedPreview(p) {
+  const img = currentImg;
+  const rect = getCellRect(img, selectedCell.col, selectedCell.row, p);
+  const canvas = document.getElementById('croppedCanvas');
+  canvas.width  = rect.w;
+  canvas.height = rect.h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+
+  document.getElementById('cropInfo').textContent =
+    `裁切區域：x=${Math.round(rect.x)}, y=${Math.round(rect.y)}, w=${Math.round(rect.w)}, h=${Math.round(rect.h)}`;
+
+  // Card name
+  const imgFile = sel.value;
+  const pos = selectedCell.row * p.cols + selectedCell.col;
+  const card = cardsData.find(c => c.source_image === imgFile && c.position === pos);
+  const badge = document.getElementById('cardInfoBadge');
+  const label = document.getElementById('selectedCellLabel');
+  if (card) {
+    label.textContent = `格 ${pos+1}  |  ${card['牌名'] || '—'}`;
+    badge.innerHTML = `<strong>${card['牌名']}</strong><br/>${card['卡片ID'] || ''} · ${card['類型'] || ''}`;
+  } else {
+    label.textContent = `格 ${pos+1}  (無卡牌資料)`;
+    badge.innerHTML = '無對應卡牌資料';
+  }
+}
+
+function updateThumbGrid(p) {
+  const grid = document.getElementById('cropGrid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = `repeat(${p.cols}, 1fr)`;
+
+  if (!currentImg) return;
+
+  for (let r = 0; r < p.rows; r++) {
+    for (let c = 0; c < p.cols; c++) {
+      const rect = getCellRect(currentImg, c, r, p);
+      const thumbCanvas = document.createElement('canvas');
+      thumbCanvas.width  = rect.w;
+      thumbCanvas.height = rect.h;
+      const ctx = thumbCanvas.getContext('2d');
+      ctx.drawImage(currentImg, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+
+      const imgFile = sel.value;
+      const pos = r * p.cols + c;
+      const card = cardsData.find(cd => cd.source_image === imgFile && cd.position === pos);
+
+      const cell = document.createElement('div');
+      cell.className = 'crop-cell' + (selectedCell.col===c && selectedCell.row===r ? ' selected' : '');
+      cell.appendChild(thumbCanvas);
+
+      const lbl = document.createElement('div');
+      lbl.className = 'cell-label';
+      lbl.textContent = card ? card['牌名'] : `格${pos+1}`;
+      cell.appendChild(lbl);
+
+      cell.addEventListener('click', () => {
+        selectedCell = { col: c, row: r };
+        redrawAll();
+      });
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function updateParams(p) {
+  const out = {
+    offsetTop: p.offsetTop,
+    offsetBottom: p.offsetBottom,
+    offsetLeft: p.offsetLeft,
+    offsetRight: p.offsetRight,
+    cols: p.cols,
+    rows: p.rows,
+  };
+  document.getElementById('paramsOutput').textContent = JSON.stringify(out, null, 2);
+}
+
+function copyParams() {
+  const p = getP();
+  const text = JSON.stringify(p, null, 2);
+  navigator.clipboard.writeText(text).then(() => alert('已複製到剪貼簿！'));
+}
+
+// Auto-load first image
+loadFromSelect();
+</script>
+</body>
+</html>

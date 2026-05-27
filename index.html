@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 卡牌圖鑑</title>
+  <meta name="description" content="農家樂（Agricola）繁體中文化卡牌資料庫，收錄次要發展卡與職業卡的完整效果說明與卡片圖像。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola 卡牌圖鑑</div>
+        <div class="brand-sub">台灣繁體中文版翻譯</div>
+      </div>
+    </div>
+    <div class="brand-center">
+      翻譯、編輯、排版、網頁編寫為烏嘎嘎桌遊小路獨立製作，禁止用於任何商業用途。
+    </div>
+    <div class="brand-right">
+      <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
+      <small style="color:var(--text3);">目前收錄：A, B, C, D, E, AY, FL, Cz</small>
+    </div>
+  </div>
+
+
+
+  <main class="main-container">
+    <!-- Filters -->
+    <section class="filter-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="搜尋牌名、說明、卡片ID…"
+          autocomplete="off"
+        />
+        <button class="clear-btn" id="clearSearch" title="清除">✕</button>
+      </div>
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="minor">次要發展卡</button>
+        <button class="chip" data-filter="occupation">職業卡</button>
+        <button class="chip" data-filter="both">雙色卡</button>
+      </div>
+      <div class="deck-filter">
+        <label for="deckSelect">牌組</label>
+        <select id="deckSelect">
+          <option value="all">全部</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Results info -->
+    <div class="results-info" id="resultsInfo">載入中…</div>
+
+    <!-- Card grid -->
+    <section class="card-grid" id="cardGrid"></section>
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-inner">
+        <div class="modal-image-wrap">
+          <canvas id="modalCanvas"></canvas>
+          <div class="modal-badge" id="modalBadge"></div>
+        </div>
+        <div class="modal-info">
+          <h2 class="modal-title" id="modalTitle"></h2>
+          <div class="modal-id" id="modalId"></div>
+          <div class="modal-fields" id="modalFields"></div>
+          <div class="modal-desc-wrap">
+            <div class="modal-desc-label">說明</div>
+            <div class="modal-desc" id="modalDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
