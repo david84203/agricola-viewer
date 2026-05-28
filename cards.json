@@ -10582,7 +10582,9 @@
     "卡片ID": "C059",
     "說明": "在計分階段開始時，你可以將食物放在你的空農田上。每個放上1/4/7份食物的空農田讓你獲得1/2/3分。（放上食物的農田視為已播種田）",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "泥濘顛簸者",
@@ -10594,7 +10596,9 @@
     "卡片ID": "C148",
     "說明": "每當你使用累積行動格，從供應區放1塊磚頭在此卡上。當此卡上有4塊磚頭時你必須立即將其轉換成1頭野豬並可容納在此卡上。（此卡上只能容納由此卡效果轉換的野豬，並可參與繁殖階段）",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "第二配偶",
@@ -10606,7 +10610,9 @@
     "卡片ID": "C129",
     "說明": "若第12或第13回合的「增加家庭成員且即使房舍中已無空房間」行動格被其他玩家的第1位家庭成員佔據，你仍然可以使用該行動格。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "鸚鵡飼養員",
@@ -10618,7 +10624,9 @@
     "卡片ID": "C150",
     "說明": "在你的回合，若你支付1份小麥至供應區，你可以使用你右手邊的玩家剛使用過的行動格。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "樹木維護員",
@@ -10630,7 +10638,9 @@
     "卡片ID": "C102",
     "說明": "每當你使用木頭累積行動格後，你可以從你的個人供應區支付4根木頭放在該行動格上來獲得2顆石頭、1塊磚頭、1綑蘆葦和1份小麥。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "石頭進口商",
@@ -10642,7 +10652,9 @@
     "卡片ID": "C124",
     "說明": "在第1/2/3/4/5/6個收成階段的餵養階段，你可以使用此卡支付2/2/3/3/4/1份食物來購買恰好2顆石頭。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "播種工",
@@ -10654,7 +10666,9 @@
     "卡片ID": "C115",
     "說明": "每當你打出1張主要發展卡，從供應區放置1綑蘆葦至此卡上。任何時候你可以移動此卡上的蘆葦至你的個人供應區或將其轉換成「播種」行動。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "綠色雜貨商",
@@ -10666,7 +10680,9 @@
     "卡片ID": "C103",
     "說明": "在每個回合開始時，你可以進行以下的交換1次：1羊→1蔬菜、1蔬菜→1豬、2羊→1蔬菜、1蔬菜→2蔬菜。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "巢穴建築師",
@@ -10678,7 +10694,9 @@
     "卡片ID": "C085",
     "說明": "當你住在磚屋或石屋，你可以支付1份小麥和2份食物。若你這麼做，在接下來的遊戲中，此卡提供1間房間來居住恰好1位家庭成員。",
     "card_type": "occupation",
-    "source_image": "C101.jpg"
+    "source_image": "C101.jpg",
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "製籃者的妻子",
@@ -10690,7 +10708,9 @@
     "卡片ID": "C139",
     "說明": "當你打出此卡，你立即獲得1綑蘆葦和1份食物。在任何時候，你可以將1綑蘆葦轉換成2份食物。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "秋季母親",
@@ -10702,7 +10722,9 @@
     "卡片ID": "C092",
     "說明": "在每個收成階段開始前，若你的房舍中有尚未居住的房間，你可以支付3份食物執行「增加家庭成員」行動。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "動物飼養員",
@@ -10714,7 +10736,9 @@
     "卡片ID": "C138",
     "說明": "你每次使用「臨時工」行動格時，你可以支付0/0/1/2份食物購買1頭羊/1份小麥/1頭野豬/1頭牛。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "農業勞動者",
@@ -10726,7 +10750,9 @@
     "卡片ID": "C120",
     "說明": "從供應區放置8塊磚頭於此卡上。每當你獲得1份小麥時（包含收成小麥），你從此卡上獲得1塊磚頭。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "犁田英雄",
@@ -10738,7 +10764,9 @@
     "卡片ID": "C091",
     "說明": "每當你派遣第1位家庭成員使用「犁1塊田」或「犁1塊田和/或播種」行動格時，你可以支付1份食物額外犁1塊田。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "資源分析者",
@@ -10750,7 +10778,9 @@
     "卡片ID": "C157",
     "說明": "在每回合開始之前，若你有至少2種建築資源多於所有其他玩家，你獲得1份食物。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "材料運輸工",
@@ -10762,7 +10792,9 @@
     "卡片ID": "C163",
     "說明": "每當任何玩家（包含你）從累積行動格上獲得5/6/7/8+份貨物時，你從供應區獲得1份木頭/磚頭/蘆葦/石頭。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "籃子搬運工",
@@ -10774,7 +10806,9 @@
     "卡片ID": "C105",
     "說明": "每個收成階段1次，你可以支付2份食物購買1根木頭、1綑蘆葦和1份小麥。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "馬廄持有家",
@@ -10786,7 +10820,9 @@
     "卡片ID": "C101",
     "說明": "1回合1次，若你的農莊中有0/1/2/3/4個圈地外馬廄，你可以將2份小麥轉換成1分和1/2/3/4/5份食物。",
     "card_type": "occupation",
-    "source_image": "C102.jpg"
+    "source_image": "C102.jpg",
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "食物經銷商",
@@ -10798,7 +10834,9 @@
     "卡片ID": "C155",
     "說明": "當你打出此卡，你立即獲得1份小麥，在這個回合的返家階段開始時，你獲得與已被佔據的第1到第14回合行動格卡片數量相同的食物。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "種子研究員",
@@ -10810,7 +10848,9 @@
     "卡片ID": "C097",
     "說明": "每當有任何人員從「拿1份小麥」和「拿1份蔬菜」這2個行動格上返回，你獲得2份食物且可以免費打出1張職業卡。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "包裝師",
@@ -10822,7 +10862,9 @@
     "卡片ID": "C140",
     "說明": "當你打出此卡，你立即獲得1份小麥。每當你獲得「打1張次要發展卡」行動時，你可以執行「烤麵包」行動來取代之。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "綿羊供給者",
@@ -10834,7 +10876,9 @@
     "卡片ID": "C141",
     "說明": "每當任何玩家(包括你)使用「1隻羊」累積行動格時，你獲得1份小麥。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "雙胞胎研究員",
@@ -10846,7 +10890,9 @@
     "卡片ID": "C154",
     "說明": "每當你使用2個同類型且數量相同的累積行動格的其中1個行動格時，你可以支付1份食物購買1分。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "土壤科學家",
@@ -10858,7 +10904,9 @@
     "卡片ID": "C114",
     "說明": "每當你使用磚頭/石頭累積行動格後，你可以從你的個人供應區放置1顆石頭/2塊磚頭在該行動格上來獲得2份小麥/1份蔬菜。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "牧場長",
@@ -10870,7 +10918,9 @@
     "卡片ID": "C136",
     "說明": "若遊戲尚有3/6/9個回合未開始進行，你立即獲得2/3/4根木頭。遊戲結束計分時，所有玩家中最大容量的圈地的玩家獲得3分。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "情聖",
@@ -10882,7 +10932,9 @@
     "卡片ID": "C127",
     "說明": "當你打出此卡，立即支付與剩餘完整回合數相同數量的食物來執行「增加家庭成員且即使房舍中已無空房間」行動。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "士兵",
@@ -10894,7 +10946,9 @@
     "卡片ID": "C133",
     "說明": "遊戲結束計分時，你個人供應區的每1組木頭+石頭讓你獲得1分。你不能將以此卡計分的這些資源進行額外的計分。",
     "card_type": "occupation",
-    "source_image": "C103.jpg"
+    "source_image": "C103.jpg",
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "男管家",
@@ -10906,7 +10960,9 @@
     "卡片ID": "C100",
     "說明": "若你在第11回合或之前打出此卡，遊戲結束計分時，若你的房間多於家庭成員，則你獲得4分。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "跑腿工",
@@ -10918,7 +10974,9 @@
     "卡片ID": "C117",
     "說明": "每當你使用1個行動格，該行動格與另1個直角相鄰的行動格已被你的人員佔據時，你獲得1根木頭。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "木匠的學徒",
@@ -10930,7 +10988,9 @@
     "卡片ID": "C088",
     "說明": "你的每間木屋少支付2根木頭，你的第3和第4棟馬廄少支付1根木頭，你的第13根到第15根柵欄不需支付費用。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "編籃者",
@@ -10942,7 +11002,9 @@
     "卡片ID": "C095",
     "說明": "當你打出此卡，立即支付1顆石頭和1綑蘆葦建造「蘆葦工坊」。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "小動物哺育師",
@@ -10954,7 +11016,9 @@
     "卡片ID": "C111",
     "說明": "在每回合開始前，若你個人供應區的食物多於或等於當前回合數，你獲得1份食物。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "森林評論家",
@@ -10966,7 +11030,9 @@
     "卡片ID": "C145",
     "說明": "每當任何玩家(包括你)使用未被佔據的「2根木頭」累積行動格或「3根木頭」累積行動格後，若2個行動格都已被佔據，你獲得1綑蘆葦。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "森林老兵",
@@ -10978,7 +11044,9 @@
     "卡片ID": "C158",
     "說明": "每當你派遣家庭成員(包含食客)前，若累積行動格上的木頭加總數量至少有8根木頭，你獲得1份食物。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "工坊助手",
@@ -10990,7 +11058,9 @@
     "卡片ID": "C146",
     "說明": "在你的每1張發展卡上從供應區放上1組2個相異的建築資源(由你選擇)，但是每1組的組合不能完全相同。每當其他玩家翻修時，你可以將1張發展卡上的2個建築資源移到你的個人供應區。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "郊區總監",
@@ -11002,7 +11072,9 @@
     "卡片ID": "C130",
     "說明": "每當你使用「2根木頭」/「2塊磚頭」累積行動格，你可以從供應區放置2綑蘆葦到「2塊磚頭」/「2根木頭」累積行動格。若你這麼做，你立即派遣另1名家庭成員。",
     "card_type": "occupation",
-    "source_image": "C104.jpg"
+    "source_image": "C104.jpg",
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "內區理事",
@@ -11014,7 +11086,9 @@
     "卡片ID": "C093",
     "說明": "每當你使用「3根木頭」或「1塊磚頭」累積行動格，你可以從供應區放置1顆石頭到「1塊磚頭」/「3根木頭」累積行動格。若你這麼做，你立即派遣另1名家庭成員。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "森林所有者",
@@ -11026,7 +11100,9 @@
     "卡片ID": "C162",
     "說明": "此卡為所有玩家都可以使用的行動格。若其他玩家使用，該玩家獲得3根木頭，且從供應區支付1份木頭給你；若你使用，你獲得4根木頭。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "動物捕手",
@@ -11038,7 +11114,9 @@
     "卡片ID": "C168",
     "說明": "你每次使用「臨時工」行動格時，你可以改為獲得3隻不同種類的動物而不獲得2份食物。若你這麼做，支付與剩餘的收成階段數量相同的食物。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "德國荒野飼養員",
@@ -11050,7 +11128,9 @@
     "卡片ID": "C164",
     "說明": "每當任何玩家(包括你)使用「1頭野豬」累積行動格，你從供應區獲得1隻羊。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "馬鈴薯挖掘工",
@@ -11062,7 +11142,9 @@
     "卡片ID": "C161",
     "說明": "當你打出此卡，若你有至少2/4/5個未播種田板塊，你立即獲得1/2/3份蔬菜。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "漁夫的朋友",
@@ -11074,7 +11156,9 @@
     "卡片ID": "C159",
     "說明": "每回合開始時，若「賣藝」累積行動格上的食物多於「釣魚」累積行動格，你從供應區獲得等同於與兩者數量差距的食物。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "蹄照護員",
@@ -11086,7 +11170,9 @@
     "卡片ID": "C156",
     "說明": "打出此卡時，立即從供應區將1頭牛放到「1頭牛」累積行動格上。接著在「1頭牛」累積行動格上每有1頭牛讓你獲得1份小麥和1份食物。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "播種理事",
@@ -11098,7 +11184,9 @@
     "卡片ID": "C151",
     "說明": "每當其他玩家使用「播種和 /或烤麵包」行動格時，你獲得「播種」行動。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "石頭採購員",
@@ -11110,7 +11198,9 @@
     "卡片ID": "C143",
     "說明": "當你打出此卡，你可以立即支付1份食物購買恰好2顆石頭。從下個回合開始，每回合1次，你可以支付2份食物購買1顆石頭。",
     "card_type": "occupation",
-    "source_image": "C105.jpg"
+    "source_image": "C105.jpg",
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "牛王子",
@@ -11122,7 +11212,9 @@
     "卡片ID": "C134",
     "說明": "遊戲結束計分時，你農莊中的每個飼養至少1頭牛的空間(包含房間)，讓你獲得1分。",
     "card_type": "occupation",
-    "source_image": "C106.jpg"
+    "source_image": "C106.jpg",
+    "grid_col": 0,
+    "grid_row": 0
   },
   {
     "牌名": "木瓦製造商",
@@ -11134,7 +11226,9 @@
     "卡片ID": "C132",
     "說明": "當你翻修成石屋，你可以從你的個人供應區，在你的每間房間各放上1根木頭。遊戲結束計分時，房間上的每根木頭讓你獲得1分。",
     "card_type": "occupation",
-    "source_image": "C106.jpg"
+    "source_image": "C106.jpg",
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "私人教師",
@@ -11146,7 +11240,9 @@
     "卡片ID": "C131",
     "說明": "你每次使用「1份小麥」行動格時，若任何「打1張職業卡」行動格已被佔據，你可以支付1份食物打1張職業卡。",
     "card_type": "occupation",
-    "source_image": "C106.jpg"
+    "source_image": "C106.jpg",
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "夜班工人",
@@ -11158,7 +11254,9 @@
     "卡片ID": "C125",
     "說明": "在每個工作階段開始前，你可以派遣1位人員到1個建築資源的累積行動格，該建築資源必須是你的個人供應區沒有的類型。",
     "card_type": "occupation",
-    "source_image": "C106.jpg"
+    "source_image": "C106.jpg",
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "馬廄清掃工",
@@ -11170,7 +11268,9 @@
     "卡片ID": "C094",
     "說明": "在任何時候，你可以執行「建造馬廄」行動而不需派遣人員。若你這麼做，每間馬廄的建造費用你必須支付1根木頭和1份食物。",
     "card_type": "occupation",
-    "source_image": "C106.jpg"
+    "source_image": "C106.jpg",
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "風笛手",
