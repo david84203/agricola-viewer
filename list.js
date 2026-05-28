@@ -259,7 +259,7 @@ function renderTable() {
       td.className = col.className;
       td.dataset.colKey = col.key;
       td.innerHTML = col.render(card);
-      if (!colState[col.key]) td.classList.add('col-hidden');
+      if (!colState[col.key] || isAutoHidden(col)) td.classList.add('col-hidden');
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
