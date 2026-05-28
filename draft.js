@@ -191,7 +191,7 @@ function renderBanlist(container) {
       grid.appendChild(item);
       requestAnimationFrame(() => {
         const canvas = item.querySelector('canvas');
-        drawCrop(canvas, card.source_image, card.grid_col, card.grid_row);
+        drawCrop(canvas, card);
         requestAnimationFrame(() => {
           if (canvas.width && canvas.height) {
             canvas.style.width = '100%';
@@ -390,7 +390,7 @@ function createCombinedCardEl(card, slot) {
   });
 
   requestAnimationFrame(() => {
-    drawCrop(div.querySelector('.card-canvas'), card.source_image, card.grid_col, card.grid_row);
+    drawCrop(div.querySelector('.card-canvas'), card);
   });
 
   return div;
@@ -457,7 +457,7 @@ function renderCombinedPickedBar() {
       if (card) {
         div.title = card['牌名'];
         div.innerHTML = '<canvas></canvas>';
-        requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row, 0.5));
+        requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card, 0.5));
       } else {
         div.textContent = j === 0 ? '職' : '次';
       }
@@ -565,7 +565,7 @@ function createDraftCardEl(card) {
   });
 
   requestAnimationFrame(() => {
-    drawCrop(div.querySelector('.card-canvas'), card.source_image, card.grid_col, card.grid_row);
+    drawCrop(div.querySelector('.card-canvas'), card);
   });
 
   return div;
@@ -650,7 +650,7 @@ function renderPickedBar() {
     div.innerHTML = '<canvas></canvas>';
     bar.appendChild(div);
     requestAnimationFrame(() => {
-      drawCrop(div.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row, 0.5);
+      drawCrop(div.querySelector('canvas'), card, 0.5);
     });
   });
 
@@ -674,7 +674,7 @@ function showTransition() {
     div.innerHTML = '<canvas></canvas>';
     grid.appendChild(div);
     requestAnimationFrame(() => {
-      drawCrop(div.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row);
+      drawCrop(div.querySelector('canvas'), card);
     });
   });
 }
@@ -794,7 +794,7 @@ function renderResultGrid(gridId, cards) {
     div.addEventListener('click', () => openModal(card));
     grid.appendChild(div);
     requestAnimationFrame(() => {
-      drawCrop(div.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row);
+      drawCrop(div.querySelector('canvas'), card);
     });
   });
 }
@@ -808,20 +808,37 @@ function showScreen(id) {
 
 // ── Canvas Crop ────────────────────────────────────
 // topFraction: 1 = full card, 0.5 = top half only
-function drawCrop(canvas, imgFile, col, row, topFraction = 1) {
-  if (!canvas || !imgFile) return;
-  const key = IMG_BASE + imgFile;
+function drawCrop(canvas, card, topFraction = 1) {
+  if (!canvas || !card || !card.source_image) return;
+  const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {
-    const usableW = img.naturalWidth  - CROP.offsetLeft - CROP.offsetRight;
-    const usableH = img.naturalHeight - CROP.offsetTop  - CROP.offsetBottom;
-    const cellW = usableW / GRID_COLS;
-    const cellH = usableH / GRID_ROWS;
+    // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
+    const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
+
+    const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
+    const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
+    
+    // Default crop offsets unless overridden
+    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite ? 0 : CROP.offsetLeft);
+    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite ? 0 : CROP.offsetRight);
+    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite ? 0 : CROP.offsetTop);
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : CROP.offsetBottom);
+
+    const usableW = img.naturalWidth  - offsetLeft - offsetRight;
+    const usableH = img.naturalHeight - offsetTop  - offsetBottom;
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
     const drawH = cellH * topFraction;
+    
     canvas.width  = cellW;
     canvas.height = drawH;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, CROP.offsetLeft + col * cellW, CROP.offsetTop + row * cellH, cellW, drawH, 0, 0, cellW, drawH);
+    
+    const sx = offsetLeft + (card.grid_col || 0) * cellW;
+    const sy = offsetTop + (card.grid_row || 0) * cellH;
+    
+    ctx.drawImage(img, sx, sy, cellW, drawH, 0, 0, cellW, drawH);
   };
 
   if (imageCache[key]) {
@@ -868,7 +885,7 @@ function openModal(card) {
     fieldsEl.appendChild(row);
   });
 
-  drawCrop(document.getElementById('modalCanvas'), card.source_image, card.grid_col, card.grid_row);
+  drawCrop(document.getElementById('modalCanvas'), card);
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
