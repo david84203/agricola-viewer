@@ -28,6 +28,7 @@
           <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
           <small style="color:var(--text3);">目前收錄：A, B, C, D, E, AY, FL, Cz</small>
         </div>
+        <button id="banlistBtn" class="draft-nav-btn" style="cursor:pointer; border:none; font-family:inherit;">🚫 禁卡表</button>
         <a href="draft.html" class="draft-nav-btn">🎲 輪抽模擬器</a>
         <a href="tierlist.html" class="draft-nav-btn">📊 Tier List</a>
         <a href="./list.html" style="
@@ -103,6 +104,17 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Banlist Modal -->
+  <div class="banlist-overlay" id="banlistOverlay">
+    <div class="banlist-modal">
+      <div class="banlist-header">
+        <h2 class="banlist-title">禁卡表</h2>
+        <button class="modal-close" id="banlistClose">✕</button>
+      </div>
+      <div class="banlist-body" id="banlistBody"></div>
     </div>
   </div>
 

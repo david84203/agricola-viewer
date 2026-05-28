@@ -318,5 +318,67 @@ document.getElementById('clearSearch').addEventListener('click', () => {
   applyFilters();
 });
 
+// ── Banlist ────────────────────────────────────────
+const BANNED_GROUPS = [
+  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127'] },
+  { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
+  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154'] },
+  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018'] },
+];
+
+function openBanlist() {
+  const body = document.getElementById('banlistBody');
+  if (!body.hasChildNodes()) renderBanlist(body);
+  document.getElementById('banlistOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBanlist() {
+  document.getElementById('banlistOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderBanlist(container) {
+  BANNED_GROUPS.forEach(({ label, ids }) => {
+    const cards = ids.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
+    if (!cards.length) return;
+
+    const section = document.createElement('div');
+    section.className = 'banlist-section';
+    section.innerHTML = `<div class="banlist-section-label">${label}（${cards.length} 張）</div>`;
+
+    const grid = document.createElement('div');
+    grid.className = 'banlist-grid';
+    cards.forEach(card => {
+      const item = document.createElement('div');
+      item.className = 'banlist-card';
+      item.innerHTML = `<canvas></canvas><div class="banlist-card-name">${card['牌名']}</div>`;
+      grid.appendChild(item);
+      requestAnimationFrame(() => {
+        const canvas = item.querySelector('canvas');
+        drawCrop(canvas, card);
+        requestAnimationFrame(() => {
+          if (canvas.width && canvas.height) {
+            canvas.style.width = '100%';
+            canvas.style.height = (item.offsetWidth * canvas.height / canvas.width) + 'px';
+          }
+        });
+      });
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+}
+
+document.getElementById('banlistBtn').addEventListener('click', openBanlist);
+document.getElementById('banlistClose').addEventListener('click', closeBanlist);
+document.getElementById('banlistOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeBanlist();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeBanlist();
+});
+
 // ── Init ───────────────────────────────────────────
 loadCards();

@@ -190,7 +190,14 @@ function renderBanlist(container) {
       item.innerHTML = `<canvas></canvas><div class="banlist-card-name">${card['牌名']}</div>`;
       grid.appendChild(item);
       requestAnimationFrame(() => {
-        drawCrop(item.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row);
+        const canvas = item.querySelector('canvas');
+        drawCrop(canvas, card.source_image, card.grid_col, card.grid_row);
+        requestAnimationFrame(() => {
+          if (canvas.width && canvas.height) {
+            canvas.style.width = '100%';
+            canvas.style.height = (item.offsetWidth * canvas.height / canvas.width) + 'px';
+          }
+        });
       });
     });
 
