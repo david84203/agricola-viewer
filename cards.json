@@ -1457,9 +1457,9 @@
     "卡片ID": "B104*",
     "說明": "你可以在任何時候將在你家的1隻羊轉換成1頭野豬、1份蔬菜或1塊石頭。",
     "card_type": "occupation",
-    "source_image": "101.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "B職業部分.jpg",
+    "position": 8,
+    "grid_col": 8,
     "grid_row": 0
   },
   {
@@ -1471,9 +1471,9 @@
     "卡片ID": "B121*",
     "說明": "你每次使用「3根木頭」或「1綑蘆葦」累積行動格時，額外獲得1塊磚頭。3人以上遊戲時，使用「1塊磚頭」累積行動格亦能額外獲得1塊磚頭。",
     "card_type": "occupation",
-    "source_image": "101.jpg",
-    "position": 3,
-    "grid_col": 0,
+    "source_image": "B職業部分.jpg",
+    "position": 14,
+    "grid_col": 4,
     "grid_row": 1
   },
   {
@@ -1485,9 +1485,9 @@
     "卡片ID": "A119*",
     "說明": "你每次使用「犁1塊農田」、「拿1份麥子」、「播種和/或烤麵包」或「犁1塊農田和/或播種」行動格，在該次行動結束時，你獲得1根木頭。",
     "card_type": "occupation",
-    "source_image": "101.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "A職業部分.jpg",
+    "position": 13,
+    "grid_col": 3,
     "grid_row": 1
   },
   {
@@ -3457,10 +3457,10 @@
     "卡片ID": "A075*",
     "說明": "你的每張發展卡費用都減少1根木頭。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "A次發部分.jpg",
+    "position": 21,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "大型溫室",
@@ -3473,10 +3473,10 @@
     "卡片ID": "A069*",
     "說明": "在目前回合數加上4、7與9的回合行動格中各放1份蔬菜。你在這些回合開始時，領取該格上的蔬菜。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "A次發部分.jpg",
+    "position": 18,
+    "grid_col": 8,
+    "grid_row": 1
   },
   {
     "牌名": "礦工鎚",
@@ -3521,10 +3521,10 @@
     "卡片ID": "A071*",
     "說明": "任何時候，你可以從其上有至少2份作物的農田上，移動1份作物到一塊空農田上。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "A次發部分.jpg",
+    "position": 19,
+    "grid_col": 9,
+    "grid_row": 1
   },
   {
     "牌名": "獨木舟",
@@ -9260,7 +9260,7 @@
     "卡片ID": "A002*",
     "說明": "你立即犁1塊田。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。",
     "card_type": "minor",
-    "source_image": "A_minor_cropped.jpg",
+    "source_image": "A次發部分.jpg",
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
@@ -9268,7 +9268,8 @@
     "crop_left": 0,
     "crop_right": 0,
     "crop_top": 0,
-    "crop_bottom": 0
+    "crop_bottom": 0,
+    "position": 0
   },
   {
     "牌名": "幼畜市場",
@@ -9282,10 +9283,10 @@
     "卡片ID": "A009*",
     "說明": "你立即獲得1頭牛（此卡效果等於你用1隻羊換取1頭牛）。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。",
     "card_type": "minor",
-    "source_image": "013.jpg",
-    "position": 7,
-    "grid_col": 1,
-    "grid_row": 2
+    "source_image": "A次發部分.jpg",
+    "position": 2,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "牛奶壺",
@@ -9299,10 +9300,10 @@
     "卡片ID": "A050*",
     "說明": "每當有玩家（包含你）使用「牛市」累積行動格時，你獲得3份食物，每位其他玩家獲得1份食物。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "A次發部分.jpg",
+    "position": 12,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "篷車",
@@ -9316,9 +9317,9 @@
     "卡片ID": "B010*",
     "說明": "此卡視為一個房間，供一位家庭成員居住。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 1,
-    "grid_col": 1,
+    "source_image": "B次發部分.jpg",
+    "position": 2,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -9333,10 +9334,10 @@
     "卡片ID": "B077*",
     "說明": "你每次使用「臨時工」行動格時，便額外獲得3塊磚頭。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 2,
-    "grid_col": 2,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 21,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "儲藏室",
@@ -9350,9 +9351,9 @@
     "卡片ID": "A055*",
     "說明": "你每次購買一張主要發展卡或打出一張次要發展卡（含此卡）後，你獲得1份食物。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 3,
-    "grid_col": 0,
+    "source_image": "A次發部分.jpg",
+    "position": 14,
+    "grid_col": 4,
     "grid_row": 1
   },
   {
@@ -9367,9 +9368,9 @@
     "卡片ID": "A063*",
     "說明": "若你在緊接著有收成階段的回合中，執行一次「烤麵包」行動，則你額外獲得3份食物。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "A次發部分.jpg",
+    "position": 16,
+    "grid_col": 6,
     "grid_row": 1
   },
   {
@@ -9384,9 +9385,9 @@
     "卡片ID": "A056*",
     "說明": "你每次使用木頭累積行動格後，可立即用2根木頭換取3份食物，將這2根木頭放在該累積行動格上。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 5,
-    "grid_col": 2,
+    "source_image": "A次發部分.jpg",
+    "position": 15,
+    "grid_col": 5,
     "grid_row": 1
   },
   {
@@ -9401,10 +9402,10 @@
     "卡片ID": "A053*",
     "說明": "在每回合的結束階段中，若你在同回合的行動階段獲得至少7份建築資源，你獲得2份食物。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "A次發部分.jpg",
+    "position": 13,
+    "grid_col": 3,
+    "grid_row": 1
   },
   {
     "牌名": "塘邊小屋",
@@ -9418,10 +9419,10 @@
     "卡片ID": "A044*",
     "說明": "在接下來的3個回合行動格上各放1份食物。你在這些回合開始時，領取該格上的食物。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 7,
+    "source_image": "A次發部分.jpg",
+    "position": 11,
     "grid_col": 1,
-    "grid_row": 2
+    "grid_row": 1
   },
   {
     "牌名": "蔬菜攤",
@@ -9435,10 +9436,10 @@
     "卡片ID": "B008*",
     "說明": "你立即獲得1份蔬菜（此卡效果等於你用1份小麥換取1份蔬菜）。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。",
     "card_type": "minor",
-    "source_image": "014.jpg",
-    "position": 8,
-    "grid_col": 2,
-    "grid_row": 2
+    "source_image": "B次發部分.jpg",
+    "position": 1,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "廚具櫃",
@@ -9452,10 +9453,10 @@
     "卡片ID": "B057*",
     "說明": "每回合開始時，若你住在木屋，便獲得1份食物。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 15,
+    "grid_col": 5,
+    "grid_row": 1
   },
   {
     "牌名": "織布機",
@@ -9469,10 +9470,10 @@
     "卡片ID": "B039*",
     "說明": "在每次收成階段的收割作物步驟中，若你有至少1/4/7隻羊，便獲得1/2/3份食物。遊戲結束計分時，你每有3隻羊便獲得1分紅利分數。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 10,
+    "grid_col": 0,
+    "grid_row": 1
   },
   {
     "牌名": "麵包鏟",
@@ -9486,9 +9487,9 @@
     "卡片ID": "B025*",
     "說明": "當你打出此卡時，立即獲得1份食物。你每打出一張職業卡，可以額外執行一次「烤麵包」行動。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "B次發部分.jpg",
+    "position": 7,
+    "grid_col": 7,
     "grid_row": 0
   },
   {
@@ -9503,9 +9504,9 @@
     "卡片ID": "B045*",
     "說明": "在接下來的3個回合行動格上各放1份食物，你在這些回合開始時，領取該格上的食物。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 3,
-    "grid_col": 0,
+    "source_image": "B次發部分.jpg",
+    "position": 11,
+    "grid_col": 1,
     "grid_row": 1
   },
   {
@@ -9520,9 +9521,9 @@
     "卡片ID": "B050*",
     "說明": "在每次收成階段的收割作物步驟中，你每有3隻羊便獲得1份食物，每有2頭牛便獲得1份食物。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "B次發部分.jpg",
+    "position": 13,
+    "grid_col": 3,
     "grid_row": 1
   },
   {
@@ -9537,10 +9538,10 @@
     "卡片ID": "B036*",
     "說明": "你必須為你的每位家庭成員各支付1塊磚頭和1份食物，才能打出此卡。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "B次發部分.jpg",
+    "position": 9,
+    "grid_col": 9,
+    "grid_row": 0
   },
   {
     "牌名": "小溪",
@@ -9571,10 +9572,10 @@
     "卡片ID": "B047*",
     "說明": "你每次使用「釣魚」累積行動格時，在接下來3個回合行動格上各放1份食物。你在這些回合開始時，領取該格上的食物。",
     "card_type": "minor",
-    "source_image": "015.jpg",
-    "position": 7,
-    "grid_col": 1,
-    "grid_row": 2
+    "source_image": "B次發部分.jpg",
+    "position": 12,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "豪華暖爐",
@@ -9605,10 +9606,10 @@
     "卡片ID": "B084*",
     "說明": "在接下來的2個回合行動格上各放1頭豬，你在這些回合開始時，領取該格上的豬。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 23,
+    "grid_col": 3,
+    "grid_row": 2
   },
   {
     "牌名": "豆田",
@@ -9622,10 +9623,10 @@
     "卡片ID": "B068*",
     "說明": "此卡視為1塊農田，你只能在其上種植蔬菜。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 19,
+    "grid_col": 9,
+    "grid_row": 1
   },
   {
     "牌名": "乾草叉",
@@ -9639,10 +9640,10 @@
     "卡片ID": "B062*",
     "說明": "你每次使用「小麥種子」行動格時，若「犁田」行動格已被佔據，便額外獲得3份食物。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 2,
-    "grid_col": 2,
-    "grid_row": 0
+    "source_image": "B次發部分.jpg",
+    "position": 17,
+    "grid_col": 7,
+    "grid_row": 1
   },
   {
     "牌名": "臥室",
@@ -9656,10 +9657,10 @@
     "卡片ID": "A026*",
     "說明": "你可使用任何一個「增加家庭成員」行動格，即使該行動格上已有其他玩家的家庭成員。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 3,
-    "grid_col": 0,
-    "grid_row": 1
+    "source_image": "A次發部分.jpg",
+    "position": 7,
+    "grid_col": 7,
+    "grid_row": 0
   },
   {
     "牌名": "密林",
@@ -9673,10 +9674,10 @@
     "卡片ID": "B074*",
     "說明": "在接下來的每個偶數回合行動格上各放1根木頭，你在這些回合開始時，領取該格上的木頭。",
     "card_type": "minor",
-    "source_image": "016.jpg",
-    "position": 4,
-    "grid_col": 1,
-    "grid_row": 1
+    "source_image": "B次發部分.jpg",
+    "position": 20,
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "三田輪耕法",
@@ -9690,7 +9691,10 @@
     "卡片ID": "B061*",
     "說明": "在每次收成階段的收割作物步驟開始時，若你有至少1塊麥田、1塊蔬菜田和1塊空農田，便獲得3份食物。",
     "card_type": "minor",
-    "source_image": "016.jpg"
+    "source_image": "B次發部分.jpg",
+    "position": 16,
+    "grid_col": 6,
+    "grid_row": 1
   },
   {
     "牌名": "打穀板",
@@ -9704,7 +9708,7 @@
     "卡片ID": "A024*",
     "說明": "你每次使用「犁田」或「耕作」行動格時，可以額外執行一次「烤麵包」行動。",
     "card_type": "minor",
-    "source_image": "A_minor_cropped.jpg",
+    "source_image": "A次發部分.jpg",
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
@@ -9712,7 +9716,8 @@
     "crop_left": 0,
     "crop_right": 0,
     "crop_top": 0,
-    "crop_bottom": 0
+    "crop_bottom": 0,
+    "position": 6
   },
   {
     "牌名": "陶器",
@@ -9726,7 +9731,10 @@
     "卡片ID": "B080*",
     "說明": "在任何時候，你可用2/3/4塊磚頭換取1/2/3塊石頭。",
     "card_type": "minor",
-    "source_image": "016.jpg"
+    "source_image": "B次發部分.jpg",
+    "position": 22,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "推車",
@@ -9740,7 +9748,10 @@
     "卡片ID": "B066*",
     "說明": "在第5、8、11和14回合行動格上各放1份小麥（僅在尚未開始的回合放置），你在這些回合開始時，領取該格上的小麥。",
     "card_type": "minor",
-    "source_image": "016.jpg"
+    "source_image": "B次發部分.jpg",
+    "position": 18,
+    "grid_col": 8,
+    "grid_row": 1
   },
   {
     "牌名": "迷你圈地",
@@ -9754,9 +9765,9 @@
     "卡片ID": "B002*",
     "說明": "你立即將1個區域圈成圈地，不須支付木頭（若你已有圈地，該新圈地必須緊鄰既有的圈地）。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "B次發部分.jpg",
+    "position": 0,
+    "grid_col": 0,
     "grid_row": 0
   },
   {
@@ -9771,10 +9782,10 @@
     "卡片ID": "A019*",
     "說明": "在目前回合數加上5的回合行動格上放1張農田板塊，在該回合開始時，你可以將該板塊放入你的農莊。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 3,
-    "grid_col": 0,
-    "grid_row": 1
+    "source_image": "A次發部分.jpg",
+    "position": 5,
+    "grid_col": 5,
+    "grid_row": 0
   },
   {
     "牌名": "板犁",
@@ -9788,10 +9799,10 @@
     "卡片ID": "B019*",
     "說明": "在此卡上放置2張農田板塊。遊戲中你可以使用以下效果2次：當你使用「犁田」行動格時，額外拿取此卡上的1張農田板塊放入你的農莊。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 4,
-    "grid_col": 1,
-    "grid_row": 1
+    "source_image": "B次發部分.jpg",
+    "position": 5,
+    "grid_col": 5,
+    "grid_row": 0
   },
   {
     "牌名": "磚頭倉庫",
@@ -9805,10 +9816,10 @@
     "卡片ID": "A005*",
     "說明": "你的個人供應區每有2塊磚頭，立即獲得1塊磚頭。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "A次發部分.jpg",
+    "position": 1,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "牌名": "黏土壓實",
@@ -9839,10 +9850,10 @@
     "卡片ID": "B013*",
     "說明": "你每擴建一個木造房間，只須支付2根木頭與2綑蘆葦。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 7,
-    "grid_col": 1,
-    "grid_row": 2
+    "source_image": "B次發部分.jpg",
+    "position": 3,
+    "grid_col": 3,
+    "grid_row": 0
   },
   {
     "牌名": "套索",
@@ -9856,10 +9867,10 @@
     "卡片ID": "B024*",
     "說明": "你可連續派遣剛好2位家庭成員執行行動，每當你讓其中至少1位使用「羊市」、「豬市」或「牛市」累積行動格時，便能如此做。",
     "card_type": "minor",
-    "source_image": "017.jpg",
-    "position": 8,
-    "grid_col": 2,
-    "grid_row": 2
+    "source_image": "B次發部分.jpg",
+    "position": 6,
+    "grid_col": 6,
+    "grid_row": 0
   },
   {
     "牌名": "飲水槽",
@@ -9873,7 +9884,7 @@
     "卡片ID": "A012*",
     "說明": "你的每個圈地（不論有無馬廄）可額外容納至多2隻動物。",
     "card_type": "minor",
-    "source_image": "A_minor_cropped.jpg",
+    "source_image": "A次發部分.jpg",
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
@@ -9881,7 +9892,8 @@
     "crop_left": 0,
     "crop_right": 0,
     "crop_top": 0,
-    "crop_bottom": 0
+    "crop_bottom": 0,
+    "position": 3
   },
   {
     "牌名": "羊毛毯",
@@ -9895,7 +9907,7 @@
     "卡片ID": "A038*",
     "說明": "遊戲結束計分時，若你住在木/磚/石屋，你獲得3/2/0分紅利分數。",
     "card_type": "minor",
-    "source_image": "A_minor_cropped.jpg",
+    "source_image": "A次發部分.jpg",
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
@@ -9903,7 +9915,8 @@
     "crop_left": 0,
     "crop_right": 0,
     "crop_top": 0,
-    "crop_bottom": 0
+    "crop_bottom": 0,
+    "position": 10
   },
   {
     "牌名": "牧羊杖",
@@ -9917,10 +9930,10 @@
     "卡片ID": "A083*",
     "說明": "你每次圈出1個佔地至少4個區域的新圈地時，立即獲得2隻羊，將其安置於此新圈地中。",
     "card_type": "minor",
-    "source_image": "018.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "A次發部分.jpg",
+    "position": 23,
+    "grid_col": 3,
+    "grid_row": 2
   },
   {
     "牌名": "採石鉗",
@@ -9934,10 +9947,10 @@
     "卡片ID": "A080*",
     "說明": "你每次使用一個石頭累積行動格時，額外獲得1塊石頭。",
     "card_type": "minor",
-    "source_image": "018.jpg",
-    "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "source_image": "A次發部分.jpg",
+    "position": 22,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "穀物勺",
@@ -9951,10 +9964,10 @@
     "卡片ID": "A067*",
     "說明": "你每次使用「小麥種子」行動格時，額外獲得1份小麥。",
     "card_type": "minor",
-    "source_image": "018.jpg",
-    "position": 2,
-    "grid_col": 2,
-    "grid_row": 0
+    "source_image": "A次發部分.jpg",
+    "position": 17,
+    "grid_col": 7,
+    "grid_row": 1
   },
   {
     "牌名": "馬槽",
@@ -9982,9 +9995,9 @@
     "卡片ID": "A092*",
     "說明": "你可以支付1份食物，讓你在本回合新增的家庭成員執行一個行動，執行行動後，該家庭成員不再算是「新生兒」。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 1,
-    "grid_col": 1,
+    "source_image": "A職業部分.jpg",
+    "position": 4,
+    "grid_col": 4,
     "grid_row": 0
   },
   {
@@ -9996,10 +10009,10 @@
     "卡片ID": "B166*",
     "說明": "你每次使用「小麥種子」行動格時，可以支付1份食物來換取1頭牛。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 2,
-    "grid_col": 2,
-    "grid_row": 0
+    "source_image": "B職業部分.jpg",
+    "position": 23,
+    "grid_col": 3,
+    "grid_row": 2
   },
   {
     "牌名": "木匠",
@@ -10010,9 +10023,9 @@
     "卡片ID": "B126*",
     "說明": "當你擴建房舍時，每擴建一個房間，僅須支付3份對應的建築資源和2綑蘆葦（例如：擴建一間木造房間，僅須3根木頭與2綑蘆葦）。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 3,
-    "grid_col": 0,
+    "source_image": "B職業部分.jpg",
+    "position": 16,
+    "grid_col": 6,
     "grid_row": 1
   },
   {
@@ -10024,9 +10037,9 @@
     "卡片ID": "B142*",
     "說明": "你每次使用「小麥種子」行動格時，額外獲得1份蔬菜。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "B職業部分.jpg",
+    "position": 18,
+    "grid_col": 8,
     "grid_row": 1
   },
   {
@@ -10038,10 +10051,10 @@
     "卡片ID": "B164*",
     "說明": "將目前的回合數加上2、5、8與10，在這些回合行動格中各放1隻羊。你在這些回合開始時，領取該格上的羊。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 5,
+    "source_image": "B職業部分.jpg",
+    "position": 22,
     "grid_col": 2,
-    "grid_row": 1
+    "grid_row": 2
   },
   {
     "牌名": "撿柴人",
@@ -10052,10 +10065,10 @@
     "卡片ID": "B145*",
     "說明": "你每次翻修房舍或擴建一個房間時，可以支付1根木頭來替代1或2綑蘆葦的費用。",
     "card_type": "occupation",
-    "source_image": "019.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 19,
+    "grid_col": 9,
+    "grid_row": 1
   },
   {
     "牌名": "倉庫管理員",
@@ -10094,10 +10107,10 @@
     "卡片ID": "B118*",
     "說明": "每回合開始時，若你有剛好2個房間，則獲得1根木頭。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "B職業部分.jpg",
+    "position": 13,
+    "grid_col": 3,
+    "grid_row": 1
   },
   {
     "牌名": "造紙人",
@@ -10108,10 +10121,10 @@
     "卡片ID": "B109*",
     "說明": "在打出此卡後，每次你打出一張職業卡前，可以立即支付1根木頭，來獲得等同你面前職業卡張數的食物。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 1,
+    "source_image": "B職業部分.jpg",
+    "position": 11,
     "grid_col": 1,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "牌名": "採菇人",
@@ -10136,8 +10149,8 @@
     "卡片ID": "B108*",
     "說明": "你每次使用一個木頭累積行動格時，可額外執行一次「烤麵包」行動。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 3,
+    "source_image": "B職業部分.jpg",
+    "position": 10,
     "grid_col": 0,
     "grid_row": 1
   },
@@ -10150,9 +10163,9 @@
     "卡片ID": "A133*",
     "說明": "遊戲結束計分時，若你面前有至少5/6/7/8/9/10張發展卡，則獲得2/3/4/5/7/9分紅利分數。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "A職業部分.jpg",
+    "position": 17,
+    "grid_col": 7,
     "grid_row": 1
   },
   {
@@ -10164,10 +10177,10 @@
     "卡片ID": "B107*",
     "說明": "一旦你住在石屋，在接下來的每個回合行動格中各放3份食物。你在這些回合開始時，領取該格上的食物。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "B職業部分.jpg",
+    "position": 9,
+    "grid_col": 9,
+    "grid_row": 0
   },
   {
     "牌名": "無子嗣者",
@@ -10178,10 +10191,10 @@
     "卡片ID": "B114*",
     "說明": "每回合開始時，若你有至少3個房間但只有2位家庭成員，獲得1份食物和1份作物（小麥或蔬菜）。",
     "card_type": "occupation",
-    "source_image": "020.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 12,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "馬伕",
@@ -10192,9 +10205,9 @@
     "卡片ID": "B089*",
     "說明": "當你打出此卡時，立即獲得1根木頭。一旦你住在石屋，每回合開始時，可以支付1根木頭來建設剛好1棟馬廄。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 0,
-    "grid_col": 0,
+    "source_image": "B職業部分.jpg",
+    "position": 1,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -10206,9 +10219,9 @@
     "卡片ID": "A090*",
     "說明": "一旦你住在石屋中，在每回合開始時，可以支付1份食物來犁1塊田。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 1,
-    "grid_col": 1,
+    "source_image": "A職業部分.jpg",
+    "position": 3,
+    "grid_col": 3,
     "grid_row": 0
   },
   {
@@ -10220,9 +10233,9 @@
     "卡片ID": "B098*",
     "說明": "遊戲結束計分時，你每有一個圈地，其上有至少1隻動物且尚可容納3隻以上動物，獲得1分紅利分數。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "B職業部分.jpg",
+    "position": 5,
+    "grid_col": 5,
     "grid_row": 0
   },
   {
@@ -10234,10 +10247,10 @@
     "卡片ID": "B087*",
     "說明": "你每次使用「臨時工」行動格時，可以擴建剛好一個房間或翻修房舍（仍須支付對應費用）。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 3,
+    "source_image": "B職業部分.jpg",
+    "position": 0,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 0
   },
   {
     "牌名": "切石工",
@@ -10262,9 +10275,9 @@
     "卡片ID": "B136*",
     "說明": "若遊戲尚有1/3/6/9個回合未開始進行，你立即獲得1/2/3/4根木頭。遊戲結束計分時，有最多房間的每一位玩家獲得3分紅利分數。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 5,
-    "grid_col": 2,
+    "source_image": "B職業部分.jpg",
+    "position": 17,
+    "grid_col": 7,
     "grid_row": 1
   },
   {
@@ -10276,10 +10289,10 @@
     "卡片ID": "B091*",
     "說明": "你每次使用「臨時工」行動格時，可以額外犁1塊田。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 2,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "牌名": "屋頂壓載工",
@@ -10290,10 +10303,10 @@
     "卡片ID": "B123*",
     "說明": "當你打出此卡時，可以立即支付1份食物，來獲得等同你房間數量的石頭。",
     "card_type": "occupation",
-    "source_image": "021.jpg",
-    "position": 7,
-    "grid_col": 1,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 15,
+    "grid_col": 5,
+    "grid_row": 1
   },
   {
     "牌名": "鏢魚手",
@@ -10318,10 +10331,10 @@
     "卡片ID": "A160*",
     "說明": "每次其他玩家使用「賣藝」累積行動格時，你獲得1份食物和1根木頭，之後你可立即支付2份食物來換取剛好1份蔬菜。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "A職業部分.jpg",
+    "position": 22,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "牌名": "樹籬修剪工",
@@ -10346,9 +10359,9 @@
     "卡片ID": "A098*",
     "說明": "遊戲結束計分時，你的每棟圈地外馬廄讓你獲得1分紅利分數。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "A職業部分.jpg",
+    "position": 5,
+    "grid_col": 5,
     "grid_row": 0
   },
   {
@@ -10360,10 +10373,10 @@
     "卡片ID": "B099*",
     "說明": "遊戲結束計分時，你在此卡之後打出的每一張職業卡，都讓你獲得1分紅利分數。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 3,
-    "grid_col": 0,
-    "grid_row": 1
+    "source_image": "B職業部分.jpg",
+    "position": 6,
+    "grid_col": 6,
+    "grid_row": 0
   },
   {
     "牌名": "顧問",
@@ -10374,10 +10387,10 @@
     "卡片ID": "B102*",
     "說明": "在1/2/3/4人遊戲中，當你打出此卡時，立即獲得2份小麥/3塊磚頭/2綑蘆葦/2隻羊。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 4,
-    "grid_col": 1,
-    "grid_row": 1
+    "source_image": "B職業部分.jpg",
+    "position": 7,
+    "grid_col": 7,
+    "grid_row": 0
   },
   {
     "牌名": "雜耍藝人",
@@ -10388,10 +10401,10 @@
     "卡片ID": "A155*",
     "說明": "你每次使用「賣藝」累積行動格時，額外獲得1根木頭和1份小麥。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "A職業部分.jpg",
+    "position": 21,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "牌名": "學者",
@@ -10402,10 +10415,10 @@
     "卡片ID": "B097*",
     "說明": "一旦你住在石屋，每回合開始時，可以支付1份食物作為職業卡費用來打出一張職業卡，或支付1張次要發展卡上的費用來打出該卡。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 4,
+    "grid_col": 4,
+    "grid_row": 0
   },
   {
     "牌名": "砌磚大師",
@@ -10416,10 +10429,10 @@
     "卡片ID": "B095*",
     "說明": "你每次購買一張主要發展卡時，可以減少石頭的費用，減少的數量等於你已擴建的房間數量（你起始的2個房間不計入）。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 7,
-    "grid_col": 1,
-    "grid_row": 2
+    "source_image": "B職業部分.jpg",
+    "position": 3,
+    "grid_col": 3,
+    "grid_row": 0
   },
   {
     "牌名": "雜貨商",
@@ -10430,10 +10443,10 @@
     "卡片ID": "A102*",
     "說明": "如圖所示，將貨物依序疊在此卡上(木頭,磚頭,蘆葦,石頭,小麥,蔬菜,羊,豬,牛，依序堆疊)，你可在任何時候支付1份食物換取此貨物堆頂的1份貨物。",
     "card_type": "occupation",
-    "source_image": "022.jpg",
-    "position": 8,
-    "grid_col": 2,
-    "grid_row": 2
+    "source_image": "A職業部分.jpg",
+    "position": 6,
+    "grid_col": 6,
+    "grid_row": 0
   },
   {
     "牌名": "磚屋師傅",
@@ -10444,10 +10457,10 @@
     "卡片ID": "A120*",
     "說明": "一旦你的木屋翻修成其他等級，在接下來的5個回合行動格中各放2塊磚頭。你在這些回合開始時，領取該格上的磚頭。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 0,
-    "grid_col": 0,
-    "grid_row": 0
+    "source_image": "A職業部分.jpg",
+    "position": 14,
+    "grid_col": 4,
+    "grid_row": 1
   },
   {
     "牌名": "牧師",
@@ -10472,10 +10485,10 @@
     "卡片ID": "A114*",
     "說明": "你每次使用「臨時工」行動格時，額外獲得1份小麥。從第6回合起，你可改為額外獲得1份蔬菜。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 2,
-    "grid_col": 2,
-    "grid_row": 0
+    "source_image": "A職業部分.jpg",
+    "position": 11,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "牌名": "野豬哺育師",
@@ -10486,10 +10499,10 @@
     "卡片ID": "A165*",
     "說明": "當你打出此卡時，立即獲得1頭野豬。你的野豬將在第12回合結束前進行一次「繁殖牲畜」步驟（若屆時有空間安置新生小豬）。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 3,
-    "grid_col": 0,
-    "grid_row": 1
+    "source_image": "A職業部分.jpg",
+    "position": 23,
+    "grid_col": 3,
+    "grid_row": 2
   },
   {
     "牌名": "架樑工",
@@ -10500,9 +10513,9 @@
     "卡片ID": "A123*",
     "說明": "你每次擴建或翻修房舍時，可以支付1根木頭來替代剛好2塊磚頭或2塊石頭的費用，但每個房間/行動僅限一次。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 4,
-    "grid_col": 1,
+    "source_image": "A職業部分.jpg",
+    "position": 16,
+    "grid_col": 6,
     "grid_row": 1
   },
   {
@@ -10514,10 +10527,10 @@
     "卡片ID": "A110*",
     "說明": "你每次擴建至少1個磚造房間或將磚屋翻修成石屋時，獲得3份食物。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1
+    "source_image": "A職業部分.jpg",
+    "position": 8,
+    "grid_col": 8,
+    "grid_row": 0
   },
   {
     "牌名": "伐木工",
@@ -10528,10 +10541,10 @@
     "卡片ID": "A116*",
     "說明": "你每次使用一個木頭累積行動格時，額外獲得1根木頭。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
-    "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "source_image": "A職業部分.jpg",
+    "position": 12,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "小麥收割工",
@@ -10542,10 +10555,10 @@
     "卡片ID": "A112*",
     "說明": "當你打出此卡時，立即獲得1份小麥。在收成階段的收割作物步驟中，你可以從你的每塊麥田上額外收割1份小麥。",
     "card_type": "occupation",
-    "source_image": "024.jpg",
-    "position": 0,
+    "source_image": "A職業部分.jpg",
+    "position": 10,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "牌名": "牲畜趕集人",
@@ -10556,10 +10569,10 @@
     "卡片ID": "A147*",
     "說明": "你每次使用「羊市」、「豬市」或「牛市」累積行動格時，可以支付1份食物來額外換取1隻同種類的動物。",
     "card_type": "occupation",
-    "source_image": "024.jpg",
-    "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "source_image": "A職業部分.jpg",
+    "position": 20,
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "泥水師傅",
@@ -10570,9 +10583,9 @@
     "卡片ID": "A111*",
     "說明": "你每次擴建至少1個房間時，可以在接下來4個回合行動格上各放1份食物。你在這些回合開始時，領取該格上的食物。",
     "card_type": "occupation",
-    "source_image": "024.jpg",
-    "position": 2,
-    "grid_col": 2,
+    "source_image": "A職業部分.jpg",
+    "position": 9,
+    "grid_col": 9,
     "grid_row": 0
   },
   {
@@ -10584,10 +10597,10 @@
     "卡片ID": "A086*",
     "說明": "當你打出此卡時，立即選擇獲得1根木頭或1份小麥。你的每個房間皆可安置1隻任意種類的動物，而非整棟房舍裡只能養一隻寵物。",
     "card_type": "occupation",
-    "source_image": "024.jpg",
-    "position": 3,
+    "source_image": "A職業部分.jpg",
+    "position": 0,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 0
   },
   {
     "牌名": "管理員",
@@ -10598,10 +10611,10 @@
     "卡片ID": "A087*",
     "說明": "當你翻修房舍時，可以將木屋直接翻修成石屋，不須先翻修成磚屋。",
     "card_type": "occupation",
-    "source_image": "024.jpg",
-    "position": 4,
+    "source_image": "A職業部分.jpg",
+    "position": 1,
     "grid_col": 1,
-    "grid_row": 1
+    "grid_row": 0
   },
   {
     "牌名": "花園設計師",
@@ -11324,5 +11337,215 @@
     "說明": "立即將1棟圈地外馬廄翻倒，該馬廄視為1個酒窖且不視為1棟馬廄。你無法在該酒窖內飼養動物。在每個收成階段的餵養階段，你獲得2份食物。酒窖所在的區域視為已使用區域，你可以在該區域柵欄且視為圈地。",
     "card_type": "minor",
     "source_image": "Cz02.jpg"
+  },
+  {
+    "卡片ID": "A015*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "當你打出此卡時，立即獲得1塊磚頭。當你建造柵欄時，可以支付磚頭來替代木頭。",
+    "先決條件": "無",
+    "勝利點數": "無",
+    "source_image": "A次發部分.jpg",
+    "position": 4,
+    "grid_col": 4,
+    "grid_row": 0,
+    "牌名": "黏土壓實",
+    "費用": "無"
+  },
+  {
+    "卡片ID": "A029*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "有",
+    "牌組": "A",
+    "說明": "遊戲結束計分時，若你的圈地至少包含 6/7/8/10 個區塊，你獲得 1/2/3/4 分紅利分數。",
+    "先決條件": "無",
+    "勝利點數": "無",
+    "source_image": "A次發部分.jpg",
+    "position": 8,
+    "grid_col": 8,
+    "grid_row": 0,
+    "牌名": "馬槽",
+    "費用": "2木"
+  },
+  {
+    "卡片ID": "A031*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "有",
+    "牌組": "A",
+    "說明": "遊戲尚餘的每個完整回合 (不含本回合)，都讓你立即獲得1分紅利分數及2份食物。",
+    "先決條件": "所有區域均已使用",
+    "勝利點數": "無",
+    "source_image": "A次發部分.jpg",
+    "position": 9,
+    "grid_col": 9,
+    "grid_row": 0,
+    "牌名": "大農莊",
+    "費用": "無"
+  },
+  {
+    "卡片ID": "A073*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你的每張發展卡費用都減少1根木頭。",
+    "先決條件": "至多3張職業卡",
+    "勝利點數": "2分",
+    "source_image": "A次發部分.jpg",
+    "position": 20,
+    "grid_col": 0,
+    "grid_row": 2,
+    "牌名": "鋸木廠",
+    "費用": "2石"
+  },
+  {
+    "卡片ID": "A089*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你每次執行「建造柵欄」行動時，所建造的柵欄中，其中3根不須支付木頭。",
+    "source_image": "A職業部分.jpg",
+    "position": 2,
+    "grid_col": 2,
+    "grid_row": 0,
+    "牌名": "樹籬修剪工",
+    "人數": "1+"
+  },
+  {
+    "卡片ID": "A106*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你每次使用不須累積行動格後，可以立即用1根木頭換取2份食物，將用來轉換的木頭放在該累積行動格上。",
+    "source_image": "A職業部分.jpg",
+    "position": 7,
+    "grid_col": 7,
+    "grid_row": 0,
+    "牌名": "採菇人",
+    "人數": "1+"
+  },
+  {
+    "卡片ID": "A121*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你每次擴建或翻修房舍時，可以支付1根木頭來替代剛好2塊磚頭或2塊石頭的費用，但每個房間/行動僅限一次。",
+    "source_image": "A職業部分.jpg",
+    "position": 15,
+    "grid_col": 5,
+    "grid_row": 1,
+    "牌名": "架樑工",
+    "人數": "1+"
+  },
+  {
+    "卡片ID": "A139*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你每次使用「釣魚」累積行動格時，可以支付1根木頭來獲得1組蘆葦和等同家庭成員數的食物。",
+    "source_image": "A職業部分.jpg",
+    "position": 18,
+    "grid_col": 8,
+    "grid_row": 1,
+    "牌名": "鏢魚手",
+    "人數": "3+"
+  },
+  {
+    "卡片ID": "A141*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "A",
+    "說明": "你執行發展卡、擴建房舍和翻修房舍行動時，皆可少支付1塊石頭。",
+    "source_image": "A職業部分.jpg",
+    "position": 19,
+    "grid_col": 9,
+    "grid_row": 1,
+    "牌名": "切石工",
+    "人數": "3+"
+  },
+  {
+    "卡片ID": "B015*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "B",
+    "說明": "當你打出此卡時，立即獲得1份食物。每次你翻修房舍時，不須支付木頭即可建設一棟馬廄。",
+    "先決條件": "無",
+    "勝利點數": "無",
+    "source_image": "B次發部分.jpg",
+    "position": 4,
+    "grid_col": 4,
+    "grid_row": 0,
+    "牌名": "礦工鎚",
+    "費用": "1木"
+  },
+  {
+    "卡片ID": "B031*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "有",
+    "牌組": "B",
+    "說明": "當你打出此卡時，遊戲尚餘的每個完整回合(不含本回合)，都讓你立即獲得1分紅利分數。直到遊戲結束，你不能再翻修房舍。",
+    "先決條件": "已翻修成磚屋或石屋",
+    "勝利點數": "-3分",
+    "source_image": "B次發部分.jpg",
+    "position": 8,
+    "grid_col": 8,
+    "grid_row": 0,
+    "牌名": "豪華暖爐",
+    "費用": "1石"
+  },
+  {
+    "卡片ID": "B055*",
+    "類型": "次要發展卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "B",
+    "說明": "你每次使用「釣魚」累積行動格上方的四個累積行動格之一，便額外獲得1份食物。",
+    "先決條件": "你有1位家庭成員在「釣魚」",
+    "勝利點數": "無",
+    "source_image": "B次發部分.jpg",
+    "position": 14,
+    "grid_col": 4,
+    "grid_row": 1,
+    "牌名": "小溪",
+    "費用": "無"
+  },
+  {
+    "卡片ID": "B154*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "B",
+    "說明": "你每次使用「建材市場」行動格時，可以額外獲得1塊磚頭或1份小麥。",
+    "source_image": "B職業部分.jpg",
+    "position": 20,
+    "grid_col": 0,
+    "grid_row": 2,
+    "牌名": "倉庫管理員",
+    "人數": "4+"
+  },
+  {
+    "卡片ID": "B161*",
+    "類型": "職業卡",
+    "是否傳遞": "否",
+    "紅利分數": "無",
+    "牌組": "B",
+    "說明": "一旦你是唯一一位只有2個房間的玩家，立即獲得3根木頭、2塊磚頭、1組蘆葦與1塊石頭(僅獲得一次)。",
+    "source_image": "B職業部分.jpg",
+    "position": 21,
+    "grid_col": 1,
+    "grid_row": 2,
+    "牌名": "神父",
+    "人數": "4+"
   }
 ]

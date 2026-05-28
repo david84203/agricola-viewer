@@ -147,14 +147,17 @@ function drawCrop(canvas, card) {
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {
-    const cols = card.grid_cols || GRID_COLS;
-    const rows = card.grid_rows || GRID_ROWS;
+    // Check if the image is a composite (from the older set named ...部分.jpg)
+    const isComposite = card.source_image.includes('部分.jpg');
+
+    const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
+    const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
     
     // Default crop offsets unless overridden
-    const offsetLeft = card.crop_left !== undefined ? card.crop_left : CROP.offsetLeft;
-    const offsetRight = card.crop_right !== undefined ? card.crop_right : CROP.offsetRight;
-    const offsetTop = card.crop_top !== undefined ? card.crop_top : CROP.offsetTop;
-    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : CROP.offsetBottom;
+    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite ? 0 : CROP.offsetLeft);
+    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite ? 0 : CROP.offsetRight);
+    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite ? 0 : CROP.offsetTop);
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : CROP.offsetBottom);
 
     const usableW = img.naturalWidth  - offsetLeft - offsetRight;
     const usableH = img.naturalHeight - offsetTop  - offsetBottom;
