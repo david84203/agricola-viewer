@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 卡牌 Tier List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tierlist.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 卡牌 Tier List</div>
+        <div class="brand-sub">根據輪抽評分資料自動生成</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <a href="draft.html" class="back-link">🎲 輪抽模擬器</a>
+      &nbsp;&nbsp;
+      <a href="index.html" class="back-link">← 卡牌圖鑑</a>
+    </div>
+  </div>
+
+  <main class="tier-main">
+
+    <!-- Controls -->
+    <div class="tier-controls">
+      <div class="tier-filter-chips">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="occupation">職業牌</button>
+        <button class="chip" data-filter="minor">次要發展牌</button>
+      </div>
+      <div class="tier-stats" id="tierStats"></div>
+      <button class="tier-refresh-btn" id="refreshBtn">↺ 重新載入</button>
+    </div>
+
+    <!-- Tier content -->
+    <div id="tierLoading" class="tier-loading">
+      <div class="tier-loading-spinner"></div>
+      <div>載入評分資料中…</div>
+    </div>
+
+    <div id="tierContent" class="tier-content" style="display:none"></div>
+
+    <div id="tierEmpty" class="tier-empty" style="display:none">
+      <div style="font-size:3rem;margin-bottom:16px">📊</div>
+      <div>尚無評分資料</div>
+      <div style="font-size:.85rem;color:var(--text3);margin-top:8px">開啟評分者模式完成幾場輪抽後再來查看</div>
+    </div>
+
+  </main>
+
+  <!-- Detail Modal (shared structure) -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-inner">
+        <div class="modal-image-wrap">
+          <canvas id="modalCanvas"></canvas>
+        </div>
+        <div class="modal-info">
+          <div class="modal-title-row">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-badge" id="modalBadge"></div>
+          </div>
+          <div class="modal-id" id="modalId"></div>
+          <div class="modal-fields" id="modalFields"></div>
+          <div class="modal-desc-wrap">
+            <div class="modal-desc-label">說明</div>
+            <div class="modal-desc" id="modalDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="tierlist.js"></script>
+</body>
+</html>

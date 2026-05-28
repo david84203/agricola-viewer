@@ -28,10 +28,23 @@ async function loadCards() {
   applyFilters();
 }
 
+const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
+
 // ── Deck filter options ────────────────────────────
 function populateDeckFilter() {
   const decks = [...new Set(allCards.map(c => c['牌組'] || '').filter(Boolean))].sort();
   const sel = document.getElementById('deckSelect');
+
+  const bgaOpt = document.createElement('option');
+  bgaOpt.value = 'BGA';
+  bgaOpt.textContent = 'BGA 牌組 (A/B/C/D/E)';
+  sel.appendChild(bgaOpt);
+
+  const sep = document.createElement('option');
+  sep.disabled = true;
+  sep.textContent = '──────────';
+  sel.appendChild(sep);
+
   decks.forEach(d => {
     const opt = document.createElement('option');
     opt.value = d;
@@ -55,7 +68,13 @@ function applyFilters() {
       if (activeType !== 'minor' && c.card_type !== activeType) return false;
     }
     // deck filter
-    if (activeDeck !== 'all' && c['牌組'] !== activeDeck) return false;
+    if (activeDeck !== 'all') {
+      if (activeDeck === 'BGA') {
+        if (!BGA_DECKS.includes(c['牌組'])) return false;
+      } else {
+        if (c['牌組'] !== activeDeck) return false;
+      }
+    }
     // search
     if (q) {
       const haystack = [c['牌名'], c['卡片ID'], c['說明'], c['先決條件'], c['費用']].join(' ').toLowerCase();

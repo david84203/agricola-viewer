@@ -107,6 +107,23 @@ body {
   font-weight: 600;
   font-size: 1.1rem;
 }
+.draft-nav-btn {
+  display: inline-block;
+  background: rgba(232,184,75,.15);
+  border: 1px solid rgba(232,184,75,.4);
+  color: #f7ce46;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.draft-nav-btn:hover {
+  background: rgba(232,184,75,.28);
+  border-color: #f7ce46;
+}
 .header-stats { display: flex; gap: 16px; }
 .stat-item {
   font-size: .85rem;

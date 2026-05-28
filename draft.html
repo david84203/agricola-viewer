@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 輪抽模擬器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="draft.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 輪抽模擬器</div>
+        <div class="brand-sub">四人輪抽模擬</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <a href="index.html" class="back-link">← 回卡牌圖鑑</a>
+    </div>
+  </div>
+
+  <main class="draft-main">
+
+    <!-- ── Setup Screen ── -->
+    <div id="setupScreen" class="draft-screen active">
+      <h1 class="setup-title">輪抽模擬器</h1>
+      <p class="setup-sub">選擇模式與牌組，系統模擬四人輪抽（最終手牌：職業牌 7 張 + 次要發展牌 7 張）</p>
+
+      <div class="mode-section-label">輪抽模式</div>
+      <div class="mode-select" id="modeSelect">
+        <label class="mode-option selected" data-mode="separate">
+          <div class="mode-title">分開輪抽</div>
+          <div class="mode-desc">先職業牌（向左傳）→ 再次要發展牌（向右傳）</div>
+        </label>
+        <label class="mode-option" data-mode="combined">
+          <div class="mode-title">同時輪抽</div>
+          <div class="mode-desc">每包各含 9 張職業＋9 張次要，每輪各選 1 張，固定向左傳</div>
+        </label>
+      </div>
+
+      <div class="deck-preset">
+        <button class="preset-btn" id="presetBGA">BGA 牌組</button>
+        <button class="preset-btn" id="presetAll">全選</button>
+        <button class="preset-btn" id="presetNone">全不選</button>
+      </div>
+
+      <div class="deck-section-label">選擇牌組</div>
+      <div class="deck-checkboxes" id="deckCheckboxes"></div>
+
+      <div class="rater-wrap">
+        <label class="rater-toggle-label">
+          <input type="checkbox" id="raterModeToggle" />
+          <span class="rater-track"><span class="rater-thumb"></span></span>
+          <div class="rater-label-text">
+            <div class="rater-label-main">評分者模式</div>
+            <div class="rater-label-sub">輪抽結束後自動上傳卡牌評分資料至資料庫</div>
+          </div>
+        </label>
+      </div>
+
+      <button class="start-btn" id="startDraft">開始輪抽</button>
+    </div>
+
+    <!-- ── Draft Screen ── -->
+    <div id="draftScreen" class="draft-screen">
+      <div class="draft-header">
+        <div class="draft-phase-label" id="phaseLabel">職業牌輪抽</div>
+        <div class="draft-round-badge" id="roundBadge">第 1 / 7 輪</div>
+        <div class="draft-pack-info" id="packInfo">包 A · 9 張</div>
+      </div>
+
+      <div class="picked-bar-wrap">
+        <div class="picked-bar-label">已選手牌</div>
+        <div class="picked-bar" id="pickedBar"></div>
+      </div>
+
+      <div class="draft-instructions">點選卡牌選擇，再按右下角「確認選擇」；點 ℹ 查看詳情</div>
+      <div class="draft-card-grid" id="draftCardGrid"></div>
+
+      <div class="confirm-bar">
+        <div class="confirm-selected-name" id="confirmName">尚未選擇</div>
+        <button class="confirm-btn" id="confirmBtn" disabled>確認選擇</button>
+      </div>
+    </div>
+
+    <!-- ── Transition Screen ── -->
+    <div id="transitionScreen" class="draft-screen">
+      <div class="transition-content">
+        <div class="transition-icon">✅</div>
+        <h2>職業牌輪抽完畢！</h2>
+        <p>已抽到 7 張職業牌，準備進行次要發展牌輪抽（反方向）</p>
+        <div class="occ-mini-grid" id="occMiniGrid"></div>
+        <button class="start-btn" id="continueBtn">繼續次要發展牌輪抽 →</button>
+      </div>
+    </div>
+
+    <!-- ── Result Screen ── -->
+    <div id="resultScreen" class="draft-screen">
+      <h2 class="result-title">本局手牌</h2>
+      <div class="result-section">
+        <h3>職業牌（7 張）</h3>
+        <div class="result-grid" id="occResultGrid"></div>
+      </div>
+      <div class="result-section">
+        <h3>次要發展牌（7 張）</h3>
+        <div class="result-grid" id="minResultGrid"></div>
+      </div>
+      <div id="uploadStatus" class="upload-status" style="display:none"></div>
+      <div class="result-actions">
+        <button class="start-btn" id="restartBtn">重新輪抽</button>
+        <button class="restart-btn" id="changeDecksBtn">更換牌組設定</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-inner">
+        <div class="modal-image-wrap">
+          <canvas id="modalCanvas"></canvas>
+        </div>
+        <div class="modal-info">
+          <div class="modal-title-row">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-badge" id="modalBadge"></div>
+          </div>
+          <div class="modal-id" id="modalId"></div>
+          <div class="modal-fields" id="modalFields"></div>
+          <div class="modal-desc-wrap">
+            <div class="modal-desc-label">說明</div>
+            <div class="modal-desc" id="modalDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="draft.js"></script>
+</body>
+</html>
