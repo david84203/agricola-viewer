@@ -15,6 +15,18 @@ const CROP = {
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
+// 禁卡表（不進入輪抽池）
+const BANNED_IDS = new Set([
+  // 過強職業
+  'FL049', 'C093', 'C130', 'A127',
+  // 過強次要發展卡
+  'C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031',
+  // 過爛職業
+  'A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154',
+  // 過爛次要發展卡
+  'C058', 'B052', 'B018',
+]);
+
 // Round configs: simPicks = how many cards to randomly remove at the START of this round
 const OCC_ROUNDS = [
   { pack: 'A', simPicks: 0 },  // R1: your pack, fresh
@@ -181,7 +193,7 @@ function buildPacks(cardType) {
     const matchType = cardType === 'occupation'
       ? c.card_type === 'occupation'
       : (c.card_type === 'minor' || c.card_type === 'both');
-    return matchType && state.selectedDecks.includes(c['牌組']);
+    return matchType && state.selectedDecks.includes(c['牌組']) && !BANNED_IDS.has(c['卡片ID']);
   });
 
   if (pool.length < 36) {
