@@ -217,7 +217,7 @@ function openModal(card) {
 
   const fieldDefs = card.card_type === 'occupation'
     ? [
-        ['需求人數', card['需求人數']],
+        ['需求人數', card['人數'] || card['需求人數']],
         ['紅利分數', card['紅利分數']],
         ['牌組', card['牌組']],
       ]

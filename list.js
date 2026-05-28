@@ -45,7 +45,7 @@ const COLUMNS = [
     className: 'col-needs',
     defaultOn: true,
     hideFor: ['minor', 'both'],   // auto-hide when NOT occupation
-    render: c => c['需求人數'] ? `${c['需求人數']} 人` : '—',
+    render: c => (c['人數'] || c['需求人數']) ? `${c['人數'] || c['需求人數']} 人` : '—',
   },
   {
     key: 'pre',
