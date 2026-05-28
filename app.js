@@ -125,7 +125,7 @@ function createCardEl(card, idx) {
   const typeBadgeClass = `badge-${card.card_type}`;
   const typeName = card.card_type === 'minor' ? '次要發展卡'
                  : card.card_type === 'occupation' ? '職業卡'
-                 : '雙色卡';
+                 : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
   const div = document.createElement('div');
   div.className = `card-item ${typeClass}`;
@@ -229,15 +229,17 @@ function drawCrop(canvas, card) {
 // ── Modal ──────────────────────────────────────────
 function openModal(card) {
   const overlay = document.getElementById('modalOverlay');
-  const typeName = card.card_type === 'minor' ? '次要發展卡'
-                 : card.card_type === 'occupation' ? '職業卡'
-                 : '次要發展卡及主要發展卡';
   const typeBadgeClass = `badge-${card.card_type}`;
 
   document.getElementById('modalTitle').textContent = card['牌名'] || '—';
   document.getElementById('modalId').textContent = card['卡片ID'] || '';
-  document.getElementById('modalBadge').className = `modal-badge ${typeBadgeClass}`;
-  document.getElementById('modalBadge').textContent = typeName;
+  const badgeEl = document.getElementById('modalBadge');
+  badgeEl.className = `modal-badge ${typeBadgeClass}`;
+  if (card.card_type === 'both') {
+    badgeEl.innerHTML = '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
+  } else {
+    badgeEl.textContent = card.card_type === 'minor' ? '次要發展卡' : '職業卡';
+  }
   document.getElementById('modalDesc').textContent = card['說明'] || '—';
 
   // Fields

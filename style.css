@@ -337,7 +337,24 @@ body {
 }
 .badge-minor    { background: rgba(240,166,58,.15); color: var(--amber); }
 .badge-occupation { background: rgba(250,204,21,.15); color: var(--yellow); }
-.badge-both     { background: rgba(224,92,92,.15); color: var(--red); }
+.badge-both {
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: 100px;
+  padding: 0;
+}
+.badge-both-minor {
+  background: rgba(240,166,58,.18);
+  color: var(--amber);
+  padding: 2px 4px 2px 8px;
+}
+.badge-both-occ {
+  background: rgba(224,92,92,.18);
+  color: var(--red);
+  padding: 2px 8px 2px 4px;
+}
+.modal-badge.badge-both .badge-both-minor { padding: 4px 5px 4px 12px; }
+.modal-badge.badge-both .badge-both-occ   { padding: 4px 12px 4px 5px; }
 
 .card-desc {
   font-size: .78rem;

@@ -34,8 +34,11 @@ const COLUMNS = [
     className: 'col-type',
     defaultOn: true,
     render: c => {
-      const map = { minor: '次要發展卡', occupation: '職業卡', both: '次要及主要發展卡' };
-      const cls = { minor: 'badge-minor', occupation: 'badge-occupation', both: 'badge-both' };
+      if (c.card_type === 'both') {
+        return `<span class="card-type-badge badge-both"><span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span></span>`;
+      }
+      const map = { minor: '次要發展卡', occupation: '職業卡' };
+      const cls = { minor: 'badge-minor', occupation: 'badge-occupation' };
       return `<span class="card-type-badge ${cls[c.card_type] || ''}">${map[c.card_type] || c.card_type}</span>`;
     },
   },
@@ -67,7 +70,7 @@ const COLUMNS = [
     key: 'pass',
     label: '是否傳遞',
     className: 'col-pass',
-    defaultOn: false,
+    defaultOn: true,
     render: c => {
       const v = c['是否傳遞'];
       if (!v || v === '—') return '<span class="val-no">—</span>';
@@ -80,7 +83,7 @@ const COLUMNS = [
     key: 'vp',
     label: '勝利點數',
     className: 'col-vp',
-    defaultOn: false,
+    defaultOn: true,
     hideFor: ['occupation'],      // auto-hide when occupation only
     render: c => {
       const v = c['勝利點數'];
