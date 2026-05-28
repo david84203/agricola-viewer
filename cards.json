@@ -10428,9 +10428,9 @@
     "說明": "打出此卡時，若你住在磚屋中，且剛好只有兩個房間，你立即獲得3塊磚頭、2綑蘆葦與2塊石頭。",
     "card_type": "occupation",
     "source_image": "023.jpg",
-    "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "position": 16,
+    "grid_col": 6,
+    "grid_row": 1
   },
   {
     "牌名": "季節工",
