@@ -50,7 +50,10 @@ function applyFilters() {
 
   filteredCards = allCards.filter(c => {
     // type filter
-    if (activeType !== 'all' && c.card_type !== activeType) return false;
+    if (activeType !== 'all') {
+      if (activeType === 'minor' && c.card_type !== 'minor' && c.card_type !== 'both') return false;
+      if (activeType !== 'minor' && c.card_type !== activeType) return false;
+    }
     // deck filter
     if (activeDeck !== 'all' && c['牌組'] !== activeDeck) return false;
     // search
