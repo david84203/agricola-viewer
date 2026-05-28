@@ -134,7 +134,7 @@ function createCardEl(card, idx) {
   // Lazy-draw after element is appended
   requestAnimationFrame(() => {
     const canvas = div.querySelector('.card-canvas');
-    if (canvas) drawCrop(canvas, card.source_image, card.grid_col, card.grid_row);
+    if (canvas) drawCrop(canvas, card);
   });
 
   return div;
@@ -143,16 +143,25 @@ function createCardEl(card, idx) {
 // ── Canvas Crop ────────────────────────────────────
 // Each source image is a 3×3 grid of cards (sometimes fewer in last row).
 // We draw the specific cell onto a canvas so it's natively responsive.
-function drawCrop(canvas, imgFile, col, row) {
-  const key = IMG_BASE + imgFile;
+function drawCrop(canvas, card) {
+  const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {
-    const usableW = img.naturalWidth  - CROP.offsetLeft - CROP.offsetRight;
-    const usableH = img.naturalHeight - CROP.offsetTop  - CROP.offsetBottom;
-    const cellW = usableW / GRID_COLS;
-    const cellH = usableH / GRID_ROWS;
-    const sx = CROP.offsetLeft + col * cellW;
-    const sy = CROP.offsetTop  + row * cellH;
+    const cols = card.grid_cols || GRID_COLS;
+    const rows = card.grid_rows || GRID_ROWS;
+    
+    // Default crop offsets unless overridden
+    const offsetLeft = card.crop_left !== undefined ? card.crop_left : CROP.offsetLeft;
+    const offsetRight = card.crop_right !== undefined ? card.crop_right : CROP.offsetRight;
+    const offsetTop = card.crop_top !== undefined ? card.crop_top : CROP.offsetTop;
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : CROP.offsetBottom;
+
+    const usableW = img.naturalWidth  - offsetLeft - offsetRight;
+    const usableH = img.naturalHeight - offsetTop  - offsetBottom;
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
+    const sx = offsetLeft + (card.grid_col || 0) * cellW;
+    const sy = offsetTop  + (card.grid_row || 0) * cellH;
 
     canvas.width  = cellW;
     canvas.height = cellH;
@@ -234,7 +243,7 @@ function openModal(card) {
 
   // Draw modal canvas
   const modalCanvas = document.getElementById('modalCanvas');
-  drawCrop(modalCanvas, card.source_image, card.grid_col, card.grid_row);
+  drawCrop(modalCanvas, card);
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
