@@ -45,7 +45,7 @@ const COLUMNS = [
     className: 'col-needs',
     defaultOn: true,
     hideFor: ['minor', 'both'],   // auto-hide when NOT occupation
-    render: c => c['需求人數'] ? `${c['需求人數']} 人` : '—',
+    render: c => (c['人數'] || c['需求人數']) ? `${c['人數'] || c['需求人數']} 人` : '—',
   },
   {
     key: 'pre',
@@ -259,7 +259,7 @@ function renderTable() {
       td.className = col.className;
       td.dataset.colKey = col.key;
       td.innerHTML = col.render(card);
-      if (!colState[col.key]) td.classList.add('col-hidden');
+      if (!colState[col.key] || isAutoHidden(col)) td.classList.add('col-hidden');
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
