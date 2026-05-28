@@ -10,7 +10,7 @@ const LS_KEY = 'agricola_dups';
 let allCards = [];
 let basePairs = [];   // from duplicates.json
 let imageCache = {};
-let activeTab = 'all';
+let activeTab = 'confirmed';  // default for read-only; admin defaults to 'all'
 
 // picked: { [pairId]: canonicalCardId }
 // dismissed: Set of pairId
@@ -105,17 +105,18 @@ function createPairEl(pair) {
                 : pair.type === 'custom'  ? '<span class="dup-type-tag tag-custom">手動新增</span>'
                 : '<span class="dup-type-tag tag-name">同名</span>';
 
+  const admin = typeof isAdmin === 'function' && isAdmin();
   div.innerHTML = `
     <div class="dup-pair-header">
       <span class="dup-pair-label">${pair.label}</span>
       ${typeTag}
-      <div class="dup-pair-actions">
+      ${admin ? `<div class="dup-pair-actions">
         ${dismissed
           ? `<button class="dup-btn-restore" data-id="${pair.id}">↩ 復原</button>`
           : `<button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
         }
         ${pair.type === 'custom' ? `<button class="dup-btn-delete" data-id="${pair.id}">🗑 刪除</button>` : ''}
-      </div>
+      </div>` : ''}
     </div>
     <div class="dup-cards-row"></div>
   `;
@@ -157,12 +158,15 @@ function createCardWrap(pair, card, dismissed) {
       <div class="dup-card-meta">${card['卡片ID']} ｜ ${card['牌組']} ｜ ${typeLabel}</div>
       <div class="dup-card-desc">${card['說明'] || '—'}</div>
     </div>
-    ${!dismissed ? `
+    ${!dismissed && (typeof isAdmin === 'function' && isAdmin()) ? `
     <div class="dup-card-footer">
       <label class="dup-radio-wrap">
         <input type="radio" name="canon_${pair.id}" value="${card['卡片ID']}" ${isCanon ? 'checked' : ''} />
         <span class="dup-radio-label ${isCanon ? 'dup-radio-active' : ''}">✓ 主要版本</span>
       </label>
+    </div>` : isCanon && !dismissed ? `
+    <div class="dup-card-footer">
+      <span class="dup-radio-label dup-radio-active">✓ 主要版本</span>
     </div>` : ''}
   `;
 
@@ -331,24 +335,33 @@ function getExcludedCardIds() {
 
 window.getExcludedCardIds = getExcludedCardIds;
 
-// ── Auth guard ─────────────────────────────────────
+// ── Auth callback ──────────────────────────────────
 function onAuthChange() {
   const admin = typeof isAdmin === 'function' && isAdmin();
-  const main  = document.querySelector('.dup-main');
-  let guard   = document.getElementById('adminGuard');
-  if (!admin) {
-    if (main) main.style.display = 'none';
-    if (!guard) {
-      guard = document.createElement('div');
-      guard.id = 'adminGuard';
-      guard.style.cssText = 'text-align:center;padding:120px 20px;color:var(--text3)';
-      guard.innerHTML = '<div style="font-size:2rem;margin-bottom:16px">🔐</div><div>需要管理員身份才能使用此頁面<br><small>請在右上角以 ID「GM」登入</small></div>';
-      document.body.appendChild(guard);
-    }
-  } else {
-    if (guard) guard.remove();
-    if (main) main.style.display = '';
+
+  // 工具列：非管理員隱藏新增按鈕和操作型頁籤
+  const toolbar = document.querySelector('.dup-toolbar');
+  if (toolbar) toolbar.style.display = admin ? '' : 'none';
+
+  // 頁籤：非管理員只顯示「已確認」
+  document.querySelectorAll('.dup-tab').forEach(tab => {
+    const t = tab.dataset.tab;
+    tab.style.display = (!admin && t !== 'confirmed') ? 'none' : '';
+  });
+
+  if (!admin && activeTab !== 'confirmed') {
+    activeTab = 'confirmed';
+    document.querySelectorAll('.dup-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === 'confirmed');
+    });
+  } else if (admin && activeTab === 'confirmed') {
+    activeTab = 'all';
+    document.querySelectorAll('.dup-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === 'all');
+    });
   }
+
+  render();
 }
 
 init();

@@ -144,6 +144,6 @@ async function doLogin() {
 // ── Auto-init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   injectLoginModal();
-  const brandRight = document.querySelector('.brand-right');
-  if (brandRight) mountAuthBar(brandRight);
+  const mount = document.getElementById('authBarMount') || document.querySelector('.brand-right');
+  if (mount) mountAuthBar(mount);
 });
