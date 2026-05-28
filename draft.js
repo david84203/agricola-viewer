@@ -78,10 +78,39 @@ let state = {
   currentMinShown: [], // min cards shown this round (combined mode)
 };
 
+// ── Duplicate exclusions ───────────────────────────
+async function loadDupExclusions() {
+  try {
+    const pairs = await fetch('./duplicates.json').then(r => r.json());
+    const raw = localStorage.getItem('agricola_dups');
+    const s = raw ? JSON.parse(raw) : { picked: {}, dismissed: [], custom: [] };
+    const allPairs = [...pairs, ...(s.custom || [])];
+    const excluded = new Set();
+    allPairs.forEach(pair => {
+      if ((s.dismissed || []).includes(pair.id)) return;
+      const canon = (s.picked || {})[pair.id] || pair.defaultCanonical;
+      if (!canon) return;
+      pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
+    });
+    return excluded;
+  } catch { return new Set(); }
+}
+
+// ── Auth callback ──────────────────────────────────
+function onAuthChange() {
+  const rater = typeof isRater === 'function' && isRater();
+  document.getElementById('raterWrap').style.display     = rater ? '' : 'none';
+  document.getElementById('raterLoginHint').style.display = rater ? 'none' : '';
+  if (!rater) document.getElementById('raterModeToggle').checked = false;
+}
+
 // ── Init ───────────────────────────────────────────
 async function init() {
-  const res = await fetch('./cards.json');
-  allCards = await res.json();
+  const [cardsData, dupExcluded] = await Promise.all([
+    fetch('./cards.json').then(r => r.json()),
+    loadDupExclusions(),
+  ]);
+  allCards = cardsData.filter(c => !dupExcluded.has(c['卡片ID']));
   buildDeckCheckboxes();
   buildModeSelect();
   bindEvents();
@@ -150,61 +179,11 @@ function bindEvents() {
   document.getElementById('modalOverlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
-  document.getElementById('banlistBtn').addEventListener('click', openBanlist);
-  document.getElementById('banlistClose').addEventListener('click', closeBanlist);
-  document.getElementById('banlistOverlay').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeBanlist();
-  });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeBanlist(); }
+    if (e.key === 'Escape') closeModal();
   });
 }
 
-// ── Banlist Modal ──────────────────────────────────
-function openBanlist() {
-  const body = document.getElementById('banlistBody');
-  if (!body.hasChildNodes()) renderBanlist(body);
-  document.getElementById('banlistOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeBanlist() {
-  document.getElementById('banlistOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function renderBanlist(container) {
-  BANNED_GROUPS.forEach(({ label, ids }) => {
-    const cards = ids.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
-    if (!cards.length) return;
-
-    const section = document.createElement('div');
-    section.className = 'banlist-section';
-    section.innerHTML = `<div class="banlist-section-label">${label}（${cards.length} 張）</div>`;
-
-    const grid = document.createElement('div');
-    grid.className = 'banlist-grid';
-    cards.forEach(card => {
-      const item = document.createElement('div');
-      item.className = 'banlist-card';
-      item.innerHTML = `<canvas></canvas><div class="banlist-card-name">${card['牌名']}</div>`;
-      grid.appendChild(item);
-      requestAnimationFrame(() => {
-        const canvas = item.querySelector('canvas');
-        drawCrop(canvas, card);
-        requestAnimationFrame(() => {
-          if (canvas.width && canvas.height) {
-            canvas.style.width = '100%';
-            canvas.style.height = (item.offsetWidth * canvas.height / canvas.width) + 'px';
-          }
-        });
-      });
-    });
-
-    section.appendChild(grid);
-    container.appendChild(section);
-  });
-}
 
 // ── Shuffle ────────────────────────────────────────
 function shuffle(arr) {
@@ -752,6 +731,7 @@ async function uploadRatings() {
           elo:       { integerValue: `${Math.round(elo)}` },
           seenCount: { integerValue: `${seenCount}` },
           pickCount: { integerValue: `${pickCount}` },
+          lastRater: { stringValue: getRaterId() || 'unknown' },
         }
       }
     }));

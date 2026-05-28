@@ -9,27 +9,55 @@ const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 1
 
 const MIN_SEEN = 5;
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
+const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
 
-// S: top 10%, A~E: 90% split equally (each 18%)
-const TIER_BOUNDS = [0.10, 0.28, 0.46, 0.64, 0.82, 1.01];
+const BANNED_GROUPS = [
+  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127'] },
+  { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
+  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154'] },
+  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018'] },
+];
+const BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+
 function getTier(rankPct) {
   return TIERS[TIER_BOUNDS.findIndex(b => rankPct < b)];
 }
 
 let allCards = [];
-let ratingsMap = {};   // cardId → { scoreSum, seenCount }
+let ratingsMap = {};
 let imageCache = {};
 let activeFilter = 'all';
+let activeDecks = new Set();
+
+// ── Duplicate exclusions ───────────────────────────
+async function loadDupExclusions() {
+  try {
+    const pairs = await fetch('./duplicates.json').then(r => r.json());
+    const raw = localStorage.getItem('agricola_dups');
+    const s = raw ? JSON.parse(raw) : { picked: {}, dismissed: [], custom: [] };
+    const allPairs = [...pairs, ...(s.custom || [])];
+    const excluded = new Set();
+    allPairs.forEach(pair => {
+      if ((s.dismissed || []).includes(pair.id)) return;
+      const canon = (s.picked || {})[pair.id] || pair.defaultCanonical;
+      if (!canon) return;
+      pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
+    });
+    return excluded;
+  } catch { return new Set(); }
+}
 
 // ── Init ───────────────────────────────────────────
 async function init() {
   try {
-    const [cards, ratings] = await Promise.all([
+    const [cards, ratings, dupExcluded] = await Promise.all([
       fetch('./cards.json').then(r => r.json()),
-      fetchAllRatings()
+      fetchAllRatings(),
+      loadDupExclusions(),
     ]);
-    allCards = cards;
+    allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']));
     ratingsMap = ratings;
+    populateDeckFilter();
     renderTierList();
   } catch (err) {
     document.getElementById('tierLoading').innerHTML =
@@ -37,18 +65,34 @@ async function init() {
   }
 }
 
+// ── Deck Filter ─────────────────────────────────────
+function populateDeckFilter() {
+  const decks = [...new Set(allCards.map(c => c['牌組']).filter(Boolean))].sort();
+  activeDecks = new Set(decks);
+  const row = document.getElementById('deckFilterRow');
+  decks.forEach(deck => {
+    const btn = document.createElement('button');
+    btn.className = 'deck-chip active';
+    btn.textContent = deck;
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      if (btn.classList.contains('active')) activeDecks.add(deck);
+      else activeDecks.delete(deck);
+      renderTierList();
+    });
+    row.appendChild(btn);
+  });
+}
+
 // ── Fetch Firestore ────────────────────────────────
 async function fetchAllRatings() {
   const map = {};
   let pageToken = null;
-
   do {
     let url = `${FIRESTORE_BASE}/agricola_ratings?pageSize=300`;
     if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-
     const res = await fetch(url);
     const data = await res.json();
-
     (data.documents || []).forEach(doc => {
       const cardId = doc.name.split('/').pop();
       const elo      = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1000);
@@ -56,10 +100,8 @@ async function fetchAllRatings() {
       const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
       map[cardId] = { elo, seenCount, pickCount };
     });
-
     pageToken = data.nextPageToken ?? null;
   } while (pageToken);
-
   return map;
 }
 
@@ -67,45 +109,39 @@ async function fetchAllRatings() {
 function renderTierList() {
   document.getElementById('tierLoading').style.display = 'none';
 
-  const filtered = allCards.filter(c => {
+  const typeOk = c => {
     if (activeFilter === 'occupation') return c.card_type === 'occupation';
     if (activeFilter === 'minor') return c.card_type === 'minor' || c.card_type === 'both';
     return true;
-  });
+  };
 
-  const rated = [];
-  const unrated = [];
+  const eligible = allCards.filter(c =>
+    !BANNED_IDS.has(c['卡片ID']) && activeDecks.has(c['牌組']) && typeOk(c)
+  );
 
-  filtered.forEach(card => {
-    const id = card['卡片ID'];
-    const r = ratingsMap[id];
+  const rated = [], unrated = [];
+  eligible.forEach(card => {
+    const r = ratingsMap[card['卡片ID']];
     if (r && r.seenCount >= MIN_SEEN) {
       rated.push({ card, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount });
     } else {
-      unrated.push({ card, seenCount: r?.seenCount ?? 0 });
+      unrated.push(card);
     }
   });
 
-  if (rated.length === 0 && unrated.length === 0) {
-    document.getElementById('tierEmpty').style.display = 'block';
-    return;
-  }
+  document.getElementById('tierEmpty').style.display = 'none';
 
   rated.sort((a, b) => b.elo - a.elo);
-
   const n = rated.length;
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
-  rated.forEach((item, i) => {
-    const tier = getTier(i / n);
-    groups[tier].push(item);
-  });
+  rated.forEach((item, i) => { groups[getTier(i / n)].push(item); });
 
   const container = document.getElementById('tierContent');
   container.innerHTML = '';
   container.style.display = 'block';
 
   TIERS.forEach(tier => {
-    if (groups[tier].length === 0) return;
+    if (!groups[tier].length) return;
     const section = document.createElement('div');
     section.className = 'tier-section';
     section.innerHTML = `
@@ -125,7 +161,7 @@ function renderTierList() {
 
   if (unrated.length > 0) {
     const section = document.createElement('div');
-    section.className = 'tier-section tier-section-unrated';
+    section.className = 'tier-section';
     section.innerHTML = `
       <div class="tier-header tier-unrated">
         <span class="tier-badge">?</span>
@@ -136,21 +172,54 @@ function renderTierList() {
     container.appendChild(section);
   }
 
+  renderBanSection(container, typeOk);
+
   const totalSeen = Object.values(ratingsMap).reduce((s, r) => s + r.seenCount, 0);
   document.getElementById('tierStats').textContent =
     `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
 }
 
+function renderBanSection(container, typeOk) {
+  const banSection = document.createElement('div');
+  banSection.className = 'tier-ban-section';
+  banSection.innerHTML = `<div class="tier-ban-title">🚫 禁卡</div>`;
+
+  let hasAny = false;
+  BANNED_GROUPS.forEach(({ label, ids }) => {
+    const cards = ids
+      .map(id => allCards.find(c => c['卡片ID'] === id))
+      .filter(c => c && typeOk(c) && activeDecks.has(c['牌組']));
+    if (!cards.length) return;
+    hasAny = true;
+
+    const group = document.createElement('div');
+    group.className = 'tier-ban-group';
+    group.innerHTML = `<div class="tier-ban-label">${label}（${cards.length} 張）</div><div class="tier-ban-grid"></div>`;
+    const grid = group.querySelector('.tier-ban-grid');
+    cards.forEach(card => {
+      const el = document.createElement('div');
+      el.className = 'tier-ban-card';
+      el.innerHTML = `<div class="tier-card-thumb"><canvas></canvas></div><div class="tier-ban-name">${card['牌名']}</div>`;
+      el.addEventListener('click', () => openModal(card));
+      requestAnimationFrame(() => drawCrop(el.querySelector('canvas'), card));
+      grid.appendChild(el);
+    });
+    banSection.appendChild(group);
+  });
+
+  if (hasAny) container.appendChild(banSection);
+}
+
 function tierRangeLabel(tier) {
-  const pcts = ['前 10%', '10–28%', '28–46%', '46–64%', '64–82%', '82–100%'];
+  const pcts = ['前 8%', '8–25%', '25–60%', '60–82%', '82–95%', '95–100%'];
   return pcts[TIERS.indexOf(tier)] || '';
 }
 
+// ── Card elements ──────────────────────────────────
 function createTierCardEl(card, elo, seenCount, pickCount) {
   const pickRate = seenCount > 0 ? Math.round(pickCount / seenCount * 100) : 0;
   const div = document.createElement('div');
   div.className = 'tier-card';
-  div.title = card['牌名'];
   div.innerHTML = `
     <div class="tier-card-thumb"><canvas></canvas></div>
     <div class="tier-card-info">
@@ -162,25 +231,33 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
     </div>
   `;
   div.addEventListener('click', () => openModal(card));
-  requestAnimationFrame(() => {
-    drawCrop(div.querySelector('canvas'), card.source_image, card.grid_col, card.grid_row);
-  });
+  requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card));
   return div;
 }
 
 // ── Canvas ─────────────────────────────────────────
-function drawCrop(canvas, imgFile, col, row) {
-  if (!canvas || !imgFile) return;
-  const key = IMG_BASE + imgFile;
+function drawCrop(canvas, card) {
+  if (!canvas || !card?.source_image) return;
+  const key = IMG_BASE + card.source_image;
+  const isComposite = card.source_image.includes('部分.jpg');
+  const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
+  const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
+  const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite ? 0 : CROP.offsetLeft);
+  const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite ? 0 : CROP.offsetRight);
+  const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite ? 0 : CROP.offsetTop);
+  const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : CROP.offsetBottom);
+
   const draw = (img) => {
-    const usableW = img.naturalWidth - CROP.offsetLeft - CROP.offsetRight;
-    const usableH = img.naturalHeight - CROP.offsetTop - CROP.offsetBottom;
-    const cellW = usableW / GRID_COLS;
-    const cellH = usableH / GRID_ROWS;
-    canvas.width = cellW;
+    const cellW = (img.naturalWidth  - oL - oR) / cols;
+    const cellH = (img.naturalHeight - oT - oB) / rows;
+    canvas.width  = cellW;
     canvas.height = cellH;
-    canvas.getContext('2d').drawImage(img, CROP.offsetLeft + col * cellW, CROP.offsetTop + row * cellH, cellW, cellH, 0, 0, cellW, cellH);
+    canvas.getContext('2d').drawImage(img,
+      oL + (card.grid_col || 0) * cellW,
+      oT + (card.grid_row || 0) * cellH,
+      cellW, cellH, 0, 0, cellW, cellH);
   };
+
   if (imageCache[key]) { draw(imageCache[key]); return; }
   const img = new Image();
   img.onload = () => { imageCache[key] = img; draw(img); };
@@ -206,7 +283,7 @@ function openModal(card) {
   const fieldsEl = document.getElementById('modalFields');
   fieldsEl.innerHTML = '';
   const fieldDefs = card.card_type === 'occupation'
-    ? [['需求人數', card['需求人數']], ['紅利分數', card['紅利分數']], ['牌組', card['牌組']]]
+    ? [['需求人數', card['人數'] || card['需求人數']], ['紅利分數', card['紅利分數']], ['牌組', card['牌組']]]
     : [['先決條件', card['先決條件']], ['費用', card['費用']], ['是否傳遞', card['是否傳遞']],
        ['勝利點數', card['勝利點數'], 'vp'], ['紅利分數', card['紅利分數'], 'bonus'], ['牌組', card['牌組']]];
   fieldDefs.forEach(([label, value, hi]) => {
@@ -219,7 +296,7 @@ function openModal(card) {
     fieldsEl.appendChild(row);
   });
 
-  drawCrop(document.getElementById('modalCanvas'), card.source_image, card.grid_col, card.grid_row);
+  drawCrop(document.getElementById('modalCanvas'), card);
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }

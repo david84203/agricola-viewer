@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 重複卡牌管理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="duplicates.css" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 重複卡牌管理</div>
+        <div class="brand-sub">標記主要版本，非主要版本將排除於輪抽與 Tier List</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <a href="index.html" class="back-link">← 卡牌圖鑑</a>
+    </div>
+  </div>
+
+  <main class="dup-main">
+    <div class="dup-toolbar">
+      <div class="dup-stats" id="dupStats">載入中…</div>
+      <button class="dup-add-btn" id="addPairBtn">+ 新增配對</button>
+    </div>
+
+    <div class="dup-tabs">
+      <button class="dup-tab active" data-tab="all">全部</button>
+      <button class="dup-tab" data-tab="pending">待確認</button>
+      <button class="dup-tab" data-tab="confirmed">已確認</button>
+      <button class="dup-tab" data-tab="dismissed">已排除（非重複）</button>
+    </div>
+
+    <div id="dupList" class="dup-list"></div>
+  </main>
+
+  <!-- Add Pair Dialog -->
+  <div class="dup-dialog-overlay" id="addDialog" style="display:none">
+    <div class="dup-dialog">
+      <div class="dup-dialog-title">新增重複配對</div>
+      <div class="dup-dialog-row">
+        <div>
+          <label>卡牌 A</label>
+          <input type="text" id="searchA" class="dup-search-input" placeholder="搜尋牌名…" autocomplete="off" />
+          <div class="dup-search-results" id="resultsA"></div>
+          <div class="dup-selected" id="selectedA">（未選擇）</div>
+        </div>
+        <div class="dup-dialog-vs">vs</div>
+        <div>
+          <label>卡牌 B</label>
+          <input type="text" id="searchB" class="dup-search-input" placeholder="搜尋牌名…" autocomplete="off" />
+          <div class="dup-search-results" id="resultsB"></div>
+          <div class="dup-selected" id="selectedB">（未選擇）</div>
+        </div>
+      </div>
+      <div class="dup-dialog-footer">
+        <button class="dup-btn-cancel" id="cancelAdd">取消</button>
+        <button class="dup-btn-confirm" id="confirmAdd">新增</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="duplicates.js"></script>
+</body>
+</html>

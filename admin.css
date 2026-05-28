@@ -1,0 +1,206 @@
+/* ── Admin Modal ── */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+.admin-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 520px;
+  max-width: 96vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+.admin-modal-wide { width: 680px; }
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.admin-modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.admin-modal-close {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color var(--transition);
+}
+.admin-modal-close:hover { color: var(--text); }
+
+.admin-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.admin-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.admin-save-status {
+  flex: 1;
+  font-size: .82rem;
+  color: var(--text3);
+}
+
+/* ── Form fields ── */
+.admin-field-row {
+  margin-bottom: 14px;
+}
+.admin-field-label {
+  display: block;
+  font-size: .78rem;
+  color: var(--text3);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.admin-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: .88rem;
+  font-family: inherit;
+  color: var(--text);
+  box-sizing: border-box;
+  transition: border-color var(--transition);
+}
+.admin-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.admin-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* ── Buttons ── */
+.admin-btn-cancel, .admin-btn-save {
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  font-size: .85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.admin-btn-cancel {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.admin-btn-cancel:hover { border-color: var(--text2); }
+.admin-btn-save {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: #0a0e1a;
+  font-weight: 600;
+}
+.admin-btn-save:hover { opacity: .85; }
+.admin-btn-save:disabled { opacity: .5; cursor: default; }
+
+/* ── Edit button in modal ── */
+.admin-edit-card-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-size: .78rem;
+  font-family: inherit;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 12px;
+}
+.admin-edit-card-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── Ban admin panel ── */
+.ban-admin-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.ban-admin-group:last-child { border-bottom: none; }
+
+.ban-admin-group-header {
+  margin-bottom: 10px;
+}
+.ban-admin-group-label {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+.ban-admin-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.ban-admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 3px 10px 3px 12px;
+  font-size: .78rem;
+  color: var(--text2);
+}
+.ban-chip-remove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: .75rem;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color var(--transition);
+}
+.ban-chip-remove:hover { color: #f87171; }
+
+.ban-admin-add-row {
+  position: relative;
+}
+.ban-admin-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  z-index: 10;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.ban-admin-result-item {
+  padding: 8px 12px;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.ban-admin-result-item:hover { background: var(--surface); }

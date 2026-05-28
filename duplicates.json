@@ -1,0 +1,382 @@
+[
+  {
+    "id": "n001",
+    "label": "燒酒釀造坊",
+    "cards": [
+      "C059*",
+      "I098"
+    ],
+    "defaultCanonical": "C059*",
+    "type": "name"
+  },
+  {
+    "id": "n002",
+    "label": "棚架",
+    "cards": [
+      "A047",
+      "C015"
+    ],
+    "defaultCanonical": "A047",
+    "type": "name"
+  },
+  {
+    "id": "n003",
+    "label": "拾木者",
+    "cards": [
+      "A119*",
+      "I235"
+    ],
+    "defaultCanonical": "A119*",
+    "type": "name"
+  },
+  {
+    "id": "n004",
+    "label": "獨木舟",
+    "cards": [
+      "A078*",
+      "舊版E30"
+    ],
+    "defaultCanonical": "A078*",
+    "type": "name"
+  },
+  {
+    "id": "n005",
+    "label": "水車",
+    "cards": [
+      "B064",
+      "I103"
+    ],
+    "defaultCanonical": "B064",
+    "type": "name"
+  },
+  {
+    "id": "n006",
+    "label": "農場工人",
+    "cards": [
+      "B140",
+      "I224"
+    ],
+    "defaultCanonical": "B140",
+    "type": "name"
+  },
+  {
+    "id": "n007",
+    "label": "吉普賽瓦罐",
+    "cards": [
+      "C053",
+      "舊版E19"
+    ],
+    "defaultCanonical": "C053",
+    "type": "name"
+  },
+  {
+    "id": "n008",
+    "label": "助產士",
+    "cards": [
+      "D160",
+      "I232"
+    ],
+    "defaultCanonical": "D160",
+    "type": "name"
+  },
+  {
+    "id": "n009",
+    "label": "蘆葦商",
+    "cards": [
+      "D159",
+      "I251"
+    ],
+    "defaultCanonical": "D159",
+    "type": "name"
+  },
+  {
+    "id": "n010",
+    "label": "籃子",
+    "cards": [
+      "A056*",
+      "舊版E34"
+    ],
+    "defaultCanonical": "A056*",
+    "type": "name"
+  },
+  {
+    "id": "n011",
+    "label": "蔬菜攤",
+    "cards": [
+      "B008*",
+      "舊版E39"
+    ],
+    "defaultCanonical": "B008*",
+    "type": "name"
+  },
+  {
+    "id": "n012",
+    "label": "奶油攪拌器",
+    "cards": [
+      "B050*",
+      "舊版E53"
+    ],
+    "defaultCanonical": "B050*",
+    "type": "name"
+  },
+  {
+    "id": "n013",
+    "label": "豆田",
+    "cards": [
+      "B068*",
+      "舊版E18"
+    ],
+    "defaultCanonical": "B068*",
+    "type": "name"
+  },
+  {
+    "id": "n014",
+    "label": "打穀板",
+    "cards": [
+      "A024*",
+      "I067"
+    ],
+    "defaultCanonical": "A024*",
+    "type": "name"
+  },
+  {
+    "id": "n015",
+    "label": "陶器",
+    "cards": [
+      "B080*",
+      "舊版E33"
+    ],
+    "defaultCanonical": "B080*",
+    "type": "name"
+  },
+  {
+    "id": "n016",
+    "label": "迷你圈地",
+    "cards": [
+      "B002*",
+      "舊版E40"
+    ],
+    "defaultCanonical": "B002*",
+    "type": "name"
+  },
+  {
+    "id": "n017",
+    "label": "套索",
+    "cards": [
+      "B024*",
+      "I088"
+    ],
+    "defaultCanonical": "B024*",
+    "type": "name"
+  },
+  {
+    "id": "n018",
+    "label": "飲水槽",
+    "cards": [
+      "A012*",
+      "舊版E59"
+    ],
+    "defaultCanonical": "A012*",
+    "type": "name"
+  },
+  {
+    "id": "n019",
+    "label": "牧羊杖",
+    "cards": [
+      "A083*",
+      "I077"
+    ],
+    "defaultCanonical": "A083*",
+    "type": "name"
+  },
+  {
+    "id": "n020",
+    "label": "採石鉗",
+    "cards": [
+      "A080*",
+      "舊版E56"
+    ],
+    "defaultCanonical": "A080*",
+    "type": "name"
+  },
+  {
+    "id": "n021",
+    "label": "馬槽",
+    "cards": [
+      "A032*",
+      "舊版E23"
+    ],
+    "defaultCanonical": "A032*",
+    "type": "name"
+  },
+  {
+    "id": "n022",
+    "label": "木匠",
+    "cards": [
+      "B126*",
+      "舊版E218"
+    ],
+    "defaultCanonical": "B126*",
+    "type": "name"
+  },
+  {
+    "id": "n023",
+    "label": "菜販",
+    "cards": [
+      "B142*",
+      "舊版E168"
+    ],
+    "defaultCanonical": "B142*",
+    "type": "name"
+  },
+  {
+    "id": "n024",
+    "label": "召羊人",
+    "cards": [
+      "B164*",
+      "I250"
+    ],
+    "defaultCanonical": "B164*",
+    "type": "name"
+  },
+  {
+    "id": "n025",
+    "label": "吹牛大王",
+    "cards": [
+      "A133*",
+      "舊版E197"
+    ],
+    "defaultCanonical": "A133*",
+    "type": "name"
+  },
+  {
+    "id": "n026",
+    "label": "男僕",
+    "cards": [
+      "B107*",
+      "I231"
+    ],
+    "defaultCanonical": "B107*",
+    "type": "name"
+  },
+  {
+    "id": "n027",
+    "label": "馬伕",
+    "cards": [
+      "B089*",
+      "I254"
+    ],
+    "defaultCanonical": "B089*",
+    "type": "name"
+  },
+  {
+    "id": "n028",
+    "label": "馭犁者",
+    "cards": [
+      "A090*",
+      "舊版E194"
+    ],
+    "defaultCanonical": "A090*",
+    "type": "name"
+  },
+  {
+    "id": "n029",
+    "label": "家庭教師",
+    "cards": [
+      "B099*",
+      "舊版E174"
+    ],
+    "defaultCanonical": "B099*",
+    "type": "name"
+  },
+  {
+    "id": "n030",
+    "label": "雜貨商",
+    "cards": [
+      "A102*",
+      "舊版E184"
+    ],
+    "defaultCanonical": "A102*",
+    "type": "name"
+  },
+  {
+    "id": "n031",
+    "label": "牧師",
+    "cards": [
+      "A125*",
+      "舊版E193"
+    ],
+    "defaultCanonical": "A125*",
+    "type": "name"
+  },
+  {
+    "id": "n032",
+    "label": "季節工",
+    "cards": [
+      "A114*",
+      "舊版E202"
+    ],
+    "defaultCanonical": "A114*",
+    "type": "name"
+  },
+  {
+    "id": "n033",
+    "label": "野豬哺育師",
+    "cards": [
+      "A165*",
+      "I252"
+    ],
+    "defaultCanonical": "A165*",
+    "type": "name"
+  },
+  {
+    "id": "n034",
+    "label": "伐木工",
+    "cards": [
+      "A116*",
+      "舊版E176"
+    ],
+    "defaultCanonical": "A116*",
+    "type": "name"
+  },
+  {
+    "id": "n035",
+    "label": "管理員",
+    "cards": [
+      "A087*",
+      "舊版E200"
+    ],
+    "defaultCanonical": "A087*",
+    "type": "name"
+  },
+  {
+    "id": "e036",
+    "label": "蓋屋匠／梯子",
+    "cards": [
+      "舊版E157",
+      "I091"
+    ],
+    "defaultCanonical": "I091",
+    "type": "effect"
+  },
+  {
+    "id": "e037",
+    "label": "草莓園／草莓田",
+    "cards": [
+      "B045*",
+      "I070"
+    ],
+    "defaultCanonical": "B045*",
+    "type": "effect"
+  },
+  {
+    "id": "e038",
+    "label": "麵包師傅的烤爐／麵包師傅的廚房",
+    "cards": [
+      "舊版E14",
+      "I065"
+    ],
+    "defaultCanonical": "I065",
+    "type": "effect"
+  }
+]

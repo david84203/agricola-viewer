@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="draft.css" />
+  <link rel="stylesheet" href="auth.css" />
 </head>
 <body>
   <div class="top-brand-bar">
@@ -20,7 +21,6 @@
       </div>
     </div>
     <div class="brand-right">
-      <button class="banlist-btn" id="banlistBtn">禁卡表</button>
       <a href="index.html" class="back-link">← 回卡牌圖鑑</a>
     </div>
   </div>
@@ -53,15 +53,18 @@
       <div class="deck-section-label">選擇牌組</div>
       <div class="deck-checkboxes" id="deckCheckboxes"></div>
 
-      <div class="rater-wrap">
+      <div class="rater-wrap" id="raterWrap" style="display:none">
         <label class="rater-toggle-label">
           <input type="checkbox" id="raterModeToggle" />
           <span class="rater-track"><span class="rater-thumb"></span></span>
           <div class="rater-label-text">
             <div class="rater-label-main">評分者模式</div>
-            <div class="rater-label-sub">輪抽結束後自動上傳卡牌評分資料至資料庫</div>
+            <div class="rater-label-sub">輪抽結束後自動上傳評分資料至資料庫</div>
           </div>
         </label>
+      </div>
+      <div class="rater-login-hint" id="raterLoginHint">
+        <span>🔐 登入後可使用評分者模式</span>
       </div>
 
       <button class="start-btn" id="startDraft">開始輪抽</button>
@@ -144,17 +147,7 @@
     </div>
   </div>
 
-  <!-- Banlist Modal -->
-  <div class="banlist-overlay" id="banlistOverlay">
-    <div class="banlist-modal">
-      <div class="banlist-header">
-        <h2 class="banlist-title">禁卡表</h2>
-        <button class="modal-close" id="banlistClose">✕</button>
-      </div>
-      <div class="banlist-body" id="banlistBody"></div>
-    </div>
-  </div>
-
+  <script src="auth.js"></script>
   <script src="draft.js"></script>
 </body>
 </html>

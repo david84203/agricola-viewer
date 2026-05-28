@@ -171,6 +171,77 @@
   color: var(--text3);
 }
 
+/* ── Deck filter ── */
+.tier-deck-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.deck-chip {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: .78rem;
+  font-family: inherit;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.deck-chip.active {
+  background: var(--surface);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── Ban section ── */
+.tier-ban-section {
+  margin-top: 40px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+.tier-ban-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+.tier-ban-group {
+  margin-bottom: 20px;
+}
+.tier-ban-label {
+  font-size: .8rem;
+  color: var(--text3);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.tier-ban-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+.tier-ban-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition);
+  opacity: .65;
+}
+.tier-ban-card:hover {
+  border-color: #f87171;
+  opacity: 1;
+}
+.tier-ban-name {
+  font-size: .7rem;
+  color: var(--text2);
+  text-align: center;
+  padding: 4px 6px 6px;
+  line-height: 1.3;
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .tier-main { padding: 20px 16px 80px; }

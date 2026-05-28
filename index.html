@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
   <div class="top-brand-bar">
@@ -26,11 +28,13 @@
       <div style="display:flex; align-items:center; gap:12px;">
         <div>
           <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
-          <small style="color:var(--text3);">目前收錄：A, B, C, D, E, AY, FL, Cz</small>
+          <small style="color:var(--text3);">目前收錄：A, B, C, D, E, AY, FL, Cz, G8, I, L, 舊版E</small>
         </div>
         <button id="banlistBtn" class="draft-nav-btn" style="cursor:pointer; border:none; font-family:inherit;">🚫 禁卡表</button>
+        <button id="banAdminBtn" class="draft-nav-btn" style="cursor:pointer; border:none; font-family:inherit; display:none;">⚙️ 禁卡管理</button>
         <a href="draft.html" class="draft-nav-btn">🎲 輪抽模擬器</a>
         <a href="tierlist.html" class="draft-nav-btn">📊 Tier List</a>
+        <a href="duplicates.html" class="draft-nav-btn">🔁 重複管理</a>
         <a href="./list.html" style="
           display:inline-flex; align-items:center; gap:6px;
           background:var(--bg3); border:1px solid var(--border); border-radius:100px;
@@ -118,6 +122,8 @@
     </div>
   </div>
 
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

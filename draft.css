@@ -532,6 +532,16 @@
   color: var(--gold);
 }
 
+.rater-login-hint {
+  margin: 20px 0 24px;
+  font-size: .83rem;
+  color: var(--text3);
+  padding: 10px 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
 /* ── Rater Mode Toggle ── */
 .rater-wrap {
   margin: 20px 0 24px;

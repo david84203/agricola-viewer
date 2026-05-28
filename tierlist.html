@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="tierlist.css" />
+  <link rel="stylesheet" href="auth.css" />
 </head>
 <body>
   <div class="top-brand-bar">
@@ -38,6 +39,9 @@
       <div class="tier-stats" id="tierStats"></div>
       <button class="tier-refresh-btn" id="refreshBtn">↺ 重新載入</button>
     </div>
+
+    <!-- Deck filter -->
+    <div class="tier-deck-row" id="deckFilterRow"></div>
 
     <!-- Tier content -->
     <div id="tierLoading" class="tier-loading">
@@ -79,6 +83,7 @@
     </div>
   </div>
 
+  <script src="auth.js"></script>
   <script src="tierlist.js"></script>
 </body>
 </html>

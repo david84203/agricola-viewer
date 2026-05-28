@@ -20,8 +20,17 @@ let imageCache = {};
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const res = await fetch('./cards.json');
-  allCards = await res.json();
+  const [base, overrides, banGroups] = await Promise.all([
+    fetch('./cards.json').then(r => r.json()),
+    typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
+    typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
+  ]);
+
+  allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
+  if (banGroups) {
+    BANNED_GROUPS.length = 0;
+    banGroups.forEach(g => BANNED_GROUPS.push(g));
+  }
 
   populateDeckFilter();
   document.getElementById('totalCount').textContent = allCards.length;
@@ -190,6 +199,7 @@ function drawCrop(canvas, card) {
 
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
+    canvas.dataset.drawn = '1';
   };
 
   if (imageCache[key]) {
@@ -267,8 +277,29 @@ function openModal(card) {
   const modalCanvas = document.getElementById('modalCanvas');
   drawCrop(modalCanvas, card);
 
+  // Admin edit button
+  let editBtn = document.getElementById('modalAdminEditBtn');
+  if (!editBtn) {
+    editBtn = document.createElement('button');
+    editBtn.id = 'modalAdminEditBtn';
+    editBtn.className = 'admin-edit-card-btn';
+    editBtn.textContent = '✏️ 編輯此卡';
+    document.querySelector('.modal-info').appendChild(editBtn);
+  }
+  editBtn.style.display = (typeof isAdmin === 'function' && isAdmin()) ? '' : 'none';
+  editBtn.onclick = () => openCardEditModal(card);
+
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+// ── Auth callback ──────────────────────────────────
+function onAuthChange() {
+  const admin = typeof isAdmin === 'function' && isAdmin();
+  const banAdminBtn = document.getElementById('banAdminBtn');
+  if (banAdminBtn) banAdminBtn.style.display = admin ? '' : 'none';
+  const editBtn = document.getElementById('modalAdminEditBtn');
+  if (editBtn) editBtn.style.display = admin ? '' : 'none';
 }
 
 function closeModal() {
@@ -319,7 +350,7 @@ document.getElementById('clearSearch').addEventListener('click', () => {
 });
 
 // ── Banlist ────────────────────────────────────────
-const BANNED_GROUPS = [
+const BANNED_GROUPS = [  // populated from Firestore on load; fallback hardcoded
   { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127'] },
   { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
   { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154'] },
@@ -357,12 +388,15 @@ function renderBanlist(container) {
       requestAnimationFrame(() => {
         const canvas = item.querySelector('canvas');
         drawCrop(canvas, card);
-        requestAnimationFrame(() => {
-          if (canvas.width && canvas.height) {
+        function applySize(retries) {
+          if (canvas.dataset.drawn === '1') {
             canvas.style.width = '100%';
-            canvas.style.height = (item.offsetWidth * canvas.height / canvas.width) + 'px';
+            canvas.style.aspectRatio = `${canvas.width} / ${canvas.height}`;
+          } else if (retries > 0) {
+            requestAnimationFrame(() => applySize(retries - 1));
           }
-        });
+        }
+        applySize(60);
       });
     });
 
@@ -372,6 +406,7 @@ function renderBanlist(container) {
 }
 
 document.getElementById('banlistBtn').addEventListener('click', openBanlist);
+document.getElementById('banAdminBtn').addEventListener('click', () => openBanAdmin(allCards));
 document.getElementById('banlistClose').addEventListener('click', closeBanlist);
 document.getElementById('banlistOverlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeBanlist();
