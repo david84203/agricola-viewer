@@ -10,7 +10,7 @@ let searchQuery = '';
 
 // ── Column definitions ─────────────────────────────
 // key: unique key, label: header text, className: td class,
-// minor: show for minor/both, occupation: show for occupation,
+// hideFor: ['occupation'] | ['minor'] — auto-hide when that type is exclusively shown
 // render: function(card) -> string
 const COLUMNS = [
   {
@@ -40,27 +40,28 @@ const COLUMNS = [
     },
   },
   {
+    key: 'needs',
+    label: '需求人數',
+    className: 'col-needs',
+    defaultOn: true,
+    hideFor: ['minor', 'both'],   // auto-hide when NOT occupation
+    render: c => c['需求人數'] ? `${c['需求人數']} 人` : '—',
+  },
+  {
     key: 'pre',
     label: '先決條件',
     className: 'col-pre',
     defaultOn: true,
-    render: c => {
-      if (c.card_type === 'occupation') {
-        const n = c['需求人數'];
-        return n ? `${n} 人` : '—';
-      }
-      return c['先決條件'] || '—';
-    },
+    hideFor: ['occupation'],      // auto-hide when occupation only
+    render: c => c['先決條件'] || '—',
   },
   {
     key: 'cost',
     label: '費用',
     className: 'col-cost',
     defaultOn: true,
-    render: c => {
-      if (c.card_type === 'occupation') return '—';
-      return c['費用'] || '—';
-    },
+    hideFor: ['occupation'],      // auto-hide when occupation only
+    render: c => c['費用'] || '—',
   },
   {
     key: 'pass',
@@ -68,8 +69,8 @@ const COLUMNS = [
     className: 'col-pass',
     defaultOn: false,
     render: c => {
-      if (c.card_type === 'occupation') return '<span class="val-no">—</span>';
       const v = c['是否傳遞'];
+      if (!v || v === '—') return '<span class="val-no">—</span>';
       return v === '是'
         ? '<span class="val-yes">是</span>'
         : '<span class="val-no">否</span>';
@@ -80,8 +81,8 @@ const COLUMNS = [
     label: '勝利點數',
     className: 'col-vp',
     defaultOn: false,
+    hideFor: ['occupation'],      // auto-hide when occupation only
     render: c => {
-      if (c.card_type === 'occupation') return '<span class="val-no">—</span>';
       const v = c['勝利點數'];
       if (!v || v === '無') return '<span class="val-no">無</span>';
       return `<span class="val-vp">${v}</span>`;
@@ -149,12 +150,14 @@ function buildColToggles() {
   COLUMNS.forEach(col => {
     if (col.alwaysOn) return;
     const label = document.createElement('label');
+    label.dataset.key = col.key;
     label.className = `col-toggle ${colState[col.key] ? 'active' : ''}`;
     label.innerHTML = `
       <span class="col-toggle-dot"></span>
       ${col.label}
     `;
     label.addEventListener('click', () => {
+      if (isAutoHidden(col)) return; // locked
       colState[col.key] = !colState[col.key];
       label.classList.toggle('active', colState[col.key]);
       updateColVisibility();
@@ -176,15 +179,36 @@ function buildTableHead() {
   });
 }
 
+// ── Determine if a column should be auto-hidden ────
+// hideFor: ['occupation'] → hide when activeType is 'occupation'
+// hideFor: ['minor','both'] → hide when activeType is 'minor' or 'both'
+function isAutoHidden(col) {
+  if (!col.hideFor) return false;
+  // occupation-only filter
+  if (activeType === 'occupation' && col.hideFor.includes('occupation')) return true;
+  // minor/both-only filter (need = 需求人數 column)
+  if (activeType !== 'all' && activeType !== 'occupation') {
+    if (col.hideFor.includes('minor')) return true;
+  }
+  return false;
+}
+
 // ── Update column visibility ───────────────────────
 function updateColVisibility() {
   COLUMNS.forEach(col => {
+    const hidden = !colState[col.key] || isAutoHidden(col);
+    // sync toggle button style (dim if auto-hidden)
+    const toggleEl = document.querySelector(`.col-toggle[data-key="${col.key}"]`);
+    if (toggleEl) {
+      toggleEl.style.opacity = isAutoHidden(col) ? '0.35' : '1';
+      toggleEl.style.pointerEvents = isAutoHidden(col) ? 'none' : '';
+    }
     // header
     const th = document.querySelector(`th[data-col-key="${col.key}"]`);
-    if (th) th.classList.toggle('col-hidden', !colState[col.key]);
+    if (th) th.classList.toggle('col-hidden', hidden);
     // body cells
     document.querySelectorAll(`td[data-col-key="${col.key}"]`).forEach(td => {
-      td.classList.toggle('col-hidden', !colState[col.key]);
+      td.classList.toggle('col-hidden', hidden);
     });
   });
 }
@@ -250,6 +274,7 @@ document.querySelectorAll('.chip').forEach(chip => {
     chip.classList.add('active');
     activeType = chip.dataset.filter;
     applyFilters();
+    updateColVisibility(); // re-evaluate auto-hidden cols
   });
 });
 
