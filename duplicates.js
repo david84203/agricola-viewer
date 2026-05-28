@@ -113,7 +113,8 @@ function createPairEl(pair) {
       ${admin ? `<div class="dup-pair-actions">
         ${dismissed
           ? `<button class="dup-btn-restore" data-id="${pair.id}">↩ 復原</button>`
-          : `<button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
+          : `${isPending(pair.id) ? `<button class="dup-btn-confirm" data-id="${pair.id}">✓ 確認</button>` : ''}
+             <button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
         }
         ${pair.type === 'custom' ? `<button class="dup-btn-delete" data-id="${pair.id}">🗑 刪除</button>` : ''}
       </div>` : ''}
@@ -233,7 +234,18 @@ function setupEvents() {
   document.getElementById('dupList').addEventListener('click', e => {
     const id = e.target.dataset.id;
     if (!id) return;
-    if (e.target.classList.contains('dup-btn-dismiss')) {
+    if (e.target.classList.contains('dup-btn-confirm')) {
+      const pairEl = e.target.closest('[data-id]');
+      const radio = pairEl ? pairEl.querySelector(`input[name="canon_${id}"]:checked`) : null;
+      if (radio) {
+        state.picked[id] = radio.value;
+      } else {
+        // fallback: use defaultCanonical
+        const pair = getAllPairs().find(p => p.id === id);
+        if (pair) state.picked[id] = getCanonical(pair);
+      }
+      saveState(); render();
+    } else if (e.target.classList.contains('dup-btn-dismiss')) {
       if (!state.dismissed.includes(id)) state.dismissed.push(id);
       delete state.picked[id];
       saveState(); render();
@@ -246,6 +258,14 @@ function setupEvents() {
       delete state.picked[id];
       saveState(); render();
     }
+  });
+
+  // Confirm all pending
+  document.getElementById('confirmAllBtn').addEventListener('click', () => {
+    const pending = getAllPairs().filter(p => isPending(p.id));
+    if (!pending.length) return;
+    pending.forEach(p => { state.picked[p.id] = getCanonical(p); });
+    saveState(); render();
   });
 
   // Add pair dialog

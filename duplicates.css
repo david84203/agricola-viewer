@@ -109,6 +109,31 @@
 .dup-btn-dismiss:hover { border-color: #f87171; color: #f87171; }
 .dup-btn-restore:hover { border-color: var(--gold); color: var(--gold); }
 .dup-btn-delete:hover  { border-color: #f87171; color: #f87171; }
+.dup-btn-confirm {
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.4);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: .75rem;
+  font-family: inherit;
+  color: #4ade80;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.dup-btn-confirm:hover { background: rgba(74,222,128,.22); border-color: #4ade80; }
+.dup-confirm-all-btn {
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.4);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: .82rem;
+  font-family: inherit;
+  color: #4ade80;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.dup-confirm-all-btn:hover { background: rgba(74,222,128,.22); border-color: #4ade80; }
 
 /* ── Cards row ── */
 .dup-cards-row {
