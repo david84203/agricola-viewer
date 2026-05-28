@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 文字列表</title>
+  <meta name="description" content="農家樂（Agricola）卡牌文字列表版本，支援欄位顯示自訂。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── List Page Specific ──────────────────────────── */
+    .list-toolbar {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .list-toolbar-title {
+      font-size: .75rem;
+      color: var(--text3);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .col-toggles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .col-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+      font-size: .82rem;
+      color: var(--text2);
+    }
+    .col-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .col-toggle.active {
+      background: rgba(232,184,75,.12);
+      border-color: var(--gold);
+      color: var(--gold2);
+    }
+    .col-toggle input[type="checkbox"] { display: none; }
+    .col-toggle-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+    .col-toggle.active .col-toggle-dot { background: var(--gold); }
+
+    /* ── Table ────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    thead th {
+      background: var(--bg3);
+      color: var(--text3);
+      font-size: .7rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg3); }
+    tbody td {
+      padding: 10px 14px;
+      color: var(--text2);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    td.col-id {
+      font-family: 'Courier New', monospace;
+      font-size: .75rem;
+      color: var(--text3);
+      white-space: nowrap;
+    }
+    td.col-name {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    td.col-desc {
+      max-width: 320px;
+      min-width: 180px;
+      line-height: 1.65;
+      color: var(--text2);
+    }
+    td.col-pre, td.col-cost {
+      min-width: 80px;
+      max-width: 140px;
+    }
+    td.col-pass, td.col-vp, td.col-bonus, td.col-deck {
+      text-align: center;
+      white-space: nowrap;
+    }
+    .val-yes { color: var(--green); font-weight: 600; }
+    .val-no  { color: var(--text3); }
+    .val-vp  { color: var(--purple); font-weight: 600; }
+    .val-bonus { color: var(--gold); font-weight: 600; }
+
+    /* ── Needs count ─────────────────────────────────── */
+    td.col-needs { white-space: nowrap; }
+
+    /* ── Hidden cols ─────────────────────────────────── */
+    .col-hidden { display: none; }
+
+    /* ── View switch ─────────────────────────────────── */
+    .view-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: .82rem;
+      color: var(--text2);
+      text-decoration: none;
+      transition: all var(--transition);
+      margin-left: auto;
+    }
+    .view-switch:hover { border-color: var(--gold); color: var(--gold); }
+    .brand-right-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola 卡牌圖鑑</div>
+        <div class="brand-sub">台灣繁體中文版翻譯</div>
+      </div>
+    </div>
+    <div class="brand-center">
+      翻譯、編輯、排版、網頁編寫為烏嘎嘎桌遊小路獨立製作，禁止用於任何商業用途。
+    </div>
+    <div class="brand-right">
+      <div class="brand-right-row">
+        <div>
+          <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
+          <small style="color:var(--text3);">目前收錄：A, B, C, D, E, AY, FL, Cz</small>
+        </div>
+        <a href="./index.html" class="view-switch">
+          🖼 卡牌圖鑑版
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-container">
+    <!-- Filters -->
+    <section class="filter-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="搜尋牌名、說明、卡片ID…"
+          autocomplete="off"
+        />
+        <button class="clear-btn" id="clearSearch" title="清除">✕</button>
+      </div>
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="minor">次要發展卡</button>
+        <button class="chip" data-filter="occupation">職業卡</button>
+        <button class="chip" data-filter="both">雙色卡</button>
+      </div>
+      <div class="deck-filter">
+        <label for="deckSelect">牌組</label>
+        <select id="deckSelect">
+          <option value="all">全部</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Column toggles -->
+    <div class="list-toolbar">
+      <div class="list-toolbar-title">顯示欄位</div>
+      <div class="col-toggles" id="colToggles"></div>
+    </div>
+
+    <!-- Results info -->
+    <div class="results-info" id="resultsInfo">載入中…</div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="cardTable">
+        <thead id="tableHead">
+          <tr></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="list.js"></script>
+</body>
+</html>
