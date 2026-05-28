@@ -10427,7 +10427,7 @@
     "卡片ID": "A125*",
     "說明": "打出此卡時，若你住在磚屋中，且剛好只有兩個房間，你立即獲得3塊磚頭、2綑蘆葦與2塊石頭。",
     "card_type": "occupation",
-    "source_image": "023.jpg",
+    "source_image": "A職業部分.jpg",
     "position": 16,
     "grid_col": 6,
     "grid_row": 1
