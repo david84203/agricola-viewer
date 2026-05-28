@@ -46,6 +46,131 @@ async function saveCardOverride(cardId, fields) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
+// ── Quick Action Helpers ───────────────────────────
+
+let _editAllCards = [];
+
+async function addCardToBanlist(card, reason, statusEl) {
+  const typeLabel = card.card_type === 'occupation' ? '職業卡' : '次發卡';
+  const groupLabel = `${typeLabel}-${reason}`;
+  statusEl.textContent = '處理中…';
+  statusEl.style.color = 'var(--text3)';
+  try {
+    const groups = await loadBanlistFromFirestore() || [];
+    const existing = groups.find(g => g.ids.includes(card['卡片ID']));
+    if (existing) {
+      statusEl.style.color = '#f87171';
+      statusEl.textContent = `✗ 已在「${existing.label}」中`;
+      return;
+    }
+    let group = groups.find(g => g.label === groupLabel);
+    if (!group) { group = { label: groupLabel, ids: [] }; groups.push(group); }
+    group.ids.push(card['卡片ID']);
+    await saveBanlistToFirestore(groups);
+    statusEl.style.color = '#4ade80';
+    statusEl.textContent = `✓ 已加入「${groupLabel}」`;
+  } catch (e) {
+    statusEl.style.color = '#f87171';
+    statusEl.textContent = '✗ 失敗：' + e.message;
+  }
+}
+
+function addDuplicatePair(cardA, cardB, statusEl) {
+  const LS_DUP_KEY = 'agricola_dups';
+  try {
+    const raw = localStorage.getItem(LS_DUP_KEY);
+    const s = raw ? { picked: {}, dismissed: [], custom: [], ...JSON.parse(raw) } : { picked: {}, dismissed: [], custom: [] };
+    const allPairs = [...(window._dupBasePairs || []), ...s.custom];
+    if (allPairs.find(p => p.cards.includes(cardA['卡片ID']) && p.cards.includes(cardB['卡片ID']))) {
+      statusEl.style.color = '#f87171';
+      statusEl.textContent = '✗ 這兩張牌已有重複配對';
+      return;
+    }
+    s.custom.push({
+      id: 'c' + Date.now(),
+      label: `${cardA['牌名']}／${cardB['牌名']}`,
+      cards: [cardA['卡片ID'], cardB['卡片ID']],
+      defaultCanonical: cardA['卡片ID'],
+      type: 'custom',
+    });
+    localStorage.setItem(LS_DUP_KEY, JSON.stringify(s));
+    statusEl.style.color = '#4ade80';
+    statusEl.textContent = '✓ 已新增，請至「重複卡牌」頁面確認';
+  } catch (e) {
+    statusEl.style.color = '#f87171';
+    statusEl.textContent = '✗ 失敗：' + e.message;
+  }
+}
+
+function renderBanSection(sec, card) {
+  sec.innerHTML = `
+    <div class="admin-qa-label">原因：</div>
+    <div class="admin-reason-row">
+      <button class="admin-reason-btn active" data-reason="過強">過強</button>
+      <button class="admin-reason-btn" data-reason="過爛">過爛</button>
+    </div>
+    <div class="admin-qa-status" id="qaBanStatus"></div>
+    <button class="admin-btn-save admin-qa-confirm" id="qaBanConfirm">確認加入禁卡</button>
+  `;
+  sec.querySelectorAll('.admin-reason-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sec.querySelectorAll('.admin-reason-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  document.getElementById('qaBanConfirm').addEventListener('click', async () => {
+    const reason = sec.querySelector('.admin-reason-btn.active').dataset.reason;
+    await addCardToBanlist(card, reason, document.getElementById('qaBanStatus'));
+  });
+}
+
+function renderDupSection(sec, card) {
+  sec.innerHTML = `
+    <div class="admin-qa-label">搜尋另一張相同的牌：</div>
+    <div class="admin-dup-search-wrap">
+      <input type="text" class="admin-input" id="qaDupSearch" placeholder="輸入牌名…" autocomplete="off" />
+      <div id="qaDupResults" class="ban-admin-results" style="display:none"></div>
+    </div>
+    <div id="qaDupSelected" class="admin-qa-selected">（未選擇）</div>
+    <div class="admin-qa-status" id="qaDupStatus"></div>
+    <button class="admin-btn-save admin-qa-confirm" id="qaDupConfirm" disabled>確認標記重複</button>
+  `;
+  let selectedOther = null;
+  const searchInput = document.getElementById('qaDupSearch');
+  const resultsEl   = document.getElementById('qaDupResults');
+  const selectedEl  = document.getElementById('qaDupSelected');
+  const confirmBtn  = document.getElementById('qaDupConfirm');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    resultsEl.innerHTML = '';
+    if (!q) { resultsEl.style.display = 'none'; return; }
+    const hits = _editAllCards
+      .filter(c => c['卡片ID'] !== card['卡片ID'] && (c['牌名'] || '').toLowerCase().includes(q))
+      .slice(0, 8);
+    if (!hits.length) { resultsEl.style.display = 'none'; return; }
+    resultsEl.style.display = 'block';
+    hits.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'ban-admin-result-item';
+      item.textContent = `${c['牌名']}（${c['卡片ID']} · ${c['牌組']}）`;
+      item.addEventListener('click', () => {
+        selectedOther = c;
+        selectedEl.textContent = `已選：${c['牌名']}（${c['卡片ID']}）`;
+        selectedEl.style.color = 'var(--gold)';
+        searchInput.value = '';
+        resultsEl.style.display = 'none';
+        confirmBtn.disabled = false;
+      });
+      resultsEl.appendChild(item);
+    });
+  });
+  searchInput.addEventListener('blur', () => { setTimeout(() => { resultsEl.style.display = 'none'; }, 200); });
+  confirmBtn.addEventListener('click', () => {
+    if (selectedOther) addDuplicatePair(card, selectedOther, document.getElementById('qaDupStatus'));
+  });
+}
+
 // ── Card Edit Modal ────────────────────────────────
 
 const EDITABLE_FIELDS_MINOR = [
@@ -92,7 +217,8 @@ function injectCardEditModal() {
   el.addEventListener('click', e => { if (e.target === el) close(); });
 }
 
-function openCardEditModal(card) {
+function openCardEditModal(card, allCardsRef) {
+  _editAllCards = allCardsRef || _editAllCards;
   injectCardEditModal();
   document.getElementById('editModalTitle').textContent = `編輯：${card['牌名'] || card['卡片ID']}`;
 
@@ -112,6 +238,36 @@ function openCardEditModal(card) {
       }
     `;
     body.appendChild(row);
+  });
+
+  // Quick actions
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'admin-quick-actions';
+  actionsDiv.innerHTML = `
+    <div class="admin-qa-divider"></div>
+    <div class="admin-qa-title">快速操作</div>
+    <div class="admin-qa-btns">
+      <button class="admin-qa-btn" id="qaBanBtn">🚫 加入禁卡</button>
+      <button class="admin-qa-btn" id="qaDupBtn">🔁 標記重複</button>
+    </div>
+    <div id="qaBanSection" class="admin-qa-section" style="display:none"></div>
+    <div id="qaDupSection" class="admin-qa-section" style="display:none"></div>
+  `;
+  body.appendChild(actionsDiv);
+
+  document.getElementById('qaBanBtn').addEventListener('click', () => {
+    const sec = document.getElementById('qaBanSection');
+    const open = sec.style.display !== 'none';
+    document.getElementById('qaDupSection').style.display = 'none';
+    sec.style.display = open ? 'none' : '';
+    if (!open) renderBanSection(sec, card);
+  });
+  document.getElementById('qaDupBtn').addEventListener('click', () => {
+    const sec = document.getElementById('qaDupSection');
+    const open = sec.style.display !== 'none';
+    document.getElementById('qaBanSection').style.display = 'none';
+    sec.style.display = open ? 'none' : '';
+    if (!open) renderDupSection(sec, card);
   });
 
   const statusEl = document.getElementById('editSaveStatus');

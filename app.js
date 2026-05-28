@@ -289,7 +289,7 @@ function openModal(card) {
     document.querySelector('.modal-info').appendChild(editBtn);
   }
   editBtn.style.display = (typeof isAdmin === 'function' && isAdmin()) ? '' : 'none';
-  editBtn.onclick = () => openCardEditModal(card);
+  editBtn.onclick = () => openCardEditModal(card, allCards);
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
