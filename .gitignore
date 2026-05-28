@@ -1,1 +1,14 @@
 .vercel
+
+# 工具腳本（本機使用，不追蹤）
+add_L_cards.js
+check_missing.js
+fix_C_cards.js
+fix_bonus.js
+fix_duplicates.js
+fix_wording.js
+update_A_cards.js
+update_old_cards.js
+crop.ps1
+crop_all.ps1
+diff.txt
