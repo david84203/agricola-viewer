@@ -12009,7 +12009,11 @@
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E12",
@@ -12028,7 +12032,11 @@
     "grid_col": 1,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E13",
@@ -12047,7 +12055,11 @@
     "grid_col": 2,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E14",
@@ -12066,7 +12078,11 @@
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E15",
@@ -12085,7 +12101,11 @@
     "grid_col": 4,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E16",
@@ -12104,7 +12124,11 @@
     "grid_col": 5,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E17",
@@ -12123,7 +12147,11 @@
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E18",
@@ -12142,7 +12170,11 @@
     "grid_col": 7,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E19",
@@ -12161,7 +12193,11 @@
     "grid_col": 8,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E20",
@@ -12180,7 +12216,11 @@
     "grid_col": 9,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E21",
@@ -12199,7 +12239,11 @@
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E22",
@@ -12218,7 +12262,11 @@
     "grid_col": 1,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E23",
@@ -12237,7 +12285,11 @@
     "grid_col": 2,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E24",
@@ -12256,7 +12308,11 @@
     "grid_col": 3,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E25",
@@ -12275,7 +12331,11 @@
     "grid_col": 4,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E26",
@@ -12294,7 +12354,11 @@
     "grid_col": 5,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E27",
@@ -12313,7 +12377,11 @@
     "grid_col": 6,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E28",
@@ -12332,7 +12400,11 @@
     "grid_col": 7,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E29",
@@ -12351,7 +12423,11 @@
     "grid_col": 8,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E30",
@@ -12370,7 +12446,11 @@
     "grid_col": 9,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E31",
@@ -12389,7 +12469,11 @@
     "grid_col": 0,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E32",
@@ -12408,7 +12492,11 @@
     "grid_col": 1,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E33",
@@ -12427,7 +12515,11 @@
     "grid_col": 2,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E34",
@@ -12446,7 +12538,11 @@
     "grid_col": 3,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E35",
@@ -12465,7 +12561,11 @@
     "grid_col": 4,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E36",
@@ -12484,7 +12584,11 @@
     "grid_col": 5,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E37",
@@ -12503,7 +12607,11 @@
     "grid_col": 6,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E38",
@@ -12522,7 +12630,11 @@
     "grid_col": 7,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E39",
@@ -12541,7 +12653,11 @@
     "grid_col": 8,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E40",
@@ -12560,7 +12676,11 @@
     "grid_col": 9,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E41",
@@ -12579,7 +12699,11 @@
     "grid_col": 0,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E42",
@@ -12598,7 +12722,11 @@
     "grid_col": 1,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E43",
@@ -12617,7 +12745,11 @@
     "grid_col": 2,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E44",
@@ -12636,7 +12768,11 @@
     "grid_col": 3,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E45",
@@ -12655,7 +12791,11 @@
     "grid_col": 4,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E46",
@@ -12674,7 +12814,11 @@
     "grid_col": 5,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E47",
@@ -12693,7 +12837,11 @@
     "grid_col": 6,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E48",
@@ -12712,7 +12860,11 @@
     "grid_col": 7,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E49",
@@ -12731,7 +12883,11 @@
     "grid_col": 8,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E50",
@@ -12750,7 +12906,11 @@
     "grid_col": 9,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E51",
@@ -12769,7 +12929,11 @@
     "grid_col": 0,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E52",
@@ -12788,7 +12952,11 @@
     "grid_col": 1,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E53",
@@ -12807,7 +12975,11 @@
     "grid_col": 2,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E54",
@@ -12826,7 +12998,11 @@
     "grid_col": 3,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E55",
@@ -12845,7 +13021,11 @@
     "grid_col": 4,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E56",
@@ -12864,7 +13044,11 @@
     "grid_col": 5,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E57",
@@ -12883,7 +13067,11 @@
     "grid_col": 6,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E58",
@@ -12902,7 +13090,11 @@
     "grid_col": 7,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E59",
@@ -12921,7 +13113,11 @@
     "grid_col": 8,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E60",
@@ -12940,7 +13136,11 @@
     "grid_col": 9,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E61",
@@ -12959,7 +13159,11 @@
     "grid_col": 0,
     "grid_row": 5,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E62",
@@ -12978,7 +13182,11 @@
     "grid_col": 1,
     "grid_row": 5,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E63",
@@ -12997,7 +13205,11 @@
     "grid_col": 2,
     "grid_row": 5,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 6,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E150",
@@ -13014,7 +13226,11 @@
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E151",
@@ -13031,7 +13247,11 @@
     "grid_col": 1,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E153",
@@ -13048,7 +13268,11 @@
     "grid_col": 2,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E154",
@@ -13065,7 +13289,11 @@
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E162",
@@ -13082,7 +13310,11 @@
     "grid_col": 4,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E171",
@@ -13099,7 +13331,11 @@
     "grid_col": 5,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E172",
@@ -13116,7 +13352,11 @@
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E173",
@@ -13133,7 +13373,11 @@
     "grid_col": 7,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E174",
@@ -13150,7 +13394,11 @@
     "grid_col": 8,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E175",
@@ -13167,7 +13415,11 @@
     "grid_col": 9,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E176",
@@ -13184,7 +13436,11 @@
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E179",
@@ -13201,7 +13457,11 @@
     "grid_col": 1,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E184",
@@ -13218,7 +13478,11 @@
     "grid_col": 2,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E187",
@@ -13235,7 +13499,11 @@
     "grid_col": 3,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E188",
@@ -13252,7 +13520,11 @@
     "grid_col": 4,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E189",
@@ -13269,7 +13541,11 @@
     "grid_col": 5,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E190",
@@ -13286,7 +13562,11 @@
     "grid_col": 6,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E191",
@@ -13303,7 +13583,11 @@
     "grid_col": 7,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E194",
@@ -13320,7 +13604,11 @@
     "grid_col": 8,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E195",
@@ -13337,7 +13625,11 @@
     "grid_col": 9,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E198",
@@ -13354,7 +13646,11 @@
     "grid_col": 0,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E199",
@@ -13371,7 +13667,11 @@
     "grid_col": 1,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E200",
@@ -13388,7 +13688,11 @@
     "grid_col": 2,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E202",
@@ -13405,7 +13709,11 @@
     "grid_col": 3,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E207",
@@ -13422,7 +13730,11 @@
     "grid_col": 4,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E208",
@@ -13439,7 +13751,11 @@
     "grid_col": 5,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E210",
@@ -13456,7 +13772,11 @@
     "grid_col": 6,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E218",
@@ -13473,7 +13793,11 @@
     "grid_col": 7,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E149",
@@ -13492,7 +13816,11 @@
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E159",
@@ -13511,7 +13839,11 @@
     "grid_col": 1,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E160",
@@ -13530,7 +13862,11 @@
     "grid_col": 2,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E163",
@@ -13549,7 +13885,11 @@
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E164",
@@ -13568,7 +13908,11 @@
     "grid_col": 4,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E166",
@@ -13587,7 +13931,11 @@
     "grid_col": 5,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E167",
@@ -13606,7 +13954,11 @@
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E169",
@@ -13625,7 +13977,11 @@
     "grid_col": 7,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E178",
@@ -13644,7 +14000,11 @@
     "grid_col": 8,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E180",
@@ -13663,7 +14023,11 @@
     "grid_col": 9,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E181",
@@ -13682,7 +14046,11 @@
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E183",
@@ -13701,7 +14069,11 @@
     "grid_col": 1,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E185",
@@ -13720,7 +14092,11 @@
     "grid_col": 2,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E186",
@@ -13739,7 +14115,11 @@
     "grid_col": 3,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E192",
@@ -13758,7 +14138,11 @@
     "grid_col": 4,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E193",
@@ -13777,7 +14161,11 @@
     "grid_col": 5,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E201",
@@ -13796,7 +14184,11 @@
     "grid_col": 6,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E203",
@@ -13815,7 +14207,11 @@
     "grid_col": 7,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E204",
@@ -13834,7 +14230,11 @@
     "grid_col": 8,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E206",
@@ -13853,7 +14253,11 @@
     "grid_col": 9,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E212",
@@ -13872,7 +14276,11 @@
     "grid_col": 0,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E213",
@@ -13891,7 +14299,11 @@
     "grid_col": 1,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E215",
@@ -13910,7 +14322,11 @@
     "grid_col": 2,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E216",
@@ -13929,7 +14345,11 @@
     "grid_col": 3,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E147",
@@ -13948,7 +14368,11 @@
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E148",
@@ -13967,7 +14391,11 @@
     "grid_col": 1,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E152",
@@ -13986,7 +14414,11 @@
     "grid_col": 2,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E155",
@@ -14005,7 +14437,11 @@
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E156",
@@ -14024,7 +14460,11 @@
     "grid_col": 4,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E157",
@@ -14043,7 +14483,11 @@
     "grid_col": 5,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E158",
@@ -14062,7 +14506,11 @@
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E161",
@@ -14081,7 +14529,11 @@
     "grid_col": 7,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E165",
@@ -14100,7 +14552,11 @@
     "grid_col": 8,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E168",
@@ -14119,7 +14575,11 @@
     "grid_col": 9,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E170",
@@ -14138,7 +14598,11 @@
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E177",
@@ -14157,7 +14621,11 @@
     "grid_col": 1,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E182",
@@ -14176,7 +14644,11 @@
     "grid_col": 2,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E197",
@@ -14195,7 +14667,11 @@
     "grid_col": 3,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E198",
@@ -14214,7 +14690,11 @@
     "grid_col": 4,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E205",
@@ -14233,7 +14713,11 @@
     "grid_col": 5,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E209",
@@ -14252,7 +14736,11 @@
     "grid_col": 6,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E211",
@@ -14271,7 +14759,11 @@
     "grid_col": 7,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E214",
@@ -14290,7 +14782,11 @@
     "grid_col": 8,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E217",
@@ -14309,7 +14805,11 @@
     "grid_col": 9,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "舊版E341",
@@ -14328,7 +14828,11 @@
     "grid_col": 0,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 3,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "I063",
