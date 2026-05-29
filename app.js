@@ -72,7 +72,9 @@ function applyFilters() {
 
   filteredCards = allCards.filter(c => {
     // type filter
-    if (activeType !== 'all') {
+    if (activeType === 'no-ban') {
+      if (BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
+    } else if (activeType !== 'all') {
       if (activeType === 'minor' && c.card_type !== 'minor' && c.card_type !== 'both') return false;
       if (activeType !== 'minor' && c.card_type !== activeType) return false;
     }
