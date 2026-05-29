@@ -6,6 +6,8 @@ const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 const LS_KEY = 'agricola_dups';
+const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+const FS_DUP_DOC = `${FIRESTORE_BASE}/agricola_dup_state/main`;
 
 let allCards = [];
 let basePairs = [];   // from duplicates.json
@@ -41,6 +43,46 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(LS_KEY, JSON.stringify(state));
+  if (typeof isAdmin === 'function' && isAdmin()) {
+    saveStateToFirestore();
+  }
+}
+
+async function loadStateFromFirestore() {
+  try {
+    const res = await fetch(FS_DUP_DOC);
+    if (!res.ok) return false;
+    const data = await res.json();
+    const json = data.fields?.stateJson?.stringValue;
+    if (!json) return false;
+    state = { picked: {}, dismissed: [], custom: [], ...JSON.parse(json) };
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    return true;
+  } catch { return false; }
+}
+
+async function saveStateToFirestore() {
+  const statusEl = document.getElementById('syncStatus');
+  try {
+    const res = await fetch(`${FS_DUP_DOC}?updateMask.fieldPaths=stateJson`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { stateJson: { stringValue: JSON.stringify(state) } } }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (statusEl) {
+      statusEl.textContent = '☁ 已同步';
+      statusEl.className = 'dup-sync-status sync-ok';
+      statusEl.style.display = '';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+    }
+  } catch (e) {
+    if (statusEl) {
+      statusEl.textContent = `⚠ 雲端同步失敗`;
+      statusEl.className = 'dup-sync-status sync-err';
+      statusEl.style.display = '';
+    }
+  }
 }
 
 // ── Computed ───────────────────────────────────────
@@ -357,8 +399,16 @@ function getExcludedCardIds() {
 window.getExcludedCardIds = getExcludedCardIds;
 
 // ── Auth callback ──────────────────────────────────
-function onAuthChange() {
+async function onAuthChange() {
   const admin = typeof isAdmin === 'function' && isAdmin();
+
+  if (admin) {
+    const statusEl = document.getElementById('syncStatus');
+    if (statusEl) { statusEl.textContent = '☁ 從雲端載入…'; statusEl.className = 'dup-sync-status sync-loading'; statusEl.style.display = ''; }
+    const loaded = await loadStateFromFirestore();
+    if (!loaded) loadState();
+    if (statusEl) statusEl.style.display = 'none';
+  }
 
   // 工具列：非管理員隱藏新增按鈕和操作型頁籤
   const toolbar = document.querySelector('.dup-toolbar');
