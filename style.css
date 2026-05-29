@@ -220,6 +220,19 @@ body {
   font-weight: 600;
 }
 
+.chip-toggle {
+  border-left: 1px solid var(--border2);
+  padding-left: 14px;
+  margin-left: 4px;
+}
+.chip-toggle.active {
+  background: #5a1a1a;
+  border-color: #c0392b;
+  color: #ff8a7a;
+  font-weight: 600;
+}
+.chip-toggle:hover { border-color: #c0392b; color: #ff8a7a; }
+
 .deck-filter {
   display: flex;
   align-items: center;

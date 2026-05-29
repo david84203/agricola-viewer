@@ -66,18 +66,19 @@ function populateDeckFilter() {
 let activeType = 'all';
 let activeDeck = 'all';
 let searchQuery = '';
+let excludeBanned = false;
 
 function applyFilters() {
   const q = searchQuery.toLowerCase();
 
   filteredCards = allCards.filter(c => {
     // type filter
-    if (activeType === 'no-ban') {
-      if (BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
-    } else if (activeType !== 'all') {
+    if (activeType !== 'all') {
       if (activeType === 'minor' && c.card_type !== 'minor' && c.card_type !== 'both') return false;
       if (activeType !== 'minor' && c.card_type !== activeType) return false;
     }
+    // exclude banned toggle
+    if (excludeBanned && BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
     // deck filter
     if (activeDeck !== 'all') {
       if (activeDeck === 'BGA') {
@@ -326,14 +327,21 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 
-// Filter chips
-document.querySelectorAll('.chip').forEach(chip => {
+// Filter chips (type, mutually exclusive)
+document.querySelectorAll('.filter-chips .chip').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     activeType = chip.dataset.filter;
     applyFilters();
   });
+});
+
+// Exclude banned toggle (independent)
+document.getElementById('excludeBanBtn').addEventListener('click', () => {
+  excludeBanned = !excludeBanned;
+  document.getElementById('excludeBanBtn').classList.toggle('active', excludeBanned);
+  applyFilters();
 });
 
 // Deck select
