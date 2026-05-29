@@ -8,6 +8,8 @@ let activeType = 'all';
 let activeDeck = 'all';
 let searchQuery = '';
 
+const BANNED_IDS = new Set(['FL049','C093','C130','A127','I251','I260','I234','I255','C003*','B010*','906-8','A010','B021','A048','C031','A107','B140','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','舊版E158','舊版E170','舊版E155','I247','C058','B052','B018','舊版E17','舊版E29','I093','舊版E51']);
+
 // ── Column definitions ─────────────────────────────
 // key: unique key, label: header text, className: td class,
 // hideFor: ['occupation'] | ['minor'] — auto-hide when that type is exclusively shown
@@ -41,6 +43,15 @@ const COLUMNS = [
       const cls = { minor: 'badge-minor', occupation: 'badge-occupation' };
       return `<span class="card-type-badge ${cls[c.card_type] || ''}">${map[c.card_type] || c.card_type}</span>`;
     },
+  },
+  {
+    key: 'banned',
+    label: '禁卡',
+    className: 'col-banned',
+    defaultOn: true,
+    render: c => BANNED_IDS.has(c['卡片ID'])
+      ? '<span class="tag tag-ban">禁卡</span>'
+      : '—',
   },
   {
     key: 'needs',

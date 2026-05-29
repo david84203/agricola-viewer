@@ -382,6 +382,7 @@ body {
 .tag-vp    { background: rgba(155,109,255,.18); color: var(--purple); }
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
+.tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
 
 /* ─── Empty State ────────────────────────────────────────────── */
 .empty-state {

@@ -135,7 +135,9 @@ function createCardEl(card, idx) {
   const vp = card['勝利點數'] && card['勝利點數'] !== '無';
   const bonus = card['紅利分數'] === '有';
   const pass = card['是否傳遞'] === '是';
+  const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
   const tagsHtml = [
+    banned ? `<span class="tag tag-ban">禁卡</span>` : '',
     vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
     pass  ? `<span class="tag tag-pass">←傳遞←</span>` : '',
