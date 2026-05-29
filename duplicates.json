@@ -378,5 +378,255 @@
     ],
     "defaultCanonical": "I065",
     "type": "effect"
+  },
+  {
+    "id": "n036",
+    "label": "重整石屋",
+    "cards": [
+      "E013",
+      "FR045"
+    ],
+    "defaultCanonical": "E013",
+    "type": "name"
+  },
+  {
+    "id": "n037",
+    "label": "木鋸",
+    "cards": [
+      "E014",
+      "FR060"
+    ],
+    "defaultCanonical": "E014",
+    "type": "name"
+  },
+  {
+    "id": "n038",
+    "label": "織布機",
+    "cards": [
+      "B039*",
+      "K146"
+    ],
+    "defaultCanonical": "B039*",
+    "type": "name"
+  },
+  {
+    "id": "n039",
+    "label": "麵包鏟",
+    "cards": [
+      "B025*",
+      "K111"
+    ],
+    "defaultCanonical": "B025*",
+    "type": "name"
+  },
+  {
+    "id": "n040",
+    "label": "臥室",
+    "cards": [
+      "A026*",
+      "K139"
+    ],
+    "defaultCanonical": "A026*",
+    "type": "name"
+  },
+  {
+    "id": "n041",
+    "label": "養父母",
+    "cards": [
+      "A092*",
+      "K267"
+    ],
+    "defaultCanonical": "A092*",
+    "type": "name"
+  },
+  {
+    "id": "n042",
+    "label": "有機農",
+    "cards": [
+      "B098*",
+      "K274"
+    ],
+    "defaultCanonical": "B098*",
+    "type": "name"
+  },
+  {
+    "id": "n043",
+    "label": "工頭",
+    "cards": [
+      "B087*",
+      "K308"
+    ],
+    "defaultCanonical": "B087*",
+    "type": "name"
+  },
+  {
+    "id": "n044",
+    "label": "管家",
+    "cards": [
+      "B136*",
+      "K282"
+    ],
+    "defaultCanonical": "B136*",
+    "type": "name"
+  },
+  {
+    "id": "n045",
+    "label": "學者",
+    "cards": [
+      "B097*",
+      "K279"
+    ],
+    "defaultCanonical": "B097*",
+    "type": "name"
+  },
+  {
+    "id": "n046",
+    "label": "架樑工",
+    "cards": [
+      "A123*",
+      "K272"
+    ],
+    "defaultCanonical": "A123*",
+    "type": "name"
+  },
+  {
+    "id": "n047",
+    "label": "馴養員",
+    "cards": [
+      "A086*",
+      "K306"
+    ],
+    "defaultCanonical": "A086*",
+    "type": "name"
+  },
+  {
+    "id": "n048",
+    "label": "情聖",
+    "cards": [
+      "C127",
+      "K291"
+    ],
+    "defaultCanonical": "C127",
+    "type": "name"
+  },
+  {
+    "id": "n049",
+    "label": "倉庫管理員",
+    "cards": [
+      "B154*",
+      "K288"
+    ],
+    "defaultCanonical": "B154*",
+    "type": "name"
+  },
+  {
+    "id": "n050",
+    "label": "私有林區",
+    "cards": [
+      "舊版E45",
+      "C074*"
+    ],
+    "defaultCanonical": "C074*",
+    "type": "name"
+  },
+  {
+    "id": "n051",
+    "label": "蘆葦池",
+    "cards": [
+      "舊版E48",
+      "D078*"
+    ],
+    "defaultCanonical": "D078*",
+    "type": "name"
+  },
+  {
+    "id": "n052",
+    "label": "飼料丸",
+    "cards": [
+      "舊版E63",
+      "D084*"
+    ],
+    "defaultCanonical": "D084*",
+    "type": "name"
+  },
+  {
+    "id": "n053",
+    "label": "馬廄工頭",
+    "cards": [
+      "舊版E208",
+      "C089*"
+    ],
+    "defaultCanonical": "C089*",
+    "type": "name"
+  },
+  {
+    "id": "n054",
+    "label": "召牛人",
+    "cards": [
+      "舊版E201",
+      "C166*"
+    ],
+    "defaultCanonical": "C166*",
+    "type": "name"
+  },
+  {
+    "id": "n055",
+    "label": "灌木林",
+    "cards": [
+      "I078",
+      "D075*"
+    ],
+    "defaultCanonical": "D075*",
+    "type": "name"
+  },
+  {
+    "id": "n056",
+    "label": "木頭推車",
+    "cards": [
+      "I079",
+      "C076*"
+    ],
+    "defaultCanonical": "C076*",
+    "type": "name"
+  },
+  {
+    "id": "n057",
+    "label": "偶戲師",
+    "cards": [
+      "I249",
+      "C152*"
+    ],
+    "defaultCanonical": "C152*",
+    "type": "name"
+  },
+  {
+    "id": "n058",
+    "label": "連枷",
+    "cards": [
+      "K113",
+      "C026*"
+    ],
+    "defaultCanonical": "C026*",
+    "type": "name"
+  },
+  {
+    "id": "n059",
+    "label": "總管",
+    "cards": [
+      "K276",
+      "C135*"
+    ],
+    "defaultCanonical": "C135*",
+    "type": "name"
+  },
+  {
+    "id": "n060",
+    "label": "菸斗吸菸者",
+    "cards": [
+      "E117",
+      "FR100"
+    ],
+    "defaultCanonical": "E117",
+    "type": "name"
   }
 ]
