@@ -106,6 +106,8 @@ function createPairEl(pair) {
                 : '<span class="dup-type-tag tag-name">同名</span>';
 
   const admin = typeof isAdmin === 'function' && isAdmin();
+  const confirmBtnHtml = (admin && !dismissed && isPending(pair.id))
+    ? `<button class="dup-btn-confirm" data-id="${pair.id}">✓ 確認</button>` : '';
   div.innerHTML = `
     <div class="dup-pair-header">
       <span class="dup-pair-label">${pair.label}</span>
@@ -113,8 +115,7 @@ function createPairEl(pair) {
       ${admin ? `<div class="dup-pair-actions">
         ${dismissed
           ? `<button class="dup-btn-restore" data-id="${pair.id}">↩ 復原</button>`
-          : `${isPending(pair.id) ? `<button class="dup-btn-confirm" data-id="${pair.id}">✓ 確認</button>` : ''}
-             <button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
+          : `${confirmBtnHtml}<button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
         }
         ${pair.type === 'custom' ? `<button class="dup-btn-delete" data-id="${pair.id}">🗑 刪除</button>` : ''}
       </div>` : ''}
@@ -235,7 +236,7 @@ function setupEvents() {
     const id = e.target.dataset.id;
     if (!id) return;
     if (e.target.classList.contains('dup-btn-confirm')) {
-      const pairEl = e.target.closest('[data-id]');
+      const pairEl = e.target.closest('.dup-pair');
       const radio = pairEl ? pairEl.querySelector(`input[name="canon_${id}"]:checked`) : null;
       if (radio) {
         state.picked[id] = radio.value;
