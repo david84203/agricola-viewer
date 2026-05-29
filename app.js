@@ -377,7 +377,6 @@ function closeBanlist() {
 function renderBanlist(container) {
   BANNED_GROUPS.forEach(({ label, ids }) => {
     const cards = ids.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
-    if (!cards.length) return;
 
     const section = document.createElement('div');
     section.className = 'banlist-section';
@@ -385,6 +384,9 @@ function renderBanlist(container) {
 
     const grid = document.createElement('div');
     grid.className = 'banlist-grid';
+    if (cards.length === 0) {
+      grid.innerHTML = '<div class="banlist-empty">尚無禁卡</div>';
+    }
     cards.forEach(card => {
       const item = document.createElement('div');
       item.className = 'banlist-card';
