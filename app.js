@@ -175,8 +175,8 @@ function drawCrop(canvas, card) {
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {
-    // Check if the image is a composite (from the older set named ...部分.jpg)
-    const isComposite = card.source_image.includes('部分.jpg');
+    // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
+    const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
@@ -353,10 +353,10 @@ document.getElementById('clearSearch').addEventListener('click', () => {
 
 // ── Banlist ────────────────────────────────────────
 const BANNED_GROUPS = [  // populated from Firestore on load; fallback hardcoded
-  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127'] },
+  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127', 'I251', 'I260', 'I234', 'I255'] },
   { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
-  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018'] },
+  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247'] },
+  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51'] },
 ];
 
 function openBanlist() {
