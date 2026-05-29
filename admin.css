@@ -93,6 +93,35 @@
   resize: vertical;
   line-height: 1.5;
 }
+.admin-option-group {
+  display: flex;
+  gap: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.admin-option-btn {
+  flex: 1;
+  padding: 8px 0;
+  background: var(--bg);
+  color: var(--text2);
+  border: none;
+  cursor: pointer;
+  font-size: .9rem;
+  transition: background var(--transition), color var(--transition);
+}
+.admin-option-btn + .admin-option-btn {
+  border-left: 1px solid var(--border);
+}
+.admin-option-btn.active {
+  background: var(--gold);
+  color: #1a1000;
+  font-weight: 600;
+}
+.admin-option-btn:hover:not(.active) {
+  background: var(--surface);
+  color: var(--text);
+}
 
 /* ── Buttons ── */
 .admin-btn-cancel, .admin-btn-save {

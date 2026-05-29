@@ -230,7 +230,10 @@ function openCardEditModal(card, allCardsRef) {
     row.className = 'admin-field-row';
     let input;
     if (options) {
-      input = `<select class="admin-input" data-key="${key}">${options.map(o => `<option value="${o}"${o === val ? ' selected' : ''}>${o}</option>`).join('')}</select>`;
+      const btns = options.map(o =>
+        `<button type="button" class="admin-option-btn${o === val ? ' active' : ''}" data-val="${o}">${o}</button>`
+      ).join('');
+      input = `<div class="admin-option-group" data-key="${key}">${btns}</div>`;
     } else if (multiline) {
       input = `<textarea class="admin-input admin-textarea" data-key="${key}" rows="4">${val}</textarea>`;
     } else {
@@ -238,6 +241,14 @@ function openCardEditModal(card, allCardsRef) {
     }
     row.innerHTML = `<label class="admin-field-label">${label}</label>${input}`;
     body.appendChild(row);
+    if (options) {
+      row.querySelectorAll('.admin-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          row.querySelectorAll('.admin-option-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
   });
 
   // Quick actions
@@ -278,7 +289,10 @@ function openCardEditModal(card, allCardsRef) {
     const changed = {};
     body.querySelectorAll('[data-key]').forEach(el => {
       const k = el.dataset.key;
-      if (el.value !== (card[k] || '')) changed[k] = el.value;
+      const v = el.classList.contains('admin-option-group')
+        ? (el.querySelector('.admin-option-btn.active')?.dataset.val || '')
+        : el.value;
+      if (v !== (card[k] || '')) changed[k] = v;
     });
 
     if (Object.keys(changed).length === 0) {
