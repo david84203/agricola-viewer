@@ -277,7 +277,7 @@ function openCardEditModal(card, allCardsRef) {
     });
 
     if (Object.keys(changed).length === 0) {
-      statusEl.textContent = '沒有修改';
+      document.getElementById('cardEditModal').style.display = 'none';
       return;
     }
 
