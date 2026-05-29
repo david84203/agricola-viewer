@@ -177,14 +177,14 @@ const EDITABLE_FIELDS_MINOR = [
   { key: '先決條件', label: '先決條件' },
   { key: '費用',    label: '費用' },
   { key: '勝利點數', label: '勝利點數' },
-  { key: '紅利分數', label: '紅利分數' },
-  { key: '是否傳遞', label: '是否傳遞' },
+  { key: '紅利分數', label: '紅利分數', options: ['有', '無'] },
+  { key: '是否傳遞', label: '是否傳遞', options: ['是', '否'] },
 ];
 const EDITABLE_FIELDS_OCC = [
   { key: '牌名',    label: '牌名' },
   { key: '說明',    label: '說明', multiline: true },
   { key: '人數',    label: '需求人數' },
-  { key: '紅利分數', label: '紅利分數' },
+  { key: '紅利分數', label: '紅利分數', options: ['有', '無'] },
 ];
 
 function injectCardEditModal() {
@@ -224,17 +224,19 @@ function openCardEditModal(card, allCardsRef) {
   const body   = document.getElementById('editModalBody');
   body.innerHTML = '';
 
-  fields.forEach(({ key, label, multiline }) => {
+  fields.forEach(({ key, label, multiline, options }) => {
     const val = card[key] || '';
     const row = document.createElement('div');
     row.className = 'admin-field-row';
-    row.innerHTML = `
-      <label class="admin-field-label">${label}</label>
-      ${multiline
-        ? `<textarea class="admin-input admin-textarea" data-key="${key}" rows="4">${val}</textarea>`
-        : `<input type="text" class="admin-input" data-key="${key}" value="${val.replace(/"/g, '&quot;')}" />`
-      }
-    `;
+    let input;
+    if (options) {
+      input = `<select class="admin-input" data-key="${key}">${options.map(o => `<option value="${o}"${o === val ? ' selected' : ''}>${o}</option>`).join('')}</select>`;
+    } else if (multiline) {
+      input = `<textarea class="admin-input admin-textarea" data-key="${key}" rows="4">${val}</textarea>`;
+    } else {
+      input = `<input type="text" class="admin-input" data-key="${key}" value="${val.replace(/"/g, '&quot;')}" />`;
+    }
+    row.innerHTML = `<label class="admin-field-label">${label}</label>${input}`;
     body.appendChild(row);
   });
 
