@@ -696,6 +696,8 @@
 .banlist-card canvas {
   display: block;
   border-radius: 4px;
+  width: 100%;
+  height: auto;
 }
 .banlist-card-name {
   font-size: .75rem;
