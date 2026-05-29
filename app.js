@@ -82,7 +82,7 @@ const lazyCanvasObserver = new IntersectionObserver((entries) => {
       if (card) drawCrop(canvas, card);
     }
   });
-}, { rootMargin: '400px' });
+}, { rootMargin: '1200px' });
 
 function applyFilters() {
   const q = searchQuery.toLowerCase();
