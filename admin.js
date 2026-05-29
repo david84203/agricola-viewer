@@ -51,8 +51,11 @@ async function saveCardOverride(cardId, fields) {
 let _editAllCards = [];
 
 async function addCardToBanlist(card, reason, statusEl) {
-  const typeLabel = card.card_type === 'occupation' ? '職業卡' : '次發卡';
-  const groupLabel = reason === '擾亂戰局' ? '擾亂戰局' : `${typeLabel}-${reason}`;
+  const isOcc = card.card_type === 'occupation';
+  const groupLabel = reason === '擾亂戰局' ? '擾亂戰局'
+    : reason === '過強' ? (isOcc ? '過強職業' : '過強次要發展卡')
+    : reason === '過爛' ? (isOcc ? '過爛職業' : '過爛次要發展卡')
+    : (isOcc ? `${reason}職業` : `${reason}次要發展卡`);
   const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
   setStatus('處理中…');
   try {
