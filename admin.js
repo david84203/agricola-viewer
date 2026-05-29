@@ -53,25 +53,22 @@ let _editAllCards = [];
 async function addCardToBanlist(card, reason, statusEl) {
   const typeLabel = card.card_type === 'occupation' ? '職業卡' : '次發卡';
   const groupLabel = reason === '擾亂戰局' ? '擾亂戰局' : `${typeLabel}-${reason}`;
-  statusEl.textContent = '處理中…';
-  statusEl.style.color = 'var(--text3)';
+  const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
+  setStatus('處理中…');
   try {
     const groups = await loadBanlistFromFirestore() || [];
     const existing = groups.find(g => g.ids.includes(card['卡片ID']));
     if (existing) {
-      statusEl.style.color = '#f87171';
-      statusEl.textContent = `✗ 已在「${existing.label}」中`;
+      setStatus(`✗ 已在「${existing.label}」中`, '#f87171');
       return;
     }
     let group = groups.find(g => g.label === groupLabel);
     if (!group) { group = { label: groupLabel, ids: [] }; groups.push(group); }
     group.ids.push(card['卡片ID']);
     await saveBanlistToFirestore(groups);
-    statusEl.style.color = '#4ade80';
-    statusEl.textContent = `✓ 已加入「${groupLabel}」`;
+    setStatus(`✓ 已加入「${groupLabel}」`, '#4ade80');
   } catch (e) {
-    statusEl.style.color = '#f87171';
-    statusEl.textContent = '✗ 失敗：' + e.message;
+    setStatus('✗ 失敗：' + e.message, '#f87171');
   }
 }
 
@@ -104,24 +101,21 @@ function addDuplicatePair(cardA, cardB, statusEl) {
 
 function renderBanSection(sec, card) {
   sec.innerHTML = `
-    <div class="admin-qa-label">原因：</div>
+    <div class="admin-qa-label">點擊原因直接加入禁卡：</div>
     <div class="admin-reason-row">
-      <button class="admin-reason-btn active" data-reason="過強">過強</button>
+      <button class="admin-reason-btn" data-reason="過強">過強</button>
       <button class="admin-reason-btn" data-reason="過爛">過爛</button>
       <button class="admin-reason-btn" data-reason="擾亂戰局">擾亂戰局</button>
     </div>
-    <div class="admin-qa-status" id="qaBanStatus"></div>
-    <button class="admin-btn-save admin-qa-confirm" id="qaBanConfirm">確認加入禁卡</button>
+    <div class="admin-qa-status"></div>
   `;
+  const statusEl = sec.querySelector('.admin-qa-status');
   sec.querySelectorAll('.admin-reason-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sec.querySelectorAll('.admin-reason-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    btn.addEventListener('click', async () => {
+      sec.querySelectorAll('.admin-reason-btn').forEach(b => b.disabled = true);
+      await addCardToBanlist(card, btn.dataset.reason, statusEl);
+      sec.querySelectorAll('.admin-reason-btn').forEach(b => b.disabled = false);
     });
-  });
-  document.getElementById('qaBanConfirm').addEventListener('click', async () => {
-    const reason = sec.querySelector('.admin-reason-btn.active').dataset.reason;
-    await addCardToBanlist(card, reason, document.getElementById('qaBanStatus'));
   });
 }
 
