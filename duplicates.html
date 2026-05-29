@@ -26,6 +26,9 @@
   </div>
 
   <main class="dup-main">
+    <div class="dup-policy">
+      <strong>重複卡牌挑選依據：</strong>若 2 張牌都非過強，則選用較強的牌；若 2 張牌有 1 張過強，則選用另 1 張。
+    </div>
     <div class="dup-toolbar">
       <div class="dup-stats" id="dupStats">載入中…</div>
       <span id="syncStatus" class="dup-sync-status" style="display:none"></span>
@@ -66,6 +69,14 @@
         <button class="dup-btn-cancel" id="cancelAdd">取消</button>
         <button class="dup-btn-confirm" id="confirmAdd">新增</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Compare Modal -->
+  <div class="dup-compare-overlay" id="compareOverlay">
+    <div class="dup-compare-modal">
+      <button class="dup-compare-close" id="compareClose">✕</button>
+      <div id="compareContent"></div>
     </div>
   </div>
 

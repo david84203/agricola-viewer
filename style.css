@@ -1,12 +1,12 @@
 /* ─── Design Tokens ────────────────────────────────────────── */
 :root {
-  --bg:        #0f1117;
-  --bg2:       #161b27;
-  --bg3:       #1d2437;
-  --surface:   #222b40;
-  --surface2:  #2c3654;
-  --border:    #2e3a55;
-  --border2:   #3d4f70;
+  --bg:        #1c1914;
+  --bg2:       #252019;
+  --bg3:       #2f2921;
+  --surface:   #38312a;
+  --surface2:  #463e35;
+  --border:    #574d43;
+  --border2:   #726258;
 
   --gold:      #e8b84b;
   --gold2:     #f5d78e;
@@ -17,9 +17,9 @@
   --blue:      #5b8dee;
   --purple:    #9b6dff;
 
-  --text:      #e8ecf4;
-  --text2:     #a8b3cc;
-  --text3:     #6b7a99;
+  --text:      #f2e8d5;
+  --text2:     #cbb898;
+  --text3:     #968272;
 
   --radius-sm: 8px;
   --radius:    14px;
@@ -235,12 +235,17 @@ body {
   cursor: pointer;
   outline: none;
   appearance: none;
+  color-scheme: dark;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   transition: border-color var(--transition);
 }
 .deck-filter select:focus { border-color: var(--gold); }
+.deck-filter select option {
+  background: var(--bg3);
+  color: var(--text);
+}
 
 /* ─── Results Info ───────────────────────────────────────────── */
 .results-info {

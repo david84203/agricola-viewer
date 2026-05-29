@@ -138,32 +138,40 @@ function render() {
 
 function createPairEl(pair) {
   const dismissed = isDismissed(pair.id);
-  const canon = getCanonical(pair);
   const div = document.createElement('div');
   div.className = 'dup-pair' + (dismissed ? ' dup-pair-dismissed' : '');
   div.dataset.id = pair.id;
 
-  const typeTag = pair.type === 'effect' ? '<span class="dup-type-tag tag-effect">效果相同</span>'
-                : pair.type === 'custom'  ? '<span class="dup-type-tag tag-custom">手動新增</span>'
-                : '<span class="dup-type-tag tag-name">同名</span>';
+  const typeTag = pair.type === 'effect'
+    ? '<span class="dup-type-tag tag-effect">效果相同</span>'
+    : pair.type === 'custom'
+    ? '<span class="dup-type-tag tag-custom">手動新增</span>'
+    : '<span class="dup-type-tag tag-name">同名</span>';
 
   const admin = typeof isAdmin === 'function' && isAdmin();
-  const confirmBtnHtml = (admin && !dismissed && isPending(pair.id))
-    ? `<button class="dup-btn-confirm" data-id="${pair.id}">✓ 確認</button>` : '';
+  let adminBtns = '';
+  if (admin) {
+    if (dismissed) {
+      adminBtns = `<button class="dup-icon-btn dup-btn-restore" data-id="${pair.id}" title="復原">↩</button>`;
+    } else {
+      if (isPending(pair.id))
+        adminBtns += `<button class="dup-icon-btn dup-btn-confirm" data-id="${pair.id}" title="確認此配對">✓</button>`;
+      adminBtns += `<button class="dup-icon-btn dup-btn-dismiss" data-id="${pair.id}" title="這不是重複">✕</button>`;
+    }
+    if (pair.type === 'custom')
+      adminBtns += `<button class="dup-icon-btn dup-btn-delete" data-id="${pair.id}" title="刪除">🗑</button>`;
+  }
+
   div.innerHTML = `
     <div class="dup-pair-header">
       <span class="dup-pair-label">${pair.label}</span>
       ${typeTag}
-      ${admin ? `<div class="dup-pair-actions">
-        ${dismissed
-          ? `<button class="dup-btn-restore" data-id="${pair.id}">↩ 復原</button>`
-          : `${confirmBtnHtml}<button class="dup-btn-dismiss" data-id="${pair.id}">✕ 這不是重複</button>`
-        }
-        ${pair.type === 'custom' ? `<button class="dup-btn-delete" data-id="${pair.id}">🗑 刪除</button>` : ''}
-      </div>` : ''}
+      <div class="dup-pair-actions">
+        <button class="dup-icon-btn dup-btn-detail" data-id="${pair.id}" title="詳細比較">🔍</button>
+        ${adminBtns}
+      </div>
     </div>
-    <div class="dup-cards-row"></div>
-  `;
+    <div class="dup-cards-row"></div>`;
 
   const row = div.querySelector('.dup-cards-row');
   pair.cards.forEach((cardId, i) => {
@@ -171,7 +179,7 @@ function createPairEl(pair) {
     if (!card) {
       const missing = document.createElement('div');
       missing.className = 'dup-card-wrap';
-      missing.innerHTML = `<div class="dup-card-missing">找不到：${cardId}</div>`;
+      missing.innerHTML = `<div class="dup-card-missing">？${cardId}</div>`;
       row.appendChild(missing);
     } else {
       row.appendChild(createCardWrap(pair, card, dismissed));
@@ -188,48 +196,115 @@ function createPairEl(pair) {
 }
 
 function createCardWrap(pair, card, dismissed) {
-  const canon = getCanonical(pair);
-  const isCanon = card['卡片ID'] === canon;
+  const isCanon = card['卡片ID'] === getCanonical(pair);
+  const admin = typeof isAdmin === 'function' && isAdmin();
   const wrap = document.createElement('div');
-  wrap.className = 'dup-card-wrap' + (isCanon ? ' dup-card-canon' : ' dup-card-alt');
-
-  const typeLabel = card.card_type === 'minor' ? '次發' : card.card_type === 'occupation' ? '職業' : '雙色';
+  wrap.className = 'dup-card-wrap' + (isCanon ? ' dup-card-canon' : '');
 
   wrap.innerHTML = `
     <div class="dup-card-thumb"><canvas></canvas></div>
-    <div class="dup-card-info">
-      <div class="dup-card-name">${card['牌名']}</div>
-      <div class="dup-card-meta">${card['卡片ID']} ｜ ${card['牌組']} ｜ ${typeLabel}</div>
-      <div class="dup-card-desc">${card['說明'] || '—'}</div>
-    </div>
-    ${!dismissed && (typeof isAdmin === 'function' && isAdmin()) ? `
-    <div class="dup-card-footer">
-      <label class="dup-radio-wrap">
-        <input type="radio" name="canon_${pair.id}" value="${card['卡片ID']}" ${isCanon ? 'checked' : ''} />
-        <span class="dup-radio-label ${isCanon ? 'dup-radio-active' : ''}">✓ 主要版本</span>
-      </label>
-    </div>` : isCanon && !dismissed ? `
-    <div class="dup-card-footer">
-      <span class="dup-radio-label dup-radio-active">✓ 主要版本</span>
-    </div>` : ''}
-  `;
+    ${isCanon ? '<div class="dup-check-badge">✓</div>' : ''}`;
 
   requestAnimationFrame(() => {
     const canvas = wrap.querySelector('canvas');
     if (canvas) drawCrop(canvas, card);
   });
 
-  if (!dismissed) {
-    wrap.querySelector('input[type=radio]').addEventListener('change', e => {
-      if (e.target.checked) {
-        state.picked[pair.id] = card['卡片ID'];
-        saveState();
-        render();
-      }
+  if (admin && !dismissed) {
+    wrap.style.cursor = 'pointer';
+    wrap.title = '點擊設為主要版本';
+    wrap.addEventListener('click', () => {
+      state.picked[pair.id] = card['卡片ID'];
+      saveState();
+      render();
     });
+  } else if (!dismissed) {
+    wrap.style.cursor = 'pointer';
+    wrap.addEventListener('click', () => openCompareModal(pair.id));
   }
 
   return wrap;
+}
+
+function openCompareModal(pairId) {
+  const pair = getAllPairs().find(p => p.id === pairId);
+  if (!pair) return;
+
+  const dismissed = isDismissed(pair.id);
+  const admin = typeof isAdmin === 'function' && isAdmin();
+
+  const typeTag = pair.type === 'effect'
+    ? '<span class="dup-type-tag tag-effect">效果相同</span>'
+    : pair.type === 'custom'
+    ? '<span class="dup-type-tag tag-custom">手動新增</span>'
+    : '<span class="dup-type-tag tag-name">同名</span>';
+
+  const cardsHtml = pair.cards.map(cardId => {
+    const card = allCards.find(c => c['卡片ID'] === cardId);
+    if (!card) return `<div class="dup-cmp-card"><div class="dup-card-missing">找不到：${cardId}</div></div>`;
+    const isCanon = cardId === getCanonical(pair);
+    const typeLabel = card.card_type === 'minor' ? '次要發展卡'
+                    : card.card_type === 'occupation' ? '職業卡' : '雙色卡';
+
+    const fields = [
+      card['費用'] && card['費用'] !== '無'
+        ? `<div class="dup-cmp-field"><span class="dup-cmp-label">費用</span>${card['費用']}</div>` : '',
+      card['遊戲人數']
+        ? `<div class="dup-cmp-field"><span class="dup-cmp-label">人數</span>${card['遊戲人數']}+</div>` : '',
+      card['先決條件'] && card['先決條件'] !== '無'
+        ? `<div class="dup-cmp-field"><span class="dup-cmp-label">先決</span>${card['先決條件']}</div>` : '',
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="dup-cmp-card ${isCanon ? 'dup-cmp-canon' : ''}">
+        <div class="dup-cmp-img-wrap">
+          <canvas data-cmp-card="${cardId}"></canvas>
+          ${isCanon ? '<div class="dup-cmp-check">✓ 主要版本</div>' : ''}
+        </div>
+        <div class="dup-cmp-info">
+          <div class="dup-cmp-name">${card['牌名']}</div>
+          <div class="dup-cmp-meta">${card['卡片ID']} ｜ ${card['牌組']} ｜ ${typeLabel}</div>
+          ${fields}
+          <div class="dup-cmp-desc-label">說明</div>
+          <div class="dup-cmp-desc">${card['說明'] || '—'}</div>
+          ${admin && !dismissed ? `
+            <button class="dup-cmp-pick-btn ${isCanon ? 'active' : ''}"
+                    data-pair="${pair.id}" data-card="${cardId}">
+              ${isCanon ? '✓ 已選為主要版本' : '選為主要版本'}
+            </button>` : ''}
+        </div>
+      </div>`;
+  }).join('<div class="dup-cmp-vs">vs</div>');
+
+  const content = document.getElementById('compareContent');
+  content.innerHTML = `
+    <div class="dup-cmp-header">
+      <div class="dup-cmp-title">${pair.label}</div>
+      <div>${typeTag}</div>
+    </div>
+    <div class="dup-cmp-grid">${cardsHtml}</div>`;
+
+  document.getElementById('compareOverlay').classList.add('open');
+
+  requestAnimationFrame(() => {
+    content.querySelectorAll('canvas[data-cmp-card]').forEach(canvas => {
+      const card = allCards.find(c => c['卡片ID'] === canvas.dataset.cmpCard);
+      if (card) drawCrop(canvas, card);
+    });
+  });
+
+  content.querySelectorAll('.dup-cmp-pick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.picked[btn.dataset.pair] = btn.dataset.card;
+      saveState();
+      render();
+      openCompareModal(pairId);
+    });
+  });
+}
+
+function closeCompareModal() {
+  document.getElementById('compareOverlay').classList.remove('open');
 }
 
 // ── Canvas ─────────────────────────────────────────
@@ -277,16 +352,12 @@ function setupEvents() {
   document.getElementById('dupList').addEventListener('click', e => {
     const id = e.target.dataset.id;
     if (!id) return;
+    if (e.target.classList.contains('dup-btn-detail')) {
+      openCompareModal(id); return;
+    }
     if (e.target.classList.contains('dup-btn-confirm')) {
-      const pairEl = e.target.closest('.dup-pair');
-      const radio = pairEl ? pairEl.querySelector(`input[name="canon_${id}"]:checked`) : null;
-      if (radio) {
-        state.picked[id] = radio.value;
-      } else {
-        // fallback: use defaultCanonical
-        const pair = getAllPairs().find(p => p.id === id);
-        if (pair) state.picked[id] = getCanonical(pair);
-      }
+      const pair = getAllPairs().find(p => p.id === id);
+      if (pair) state.picked[id] = getCanonical(pair);
       saveState(); render();
     } else if (e.target.classList.contains('dup-btn-dismiss')) {
       if (!state.dismissed.includes(id)) state.dismissed.push(id);
@@ -350,6 +421,12 @@ function setupEvents() {
     document.getElementById('selectedB').textContent = card['牌名'] + '（' + card['卡片ID'] + '）';
     document.getElementById('resultsB').innerHTML = '';
   });
+
+  // Compare modal close
+  document.getElementById('compareOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeCompareModal();
+  });
+  document.getElementById('compareClose').addEventListener('click', closeCompareModal);
 }
 
 function setupSearch(inputId, resultsId, onSelect) {
