@@ -11,12 +11,12 @@
 .draft-screen.active { display: block; }
 
 .back-link {
-  color: var(--text2);
+  color: var(--gold);
   text-decoration: none;
   font-size: .9rem;
   transition: color var(--transition);
 }
-.back-link:hover { color: var(--gold); }
+.back-link:hover { color: #fff; }
 
 /* ── Setup Screen ── */
 .setup-title {
