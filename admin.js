@@ -52,7 +52,7 @@ let _editAllCards = [];
 
 async function addCardToBanlist(card, reason, statusEl) {
   const typeLabel = card.card_type === 'occupation' ? '職業卡' : '次發卡';
-  const groupLabel = `${typeLabel}-${reason}`;
+  const groupLabel = reason === '擾亂戰局' ? '擾亂戰局' : `${typeLabel}-${reason}`;
   statusEl.textContent = '處理中…';
   statusEl.style.color = 'var(--text3)';
   try {
@@ -108,6 +108,7 @@ function renderBanSection(sec, card) {
     <div class="admin-reason-row">
       <button class="admin-reason-btn active" data-reason="過強">過強</button>
       <button class="admin-reason-btn" data-reason="過爛">過爛</button>
+      <button class="admin-reason-btn" data-reason="擾亂戰局">擾亂戰局</button>
     </div>
     <div class="admin-qa-status" id="qaBanStatus"></div>
     <button class="admin-btn-save admin-qa-confirm" id="qaBanConfirm">確認加入禁卡</button>
