@@ -85,6 +85,7 @@ let activeType = 'all';
 let activeDeck = 'all';
 let searchQuery = '';
 let excludeBanned = false;
+let excludeDups = false;
 
 // Card elements are created once and reused; only visibility is toggled on filter
 const cardElMap = new Map(); // cardId → {el, card}
@@ -113,6 +114,8 @@ function applyFilters() {
     }
     // exclude banned toggle
     if (excludeBanned && BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
+    // exclude non-canonical duplicates toggle
+    if (excludeDups && dupNonCanonical.has(c['卡片ID'])) return false;
     // deck filter
     if (activeDeck !== 'all') {
       if (activeDeck === 'BGA') {
@@ -458,6 +461,13 @@ document.querySelectorAll('.filter-chips .chip').forEach(chip => {
 document.getElementById('excludeBanBtn').addEventListener('click', () => {
   excludeBanned = !excludeBanned;
   document.getElementById('excludeBanBtn').classList.toggle('active', excludeBanned);
+  applyFilters();
+});
+
+// Exclude non-canonical duplicates toggle (independent)
+document.getElementById('excludeDupBtn').addEventListener('click', () => {
+  excludeDups = !excludeDups;
+  document.getElementById('excludeDupBtn').classList.toggle('active', excludeDups);
   applyFilters();
 });
 
