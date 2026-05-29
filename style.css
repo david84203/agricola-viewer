@@ -62,7 +62,7 @@ body {
   gap: 16px;
 }
 
-.logo-link { display: contents; }
+.logo-link { display: inline-flex; }
 .logo-link:hover .ugg-logo { opacity: .8; }
 
 .ugg-logo {
