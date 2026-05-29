@@ -357,11 +357,11 @@ document.getElementById('clearSearch').addEventListener('click', () => {
 
 // ── Banlist ────────────────────────────────────────
 const BANNED_GROUPS = [  // populated from Firestore on load; fallback hardcoded
-  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127', 'I251', 'I260', 'I234', 'I255'] },
-  { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
+  { label: '過強職業',       ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255'] },
+  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
   { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247'] },
   { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51'] },
-  { label: '擾亂戰局',       ids: [] },
+  { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*'] },
 ];
 
 function openBanlist() {
