@@ -10,7 +10,9 @@
 .draft-screen { display: none; }
 .draft-screen.active { display: block; }
 
-.back-link {
+.back-link,
+.back-link:link,
+.back-link:visited {
   color: var(--gold);
   text-decoration: none;
   font-size: .9rem;

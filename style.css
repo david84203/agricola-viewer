@@ -107,7 +107,9 @@ body {
   font-weight: 600;
   font-size: 1.1rem;
 }
-.draft-nav-btn {
+.draft-nav-btn,
+.draft-nav-btn:link,
+.draft-nav-btn:visited {
   display: inline-block;
   background: rgba(232,184,75,.15);
   border: 1px solid rgba(232,184,75,.4);
