@@ -179,15 +179,16 @@ function drawCrop(canvas, card) {
   const draw = (img) => {
     // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
+    const isFR = card.source_image.startsWith('FR');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
     
     // Default crop offsets unless overridden
-    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite ? 0 : CROP.offsetLeft);
-    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite ? 0 : CROP.offsetRight);
-    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite ? 0 : CROP.offsetTop);
-    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : CROP.offsetBottom);
+    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite ? 0 : (isFR ? 167 : CROP.offsetLeft));
+    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite ? 0 : (isFR ? 115 : CROP.offsetRight));
+    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite ? 0 : (isFR ? 0 : CROP.offsetTop));
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : (isFR ? 165 : CROP.offsetBottom));
 
     const usableW = img.naturalWidth  - offsetLeft - offsetRight;
     const usableH = img.naturalHeight - offsetTop  - offsetBottom;
@@ -310,7 +311,8 @@ function onAuthChange() {
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  const banlistOpen = document.getElementById('banlistOverlay').classList.contains('open');
+  if (!banlistOpen) document.body.style.overflow = '';
 }
 
 // ── Event Listeners ────────────────────────────────
@@ -392,7 +394,9 @@ function renderBanlist(container) {
     cards.forEach(card => {
       const item = document.createElement('div');
       item.className = 'banlist-card';
+      item.style.cursor = 'pointer';
       item.innerHTML = `<canvas></canvas><div class="banlist-card-name">${card['牌名']}</div>`;
+      item.addEventListener('click', () => openModal(card));
       grid.appendChild(item);
       requestAnimationFrame(() => {
         const canvas = item.querySelector('canvas');
