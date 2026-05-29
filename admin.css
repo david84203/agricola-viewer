@@ -198,6 +198,8 @@
   transition: all var(--transition);
 }
 .admin-qa-btn:hover { border-color: var(--gold); color: var(--gold); }
+.admin-qa-btn-remove { border-color: #c0392b; color: #ff8a7a; }
+.admin-qa-btn-remove:hover { border-color: #e74c3c; color: #fff; background: #5a1a1a; }
 .admin-qa-section {
   background: var(--bg);
   border: 1px solid var(--border);

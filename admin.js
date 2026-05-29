@@ -50,6 +50,24 @@ async function saveCardOverride(cardId, fields) {
 
 let _editAllCards = [];
 
+async function removeCardFromBanlist(card, statusEl) {
+  const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
+  setStatus('處理中…');
+  try {
+    const groups = await loadBanlistFromFirestore() || [];
+    let removed = false;
+    groups.forEach(g => {
+      const idx = g.ids.indexOf(card['卡片ID']);
+      if (idx !== -1) { g.ids.splice(idx, 1); removed = true; }
+    });
+    if (!removed) { setStatus('✗ 此牌不在禁卡表中', '#f87171'); return; }
+    await saveBanlistToFirestore(groups.filter(g => g.ids.length > 0));
+    setStatus('✓ 已移除禁卡', '#4ade80');
+  } catch (e) {
+    setStatus('✗ 失敗：' + e.message, '#f87171');
+  }
+}
+
 async function addCardToBanlist(card, reason, statusEl) {
   const isOcc = card.card_type === 'occupation';
   const groupLabel = reason === '擾亂戰局' ? '擾亂戰局'
@@ -259,12 +277,30 @@ function openCardEditModal(card, allCardsRef) {
     <div class="admin-qa-title">快速操作</div>
     <div class="admin-qa-btns">
       <button class="admin-qa-btn" id="qaBanBtn">🚫 加入禁卡</button>
+      <button class="admin-qa-btn admin-qa-btn-remove" id="qaUnbanBtn" style="display:none">✅ 移除禁卡</button>
       <button class="admin-qa-btn" id="qaDupBtn">🔁 標記重複</button>
     </div>
     <div id="qaBanSection" class="admin-qa-section" style="display:none"></div>
     <div id="qaDupSection" class="admin-qa-section" style="display:none"></div>
   `;
   body.appendChild(actionsDiv);
+
+  // 偵測是否已在禁卡表，動態顯示移除按鈕
+  loadBanlistFromFirestore().then(groups => {
+    const inBan = (groups || []).some(g => g.ids.includes(card['卡片ID']));
+    document.getElementById('qaBanBtn').style.display = inBan ? 'none' : '';
+    document.getElementById('qaUnbanBtn').style.display = inBan ? '' : 'none';
+  });
+
+  document.getElementById('qaUnbanBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('editSaveStatus');
+    document.getElementById('qaUnbanBtn').disabled = true;
+    await removeCardFromBanlist(card, statusEl);
+    document.getElementById('qaUnbanBtn').disabled = false;
+    // 移除後切換回加入按鈕
+    document.getElementById('qaBanBtn').style.display = '';
+    document.getElementById('qaUnbanBtn').style.display = 'none';
+  });
 
   document.getElementById('qaBanBtn').addEventListener('click', () => {
     const sec = document.getElementById('qaBanSection');
