@@ -22450,7 +22450,11 @@
     "source_image": "舊版改新.jpg",
     "position": 0,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "D078*",
@@ -22467,7 +22471,11 @@
     "source_image": "舊版改新.jpg",
     "position": 1,
     "grid_col": 1,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C026*",
@@ -22484,7 +22492,11 @@
     "source_image": "舊版改新.jpg",
     "position": 2,
     "grid_col": 2,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C076*",
@@ -22501,7 +22513,11 @@
     "source_image": "舊版改新.jpg",
     "position": 3,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C074*",
@@ -22518,7 +22534,11 @@
     "source_image": "舊版改新.jpg",
     "position": 4,
     "grid_col": 1,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "D084*",
@@ -22535,7 +22555,11 @@
     "source_image": "舊版改新.jpg",
     "position": 5,
     "grid_col": 2,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "D012*",
@@ -22552,7 +22576,11 @@
     "source_image": "舊版改新.jpg",
     "position": 7,
     "grid_col": 1,
-    "grid_row": 2
+    "grid_row": 2,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "A093*",
@@ -22566,7 +22594,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 0,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C089*",
@@ -22580,7 +22612,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 2,
     "grid_col": 2,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C152*",
@@ -22594,7 +22630,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 3,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C166*",
@@ -22608,7 +22648,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 4,
     "grid_col": 1,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C135*",
@@ -22622,7 +22666,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 5,
     "grid_col": 2,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "D162*",
@@ -22636,7 +22684,11 @@
     "source_image": "舊版改新2.jpg",
     "position": 6,
     "grid_col": 0,
-    "grid_row": 2
+    "grid_row": 2,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   },
   {
     "卡片ID": "C098*",
@@ -22650,6 +22702,10 @@
     "source_image": "舊版改新2.jpg",
     "position": 7,
     "grid_col": 1,
-    "grid_row": 2
+    "grid_row": 2,
+    "crop_top": 113,
+    "crop_bottom": 99,
+    "crop_left": 182,
+    "crop_right": 164
   }
 ]
