@@ -406,7 +406,10 @@ async function onAuthChange() {
     const statusEl = document.getElementById('syncStatus');
     if (statusEl) { statusEl.textContent = '☁ 從雲端載入…'; statusEl.className = 'dup-sync-status sync-loading'; statusEl.style.display = ''; }
     const loaded = await loadStateFromFirestore();
-    if (!loaded) loadState();
+    if (!loaded) {
+      loadState();
+      await saveStateToFirestore(); // 首次：把 localStorage 推上雲端
+    }
     if (statusEl) statusEl.style.display = 'none';
   }
 
