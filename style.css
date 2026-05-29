@@ -645,7 +645,7 @@ body {
   align-items: center;
   gap: 6px;
 }
-.banlist-card canvas { display: block; border-radius: 4px; }
+.banlist-card canvas { display: block; border-radius: 4px; width: 100%; height: auto; }
 .banlist-card-name {
   font-size: .75rem;
   color: var(--text2);
