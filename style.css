@@ -312,6 +312,23 @@ body {
 }
 .card-item:hover::before { opacity: 1; }
 
+.card-dup-excluded { opacity: .45; filter: grayscale(.7); }
+.card-dup-excluded:hover { opacity: .7; }
+
+.card-dup-badge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: #fff;
+  background: rgba(0,0,0,.45);
+  pointer-events: none;
+}
+
 .card-thumb-wrap {
   width: 100%;
   aspect-ratio: 6 / 5;

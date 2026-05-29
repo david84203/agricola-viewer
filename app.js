@@ -17,14 +17,26 @@ const CROP = {
 let allCards = [];
 let filteredCards = [];
 let imageCache = {};
+let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const [base, overrides, banGroups] = await Promise.all([
+  const [base, overrides, banGroups, dupPairs] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
+    fetch('./duplicates.json').then(r => r.json()).catch(() => []),
   ]);
+
+  // Build non-canonical duplicate set from localStorage state
+  const dupState = (() => { try { return JSON.parse(localStorage.getItem('agricola_dups') || '{}'); } catch { return {}; } })();
+  const allPairs = [...dupPairs, ...(dupState.custom || [])];
+  allPairs.forEach(pair => {
+    if ((dupState.dismissed || []).includes(pair.id)) return;
+    const canon = (dupState.picked || {})[pair.id] || pair.defaultCanonical;
+    if (!canon) return;
+    pair.cards.forEach(id => { if (id !== canon) dupNonCanonical.add(id); });
+  });
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
   if (banGroups) {
@@ -168,8 +180,10 @@ function createCardEl(card, idx) {
                  : card.card_type === 'occupation' ? '職業卡'
                  : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
+  const isDupNonCanon = dupNonCanonical.has(card['卡片ID']);
+
   const div = document.createElement('div');
-  div.className = `card-item ${typeClass}`;
+  div.className = `card-item ${typeClass}${isDupNonCanon ? ' card-dup-excluded' : ''}`;
   div.dataset.idx = idx;
 
   // Tags
@@ -188,6 +202,7 @@ function createCardEl(card, idx) {
     <div class="card-thumb-wrap">
       <canvas class="card-canvas" data-img="${card.source_image}"
         data-col="${card.grid_col}" data-row="${card.grid_row}"></canvas>
+      ${isDupNonCanon ? '<div class="card-dup-badge">重複</div>' : ''}
     </div>
     <div class="card-body">
       <div class="card-meta">
