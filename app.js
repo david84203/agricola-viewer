@@ -138,7 +138,7 @@ function createCardEl(card, idx) {
   const tagsHtml = [
     vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
-    pass  ? `<span class="tag tag-pass">傳遞</span>` : '',
+    pass  ? `<span class="tag tag-pass">←傳遞←</span>` : '',
   ].join('');
 
   div.innerHTML = `
