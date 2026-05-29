@@ -19225,8 +19225,8 @@
     "card_type": "occupation",
     "source_image": "E104.jpg",
     "position": 4,
-    "grid_col": 1,
-    "grid_row": 1
+    "grid_col": 0,
+    "grid_row": 2
   },
   {
     "牌名": "菸斗吸菸者",
@@ -19239,7 +19239,7 @@
     "card_type": "occupation",
     "source_image": "E104.jpg",
     "position": 5,
-    "grid_col": 2,
+    "grid_col": 1,
     "grid_row": 1
   },
   {
@@ -19253,8 +19253,8 @@
     "card_type": "occupation",
     "source_image": "E104.jpg",
     "position": 6,
-    "grid_col": 0,
-    "grid_row": 2
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "牌名": "土地繼承人",
