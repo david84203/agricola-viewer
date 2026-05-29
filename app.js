@@ -190,16 +190,16 @@ function createCardEl(card, idx) {
                  : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
   const isDupNonCanon = dupNonCanonical.has(card['卡片ID']);
+  const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
 
   const div = document.createElement('div');
-  div.className = `card-item ${typeClass}${isDupNonCanon ? ' card-dup-excluded' : ''}`;
+  div.className = `card-item ${typeClass}${isDupNonCanon ? ' card-dup-excluded' : ''}${banned ? ' card-banned-excluded' : ''}`;
   div.dataset.idx = idx;
 
   // Tags
   const vp = card['勝利點數'] && card['勝利點數'] !== '無';
   const bonus = card['紅利分數'] === '有';
   const pass = card['是否傳遞'] === '是';
-  const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
   const tagsHtml = [
     banned ? `<span class="tag tag-ban">禁卡</span>` : '',
     vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
@@ -212,6 +212,7 @@ function createCardEl(card, idx) {
       <canvas class="card-canvas" data-img="${card.source_image}"
         data-col="${card.grid_col}" data-row="${card.grid_row}"></canvas>
       ${isDupNonCanon ? '<div class="card-dup-badge">重複</div>' : ''}
+      ${banned ? '<div class="card-dup-badge card-ban-badge">禁卡</div>' : ''}
     </div>
     <div class="card-body">
       <div class="card-meta">
