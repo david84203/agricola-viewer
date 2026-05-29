@@ -16848,7 +16848,11 @@
     "grid_col": 0,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K106",
@@ -16867,7 +16871,11 @@
     "grid_col": 1,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K107",
@@ -16886,7 +16894,11 @@
     "grid_col": 2,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K108",
@@ -16905,7 +16917,11 @@
     "grid_col": 3,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K109",
@@ -16924,7 +16940,11 @@
     "grid_col": 4,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K110",
@@ -16943,7 +16963,11 @@
     "grid_col": 5,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K111",
@@ -16962,7 +16986,11 @@
     "grid_col": 6,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K112",
@@ -16981,7 +17009,11 @@
     "grid_col": 7,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K113",
@@ -17000,7 +17032,11 @@
     "grid_col": 8,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K114",
@@ -17019,7 +17055,11 @@
     "grid_col": 9,
     "grid_row": 0,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K115",
@@ -17038,7 +17078,11 @@
     "grid_col": 0,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K116",
@@ -17057,7 +17101,11 @@
     "grid_col": 1,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K117",
@@ -17076,7 +17124,11 @@
     "grid_col": 2,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K118",
@@ -17095,7 +17147,11 @@
     "grid_col": 3,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K119",
@@ -17114,7 +17170,11 @@
     "grid_col": 4,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K120",
@@ -17133,7 +17193,11 @@
     "grid_col": 5,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K121",
@@ -17152,7 +17216,11 @@
     "grid_col": 6,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K122",
@@ -17171,7 +17239,11 @@
     "grid_col": 7,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K123",
@@ -17190,7 +17262,11 @@
     "grid_col": 8,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K124",
@@ -17209,7 +17285,11 @@
     "grid_col": 9,
     "grid_row": 1,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K125",
@@ -17228,7 +17308,11 @@
     "grid_col": 0,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K126",
@@ -17247,7 +17331,11 @@
     "grid_col": 1,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K127",
@@ -17266,7 +17354,11 @@
     "grid_col": 2,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K128",
@@ -17285,7 +17377,11 @@
     "grid_col": 3,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K129",
@@ -17304,7 +17400,11 @@
     "grid_col": 4,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K130",
@@ -17323,7 +17423,11 @@
     "grid_col": 5,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K131",
@@ -17342,7 +17446,11 @@
     "grid_col": 6,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K132",
@@ -17361,7 +17469,11 @@
     "grid_col": 7,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K133",
@@ -17380,7 +17492,11 @@
     "grid_col": 8,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K134",
@@ -17399,7 +17515,11 @@
     "grid_col": 9,
     "grid_row": 2,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K135",
@@ -17418,7 +17538,11 @@
     "grid_col": 0,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K136",
@@ -17437,7 +17561,11 @@
     "grid_col": 1,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K137",
@@ -17456,7 +17584,11 @@
     "grid_col": 2,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K138",
@@ -17475,7 +17607,11 @@
     "grid_col": 3,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K139",
@@ -17494,7 +17630,11 @@
     "grid_col": 4,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K140",
@@ -17513,7 +17653,11 @@
     "grid_col": 5,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K141",
@@ -17532,7 +17676,11 @@
     "grid_col": 6,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K142",
@@ -17551,7 +17699,11 @@
     "grid_col": 7,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K143",
@@ -17570,7 +17722,11 @@
     "grid_col": 8,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K144",
@@ -17589,7 +17745,11 @@
     "grid_col": 9,
     "grid_row": 3,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K145",
@@ -17608,7 +17768,11 @@
     "grid_col": 0,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K146",
@@ -17627,7 +17791,11 @@
     "grid_col": 1,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "K147",
@@ -17646,6 +17814,10 @@
     "grid_col": 2,
     "grid_row": 4,
     "grid_cols": 10,
-    "grid_rows": 7
+    "grid_rows": 7,
+    "crop_left": 0,
+    "crop_right": 0,
+    "crop_top": 0,
+    "crop_bottom": 0
   }
 ]
