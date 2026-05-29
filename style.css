@@ -502,12 +502,26 @@ body {
   color: var(--text);
   line-height: 1.2;
 }
+.modal-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -8px;
+}
 .modal-id {
   font-family: 'Courier New', monospace;
   font-size: .82rem;
   color: var(--text3);
   letter-spacing: .06em;
-  margin-top: -8px;
+}
+.modal-ban-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #c0392b;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: .04em;
 }
 
 .modal-fields {

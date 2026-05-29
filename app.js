@@ -233,6 +233,8 @@ function openModal(card) {
 
   document.getElementById('modalTitle').textContent = card['牌名'] || '—';
   document.getElementById('modalId').textContent = card['卡片ID'] || '';
+  const isBanned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
+  document.getElementById('modalBanBadge').style.display = isBanned ? '' : 'none';
   const badgeEl = document.getElementById('modalBadge');
   badgeEl.className = `modal-badge ${typeBadgeClass}`;
   if (card.card_type === 'both') {
@@ -357,6 +359,7 @@ const BANNED_GROUPS = [  // populated from Firestore on load; fallback hardcoded
   { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031'] },
   { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247'] },
   { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51'] },
+  { label: '擾亂戰局',       ids: [] },
 ];
 
 function openBanlist() {
