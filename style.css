@@ -626,6 +626,108 @@ body {
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 }
 
+/* ── Duplicate Compare (inline, index.html) ── */
+.dup-cmp-overlay-inline {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(6px);
+  z-index: 400;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.dup-cmp-overlay-inline.open { display: flex; }
+.dup-ci-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 660px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.dup-ci-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.dup-ci-close:hover { background: var(--surface2); color: var(--text); }
+.dup-ci-header {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-size: 1rem;
+  margin-bottom: 20px;
+  padding-right: 30px;
+}
+.dup-ci-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.dup-ci-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+  color: var(--text3);
+  font-size: .85rem;
+}
+.dup-ci-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--radius);
+  padding: 10px;
+  border: 1px solid transparent;
+}
+.dup-ci-canon {
+  background: rgba(232,184,75,.06);
+  border-color: rgba(232,184,75,.25);
+}
+.dup-ci-thumb canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+.dup-ci-label {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  color: var(--text3);
+}
+.dup-ci-canon .dup-ci-label { color: var(--gold); }
+.dup-ci-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.dup-ci-id {
+  font-size: .72rem;
+  color: var(--text3);
+  font-family: 'Courier New', monospace;
+}
+.dup-ci-desc {
+  font-size: .82rem;
+  color: var(--text2);
+  line-height: 1.6;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
 /* ── Banlist Modal (shared) ── */
 .banlist-overlay {
   display: none;

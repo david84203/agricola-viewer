@@ -18,6 +18,7 @@ let allCards = [];
 let filteredCards = [];
 let imageCache = {};
 let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
+let dupCardToPair = new Map();   // cardId → { pair, canonId }
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
@@ -35,7 +36,12 @@ async function loadCards() {
     if ((dupState.dismissed || []).includes(pair.id)) return;
     const canon = (dupState.picked || {})[pair.id] || pair.defaultCanonical;
     if (!canon) return;
-    pair.cards.forEach(id => { if (id !== canon) dupNonCanonical.add(id); });
+    pair.cards.forEach(id => {
+      if (id !== canon) {
+        dupNonCanonical.add(id);
+        dupCardToPair.set(id, { pair, canonId: canon });
+      }
+    });
   });
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
@@ -215,7 +221,10 @@ function createCardEl(card, idx) {
     </div>
   `;
 
-  div.addEventListener('click', () => openModal(card));
+  div.addEventListener('click', () => {
+    if (dupNonCanonical.has(card['卡片ID'])) openDupCompare(card);
+    else openModal(card);
+  });
 
   // Register canvas for lazy draw via IntersectionObserver
   const canvas = div.querySelector('.card-canvas');
@@ -284,6 +293,60 @@ function drawCrop(canvas, card) {
     };
     img.src = key;
   }
+}
+
+// ── Duplicate Compare Modal ────────────────────────
+function openDupCompare(nonCanonCard) {
+  const info = dupCardToPair.get(nonCanonCard['卡片ID']);
+  if (!info) { openModal(nonCanonCard); return; }
+  const canonCard = allCards.find(c => c['卡片ID'] === info.canonId);
+  if (!canonCard) { openModal(nonCanonCard); return; }
+
+  // Inject overlay if not present
+  let overlay = document.getElementById('dupCompareOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'dupCompareOverlay';
+    overlay.className = 'dup-cmp-overlay-inline';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeDupCompare(); });
+  }
+
+  const cardHtml = (card, isCanon) => `
+    <div class="dup-ci-card${isCanon ? ' dup-ci-canon' : ''}">
+      <div class="dup-ci-thumb"><canvas data-card-id="${card['卡片ID']}"></canvas></div>
+      <div class="dup-ci-label">${isCanon ? '✓ 選用此版本' : '✕ 此版本被取代'}</div>
+      <div class="dup-ci-name">${card['牌名'] || '—'}</div>
+      <div class="dup-ci-id">${card['卡片ID']}</div>
+      <div class="dup-ci-desc">${card['說明'] || ''}</div>
+    </div>`;
+
+  overlay.innerHTML = `
+    <div class="dup-ci-modal">
+      <button class="dup-ci-close" id="dupCiClose">✕</button>
+      <div class="dup-ci-header">重複卡牌比對</div>
+      <div class="dup-ci-grid">
+        ${cardHtml(canonCard, true)}
+        <div class="dup-ci-vs">vs</div>
+        ${cardHtml(nonCanonCard, false)}
+      </div>
+    </div>`;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('dupCiClose').addEventListener('click', closeDupCompare);
+
+  // Draw canvases
+  [canonCard, nonCanonCard].forEach(card => {
+    const canvas = overlay.querySelector(`canvas[data-card-id="${card['卡片ID']}"]`);
+    if (canvas) requestAnimationFrame(() => drawCrop(canvas, card));
+  });
+}
+
+function closeDupCompare() {
+  const overlay = document.getElementById('dupCompareOverlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ── Modal ──────────────────────────────────────────
@@ -378,7 +441,7 @@ document.getElementById('modalOverlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeDupCompare(); }
 });
 
 // Filter chips (type, mutually exclusive)
