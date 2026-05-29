@@ -62,10 +62,15 @@ body {
   gap: 16px;
 }
 
+.logo-link { display: contents; }
+.logo-link:hover .ugg-logo { opacity: .8; }
+
 .ugg-logo {
   max-height: 70px;
   max-width: 200px;
   object-fit: contain;
+  transition: opacity var(--transition);
+  cursor: pointer;
   background: white;
   border-radius: 8px;
   padding: 4px;
