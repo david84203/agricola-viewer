@@ -312,12 +312,13 @@ function drawCrop(canvas, card) {
   if (!canvas || !card?.source_image) return;
   const key = IMG_BASE + card.source_image;
   const isComposite = card.source_image.includes('部分.jpg');
+  const isFR = card.source_image.startsWith('FR');
   const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
   const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
-  const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite ? 0 : CROP.offsetLeft);
-  const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite ? 0 : CROP.offsetRight);
-  const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite ? 0 : CROP.offsetTop);
-  const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite ? 0 : CROP.offsetBottom);
+  const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite || isFR ? 0 : CROP.offsetLeft);
+  const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite || isFR ? 0 : CROP.offsetRight);
+  const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite || isFR ? 0 : CROP.offsetTop);
+  const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isFR ? 0 : CROP.offsetBottom);
 
   const draw = (img) => {
     const cellW = (img.naturalWidth  - oL - oR) / cols;
