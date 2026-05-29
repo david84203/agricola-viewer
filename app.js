@@ -68,6 +68,22 @@ let activeDeck = 'all';
 let searchQuery = '';
 let excludeBanned = false;
 
+// Card elements are created once and reused; only visibility is toggled on filter
+const cardElMap = new Map(); // cardId → {el, card}
+const canvasCardMap = new WeakMap(); // canvas → card
+
+const lazyCanvasObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const canvas = entry.target;
+    lazyCanvasObserver.unobserve(canvas);
+    if (!canvas.dataset.drawn) {
+      const card = canvasCardMap.get(canvas);
+      if (card) drawCrop(canvas, card);
+    }
+  });
+}, { rootMargin: '400px' });
+
 function applyFilters() {
   const q = searchQuery.toLowerCase();
 
@@ -105,21 +121,43 @@ function applyFilters() {
 // ── Render Grid ────────────────────────────────────
 function renderGrid() {
   const grid = document.getElementById('cardGrid');
-  grid.innerHTML = '';
 
-  if (filteredCards.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🌾</div>
-        <p>找不到符合條件的卡牌</p>
-      </div>`;
-    return;
+  // First call: create all card elements once
+  if (cardElMap.size === 0) {
+    allCards.forEach((card, idx) => {
+      const el = createCardEl(card, idx);
+      cardElMap.set(card['卡片ID'], { el, card });
+      grid.appendChild(el);
+    });
   }
 
-  filteredCards.forEach((card, idx) => {
-    const el = createCardEl(card, idx);
-    grid.appendChild(el);
+  // Toggle visibility only
+  const filteredSet = new Set(filteredCards.map(c => c['卡片ID']));
+  let count = 0;
+  cardElMap.forEach(({ el, card }, id) => {
+    const show = filteredSet.has(id);
+    const wasHidden = el.hidden;
+    el.hidden = !show;
+    // Re-observe canvas if card just became visible and wasn't drawn yet
+    if (show && wasHidden) {
+      const canvas = el.querySelector('.card-canvas');
+      if (canvas && !canvas.dataset.drawn) lazyCanvasObserver.observe(canvas);
+    }
+    if (show) count++;
   });
+
+  // Empty state
+  let emptyEl = grid.querySelector('.empty-state');
+  if (count === 0) {
+    if (!emptyEl) {
+      emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      emptyEl.innerHTML = `<div class="empty-icon">🌾</div><p>找不到符合條件的卡牌</p>`;
+      grid.appendChild(emptyEl);
+    }
+  } else if (emptyEl) {
+    emptyEl.remove();
+  }
 }
 
 // ── Create Card Element ────────────────────────────
@@ -164,11 +202,12 @@ function createCardEl(card, idx) {
 
   div.addEventListener('click', () => openModal(card));
 
-  // Lazy-draw after element is appended
-  requestAnimationFrame(() => {
-    const canvas = div.querySelector('.card-canvas');
-    if (canvas) drawCrop(canvas, card);
-  });
+  // Register canvas for lazy draw via IntersectionObserver
+  const canvas = div.querySelector('.card-canvas');
+  if (canvas) {
+    canvasCardMap.set(canvas, card);
+    lazyCanvasObserver.observe(canvas);
+  }
 
   return div;
 }
