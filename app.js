@@ -249,7 +249,7 @@ function drawCrop(canvas, card) {
   const draw = (img) => {
     // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
-    const isTTS = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go');
+    const isTTS = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go') || card.source_image.toLowerCase().startsWith('wa');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
