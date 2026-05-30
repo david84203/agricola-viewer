@@ -240,7 +240,7 @@ function drawCrop(canvas, card) {
   if (!canvas || !card?.source_image) return;
   const key = IMG_BASE + card.source_image;
   const isComposite = card.source_image.includes('部分.jpg');
-  const isFR = card.source_image.startsWith('FR');
+  const isFR = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go') || card.source_image.toLowerCase().startsWith('wa') || card.source_image.toLowerCase().startsWith('wm');
   const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
   const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
   const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite || isFR ? 0 : CROP.offsetLeft);
