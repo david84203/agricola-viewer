@@ -22744,13 +22744,9 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在你打出此卡時，若遊戲尚有1/3/6/9回合，則你獲得1/2/3/4根木頭。在遊戲結束時，有最少家庭成員或同為有最少家庭成員的玩家獲得2點紅利分數。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -22762,14 +22758,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你執行「釣魚」行動時，你得到額外1綑蘆葦。每當其他玩家執行「釣魚」行動時，你得到1綑蘆葦和1份食物。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -22780,14 +22772,10 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在遊戲最後一次的收成階段，餵養家人之後，你可以支付3份食物換取1點紅利分數，最多換取6點紅利分數。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -22798,15 +22786,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你從行動格上取得食物時，你得到額外的1份食物。透過職業或發展卡而得到的食物不算在內。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G055",
@@ -22816,15 +22800,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你以家庭成員執行行動，取得木頭時，若你有1/2/3頭豬，則你獲得額外的1/2/3份食物。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G044",
@@ -22834,15 +22814,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你執行「釣魚」行動時，得到額外的1顆石頭。可以使用「釣魚」行動格得到的食物再多買石頭，每顆石頭需付2份食物。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G001",
@@ -22852,15 +22828,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當你建設柵欄或馬廄時，可使用等量的磚頭或石頭來取代木頭。每當你擴建房舍時，亦可使用等量的磚頭或石頭來取代木頭，每間房間最多使用2塊磚頭以及2塊石頭。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 2
   },
   {
     "卡片ID": "G006",
@@ -22870,15 +22842,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次收成階段可使用一次：當你使用發展卡將建築資源轉換成食物時，你可以額外得到2份食物。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G039",
@@ -22888,15 +22856,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "從第6回合開始，每回合開始階段補充料後，若是有2個木頭的行動格上的木頭數目相等，你可以從其中1格拿走1根木頭。對於磚頭的行動格也同樣適用。在5人遊戲，同樣適用於石頭的行動格。每回合你至多只能因此得到1個資源。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G035",
@@ -22906,13 +22870,9 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "這張卡打出後，不算是1張職業卡。在每回合開始時，若你打出的職業卡數，比2位其他玩家少，則你可以支付1份食物打出1張職業卡。(以此方式打出的職業卡不能回到玩家手上。)",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -22924,14 +22884,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "你隨時可以支付1份食物將1份小麥轉換成1份蔬菜；你隨時可以將1份蔬菜轉換成1份小麥。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -22942,14 +22898,10 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在打出此卡後，你下一次執行「釣魚」行動時，從供應區拿1份食物放到此卡上。每當你烤麵包，或將動物、蔬菜、建築資源轉換成食物時，你可以將被轉換的東西放在此卡上。遊戲結束時，此卡上有4/5/6/7+種不同種類的物品，你得到1/2/4/6分。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -22960,15 +22912,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當有其他玩家購買主要發展卡時，你可以拿走1個該玩家支付的建築資源，由你選擇拿走哪1個。你可以選擇額外再支付1份食物，若你如此做，則可以再獲得1個該玩家支付的建築資源。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G048",
@@ -22978,15 +22926,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你執行「賣藝」行動時，你可以打出1張次要發展卡，或是支付1份小麥打出1張主要發展卡。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G060",
@@ -22996,15 +22940,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在每次收成的「收割作物」及「餵養家人」階段之間，你可以打出1張次要發展卡，或是支付2份食物購買1張主要發展卡。(發展卡費用照常支付。)",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G046",
@@ -23014,15 +22954,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在每回合的工作階段結束後，每位玩家都執行完行動後，你可以支付1份食物，將你派遣至「釣魚」行動格的家庭成員，移動到1個會累積木頭的行動格並且拿取該格的木頭。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 2
   },
   {
     "卡片ID": "G034",
@@ -23032,15 +22968,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "對你而言，所有價格在4個建築資源以上的發展卡，都可以少支付1個資源，由你選擇少哪1個資源。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G024",
@@ -23050,15 +22982,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在「繁殖動物」階段，若你的個人供應區有2份以上麥子，你得到1份麥子；若你的個人供應區有2份以上蔬菜，你得到1份蔬菜。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G030",
@@ -23068,13 +22996,9 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "每當有其他玩家打出職業卡時，從公用區拿1份食物放在此卡上。每次你要打出職業卡時，你可以使用這張卡上的食物來支付費用。在4/5人遊戲結束時，此卡上每有3/4份食物，你獲得1點紅利分數。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -23086,14 +23010,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在接下來4個回合的行動格上，放置1根木頭、1塊磚頭、1綑蘆葦、1顆石頭，4者的順序由你決定。在這些回合開始時領取該格上的資源。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -23104,14 +23024,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你將麥子或蔬菜轉換成食物，你得到額外的1份食物。整個遊戲過程中，你不得將動物轉換成食物。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -23122,15 +23038,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當有其他玩家打出職業卡時，你可以支付1份食物打出1張次要發展卡，或是支付2份食物打出1張主要發展卡。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G036",
@@ -23140,15 +23052,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "遊戲中任何時候，只要你的家庭成員數比任何其他玩家的家庭成員數都少，而且你的房舍內還有空房間，則你可以立即增加1名家庭成員。如此增加的家庭成員不算是新生兒，並且在當回合就可以執行行動。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G033",
@@ -23158,15 +23066,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當你至少建造1根柵欄時，你可以支付1份食物犁1片田。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G025",
@@ -23176,15 +23080,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在你打出此卡時，可以立即購買2張發展卡(主要或次要皆可)，以正常費用支付。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 2
   },
   {
     "卡片ID": "G058",
@@ -23194,15 +23094,11 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在你打出此卡時，若遊戲尚有1/3/6/9回合，則你獲得1/2/3/4根木頭。在遊戲結束時，有最多塊田或同為有最多塊田的玩家獲得3點紅利分數。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G012",
@@ -23212,15 +23108,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "從公用區拿3份蔬菜放在此卡上，每次你執行「犁1塊農田」行動時，可以支付1份食物得到此卡上的1份蔬菜。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G053",
@@ -23230,13 +23122,9 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "當你建造柵欄或馬廄時，你可以將部分或全部費用使用石頭支付，每顆石頭等於2根木頭。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -23248,14 +23136,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在你打出此卡時，將箭頭標示在1個行動格上，該格的行動加上「和/或 烤麵包」。當其他玩家使用該行動格執行烤麵包時，你從公用區得到1份食物。在你打出此卡時，你可以立即執行一次「烤麵包」。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -23266,14 +23150,10 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在你打出此卡時，若遊戲尚有7個完整回合，你可以立刻犁1塊田，並且立刻在這塊田上種植小麥(你個人的供應區要有小麥種子)。在遊戲結束時，有最多麥子或同為有最多麥子的玩家獲得2點紅利分數。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -23284,15 +23164,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "分別在第7/9/11/13回合的行動格上，各擺2綑蘆葦、3根木頭、3塊磚頭、2塊石頭。在這些回合開始時，由所有玩家出食物競標，以暗標方式進行，將食物握在手中。出價最高者得到行動格上的資源，你得到該玩家所出的食物。若你贏得競標，則將你出的食物支付至公用區。競標出價若有平手，由當回合的玩家順位決定輸贏。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G052",
@@ -23302,15 +23178,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每次你以行動取得石頭時，你可以立刻支付1份食物，打出1張費用含石頭的發展卡。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G050",
@@ -23320,15 +23192,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在你打出此卡時，得到2個建築資源(相同或不相同皆可)。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G009",
@@ -23338,15 +23206,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "若有其他玩家打出「麵包師傅」或「烘焙大師」時，你可立即打出此卡，而不須支付任何費用。你可以派遣你的家庭成員，去執行「拿1份小麥」或「播種 和/或 烤麵包」的行動，即使該行動格上已經有其他玩家的家庭成員。當你打出此卡時，你可以立即執行1次「烤麵包」。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 2
   },
   {
     "卡片ID": "G007",
@@ -23356,15 +23220,11 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在你打出此卡時，得到2份食物。若你有3/4/5位家庭成員使用3/4/5個相鄰的行動格，形成垂直或水平的一直線，則你獲得1/3/5分的紅利分數。這些相鄰的行動格必須大小相同。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G016",
@@ -23374,15 +23234,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當其他玩家執行「建造柵欄」行動時，你可以支付該玩家1份食物並且執行「建造柵欄」行動。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G026",
@@ -23392,13 +23248,9 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在「收割作物」階段一開始時，若你的農田上已播種的麥子數目有1/4/7/10個，你得到1/2/3/4份食物。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -23410,14 +23262,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每一回合，你第1個派遣的家庭成員，可以派至1個已經被其他玩家佔領的行動格執行行動。每回合你的第1個家庭成員不能派遣至「起始玩家」格。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -23428,14 +23276,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當其他玩家執行「釣魚」行動時，你可以支付該玩家1份食物並且打出1張職業卡。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -23446,15 +23290,11 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "在你打出此卡時，或遊戲尚有1/3/6/9回合，則你獲得1/2/3/4根木頭。在遊戲結束時，有最多動物或同為有最多動物的玩家獲得3點紅利分數。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G015",
@@ -23464,15 +23304,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在工作階段結束時，若你全部的家庭成員皆派遣至同一塊板子上工作，總計有2/3/4個家庭成員(新生兒不計算在內)，則你獲得1份食物/小麥/蔬菜。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G031",
@@ -23482,15 +23318,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "你可以派遣你的家庭成員，去執行「翻修房舍」、「擴建房舍」、「打1張主要或次要發展卡」的行動，即使該行動格上已經有其他玩家的家庭成員。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G014",
@@ -23500,15 +23332,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在你打出此卡時，得到1隻羊。在你的收成階段，先執行「繁殖動物」，再執行「收割作物」以及「餵養家人」。剛出生的動物若沒有空間圈養，可以立即轉換成食物。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 2
   },
   {
     "卡片ID": "G022",
@@ -23518,15 +23346,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "若你擁有烤爐，在收成階段，吹玻璃工可以將1/2塊磚頭轉換成3/5份食物。",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G056",
@@ -23536,15 +23360,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "若某個行動格上恰有1位你的家庭成員，你可以再派遣1位家庭成員至該行動格再執行1次行動。(新生兒算是家庭成員。)",
-    "crop_top": 675,
-    "crop_bottom": 14,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G042",
@@ -23554,13 +23374,9 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "從第5回合開始，每當有其他玩家執行「臨時工」行動時，他可以支付你2份食物以增加家庭成員。(該玩家房舍內要有空房間才能如此做。如果你自己執行「臨時工」，不需支付食物便可增加家庭成員)",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 0
   },
@@ -23572,14 +23388,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "你擴建每間房間時可得到2份食物。你建造每棟馬廄時可得到1份食物。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
     "grid_row": 0
   },
   {
@@ -23590,14 +23402,10 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "在第8、10、12、14回合的行動格上，各擺1塊石頭。在這些回合開始時領取該格上的石頭。",
-    "crop_top": 13,
-    "crop_bottom": 676,
-    "crop_left": 681,
-    "crop_right": 5,
     "source_image": "Go6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
     "grid_row": 0
   },
   {
@@ -23608,15 +23416,11 @@
     "紅利分數": "有",
     "牌組": "G",
     "說明": "遊戲結束時，若這張卡是你唯一有打出的職業卡，你獲得6點紅利分數。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 17,
-    "crop_right": 669,
     "source_image": "Go6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 1
   },
   {
     "卡片ID": "G011",
@@ -23626,15 +23430,11 @@
     "紅利分數": "無",
     "牌組": "G",
     "說明": "每當你將蔬菜轉換成食物時，你可以立即執行一次「烤麵包」行動。紅蘿蔔蛋糕師傅可以隨時將1份蔬菜轉換成2份食物。",
-    "crop_top": 344,
-    "crop_bottom": 345,
-    "crop_left": 349,
-    "crop_right": 337,
     "source_image": "Go6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G094",
@@ -23648,14 +23448,10 @@
     "牌組": "G",
     "說明": "每次你使用製陶工或陶藝工坊將磚頭轉換成食物時，你可以額外得到1份食物。從現在起陶藝工坊對你而言是張次要發展卡。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G108",
@@ -23669,14 +23465,10 @@
     "牌組": "G",
     "說明": "你農莊中的每1格未使用區域，可以圈養至多2隻羊。(這些格子仍被視作未使用。)你房舍中所能飼養的寵物僅限羊，不能是其他種動物。收成階段時，需餵養牧羊犬1份食物。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G086",
@@ -23690,14 +23482,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即執行1次「播種」。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G087",
@@ -23711,14 +23499,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，得到2份蔬菜。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G093",
@@ -23732,14 +23516,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，你得到等同於你的農場內已經播種的農田數目的食物。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G106",
@@ -23753,14 +23533,10 @@
     "牌組": "G",
     "說明": "你的房舍現在可當作圈地的邊界，被視作圈地邊界的房間不得再由該處擴建。你仍然可以使用完15根柵欄。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G100",
@@ -23774,14 +23550,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，得到3份食物。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G092",
@@ -23795,14 +23567,10 @@
     "牌組": "G",
     "說明": "在回合開始時，若你沒有木頭，則在此卡上擺上1根木頭。當此卡上有5根木頭時，將這5根木頭移到你的個人資源區。",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G084",
@@ -23816,14 +23584,10 @@
     "牌組": "G",
     "說明": "每次你播種時，在所有你新播種，且緊鄰恰好1個馬廄旁的農田上，擺上額外的1份麥子或1份蔬菜；緊鄰2個以上馬廄旁的農田，擺上額外的2份麥子或2份蔬菜。(不論馬廄是否有被圍起來皆可。)",
     "source_image": "Gm1.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G096",
@@ -23837,14 +23601,10 @@
     "牌組": "G",
     "說明": "將此卡視為額外的1個行動格。所有玩家皆可依正常程序執行此行動。執行此行動的玩家，需支付你1份食物，則可打出1張職業卡。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G091",
@@ -23858,14 +23618,10 @@
     "牌組": "G",
     "說明": "每次你將1頭牛或1頭豬或2隻羊轉換成食物時，你可以從公用區拿1綑蘆葦放在此卡上。放在此卡上的蘆葦可用來擴建或翻修房舍。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G079",
@@ -23879,14 +23635,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即執行1次「建造柵欄」動作。你必須支付所有已建造柵欄的其他玩家1根木頭。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G107",
@@ -23900,14 +23652,10 @@
     "牌組": "G",
     "說明": "收成階段一開始時，你可以用1份小麥或1份蔬菜換取1隻羊，或者用1隻羊換取1份小麥或1份蔬菜。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G090",
@@ -23921,14 +23669,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即在你已有的圈地內，免費建造至多4根柵欄。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G075",
@@ -23942,14 +23686,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，得到1份蔬菜。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G077",
@@ -23963,14 +23703,10 @@
     "牌組": "G",
     "說明": "擴建每間木/磚/石屋時，可以少支付1份木頭/磚頭/石頭，每回合你所建造的前2間馬廄各可少支付1根木頭。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G119",
@@ -23984,14 +23720,10 @@
     "牌組": "G",
     "說明": "每當你執行「1綑蘆葦」行動時，得到額外的1份食物。每當你執行「臨時工」行動時，得到額外的1綑蘆葦。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G118",
@@ -24005,14 +23737,10 @@
     "牌組": "G",
     "說明": "你房舍中的其中1間房間，可視同農田般播種。一旦你的家中有飼養動物(包括寵物山羊)，將種在家中的所有作物歸還至公用區。\n種植在你家中的作物除了會在正常收成階段收割，也會在第6、8、10、12回合結束時收割。",
     "source_image": "Gm2.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G117",
@@ -24026,14 +23754,10 @@
     "牌組": "G",
     "說明": "每次你執行「拿1份蔬菜」行動時，得到額外的1份蔬菜。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G114",
@@ -24047,14 +23771,10 @@
     "牌組": "G",
     "說明": "在每次收成階段，你可以用此卡將至多1顆石頭轉換成3份食物。在遊戲結束時，你因持有2/4/5顆石頭而獲得1/2/3分的紅利分數。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G072",
@@ -24068,14 +23788,10 @@
     "牌組": "G",
     "說明": "在你的收成階段，收割作物前，若你有2/3種不同的動物，則你可以在1/2片已播種的農田上，多疊上1份作物或資源。\n(家用山羊不視為1種動物)",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G061",
@@ -24089,14 +23805,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即執行收成階段中的「收割作物」以及「繁殖動物」動作。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G078",
@@ -24110,14 +23822,10 @@
     "牌組": "G",
     "說明": "每次你收割小麥時，你可以立即將1份小麥轉換為1份蔬菜。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G095",
@@ -24131,14 +23839,10 @@
     "牌組": "G",
     "說明": "每回合你可使用以下效果至多1次：退還2份食物，得到1個任意的建築資源。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G080",
@@ -24152,14 +23856,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，所有玩家可以立即將農田上任意數量已種植的作物或資源移到個人的供應區。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G068",
@@ -24173,14 +23873,10 @@
     "牌組": "G",
     "說明": "在每張尚未被購買的主要發展卡上，各放1份食物。這些主要發展卡被買走時，你得到放置其上的食物。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G103",
@@ -24194,14 +23890,10 @@
     "牌組": "G",
     "說明": "你可以在已有作物的農田上繼續播種，將新種的作物疊在原有的作物上。1塊農田上不能有不同的作物。",
     "source_image": "Gm3.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G082",
@@ -24215,14 +23907,10 @@
     "牌組": "G",
     "說明": "每一回合你可以使用1個食客標記執行行動，若你如此做，則你下一回合必須少派1個家人執行行動。你不能連續2個回合使用此能力，也不能在第14回合使用此能力。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G102",
@@ -24236,14 +23924,10 @@
     "牌組": "G",
     "說明": "每次你轉換動物成食物時，每隻被轉換的動物可額外多得到1份食物。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G110",
@@ -24257,14 +23941,10 @@
     "牌組": "G",
     "說明": "每次你以家庭成員執行「臨時工」行動時，你可以執行1次「播種」行動。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G105",
@@ -24278,14 +23958,10 @@
     "牌組": "G",
     "說明": "每次你執行「犁1塊農田」行動時，你可以立即種1份小麥或1份蔬菜。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G064",
@@ -24299,14 +23975,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即以建築資源換取至多2隻相同或不同的動物。每隻羊需2份建築資源、每隻豬需3份、每隻牛需4份。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G088",
@@ -24320,14 +23992,10 @@
     "牌組": "G",
     "說明": "每次你執行「烤麵包」，將至少1份麥子轉換成食物時，你可以額外支付1份麥子和1隻動物，獲得3點紅利分數。\n在你打出此卡時，你可以立即執行1次「烤麵包」。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G099",
@@ -24341,14 +24009,10 @@
     "牌組": "G",
     "說明": "每次你執行「犁1塊農田」行動時，得到1綑蘆葦。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G098",
@@ -24362,14 +24026,10 @@
     "牌組": "G",
     "說明": "每次你執行「烤麵包」，將至少1份麥子轉換成食物時，你可以額外支付1份麥子和1份蔬菜，獲得3點紅利分數。\n在你打出此卡時，你可以立即執行1次「烤麵包」。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G066",
@@ -24383,14 +24043,10 @@
     "牌組": "G",
     "說明": "每次你增加家庭成員時，你可以支付1顆石頭得到1點紅利分數。當你打出誕生石時，若當回合已有執行「增加家庭成員」的動作，亦可以使用此能力。",
     "source_image": "Gm4.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G069",
@@ -24404,14 +24060,10 @@
     "牌組": "G",
     "說明": "每次你犁1片或多片田時，得到等同該次犁田數目的木頭。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G074",
@@ -24425,14 +24077,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即購買1張主要發展卡。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G109",
@@ -24446,14 +24094,10 @@
     "牌組": "G",
     "說明": "遊戲結束時，若你擁有火爐，你得到2點紅利分數。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G067",
@@ -24467,14 +24111,10 @@
     "牌組": "G",
     "說明": "若在收成階段時，你收割至少2份作物或資源，並且至少繁殖1隻動物，則從公用區拿1份食物放在此卡上。放在此卡上的食物隨時可以使用。遊戲結束時，此卡上每有1份食物，你獲得1點紅利分數。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G097",
@@ -24488,14 +24128,10 @@
     "牌組": "G",
     "說明": "每次你以家庭成員執行「臨時工」行動時，你可以依照正常價格擴建1間房舍。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G076",
@@ -24509,14 +24145,10 @@
     "牌組": "G",
     "說明": "每次其他玩家執行「播種」行動時，你可以選擇支付1份食物至公用區，立即執行「播種」行動。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G111",
@@ -24530,14 +24162,10 @@
     "牌組": "G",
     "說明": "遊戲結束時，若你有5塊農田、8份小麥以及4份蔬菜，則你獲得3點紅利分數。(種在田裡的小麥與蔬菜均算在內。)",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G081",
@@ -24551,14 +24179,10 @@
     "牌組": "G",
     "說明": "遊戲結束時，你有3/4間馬廄，則獲得1/2點紅利分數。",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "G071",
@@ -24572,14 +24196,10 @@
     "牌組": "G",
     "說明": "你農莊中的每1格未使用區域，可以圈養至多2頭牛。以此種方式圈養的牛最多4頭。(這些格子仍被視作未使用。)",
     "source_image": "Gm5.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 2
   },
   {
     "卡片ID": "G073",
@@ -24593,14 +24213,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，立即執行1次「烤麵包」。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G070",
@@ -24614,14 +24230,10 @@
     "牌組": "G",
     "說明": "在每片尚未播種且緊鄰在你的房舍旁的農田上，可圈養至多2隻相同的動物。不同的農田所圈養的動物可以不同。遊戲結束時，每片至少圈養1隻動物的農田，可得到1點紅利分數。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "G085",
@@ -24635,14 +24247,10 @@
     "牌組": "G",
     "說明": "每次犁田，若新犁的農田緊鄰已經播種的農田，則可從該片已經播種的農田取下1份麥子或1份蔬菜，播種在新犁的農田。以此方式播種的農田少放1份麥子或1份蔬菜。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 0
   },
   {
     "卡片ID": "G062",
@@ -24656,14 +24264,10 @@
     "牌組": "G",
     "說明": "每回合你可以使用以下效果至多一次：退還一隻動物，得到一個可以當回合使用的食客標記。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   },
   {
     "卡片ID": "G065",
@@ -24677,14 +24281,10 @@
     "牌組": "G",
     "說明": "每次你執行「烤麵包」行動時，你可以使用此牌，將至多1份麥子轉換成4份食物。若你執行「烤麵包」動作時，沒有使用到蜂窩烤爐，則可以額外得到1份食物。\n在你打出此卡時，你可以立即執行1次「烤麵包」。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 1
   },
   {
     "卡片ID": "G083",
@@ -24698,14 +24298,10 @@
     "牌組": "G",
     "說明": "在你打出這張卡時，棄掉1張乞討卡，或者從公用區拿任意1隻動物。\n之後將這張牌傳給你左手邊的玩家。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 681,
-    "crop_right": 5,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 2,
+    "grid_row": 1
   },
   {
     "卡片ID": "G116",
@@ -24719,14 +24315,10 @@
     "牌組": "G",
     "說明": "一旦你翻修至磚屋或石屋，你的其中一間房間可多住1位家庭成員。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_row": 2
   },
   {
     "卡片ID": "G089",
@@ -24740,14 +24332,10 @@
     "牌組": "G",
     "說明": "每次你以家庭成員執行「臨時工」行動時，你可以支付1份食物犁1片田。",
     "source_image": "Gm6.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 675,
-    "crop_bottom": 14
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 2
   },
   {
     "卡片ID": "9712",
@@ -24778,14 +24366,10 @@
     "牌組": "G",
     "說明": "每當其他玩家執行「釣魚」行動時，你可以從每個你已播種的農田上，拔取1份麥子或1份蔬菜，並置入你的個人供應區中。(所有可播種的發展卡都可算農田。)",
     "source_image": "Gm7.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_row": 0
   },
   {
     "卡片ID": "G063",
@@ -24799,14 +24383,10 @@
     "牌組": "G",
     "說明": "你可以將此卡視同1塊農田，用「播種」行動種植1份小麥。收成階段時，你必須立刻將此卡上收成的小麥烤成麵包。(在遊戲結束時，此卡不視為1塊農田進入計分。)",
     "source_image": "Gm7.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
-    "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 349,
-    "crop_right": 337,
-    "crop_top": 13,
-    "crop_bottom": 676
+    "grid_cols": 3,
+    "grid_rows": 3,
+    "grid_col": 1,
+    "grid_row": 0
   },
   {
     "卡片ID": "BI12",
@@ -24837,13 +24417,9 @@
     "牌組": "G",
     "說明": "在任何時候，你皆可以以下比例轉換食物：\n蔬菜:1 -> 4食物\n羊:1 -> 2食物\n野豬:1 -> 3食物\n牛:1 -> 4食物\n每次你執行「烤麵包」行動時，你可以將任意數量的麥子轉換成食物。1麥 -> 3食物",
     "source_image": "Gm7.jpg",
-    "grid_cols": 1,
-    "grid_rows": 1,
+    "grid_cols": 3,
+    "grid_rows": 3,
     "grid_col": 0,
-    "grid_row": 0,
-    "crop_left": 17,
-    "crop_right": 669,
-    "crop_top": 344,
-    "crop_bottom": 345
+    "grid_row": 1
   }
 ]
