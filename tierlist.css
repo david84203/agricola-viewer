@@ -244,7 +244,29 @@
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  .tier-main { padding: 20px 16px 80px; }
-  .tier-card-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-  .tier-controls { gap: 10px; }
+  .tier-main { padding: 16px 12px 80px; }
+
+  /* Controls — stats on own line */
+  .tier-controls { gap: 8px; }
+  .tier-filter-chips { flex-wrap: wrap; }
+  .tier-stats { width: 100%; order: 10; font-size: .78rem; }
+  .tier-refresh-btn { padding: 6px 12px; font-size: .8rem; }
+
+  /* Deck chips */
+  .deck-chip { padding: 3px 10px; font-size: .75rem; }
+
+  /* Tier header */
+  .tier-header { padding: 8px 12px; }
+  .tier-badge { font-size: 1.1rem; width: 28px; }
+  .tier-range { font-size: .72rem; }
+
+  /* Card grid */
+  .tier-card-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 7px; padding: 8px; }
+  .tier-card-info { padding: 4px 6px 6px; }
+  .tier-card-name { font-size: .7rem; }
+  .tier-card-score { font-size: .72rem; }
+  .tier-card-seen { font-size: .6rem; }
+
+  /* Ban section */
+  .tier-ban-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
 }

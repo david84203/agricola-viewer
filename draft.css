@@ -708,9 +708,44 @@
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  .draft-main { padding: 20px 16px 80px; }
-  .draft-card-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-  .result-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-  .confirm-bar { padding: 16px 0 8px; }
-  .draft-header { gap: 10px; }
+  .draft-main { padding: 16px 12px 80px; }
+
+  /* Setup */
+  .setup-title { font-size: 1.4rem; }
+  .setup-sub { font-size: .82rem; margin-bottom: 20px; }
+  .mode-select { flex-direction: column; gap: 8px; }
+  .mode-option { min-width: 0; padding: 12px 14px; }
+  .start-btn { width: 100%; text-align: center; }
+  .deck-preset { gap: 6px; }
+  .preset-btn { padding: 6px 12px; font-size: .82rem; }
+
+  /* Draft screen */
+  .draft-header { gap: 8px; }
+  .draft-phase-label { font-size: .92rem; }
+  .draft-round-badge { font-size: .75rem; padding: 3px 10px; }
+  .draft-pack-info { width: 100%; margin-left: 0; font-size: .8rem; }
+
+  /* Picked bar — horizontal scroll */
+  .picked-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .picked-thumb { width: 52px; flex-shrink: 0; }
+
+  /* Card grids */
+  .draft-card-grid.single-mode { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .combined-sub-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .result-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+
+  /* Confirm bar */
+  .confirm-bar { padding: 12px 0 8px; gap: 10px; }
+  .confirm-btn { padding: 10px 18px; font-size: .88rem; }
+  .confirm-selected-name { font-size: .82rem; }
+
+  /* Result actions */
+  .result-actions { flex-direction: column; gap: 8px; }
+  .start-btn, .restart-btn { width: 100%; text-align: center; }
 }

@@ -505,7 +505,33 @@
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
+  .dup-main { padding: 14px 12px 80px; }
+
+  /* List */
   .dup-list { grid-template-columns: 1fr; }
+
+  /* Toolbar */
+  .dup-toolbar { flex-wrap: wrap; gap: 8px; }
+  .dup-stats { width: 100%; }
+
+  /* Tabs */
+  .dup-tab { padding: 4px 11px; font-size: .78rem; }
+
+  /* Compare modal — bottom sheet */
+  .dup-compare-overlay { padding: 0; align-items: flex-end; }
+  .dup-compare-modal {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh;
+    padding: 18px 14px 28px;
+  }
+  .dup-compare-close { top: 12px; right: 12px; }
   .dup-cmp-grid { grid-template-columns: 1fr; }
   .dup-cmp-vs { display: none; }
+  .dup-cmp-card { padding: 8px; }
+  .dup-cmp-img-wrap canvas { max-width: 140px; }
+
+  /* Add pair dialog — stack fields */
+  .dup-dialog { padding: 18px 14px 24px; }
+  .dup-dialog-row { grid-template-columns: 1fr; gap: 16px; }
+  .dup-dialog-vs { display: none; }
 }
