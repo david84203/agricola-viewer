@@ -628,5 +628,65 @@
     ],
     "defaultCanonical": "E117",
     "type": "name"
+  },
+  {
+    "id": "n061",
+    "label": "建築專家",
+    "cards": [
+      "A163",
+      "WM018"
+    ],
+    "defaultCanonical": "A163",
+    "type": "name"
+  },
+  {
+    "id": "n062",
+    "label": "木頭工人",
+    "cards": [
+      "A164",
+      "WM055"
+    ],
+    "defaultCanonical": "A164",
+    "type": "name"
+  },
+  {
+    "id": "n063",
+    "label": "鏟子",
+    "cards": [
+      "A071*",
+      "G110"
+    ],
+    "defaultCanonical": "A071*",
+    "type": "name"
+  },
+  {
+    "id": "n064",
+    "label": "圍欄",
+    "cards": [
+      "B012",
+      "G070"
+    ],
+    "defaultCanonical": "B012",
+    "type": "name"
+  },
+  {
+    "id": "n065",
+    "label": "農夫市場",
+    "cards": [
+      "E008",
+      "G075"
+    ],
+    "defaultCanonical": "E008",
+    "type": "name"
+  },
+  {
+    "id": "n066",
+    "label": "貿易小屋",
+    "cards": [
+      "E009",
+      "G064"
+    ],
+    "defaultCanonical": "E009",
+    "type": "name"
   }
 ]
