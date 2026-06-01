@@ -261,7 +261,7 @@ function drawCrop(canvas, card) {
 
     // 依模板決定預設裁切邊界（per-card crop_* 仍最優先）
     let base;
-    if (isNLtmpl)            base = { l: 213, t: 114, r: 131, b: 101 };
+    if (isNLtmpl)            base = { l: 182, t: 114, r: 166, b: 101 };
     else if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
     else                     base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
 
