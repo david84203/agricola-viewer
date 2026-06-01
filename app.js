@@ -249,16 +249,26 @@ function drawCrop(canvas, card) {
   const draw = (img) => {
     // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
-    const isTTS = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go') || card.source_image.toLowerCase().startsWith('wa') || card.source_image.toLowerCase().startsWith('wm') || card.source_image.toLowerCase().startsWith('bi') || card.source_image.toLowerCase().startsWith('nl') || card.source_image.toLowerCase().startsWith('fl') || card.source_image.toLowerCase().startsWith('z');
+    const src = card.source_image;
+    // NL 同人頁(2040×2807，含 FL02NL01)：卡格自 x213/y114 起、間距≈565/864
+    const isNLtmpl = /^NL\d/i.test(src) || src === 'FL02NL01.jpg';
+    // O 牌組(Om/Oo，1116×1860)：卡片滿版，均分即可
+    const isOdeck = /^O[mo]/i.test(src);
+    const isTTS = src.startsWith('FR') || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
-    
-    // Default crop offsets unless overridden
-    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite || isTTS ? 0 : CROP.offsetLeft);
-    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite || isTTS ? 0 : CROP.offsetRight);
-    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite || isTTS ? 0 : CROP.offsetTop);
-    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isTTS ? 0 : CROP.offsetBottom);
+
+    // 依模板決定預設裁切邊界（per-card crop_* 仍最優先）
+    let base;
+    if (isNLtmpl)            base = { l: 213, t: 114, r: 131, b: 101 };
+    else if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
+    else                     base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
+
+    const offsetLeft   = card.crop_left   !== undefined ? card.crop_left   : base.l;
+    const offsetRight  = card.crop_right  !== undefined ? card.crop_right  : base.r;
+    const offsetTop    = card.crop_top    !== undefined ? card.crop_top    : base.t;
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
 
     const usableW = img.naturalWidth  - offsetLeft - offsetRight;
     const usableH = img.naturalHeight - offsetTop  - offsetBottom;
