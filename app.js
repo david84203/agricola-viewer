@@ -146,6 +146,10 @@ function renderGrid() {
   // First call: create all card elements once
   if (cardElMap.size === 0) {
     allCards.forEach((card, idx) => {
+      // Remove stale DOM element if this ID was already processed (duplicate guard)
+      if (cardElMap.has(card['卡片ID'])) {
+        cardElMap.get(card['卡片ID']).el.remove();
+      }
       const el = createCardEl(card, idx);
       cardElMap.set(card['卡片ID'], { el, card });
       grid.appendChild(el);
