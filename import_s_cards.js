@@ -89,10 +89,14 @@ for (const [deck, images] of Object.entries(deckImages)) {
   console.log(`${deck}: ${cards.length} 張卡 → 用了 ${imgIdx + (posInImg > 0 ? 1 : 0)} 張圖 (最後一張 ${posInImg} 張卡)`);
 }
 
+for (const card of allCards) {
+  card.牌組 = 'S';
+}
+
 // Update cards.json
 const cardsJsonPath = path.join(__dirname, 'cards.json');
 const existing = JSON.parse(fs.readFileSync(cardsJsonPath, 'utf8'));
-const filtered = existing.filter(c => !c['牌組'] || !/^S\d+$/.test(String(c['牌組'])));
+const filtered = existing.filter(c => !c['牌組'] || !/^S(?:\d+)?$/.test(String(c['牌組'])));
 const final = [...filtered, ...allCards];
 fs.writeFileSync(cardsJsonPath, JSON.stringify(final, null, 2), 'utf8');
 console.log(`\n移除舊 S 系列 ${existing.length - filtered.length} 筆，新增 ${allCards.length} 筆，總計 ${final.length} 筆`);
