@@ -20,14 +20,16 @@ let imageCache = {};
 let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
 let dupCardToPair = new Map();   // cardId → { pair, canonId }
 let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
+let bgaExtraIds = new Set();     // manually marked BGA card IDs
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const [base, overrides, banGroups, dupPairs] = await Promise.all([
+  const [base, overrides, banGroups, dupPairs, bgaData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
+    typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
   ]);
 
   // Build non-canonical duplicate set from localStorage state
@@ -60,6 +62,7 @@ async function loadCards() {
     BANNED_GROUPS.length = 0;
     banGroups.forEach(g => BANNED_GROUPS.push(g));
   }
+  bgaExtraIds = new Set(bgaData || []);
 
   populateDeckFilter();
   document.getElementById('totalCount').textContent = allCards.length;
@@ -75,7 +78,7 @@ function populateDeckFilter() {
 
   const bgaOpt = document.createElement('option');
   bgaOpt.value = 'BGA';
-  bgaOpt.textContent = 'BGA 牌組 (A/B/C/D/E)';
+  bgaOpt.textContent = 'BGA 牌組';
   sel.appendChild(bgaOpt);
 
   const sep = document.createElement('option');
@@ -148,7 +151,7 @@ function applyFilters() {
     // deck filter
     if (activeDeck !== 'all') {
       if (activeDeck === 'BGA') {
-        if (!BGA_DECKS.includes(c['牌組'])) return false;
+        if (!BGA_DECKS.includes(c['牌組']) && !bgaExtraIds.has(c['卡片ID'])) return false;
       } else {
         if (c['牌組'] !== activeDeck) return false;
       }
@@ -480,6 +483,8 @@ function onAuthChange() {
   const admin = typeof isAdmin === 'function' && isAdmin();
   const banAdminBtn = document.getElementById('banAdminBtn');
   if (banAdminBtn) banAdminBtn.style.display = admin ? '' : 'none';
+  const bgaAdminBtn = document.getElementById('bgaAdminBtn');
+  if (bgaAdminBtn) bgaAdminBtn.style.display = admin ? '' : 'none';
   const editBtn = document.getElementById('modalAdminEditBtn');
   if (editBtn) editBtn.style.display = admin ? '' : 'none';
 }
@@ -609,6 +614,7 @@ function renderBanlist(container) {
 
 document.getElementById('banlistBtn').addEventListener('click', openBanlist);
 document.getElementById('banAdminBtn').addEventListener('click', () => openBanAdmin(allCards));
+document.getElementById('bgaAdminBtn').addEventListener('click', () => openBgaAdmin(allCards));
 document.getElementById('banlistClose').addEventListener('click', closeBanlist);
 document.getElementById('banlistOverlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeBanlist();
