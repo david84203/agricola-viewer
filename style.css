@@ -428,6 +428,7 @@ body {
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
+.tag-bga   { background: rgba(91,141,238,.2);  color: #7aadff; font-weight: 600; }
 .tag-replaces {
   background: rgba(91,141,238,.18);
   color: #9fc0ff;
@@ -570,6 +571,15 @@ body {
   font-weight: 700;
   color: #fff;
   background: #c0392b;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: .04em;
+}
+.modal-bga-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #3a6bc4;
   padding: 2px 8px;
   border-radius: 100px;
   letter-spacing: .04em;

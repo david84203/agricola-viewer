@@ -93,30 +93,46 @@ async function addCardToBanlist(card, reason, statusEl) {
   }
 }
 
-function addDuplicatePair(cardA, cardB, statusEl) {
+async function addDuplicatePair(cardA, cardB, statusEl) {
   const LS_DUP_KEY = 'agricola_dups';
+  const FS_DUP_DOC = `${FIRESTORE_BASE_ADMIN}/agricola_dup_state/main`;
+  const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
+  setStatus('處理中…');
   try {
-    const raw = localStorage.getItem(LS_DUP_KEY);
-    const s = raw ? { picked: {}, dismissed: [], custom: [], ...JSON.parse(raw) } : { picked: {}, dismissed: [], custom: [] };
-    const allPairs = [...(window._dupBasePairs || []), ...s.custom];
+    // 從 Firestore 載入最新狀態
+    let state = { picked: {}, dismissed: [], custom: [] };
+    const res = await fetch(FS_DUP_DOC);
+    if (res.ok) {
+      const data = await res.json();
+      const json = data.fields?.stateJson?.stringValue;
+      if (json) state = { ...state, ...JSON.parse(json) };
+    }
+
+    const allPairs = [...(window._dupBasePairs || []), ...(state.custom || [])];
     if (allPairs.find(p => p.cards.includes(cardA['卡片ID']) && p.cards.includes(cardB['卡片ID']))) {
-      statusEl.style.color = '#f87171';
-      statusEl.textContent = '✗ 這兩張牌已有重複配對';
+      setStatus('✗ 這兩張牌已有重複配對', '#f87171');
       return;
     }
-    s.custom.push({
+
+    state.custom = [...(state.custom || []), {
       id: 'c' + Date.now(),
       label: `${cardA['牌名']}／${cardB['牌名']}`,
       cards: [cardA['卡片ID'], cardB['卡片ID']],
       defaultCanonical: cardA['卡片ID'],
       type: 'custom',
+    }];
+
+    // 同步儲存至 Firestore 和 localStorage
+    const saveRes = await fetch(`${FS_DUP_DOC}?updateMask.fieldPaths=stateJson`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { stateJson: { stringValue: JSON.stringify(state) } } }),
     });
-    localStorage.setItem(LS_DUP_KEY, JSON.stringify(s));
-    statusEl.style.color = '#4ade80';
-    statusEl.textContent = '✓ 已新增，請至「重複卡牌」頁面確認';
+    if (!saveRes.ok) throw new Error(`HTTP ${saveRes.status}`);
+    localStorage.setItem(LS_DUP_KEY, JSON.stringify(state));
+    setStatus('✓ 已新增並同步至雲端', '#4ade80');
   } catch (e) {
-    statusEl.style.color = '#f87171';
-    statusEl.textContent = '✗ 失敗：' + e.message;
+    setStatus('✗ 失敗：' + e.message, '#f87171');
   }
 }
 

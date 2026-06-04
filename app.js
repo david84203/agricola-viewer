@@ -70,6 +70,9 @@ async function loadCards() {
 }
 
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
+function isCardBga(card) {
+  return BGA_DECKS.includes(card['牌組']) || bgaExtraIds.has(card['卡片ID']);
+}
 
 // ── Deck filter options ────────────────────────────
 function populateDeckFilter() {
@@ -229,6 +232,7 @@ function createCardEl(card, idx) {
   const isDupNonCanon = dupNonCanonical.has(card['卡片ID']);
   const replacedCount = getCanonicalReplacedIds(card).length;
   const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
+  const bga = isCardBga(card);
 
   const div = document.createElement('div');
   div.className = `card-item ${typeClass}${isDupNonCanon ? ' card-dup-excluded' : ''}${banned ? ' card-banned-excluded' : ''}`;
@@ -239,6 +243,7 @@ function createCardEl(card, idx) {
   const bonus = card['紅利分數'] === '有';
   const pass = card['是否傳遞'] === '是';
   const tagsHtml = [
+    bga   ? `<span class="tag tag-bga">BGA</span>` : '',
     banned ? `<span class="tag tag-ban">禁卡</span>` : '',
     vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
@@ -412,6 +417,8 @@ function openModal(card) {
   document.getElementById('modalId').textContent = card['卡片ID'] || '';
   const isBanned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
   document.getElementById('modalBanBadge').style.display = isBanned ? '' : 'none';
+  const bgaBadge = document.getElementById('modalBgaBadge');
+  if (bgaBadge) bgaBadge.style.display = isCardBga(card) ? '' : 'none';
   const badgeEl = document.getElementById('modalBadge');
   badgeEl.className = `modal-badge ${typeBadgeClass}`;
   if (card.card_type === 'both') {
