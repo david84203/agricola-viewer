@@ -259,9 +259,9 @@ function drawCrop(canvas, card) {
     // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
     const src = card.source_image;
-    // NL 同人頁(2040×2807，含 FL02NL01)：卡格自 x213/y114 起、間距≈565/864
-    // G4(UGG 同人頁，2040×2807)與 NL 同人頁共用同一裁切邊界
-    const isNLtmpl = /^NL\d/i.test(src) || src === 'FL02NL01.jpg' || /^G\d/i.test(src);
+    // NL/FL 同人頁(2040×2807)：卡格自 x213/y114 起、間距≈565/864
+    // G4(UGG 同人頁，2040×2807)與 NL/FL 同人頁共用同一裁切邊界
+    const isNLtmpl = /^NL\d/i.test(src) || /^FL/i.test(src) || /^G\d/i.test(src);
     // O 牌組(Om/Oo，1116×1860)：卡片滿版，均分即可
     const isOdeck = /^O[mo]/i.test(src);
     const isTTS = src.startsWith('FR') || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
