@@ -281,6 +281,8 @@ function openCardEditModal(card, allCardsRef) {
       <button class="admin-qa-btn" id="qaBanBtn">🚫 加入禁卡</button>
       <button class="admin-qa-btn admin-qa-btn-remove" id="qaUnbanBtn" style="display:none">✅ 移除禁卡</button>
       <button class="admin-qa-btn" id="qaDupBtn">🔁 標記重複</button>
+      <button class="admin-qa-btn" id="qaBgaAddBtn">🎮 加入BGA</button>
+      <button class="admin-qa-btn admin-qa-btn-remove" id="qaBgaRemoveBtn" style="display:none">🎮 移除BGA</button>
     </div>
     <div id="qaBanSection" class="admin-qa-section" style="display:none"></div>
     <div id="qaDupSection" class="admin-qa-section" style="display:none"></div>
@@ -294,6 +296,19 @@ function openCardEditModal(card, allCardsRef) {
     document.getElementById('qaUnbanBtn').style.display = inBan ? '' : 'none';
   });
 
+  // BGA 按鈕：ABCDE 自動屬於 BGA，不需手動操作
+  const isAutoBga = ['A','B','C','D','E'].includes(card['牌組']);
+  if (isAutoBga) {
+    document.getElementById('qaBgaAddBtn').style.display = 'none';
+    document.getElementById('qaBgaRemoveBtn').style.display = 'none';
+  } else {
+    loadBgaFromFirestore().then(ids => {
+      const inBga = ids.includes(card['卡片ID']);
+      document.getElementById('qaBgaAddBtn').style.display = inBga ? 'none' : '';
+      document.getElementById('qaBgaRemoveBtn').style.display = inBga ? '' : 'none';
+    });
+  }
+
   document.getElementById('qaUnbanBtn').addEventListener('click', async () => {
     const statusEl = document.getElementById('editSaveStatus');
     document.getElementById('qaUnbanBtn').disabled = true;
@@ -302,6 +317,24 @@ function openCardEditModal(card, allCardsRef) {
     // 移除後切換回加入按鈕
     document.getElementById('qaBanBtn').style.display = '';
     document.getElementById('qaUnbanBtn').style.display = 'none';
+  });
+
+  document.getElementById('qaBgaAddBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('editSaveStatus');
+    document.getElementById('qaBgaAddBtn').disabled = true;
+    await addCardToBga(card, statusEl);
+    document.getElementById('qaBgaAddBtn').disabled = false;
+    document.getElementById('qaBgaAddBtn').style.display = 'none';
+    document.getElementById('qaBgaRemoveBtn').style.display = '';
+  });
+
+  document.getElementById('qaBgaRemoveBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('editSaveStatus');
+    document.getElementById('qaBgaRemoveBtn').disabled = true;
+    await removeCardFromBga(card, statusEl);
+    document.getElementById('qaBgaRemoveBtn').disabled = false;
+    document.getElementById('qaBgaRemoveBtn').style.display = 'none';
+    document.getElementById('qaBgaAddBtn').style.display = '';
   });
 
   document.getElementById('qaBanBtn').addEventListener('click', () => {
@@ -537,9 +570,198 @@ function renderBanAdminGroups() {
   });
 }
 
+// ── BGA Admin ──────────────────────────────────────
+
+async function loadBgaFromFirestore() {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards`);
+    const doc = await res.json();
+    return (doc.fields?.ids?.arrayValue?.values || []).map(v => v.stringValue).filter(Boolean);
+  } catch { return []; }
+}
+
+async function saveBgaToFirestore(ids) {
+  const body = JSON.stringify({
+    fields: {
+      ids: { arrayValue: { values: ids.map(s => ({ stringValue: s })) } }
+    }
+  });
+  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+}
+
+async function addCardToBga(card, statusEl) {
+  const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
+  setStatus('處理中…');
+  try {
+    const ids = await loadBgaFromFirestore();
+    if (ids.includes(card['卡片ID'])) { setStatus('✗ 已在 BGA 牌組中', '#f87171'); return; }
+    ids.push(card['卡片ID']);
+    await saveBgaToFirestore(ids);
+    if (typeof bgaExtraIds !== 'undefined') bgaExtraIds.add(card['卡片ID']);
+    setStatus('✓ 已加入 BGA 牌組', '#4ade80');
+  } catch (e) {
+    setStatus('✗ 失敗：' + e.message, '#f87171');
+  }
+}
+
+async function removeCardFromBga(card, statusEl) {
+  const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
+  setStatus('處理中…');
+  try {
+    let ids = await loadBgaFromFirestore();
+    if (!ids.includes(card['卡片ID'])) { setStatus('✗ 此牌不在 BGA 牌組中', '#f87171'); return; }
+    ids = ids.filter(x => x !== card['卡片ID']);
+    await saveBgaToFirestore(ids);
+    if (typeof bgaExtraIds !== 'undefined') bgaExtraIds.delete(card['卡片ID']);
+    setStatus('✓ 已移除 BGA 牌組', '#4ade80');
+  } catch (e) {
+    setStatus('✗ 失敗：' + e.message, '#f87171');
+  }
+}
+
+let adminBgaAllCards = null;
+
+async function openBgaAdmin(allCards) {
+  adminBgaAllCards = allCards;
+  injectBgaAdminPanel();
+  document.getElementById('bgaAdminPanel').style.display = 'flex';
+
+  const status = document.getElementById('bgaAdminStatus');
+  status.textContent = '載入中…';
+  const ids = await loadBgaFromFirestore();
+  if (ids === null) { status.textContent = '載入失敗'; return; }
+  window._bgaAdminIds = [...ids];
+  status.textContent = '';
+  renderBgaAdminList();
+}
+
+function injectBgaAdminPanel() {
+  if (document.getElementById('bgaAdminPanel')) return;
+  const el = document.createElement('div');
+  el.id = 'bgaAdminPanel';
+  el.className = 'admin-modal-overlay';
+  el.style.display = 'none';
+  el.innerHTML = `
+    <div class="admin-modal admin-modal-wide">
+      <div class="admin-modal-header">
+        <div class="admin-modal-title">BGA 牌組管理（手動標記）</div>
+        <button class="admin-modal-close" id="bgaAdminClose">✕</button>
+      </div>
+      <div class="admin-modal-body" id="bgaAdminBody">
+        <div class="admin-save-status" id="bgaAdminStatus"></div>
+        <p style="font-size:.8rem;color:var(--text3);margin-bottom:12px;">
+          ABCDE 牌組自動屬於 BGA，此處只管理其他牌組中需手動標記的卡牌。
+        </p>
+        <div id="bgaAdminChips" class="ban-admin-chips" style="flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+        <div class="ban-admin-add-row" style="position:relative;">
+          <input type="text" class="admin-input" id="bgaAdminSearch" placeholder="搜尋牌名新增…" autocomplete="off" />
+          <div class="ban-admin-results" id="bgaAdminResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:10;"></div>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <div class="admin-save-status" id="bgaAdminSaveStatus"></div>
+        <button class="admin-btn-cancel" id="bgaAdminCancel">關閉</button>
+        <button class="admin-btn-save" id="bgaAdminSave">儲存變更</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(el);
+
+  const close = () => { el.style.display = 'none'; };
+  document.getElementById('bgaAdminClose').addEventListener('click', close);
+  document.getElementById('bgaAdminCancel').addEventListener('click', close);
+  el.addEventListener('click', e => { if (e.target === el) close(); });
+
+  document.getElementById('bgaAdminSave').onclick = async () => {
+    const btn = document.getElementById('bgaAdminSave');
+    const st  = document.getElementById('bgaAdminSaveStatus');
+    btn.disabled = true;
+    st.textContent = '儲存中…';
+    st.style.color = 'var(--text3)';
+    try {
+      await saveBgaToFirestore(window._bgaAdminIds || []);
+      if (typeof bgaExtraIds !== 'undefined') {
+        bgaExtraIds.clear();
+        (window._bgaAdminIds || []).forEach(id => bgaExtraIds.add(id));
+      }
+      st.style.color = '#4ade80';
+      st.textContent = '✓ 已儲存';
+    } catch (e) {
+      st.style.color = '#f87171';
+      st.textContent = '✗ 失敗：' + e.message;
+    }
+    btn.disabled = false;
+  };
+
+  const searchInput  = document.getElementById('bgaAdminSearch');
+  const resultsEl    = document.getElementById('bgaAdminResults');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    resultsEl.innerHTML = '';
+    if (!q) { resultsEl.style.display = 'none'; return; }
+    const hits = (adminBgaAllCards || [])
+      .filter(c => {
+        const deck = c['牌組'] || '';
+        if (['A','B','C','D','E'].includes(deck)) return false;
+        return (c['牌名'] || '').toLowerCase().includes(q) && !(window._bgaAdminIds || []).includes(c['卡片ID']);
+      })
+      .slice(0, 8);
+    if (!hits.length) { resultsEl.style.display = 'none'; return; }
+    resultsEl.style.display = 'block';
+    hits.forEach(card => {
+      const item = document.createElement('div');
+      item.className = 'ban-admin-result-item';
+      item.textContent = `${card['牌名']}（${card['卡片ID']} · ${card['牌組']}）`;
+      item.addEventListener('click', () => {
+        window._bgaAdminIds = window._bgaAdminIds || [];
+        window._bgaAdminIds.push(card['卡片ID']);
+        searchInput.value = '';
+        resultsEl.style.display = 'none';
+        renderBgaAdminList();
+      });
+      resultsEl.appendChild(item);
+    });
+  });
+
+  searchInput.addEventListener('blur', () => {
+    setTimeout(() => { resultsEl.style.display = 'none'; }, 200);
+  });
+}
+
+function renderBgaAdminList() {
+  const chipsEl = document.getElementById('bgaAdminChips');
+  if (!chipsEl) return;
+  const ids = window._bgaAdminIds || [];
+  chipsEl.innerHTML = ids.length === 0
+    ? '<span style="color:var(--text3);font-size:.8rem;">尚無手動標記的 BGA 卡牌</span>'
+    : ids.map(id => {
+        const card = (adminBgaAllCards || []).find(c => c['卡片ID'] === id);
+        const label = card ? `${card['牌名']}（${id} · ${card['牌組']}）` : id;
+        return `<span class="ban-admin-chip" data-id="${id}">
+          ${label}
+          <button class="ban-chip-remove" data-id="${id}">✕</button>
+        </span>`;
+      }).join('');
+
+  chipsEl.querySelectorAll('.ban-chip-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window._bgaAdminIds = (window._bgaAdminIds || []).filter(x => x !== btn.dataset.id);
+      renderBgaAdminList();
+    });
+  });
+}
+
 // ── Expose ─────────────────────────────────────────
 window.adminLoadOverrides  = loadCardOverrides;
 window.adminApplyOverrides = applyOverrides;
 window.openCardEditModal   = openCardEditModal;
 window.openBanAdmin        = openBanAdmin;
+window.openBgaAdmin        = openBgaAdmin;
 window.loadBanlistFromFirestore = loadBanlistFromFirestore;
+window.loadBgaFromFirestore     = loadBgaFromFirestore;
