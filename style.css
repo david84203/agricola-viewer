@@ -428,6 +428,11 @@ body {
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
+.tag-replaces {
+  background: rgba(91,141,238,.18);
+  color: #9fc0ff;
+  font-weight: 600;
+}
 
 /* ─── Empty State ────────────────────────────────────────────── */
 .empty-state {
@@ -594,6 +599,7 @@ body {
 .field-value.highlight-vp   { color: var(--purple); }
 .field-value.highlight-bonus { color: var(--gold); }
 .field-value.highlight-pass  { color: var(--green); }
+.field-value.highlight-replace { color: #9fc0ff; }
 
 .modal-desc-wrap { margin-top: 6px; }
 .modal-desc-label {

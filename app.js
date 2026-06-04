@@ -19,6 +19,7 @@ let filteredCards = [];
 let imageCache = {};
 let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
 let dupCardToPair = new Map();   // cardId → { pair, canonId }
+let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
@@ -31,17 +32,27 @@ async function loadCards() {
 
   // Build non-canonical duplicate set from localStorage state
   const dupState = (() => { try { return JSON.parse(localStorage.getItem('agricola_dups') || '{}'); } catch { return {}; } })();
+  dupNonCanonical = new Set();
+  dupCardToPair = new Map();
+  dupCanonicalMap = new Map();
   const allPairs = [...dupPairs, ...(dupState.custom || [])];
   allPairs.forEach(pair => {
     if ((dupState.dismissed || []).includes(pair.id)) return;
     const canon = (dupState.picked || {})[pair.id] || pair.defaultCanonical;
-    if (!canon) return;
+    if (!canon || !Array.isArray(pair.cards)) return;
+    const replacedIds = [];
     pair.cards.forEach(id => {
       if (id !== canon) {
+        replacedIds.push(id);
         dupNonCanonical.add(id);
         dupCardToPair.set(id, { pair, canonId: canon });
       }
     });
+    if (replacedIds.length) {
+      const existing = dupCanonicalMap.get(canon) || [];
+      existing.push({ pair, replacedIds });
+      dupCanonicalMap.set(canon, existing);
+    }
   });
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
@@ -93,6 +104,20 @@ const canvasCardMap = new WeakMap(); // canvas → card
 
 function getCardKey(card) {
   return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
+}
+
+function getCanonicalReplacedIds(card) {
+  const entries = dupCanonicalMap.get(card['卡片ID']) || [];
+  return [...new Set(entries.flatMap(entry => entry.replacedIds))];
+}
+
+function getReplacedCardsText(card) {
+  return getCanonicalReplacedIds(card)
+    .map(id => {
+      const replaced = allCards.find(c => c['卡片ID'] === id);
+      return replaced ? `${replaced['牌名'] || '未命名'}（${id}）` : id;
+    })
+    .join('、');
 }
 
 const lazyCanvasObserver = new IntersectionObserver((entries) => {
@@ -199,6 +224,7 @@ function createCardEl(card, idx) {
                  : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
   const isDupNonCanon = dupNonCanonical.has(card['卡片ID']);
+  const replacedCount = getCanonicalReplacedIds(card).length;
   const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
 
   const div = document.createElement('div');
@@ -214,6 +240,7 @@ function createCardEl(card, idx) {
     vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
     pass  ? `<span class="tag tag-pass">←傳遞←</span>` : '',
+    replacedCount ? `<span class="tag tag-replaces">取代 ${replacedCount} 張</span>` : '',
   ].join('');
 
   div.innerHTML = `
@@ -410,12 +437,16 @@ function openModal(card) {
         ['牌組', card['牌組']],
       ];
 
+  const replacedCardsText = getReplacedCardsText(card);
+  if (replacedCardsText) fieldDefs.push(['取代卡牌', replacedCardsText, 'replace']);
+
   fieldDefs.forEach(([label, value, highlight]) => {
     if (!value) return;
     const row = document.createElement('div');
     row.className = 'field-row';
     const cls = highlight === 'vp' && value !== '無' ? 'highlight-vp'
               : highlight === 'bonus' && value === '有' ? 'highlight-bonus'
+              : highlight === 'replace' ? 'highlight-replace'
               : '';
     row.innerHTML = `
       <div class="field-label">${label}</div>
