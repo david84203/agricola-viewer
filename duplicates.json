@@ -2259,5 +2259,25 @@
     ],
     "defaultCanonical": "E093",
     "type": "name"
+  },
+  {
+    "id": "n226",
+    "label": "烤盤／啤酒杯",
+    "cards": [
+      "A030",
+      "C061"
+    ],
+    "defaultCanonical": "A030",
+    "type": "description"
+  },
+  {
+    "id": "n227",
+    "label": "穀物勺／玉米勺",
+    "cards": [
+      "A067*",
+      "舊版E35"
+    ],
+    "defaultCanonical": "A067*",
+    "type": "similar"
   }
 ]
