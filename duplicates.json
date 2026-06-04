@@ -688,5 +688,1576 @@
     ],
     "defaultCanonical": "E009",
     "type": "name"
+  },
+  {
+    "id": "n067",
+    "label": "木桿穀倉",
+    "cards": [
+      "E001",
+      "6210-2"
+    ],
+    "defaultCanonical": "E001",
+    "type": "name"
+  },
+  {
+    "id": "n068",
+    "label": "翻修材料",
+    "cards": [
+      "E002",
+      "5187-2"
+    ],
+    "defaultCanonical": "E002",
+    "type": "name"
+  },
+  {
+    "id": "n069",
+    "label": "釘籃",
+    "cards": [
+      "E015",
+      "5511-6"
+    ],
+    "defaultCanonical": "E015",
+    "type": "name"
+  },
+  {
+    "id": "n070",
+    "label": "驅牛棒",
+    "cards": [
+      "E019",
+      "4814-2"
+    ],
+    "defaultCanonical": "E019",
+    "type": "name"
+  },
+  {
+    "id": "n071",
+    "label": "羊毛地毯",
+    "cards": [
+      "E021",
+      "5151-3"
+    ],
+    "defaultCanonical": "E021",
+    "type": "name"
+  },
+  {
+    "id": "n072",
+    "label": "客房",
+    "cards": [
+      "E022",
+      "4225-8"
+    ],
+    "defaultCanonical": "E022",
+    "type": "name"
+  },
+  {
+    "id": "n073",
+    "label": "養蜂場",
+    "cards": [
+      "E023",
+      "6427-3"
+    ],
+    "defaultCanonical": "E023",
+    "type": "name"
+  },
+  {
+    "id": "n074",
+    "label": "日晷",
+    "cards": [
+      "E026",
+      "6179-8"
+    ],
+    "defaultCanonical": "E026",
+    "type": "name"
+  },
+  {
+    "id": "n075",
+    "label": "小豬撲滿",
+    "cards": [
+      "E027",
+      "5616-13"
+    ],
+    "defaultCanonical": "E027",
+    "type": "name"
+  },
+  {
+    "id": "n076",
+    "label": "書籤",
+    "cards": [
+      "E028",
+      "5107-4"
+    ],
+    "defaultCanonical": "E028",
+    "type": "name"
+  },
+  {
+    "id": "n077",
+    "label": "兒童玩具",
+    "cards": [
+      "E030",
+      "4767-3"
+    ],
+    "defaultCanonical": "E030",
+    "type": "name"
+  },
+  {
+    "id": "n078",
+    "label": "室內裝潢",
+    "cards": [
+      "E031",
+      "5048-7"
+    ],
+    "defaultCanonical": "E031",
+    "type": "name"
+  },
+  {
+    "id": "n079",
+    "label": "牛頭骨",
+    "cards": [
+      "E037",
+      "4316-6"
+    ],
+    "defaultCanonical": "E037",
+    "type": "name"
+  },
+  {
+    "id": "n080",
+    "label": "蜜蜂雕像",
+    "cards": [
+      "E040",
+      "4822-3"
+    ],
+    "defaultCanonical": "E040",
+    "type": "name"
+  },
+  {
+    "id": "n081",
+    "label": "市政大廳",
+    "cards": [
+      "E048",
+      "5120-8"
+    ],
+    "defaultCanonical": "E048",
+    "type": "name"
+  },
+  {
+    "id": "n082",
+    "label": "丁字鋤",
+    "cards": [
+      "E049",
+      "5169-4"
+    ],
+    "defaultCanonical": "E049",
+    "type": "name"
+  },
+  {
+    "id": "n083",
+    "label": "野菜",
+    "cards": [
+      "E050",
+      "4642-9"
+    ],
+    "defaultCanonical": "E050",
+    "type": "name"
+  },
+  {
+    "id": "n084",
+    "label": "鯨油",
+    "cards": [
+      "E051",
+      "4435-3"
+    ],
+    "defaultCanonical": "E051",
+    "type": "name"
+  },
+  {
+    "id": "n085",
+    "label": "石堰",
+    "cards": [
+      "E055",
+      "2738-8"
+    ],
+    "defaultCanonical": "E055",
+    "type": "name"
+  },
+  {
+    "id": "n086",
+    "label": "起司火鍋",
+    "cards": [
+      "E057",
+      "5007-3"
+    ],
+    "defaultCanonical": "E057",
+    "type": "name"
+  },
+  {
+    "id": "n087",
+    "label": "鐵製烤爐",
+    "cards": [
+      "E063",
+      "6600-3"
+    ],
+    "defaultCanonical": "E063",
+    "type": "name"
+  },
+  {
+    "id": "n088",
+    "label": "簡易烤爐",
+    "cards": [
+      "E064",
+      "4654-7"
+    ],
+    "defaultCanonical": "E064",
+    "type": "name"
+  },
+  {
+    "id": "n089",
+    "label": "糧袋",
+    "cards": [
+      "E067",
+      "5242-3"
+    ],
+    "defaultCanonical": "E067",
+    "type": "name"
+  },
+  {
+    "id": "n090",
+    "label": "甜瓜田",
+    "cards": [
+      "E069",
+      "6468-7"
+    ],
+    "defaultCanonical": "E069",
+    "type": "name"
+  },
+  {
+    "id": "n091",
+    "label": "輪種田",
+    "cards": [
+      "E070",
+      "4389-2"
+    ],
+    "defaultCanonical": "E070",
+    "type": "name"
+  },
+  {
+    "id": "n092",
+    "label": "朝鮮薊田",
+    "cards": [
+      "E072",
+      "6318-3"
+    ],
+    "defaultCanonical": "E072",
+    "type": "name"
+  },
+  {
+    "id": "n093",
+    "label": "開山刀",
+    "cards": [
+      "E073",
+      "4926-5"
+    ],
+    "defaultCanonical": "E073",
+    "type": "name"
+  },
+  {
+    "id": "n094",
+    "label": "石斧",
+    "cards": [
+      "E075",
+      "5093-4"
+    ],
+    "defaultCanonical": "E075",
+    "type": "name"
+  },
+  {
+    "id": "n095",
+    "label": "木材堆",
+    "cards": [
+      "E076",
+      "4280-2"
+    ],
+    "defaultCanonical": "E076",
+    "type": "name"
+  },
+  {
+    "id": "n096",
+    "label": "鶴嘴鋤",
+    "cards": [
+      "E077",
+      "7068-6"
+    ],
+    "defaultCanonical": "E077",
+    "type": "name"
+  },
+  {
+    "id": "n097",
+    "label": "變戲法",
+    "cards": [
+      "E078",
+      "4671-4"
+    ],
+    "defaultCanonical": "E078",
+    "type": "name"
+  },
+  {
+    "id": "n098",
+    "label": "岩石庭院",
+    "cards": [
+      "E080",
+      "5470-3"
+    ],
+    "defaultCanonical": "E080",
+    "type": "name"
+  },
+  {
+    "id": "n099",
+    "label": "煉金術士的實驗室",
+    "cards": [
+      "E081",
+      "6163-5"
+    ],
+    "defaultCanonical": "E081",
+    "type": "name"
+  },
+  {
+    "id": "n100",
+    "label": "桃莉羊之母",
+    "cards": [
+      "E084",
+      "5310-15"
+    ],
+    "defaultCanonical": "E084",
+    "type": "name"
+  },
+  {
+    "id": "n101",
+    "label": "圍欄建築師",
+    "cards": [
+      "E086",
+      "5648-5"
+    ],
+    "defaultCanonical": "E086",
+    "type": "name"
+  },
+  {
+    "id": "n102",
+    "label": "翻修大師",
+    "cards": [
+      "E087",
+      "5693-3"
+    ],
+    "defaultCanonical": "E087",
+    "type": "name"
+  },
+  {
+    "id": "n103",
+    "label": "柵欄大師",
+    "cards": [
+      "E088",
+      "5685-3"
+    ],
+    "defaultCanonical": "E088",
+    "type": "name"
+  },
+  {
+    "id": "n104",
+    "label": "肥料收集者",
+    "cards": [
+      "E090",
+      "6463-7"
+    ],
+    "defaultCanonical": "E090",
+    "type": "name"
+  },
+  {
+    "id": "n105",
+    "label": "農田醫生",
+    "cards": [
+      "E092",
+      "4311-4"
+    ],
+    "defaultCanonical": "E092",
+    "type": "name"
+  },
+  {
+    "id": "n106",
+    "label": "磨坊主人",
+    "cards": [
+      "E095",
+      "6028-2"
+    ],
+    "defaultCanonical": "E095",
+    "type": "name"
+  },
+  {
+    "id": "n107",
+    "label": "併購者",
+    "cards": [
+      "E102",
+      "6096-15"
+    ],
+    "defaultCanonical": "E102",
+    "type": "name"
+  },
+  {
+    "id": "n108",
+    "label": "大野狼",
+    "cards": [
+      "E103",
+      "6552-10"
+    ],
+    "defaultCanonical": "E103",
+    "type": "name"
+  },
+  {
+    "id": "n109",
+    "label": "先鋒",
+    "cards": [
+      "E105",
+      "5775-4"
+    ],
+    "defaultCanonical": "E105",
+    "type": "name"
+  },
+  {
+    "id": "n110",
+    "label": "土地測量員",
+    "cards": [
+      "E107",
+      "4882"
+    ],
+    "defaultCanonical": "E107",
+    "type": "name"
+  },
+  {
+    "id": "n111",
+    "label": "編籃工",
+    "cards": [
+      "E109",
+      "4939-2"
+    ],
+    "defaultCanonical": "E109",
+    "type": "name"
+  },
+  {
+    "id": "n112",
+    "label": "牙醫",
+    "cards": [
+      "E110",
+      "6196-4"
+    ],
+    "defaultCanonical": "E110",
+    "type": "name"
+  },
+  {
+    "id": "n113",
+    "label": "隱居者",
+    "cards": [
+      "E111",
+      "4278-11"
+    ],
+    "defaultCanonical": "E111",
+    "type": "name"
+  },
+  {
+    "id": "n114",
+    "label": "丘陵耕種者",
+    "cards": [
+      "E121",
+      "6198-2"
+    ],
+    "defaultCanonical": "E121",
+    "type": "name"
+  },
+  {
+    "id": "n115",
+    "label": "資源交易員",
+    "cards": [
+      "E123",
+      "6237-8"
+    ],
+    "defaultCanonical": "E123",
+    "type": "name"
+  },
+  {
+    "id": "n116",
+    "label": "市長候選人",
+    "cards": [
+      "E124",
+      "7069-4"
+    ],
+    "defaultCanonical": "E124",
+    "type": "name"
+  },
+  {
+    "id": "n117",
+    "label": "勤勞的農夫",
+    "cards": [
+      "E127",
+      "5722-5"
+    ],
+    "defaultCanonical": "E127",
+    "type": "name"
+  },
+  {
+    "id": "n118",
+    "label": "愛吃素的人",
+    "cards": [
+      "E132",
+      "5302-37"
+    ],
+    "defaultCanonical": "E132",
+    "type": "name"
+  },
+  {
+    "id": "n119",
+    "label": "冠軍哺育師",
+    "cards": [
+      "E133",
+      "5036-4"
+    ],
+    "defaultCanonical": "E133",
+    "type": "name"
+  },
+  {
+    "id": "n120",
+    "label": "全方位農夫",
+    "cards": [
+      "E134",
+      "5694-5"
+    ],
+    "defaultCanonical": "E134",
+    "type": "name"
+  },
+  {
+    "id": "n121",
+    "label": "醃菜工",
+    "cards": [
+      "E135",
+      "4550-2"
+    ],
+    "defaultCanonical": "E135",
+    "type": "name"
+  },
+  {
+    "id": "n122",
+    "label": "動物畜牧工人",
+    "cards": [
+      "E136",
+      "4502-9"
+    ],
+    "defaultCanonical": "E136",
+    "type": "name"
+  },
+  {
+    "id": "n123",
+    "label": "蔬菜攤商",
+    "cards": [
+      "E141",
+      "5196-9"
+    ],
+    "defaultCanonical": "E141",
+    "type": "name"
+  },
+  {
+    "id": "n124",
+    "label": "走私者",
+    "cards": [
+      "E142",
+      "4414-9"
+    ],
+    "defaultCanonical": "E142",
+    "type": "name"
+  },
+  {
+    "id": "n125",
+    "label": "伐煤礦工",
+    "cards": [
+      "E143",
+      "5340-18"
+    ],
+    "defaultCanonical": "E143",
+    "type": "name"
+  },
+  {
+    "id": "n126",
+    "label": "商品推銷員",
+    "cards": [
+      "E144",
+      "4211-3"
+    ],
+    "defaultCanonical": "E144",
+    "type": "name"
+  },
+  {
+    "id": "n127",
+    "label": "暴發戶",
+    "cards": [
+      "E145",
+      "6932-4"
+    ],
+    "defaultCanonical": "E145",
+    "type": "name"
+  },
+  {
+    "id": "n128",
+    "label": "討價還價獵人",
+    "cards": [
+      "E152",
+      "5612"
+    ],
+    "defaultCanonical": "E152",
+    "type": "name"
+  },
+  {
+    "id": "n129",
+    "label": "石雕家",
+    "cards": [
+      "E153",
+      "5784-7"
+    ],
+    "defaultCanonical": "E153",
+    "type": "name"
+  },
+  {
+    "id": "n130",
+    "label": "夢想家",
+    "cards": [
+      "E155",
+      "5110-4"
+    ],
+    "defaultCanonical": "E155",
+    "type": "name"
+  },
+  {
+    "id": "n131",
+    "label": "石頭管理者",
+    "cards": [
+      "E158",
+      "4855-3"
+    ],
+    "defaultCanonical": "E158",
+    "type": "name"
+  },
+  {
+    "id": "n132",
+    "label": "吝嗇老頭",
+    "cards": [
+      "E159",
+      "5704-13"
+    ],
+    "defaultCanonical": "E159",
+    "type": "name"
+  },
+  {
+    "id": "n133",
+    "label": "海藻採集者",
+    "cards": [
+      "E160",
+      "5776-5"
+    ],
+    "defaultCanonical": "E160",
+    "type": "name"
+  },
+  {
+    "id": "n134",
+    "label": "企業家",
+    "cards": [
+      "E162",
+      "5435-9"
+    ],
+    "defaultCanonical": "E162",
+    "type": "name"
+  },
+  {
+    "id": "n135",
+    "label": "山區犁田者",
+    "cards": [
+      "E164",
+      "6026-2"
+    ],
+    "defaultCanonical": "E164",
+    "type": "name"
+  },
+  {
+    "id": "n136",
+    "label": "狩獵大師",
+    "cards": [
+      "E165",
+      "4809-4"
+    ],
+    "defaultCanonical": "E165",
+    "type": "name"
+  },
+  {
+    "id": "n137",
+    "label": "乳品供應商",
+    "cards": [
+      "E167",
+      "5817-4"
+    ],
+    "defaultCanonical": "E167",
+    "type": "name"
+  },
+  {
+    "id": "n138",
+    "label": "訓養員的學徒",
+    "cards": [
+      "E168",
+      "6015-4"
+    ],
+    "defaultCanonical": "E168",
+    "type": "name"
+  },
+  {
+    "id": "n139",
+    "label": "鐵製鋤頭／鋤頭",
+    "cards": [
+      "E020",
+      "5207-2"
+    ],
+    "defaultCanonical": "E020",
+    "type": "name"
+  },
+  {
+    "id": "n140",
+    "label": "混濁水坑／泥濘水坑",
+    "cards": [
+      "E041",
+      "4970-7"
+    ],
+    "defaultCanonical": "E041",
+    "type": "name"
+  },
+  {
+    "id": "n141",
+    "label": "水溝／動物陷阱",
+    "cards": [
+      "E042",
+      "5300-15"
+    ],
+    "defaultCanonical": "E042",
+    "type": "name"
+  },
+  {
+    "id": "n142",
+    "label": "高架花台／麵包店",
+    "cards": [
+      "E061",
+      "6174"
+    ],
+    "defaultCanonical": "E061",
+    "type": "name"
+  },
+  {
+    "id": "n143",
+    "label": "畜棚工匠／工程師的學徒",
+    "cards": [
+      "E089",
+      "6243-7"
+    ],
+    "defaultCanonical": "E089",
+    "type": "name"
+  },
+  {
+    "id": "n146",
+    "label": "種子僕人／廉價勞工",
+    "cards": [
+      "E115",
+      "5130-7"
+    ],
+    "defaultCanonical": "E115",
+    "type": "name"
+  },
+  {
+    "id": "n147",
+    "label": "櫻桃果園／櫻桃園",
+    "cards": [
+      "E068",
+      "4867-4"
+    ],
+    "defaultCanonical": "E068",
+    "type": "name"
+  },
+  {
+    "id": "n148",
+    "label": "雷電／雷霆",
+    "cards": [
+      "E004",
+      "6171-5"
+    ],
+    "defaultCanonical": "E004",
+    "type": "name"
+  },
+  {
+    "id": "n149",
+    "label": "下午茶時間／茶",
+    "cards": [
+      "E003",
+      "4637-7"
+    ],
+    "defaultCanonical": "E003",
+    "type": "name"
+  },
+  {
+    "id": "n150",
+    "label": "收藏釣竿／造船廠",
+    "cards": [
+      "E038",
+      "6098-7"
+    ],
+    "defaultCanonical": "E038",
+    "type": "name"
+  },
+  {
+    "id": "n151",
+    "label": "穀倉棚屋／鄉村筒倉",
+    "cards": [
+      "E066",
+      "5039-7"
+    ],
+    "defaultCanonical": "E066",
+    "type": "name"
+  },
+  {
+    "id": "n152",
+    "label": "教母／園丁的妻子",
+    "cards": [
+      "E113",
+      "4526-5"
+    ],
+    "defaultCanonical": "E113",
+    "type": "name"
+  },
+  {
+    "id": "n153",
+    "label": "土地登記／農場名稱標誌",
+    "cards": [
+      "E034",
+      "3492-7"
+    ],
+    "defaultCanonical": "E034",
+    "type": "name"
+  },
+  {
+    "id": "n154",
+    "label": "優等生／傑出成就者",
+    "cards": [
+      "E130",
+      "179-4"
+    ],
+    "defaultCanonical": "E130",
+    "type": "name"
+  },
+  {
+    "id": "n155",
+    "label": "兔子牧人／店員",
+    "cards": [
+      "E139",
+      "6306-3"
+    ],
+    "defaultCanonical": "E139",
+    "type": "name"
+  },
+  {
+    "id": "n156",
+    "label": "動物騎師／騎師",
+    "cards": [
+      "E147",
+      "5284-2"
+    ],
+    "defaultCanonical": "E147",
+    "type": "name"
+  },
+  {
+    "id": "n157",
+    "label": "燒烤大師／漢堡排煎台手",
+    "cards": [
+      "E166",
+      "4411-2"
+    ],
+    "defaultCanonical": "E166",
+    "type": "name"
+  },
+  {
+    "id": "n158",
+    "label": "經銷商／謹慎的商人",
+    "cards": [
+      "E146",
+      "5609-5"
+    ],
+    "defaultCanonical": "E146",
+    "type": "name"
+  },
+  {
+    "id": "n159",
+    "label": "穀倉貓／農場馬廄",
+    "cards": [
+      "E043",
+      "6379-3"
+    ],
+    "defaultCanonical": "E043",
+    "type": "name"
+  },
+  {
+    "id": "n160",
+    "label": "梳子和刀具／羊毛剪",
+    "cards": [
+      "E059",
+      "5393-7"
+    ],
+    "defaultCanonical": "E059",
+    "type": "name"
+  },
+  {
+    "id": "n161",
+    "label": "亞麻農夫／稻米農夫",
+    "cards": [
+      "E137",
+      "5600-2"
+    ],
+    "defaultCanonical": "E137",
+    "type": "name"
+  },
+  {
+    "id": "n162",
+    "label": "畫筆／油漆刷",
+    "cards": [
+      "E039",
+      "4355-5"
+    ],
+    "defaultCanonical": "E039",
+    "type": "name"
+  },
+  {
+    "id": "n163",
+    "label": "水果梯子／公有林地",
+    "cards": [
+      "E045",
+      "4531-4"
+    ],
+    "defaultCanonical": "E045",
+    "type": "name"
+  },
+  {
+    "id": "n164",
+    "label": "夜間掠奪／夜市",
+    "cards": [
+      "E005",
+      "5037-4"
+    ],
+    "defaultCanonical": "E005",
+    "type": "name"
+  },
+  {
+    "id": "n165",
+    "label": "農場勞動者／庫存經理",
+    "cards": [
+      "E122",
+      "5055-2"
+    ],
+    "defaultCanonical": "E122",
+    "type": "name"
+  },
+  {
+    "id": "n166",
+    "label": "黏土坑所有者／山賊",
+    "cards": [
+      "E156",
+      "4407-3"
+    ],
+    "defaultCanonical": "E156",
+    "type": "name"
+  },
+  {
+    "id": "n167",
+    "label": "酸種麵包／麵包機器",
+    "cards": [
+      "E062",
+      "6323-3"
+    ],
+    "defaultCanonical": "E062",
+    "type": "name"
+  },
+  {
+    "id": "n168",
+    "label": "預言家／先知",
+    "cards": [
+      "E094",
+      "6551"
+    ],
+    "defaultCanonical": "E094",
+    "type": "name"
+  },
+  {
+    "id": "n169",
+    "label": "副犁／腐朽犁",
+    "cards": [
+      "E017",
+      "4834"
+    ],
+    "defaultCanonical": "E017",
+    "type": "name"
+  },
+  {
+    "id": "n170",
+    "label": "神童／有錢人",
+    "cards": [
+      "E098",
+      "5774-2"
+    ],
+    "defaultCanonical": "E098",
+    "type": "name"
+  },
+  {
+    "id": "n171",
+    "label": "廢料收集者／送貨員",
+    "cards": [
+      "E120",
+      "4743-3"
+    ],
+    "defaultCanonical": "E120",
+    "type": "name"
+  },
+  {
+    "id": "n172",
+    "label": "市場大師／馬戲團經理",
+    "cards": [
+      "E131",
+      "5157-5"
+    ],
+    "defaultCanonical": "E131",
+    "type": "name"
+  },
+  {
+    "id": "n173",
+    "label": "寵物動物園／寵物門",
+    "cards": [
+      "E011",
+      "5424-3"
+    ],
+    "defaultCanonical": "E011",
+    "type": "name"
+  },
+  {
+    "id": "n174",
+    "label": "草藥園／兒童遊樂園",
+    "cards": [
+      "E036",
+      "2466-2"
+    ],
+    "defaultCanonical": "E036",
+    "type": "name"
+  },
+  {
+    "id": "n175",
+    "label": "分娩護士／貼身侍女",
+    "cards": [
+      "E151",
+      "5305-3"
+    ],
+    "defaultCanonical": "E151",
+    "type": "name"
+  },
+  {
+    "id": "n176",
+    "label": "憤世嫉俗／隱士的手杖",
+    "cards": [
+      "E035",
+      "5017-3"
+    ],
+    "defaultCanonical": "E035",
+    "type": "name"
+  },
+  {
+    "id": "n177",
+    "label": "教堂正廳／迴廊",
+    "cards": [
+      "E032",
+      "6482-2"
+    ],
+    "defaultCanonical": "E032",
+    "type": "name"
+  },
+  {
+    "id": "n178",
+    "label": "海狸殖民地／熊貓",
+    "cards": [
+      "E033",
+      "4901-12"
+    ],
+    "defaultCanonical": "E033",
+    "type": "name"
+  },
+  {
+    "id": "n179",
+    "label": "家畜專家／畜牧專家",
+    "cards": [
+      "E138",
+      "5622-11"
+    ],
+    "defaultCanonical": "E138",
+    "type": "name"
+  },
+  {
+    "id": "n180",
+    "label": "駕駛員舊版／拉鍊製造商",
+    "cards": [
+      "E140",
+      "6301-11"
+    ],
+    "defaultCanonical": "E140",
+    "type": "name"
+  },
+  {
+    "id": "n181",
+    "label": "抄寫員／友善的工人",
+    "cards": [
+      "E129",
+      "6078"
+    ],
+    "defaultCanonical": "E129",
+    "type": "name"
+  },
+  {
+    "id": "n182",
+    "label": "牧羊人的哨子／哨子",
+    "cards": [
+      "E083",
+      "4907-7"
+    ],
+    "defaultCanonical": "E083",
+    "type": "name"
+  },
+  {
+    "id": "n183",
+    "label": "牛糞餅／乾牛糞",
+    "cards": [
+      "E071",
+      "5339-2"
+    ],
+    "defaultCanonical": "E071",
+    "type": "name"
+  },
+  {
+    "id": "n184",
+    "label": "施捨袋／施捨品的籃子",
+    "cards": [
+      "E065",
+      "5375-3"
+    ],
+    "defaultCanonical": "E065",
+    "type": "name"
+  },
+  {
+    "id": "n185",
+    "label": "侯爵／邊境伯爵",
+    "cards": [
+      "E154",
+      "5318-13"
+    ],
+    "defaultCanonical": "E154",
+    "type": "name"
+  },
+  {
+    "id": "n186",
+    "label": "女贊助商舊版／女贊助商",
+    "cards": [
+      "E163",
+      "3868-7"
+    ],
+    "defaultCanonical": "E163",
+    "type": "name"
+  },
+  {
+    "id": "n187",
+    "label": "冷漠的雙親／村長的孫子",
+    "cards": [
+      "E099",
+      "4917-5"
+    ],
+    "defaultCanonical": "E099",
+    "type": "name"
+  },
+  {
+    "id": "n188",
+    "label": "博物館管理員／文藝復興之士",
+    "cards": [
+      "E100",
+      "5707-2"
+    ],
+    "defaultCanonical": "E100",
+    "type": "name"
+  },
+  {
+    "id": "n189",
+    "label": "種子年鑑／藏寶圖",
+    "cards": [
+      "E018",
+      "5442-2"
+    ],
+    "defaultCanonical": "E018",
+    "type": "name"
+  },
+  {
+    "id": "n190",
+    "label": "志向／廚櫃",
+    "cards": [
+      "E024",
+      "5553-13"
+    ],
+    "defaultCanonical": "E024",
+    "type": "name"
+  },
+  {
+    "id": "n191",
+    "label": "羅馬鍋／紅鶴湖",
+    "cards": [
+      "E056",
+      "5372-22"
+    ],
+    "defaultCanonical": "E056",
+    "type": "name"
+  },
+  {
+    "id": "n192",
+    "label": "香料商人／蔬菜進口商",
+    "cards": [
+      "E104",
+      "5695-2"
+    ],
+    "defaultCanonical": "E104",
+    "type": "name"
+  },
+  {
+    "id": "n193",
+    "label": "用益權使用者／施捨者",
+    "cards": [
+      "E157",
+      "4286-4"
+    ],
+    "defaultCanonical": "E157",
+    "type": "name"
+  },
+  {
+    "id": "n194",
+    "label": "動物寢具／稻草",
+    "cards": [
+      "E012",
+      "2578-9"
+    ],
+    "defaultCanonical": "E012",
+    "type": "name"
+  },
+  {
+    "id": "n195",
+    "label": "野豬長矛／獵人的來福槍",
+    "cards": [
+      "E053",
+      "4315-4"
+    ],
+    "defaultCanonical": "E053",
+    "type": "name"
+  },
+  {
+    "id": "n196",
+    "label": "棚屋建築師／筒倉建築工",
+    "cards": [
+      "E114",
+      "4300-6"
+    ],
+    "defaultCanonical": "E114",
+    "type": "name"
+  },
+  {
+    "id": "n197",
+    "label": "引火柴採集者／工坊木匠",
+    "cards": [
+      "E118",
+      "5585-3"
+    ],
+    "defaultCanonical": "E118",
+    "type": "name"
+  },
+  {
+    "id": "n198",
+    "label": "討厭鬼／搗蛋鬼",
+    "cards": [
+      "E101",
+      "5464-6"
+    ],
+    "defaultCanonical": "E101",
+    "type": "name"
+  },
+  {
+    "id": "n199",
+    "label": "敲石者／石屋建築師",
+    "cards": [
+      "E150",
+      "4438-3"
+    ],
+    "defaultCanonical": "E150",
+    "type": "name"
+  },
+  {
+    "id": "n200",
+    "label": "糖漿龍頭／楓糖漿龍頭",
+    "cards": [
+      "E047",
+      "5186-2"
+    ],
+    "defaultCanonical": "E047",
+    "type": "name"
+  },
+  {
+    "id": "n201",
+    "label": "草帽／大遮陽帽",
+    "cards": [
+      "E010",
+      "5371-4"
+    ],
+    "defaultCanonical": "E010",
+    "type": "name"
+  },
+  {
+    "id": "n202",
+    "label": "農田鏟／鐵鍬",
+    "cards": [
+      "E079",
+      "3838-3"
+    ],
+    "defaultCanonical": "E079",
+    "type": "name"
+  },
+  {
+    "id": "n203",
+    "label": "牟取暴利／薪水",
+    "cards": [
+      "E082",
+      "6316-4"
+    ],
+    "defaultCanonical": "E082",
+    "type": "name"
+  },
+  {
+    "id": "n204",
+    "label": "受益者／小氣鬼",
+    "cards": [
+      "E097",
+      "5441-9"
+    ],
+    "defaultCanonical": "E097",
+    "type": "name"
+  },
+  {
+    "id": "n205",
+    "label": "懶惰的人／兼職建築工",
+    "cards": [
+      "E148",
+      "4327-5"
+    ],
+    "defaultCanonical": "E148",
+    "type": "name"
+  },
+  {
+    "id": "n206",
+    "label": "黑麥麵包／玉米",
+    "cards": [
+      "E007",
+      "4385-2"
+    ],
+    "defaultCanonical": "E007",
+    "type": "name"
+  },
+  {
+    "id": "n207",
+    "label": "隔間／水果樹屋",
+    "cards": [
+      "E052",
+      "4296-2"
+    ],
+    "defaultCanonical": "E052",
+    "type": "name"
+  },
+  {
+    "id": "n208",
+    "label": "走私貨物／室內設計",
+    "cards": [
+      "E054",
+      "5437-6"
+    ],
+    "defaultCanonical": "E054",
+    "type": "name"
+  },
+  {
+    "id": "n209",
+    "label": "偷麥賊／小麥農夫",
+    "cards": [
+      "E112",
+      "4463-2"
+    ],
+    "defaultCanonical": "E112",
+    "type": "name"
+  },
+  {
+    "id": "n210",
+    "label": "土地繼承人／煤礦投資客",
+    "cards": [
+      "E119",
+      "6211-4"
+    ],
+    "defaultCanonical": "E119",
+    "type": "name"
+  },
+  {
+    "id": "n211",
+    "label": "稅收官／資源採集者",
+    "cards": [
+      "E126",
+      "6027-4"
+    ],
+    "defaultCanonical": "E126",
+    "type": "name"
+  },
+  {
+    "id": "n212",
+    "label": "馬鞍匠／底層農民",
+    "cards": [
+      "E128",
+      "5580-2"
+    ],
+    "defaultCanonical": "E128",
+    "type": "name"
+  },
+  {
+    "id": "n213",
+    "label": "年長的麵包師傅／利潤導向麵包師",
+    "cards": [
+      "E161",
+      "4458-2"
+    ],
+    "defaultCanonical": "E161",
+    "type": "name"
+  },
+  {
+    "id": "n214",
+    "label": "犁具製造者／商業犁田者",
+    "cards": [
+      "E091",
+      "5080-5"
+    ],
+    "defaultCanonical": "E091",
+    "type": "name"
+  },
+  {
+    "id": "n215",
+    "label": "緊急賣家／急躁交易員",
+    "cards": [
+      "E106",
+      "4393-4"
+    ],
+    "defaultCanonical": "E106",
+    "type": "name"
+  },
+  {
+    "id": "n216",
+    "label": "女長者／自雇者",
+    "cards": [
+      "E096",
+      "4206"
+    ],
+    "defaultCanonical": "E096",
+    "type": "name"
+  },
+  {
+    "id": "n217",
+    "label": "傳家寶／紅利",
+    "cards": [
+      "E029",
+      "5718"
+    ],
+    "defaultCanonical": "E029",
+    "type": "name"
+  },
+  {
+    "id": "n218",
+    "label": "製革大師／鞣皮大師",
+    "cards": [
+      "E085",
+      "4918-3"
+    ],
+    "defaultCanonical": "E085",
+    "type": "name"
+  },
+  {
+    "id": "n219",
+    "label": "冷杉切割者／弓箭手",
+    "cards": [
+      "E116",
+      "4921-8"
+    ],
+    "defaultCanonical": "E116",
+    "type": "name"
+  },
+  {
+    "id": "n220",
+    "label": "黑莓農夫2版／黑莓農夫2版",
+    "cards": [
+      "E108",
+      "11823-4",
+      "6598-5"
+    ],
+    "defaultCanonical": "E108",
+    "type": "name"
+  },
+  {
+    "id": "n221",
+    "label": "重新計算／投資",
+    "cards": [
+      "E006",
+      "5739-9"
+    ],
+    "defaultCanonical": "E006",
+    "type": "name"
+  },
+  {
+    "id": "n222",
+    "label": "荊棘籬笆／牧草地",
+    "cards": [
+      "E016",
+      "5602-4"
+    ],
+    "defaultCanonical": "E016",
+    "type": "name"
+  },
+  {
+    "id": "n223",
+    "label": "白臘樹／竹子",
+    "cards": [
+      "E074",
+      "4784-2"
+    ],
+    "defaultCanonical": "E074",
+    "type": "name"
+  },
+  {
+    "id": "n224",
+    "label": "飼料甜菜／胡蘿蔔",
+    "cards": [
+      "E044",
+      "6404-7"
+    ],
+    "defaultCanonical": "E044",
+    "type": "name"
+  },
+  {
+    "id": "n225",
+    "label": "激勵者／監督者",
+    "cards": [
+      "E093",
+      "6159-2"
+    ],
+    "defaultCanonical": "E093",
+    "type": "name"
   }
 ]
