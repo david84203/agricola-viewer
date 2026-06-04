@@ -28329,11 +28329,16 @@
     "說明": "當你打出此卡時，若在之後的回合行動格上放有你可以取得的食物，你可以將那些食物部份或全部放在這張卡上。遊戲結束時，此卡上有1/2/3/5/8份食物，你獲得1/2/3/4/5點紅利分數。(你不能使用此卡上的食物。)",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 0,
     "card_type": "minor",
+    "position": 0,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI14",
@@ -28348,11 +28353,16 @@
     "說明": "在每次收成階段的繁殖牲畜時，若你有2種以上的動物繁殖，你可以歸還2隻新出生的動物至公用區以執行一次「增加家庭成員，即使房舍中已無空的房間」的行動。(必須有空間讓動物能繁殖新生動物。)",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 1,
     "card_type": "minor",
+    "position": 1,
     "grid_col": 1,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI15",
@@ -28367,11 +28377,16 @@
     "說明": "當你執行「釣魚」行動時，你可以從任何一個行動格拿取1個建築資源。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 2,
     "card_type": "minor",
+    "position": 2,
     "grid_col": 2,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI16",
@@ -28386,11 +28401,16 @@
     "說明": "當你執行「犁1塊農田」行動後，你可以立刻將該名家庭成員移到此卡上以獲得1份小麥。當你執行「犁1塊農田和/或播種」行動後，你可以立刻將該名家庭成員移到此卡上以獲得1份蔬菜。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 3,
     "card_type": "minor",
+    "position": 3,
     "grid_col": 3,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI17",
@@ -28405,11 +28425,16 @@
     "說明": "從牌庫隨機抽取3張次要發展卡。你可以立刻從這3張中選擇1張，按照正常條件及費用將它打出。或將那1張卡片加到手牌中，棄掉其餘2張。之後將這張牌傳給你左手邊的玩家。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 4,
     "card_type": "minor",
+    "position": 4,
     "grid_col": 4,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI18",
@@ -28424,11 +28449,16 @@
     "說明": "你的農田不須相鄰，但同時犁的多塊田則仍須彼此相鄰。遊戲結束時，你因擁有3/4/5片「不與其他田相鄰」的田，而獲得1/2/3點紅利分數。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 5,
     "card_type": "minor",
+    "position": 5,
     "grid_col": 5,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI19",
@@ -28443,11 +28473,16 @@
     "說明": "當你打出此卡時，從公用區任選4個建築資源放在此卡上。當任何玩家(包括你自己)從行動格上取得建築資源時，可以將其中1個取得的建築資源與此卡上的1個建築資源交換，這麼做的玩家必須支付你1份食物。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 6,
     "card_type": "minor",
+    "position": 6,
     "grid_col": 6,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI20",
@@ -28462,11 +28497,16 @@
     "說明": "當你打出此卡時，每個玩家必須從手中拿出一張職業卡，面朝上放在桌子中間，再從職業卡牌庫隨機抽牌，補滿到5張為止。有任何玩家要打出職業卡時，他可以從這疊牌中選擇1張打出，若他這麼做，你得到他打職業卡支付的食物。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 7,
     "card_type": "minor",
+    "position": 7,
     "grid_col": 7,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI21",
@@ -28481,11 +28521,16 @@
     "說明": "當你要擴建或翻修房舍時，你可以直接從累積格支付所需的蘆葦。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 8,
     "card_type": "minor",
+    "position": 8,
     "grid_col": 8,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI22",
@@ -28500,11 +28545,16 @@
     "說明": "立刻面朝下覆蓋你面前所有打出的職業卡。每回合開始時，只要你面前沒有面朝上的職業卡，你獲得1份食物。面朝下的職業卡不具任何效果，但仍計為打出的職業卡。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 9,
     "card_type": "minor",
+    "position": 9,
     "grid_col": 9,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI23",
@@ -28519,11 +28569,16 @@
     "說明": "此卡可提供空間給一名家庭成員。住在此卡的家庭成員僅能執行「拿一份小麥」、「拿一份蔬菜」、「犁一塊農田」、「播種和/或烤麵包」的行動，且這名家庭成員不能移動到你的房舍中居住。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 10,
     "card_type": "minor",
+    "position": 10,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI24",
@@ -28538,11 +28593,16 @@
     "說明": "當你要擴建或翻修房舍時，你可以選擇扣1分而不支付所需的1或2綑蘆葦。在2人或3人遊戲，此卡僅能在「打一張主要或次要發展卡」該行動格打出。",
     "source_image": "PI次發.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 11,
     "card_type": "minor",
+    "position": 11,
     "grid_col": 1,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 5306
   },
   {
     "卡片ID": "PI10",
@@ -28555,11 +28615,16 @@
     "說明": "打出這張卡後，棄掉手上全部的職業卡，重抽7張新的職業卡，可以再支付2份食物立刻再打出一張職業卡。(新打出的職業有任何費用仍需正常支付。)",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 0,
     "card_type": "occupation",
+    "position": 0,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI02",
@@ -28572,11 +28637,16 @@
     "說明": "一場遊戲可使用兩次：你可以使用『翻修』行動，支付1綑蘆葦與等同於房間數量的木頭，將你的石屋轉換成木屋。當你這麼做時，你得到房間數量3倍的紅利分數與3塊磚頭。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 1,
     "card_type": "occupation",
+    "position": 1,
     "grid_col": 1,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI01",
@@ -28589,11 +28659,16 @@
     "說明": "當你打出此卡時，得到2根木頭。每當你從行動格取得建築資源或動物時，可以將其中1個資源或動物放回該行動格，並從任一個資源累積格拿取1根木頭或1塊磚頭。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 2,
     "card_type": "occupation",
+    "position": 2,
     "grid_col": 2,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI03",
@@ -28606,11 +28681,16 @@
     "說明": "在每個偶數回合的返家階段，你可以選擇將1個家庭成員留在他所佔領的行動格，若你如此做，在下一回合的工作階段開始之前，該家庭成員立刻再次執行該行動(該行動格維持被佔領)。若你無法執行該格行動，則領取1張乞討卡並返回該家庭成員。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 3,
     "card_type": "occupation",
+    "position": 3,
     "grid_col": 3,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI04",
@@ -28623,11 +28703,16 @@
     "說明": "將「箭頭」標示物擺在任何一個已翻開的回合行動格。每次有玩家執行該格行動時，將箭頭指向該玩家，每回合開始時被箭頭指到的玩家得到1根木頭。擺放箭頭後，第一個執行該行動格的玩家可以得到1顆石頭。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 4,
     "card_type": "occupation",
+    "position": 4,
     "grid_col": 4,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI06",
@@ -28640,11 +28725,16 @@
     "說明": "一回合可以使用一次：你可以派遣家庭成員至一行動格而不立即執行該行動，該行動效果可在同一回合你另一個行動結束後，再立刻執行該行動效果。如果回合結束時你還是沒能執行該行動效果，則領取一張乞討卡。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 5,
     "card_type": "occupation",
+    "position": 5,
     "grid_col": 5,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI08",
@@ -28657,11 +28747,16 @@
     "說明": "你可以在你每間房間的四個周圍建造柵欄，每一回合最多可以對一個房間這麼做。每個被柵欄包圍的房間可以多容納一個家庭成員。(被柵欄包圍的房間不視作圈地。)",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 6,
     "card_type": "occupation",
+    "position": 6,
     "grid_col": 6,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI05",
@@ -28674,11 +28769,16 @@
     "說明": "在一容器中放入4根木頭、3塊磚頭、2綑蘆葦和2顆石頭。每當你執行『賣藝』行動時，從該容器中隨機抽取2資源，若是相同則拿取該2資源，若是不同則拿取其中1資源，將另1資源放回公用區。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 7,
     "card_type": "occupation",
+    "position": 7,
     "grid_col": 7,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI07",
@@ -28691,11 +28791,16 @@
     "說明": "回合開始時，若有另一名玩家比你多兩個家庭成員以上，或是所有其他玩家都比你多一個家庭成員以上，你可以支付1個食物獲得1個當回合可以使用的食客標記。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 8,
     "card_type": "occupation",
+    "position": 8,
     "grid_col": 8,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI09",
@@ -28708,11 +28813,16 @@
     "說明": "若你還沒建造過柵欄，在14個回合行動卡(不論是否已翻開)上各擺上1根柵欄。每當你執行回合行動卡的行動時，取回該行動格上的柵欄。除了前6根不計，每取回一根柵欄獲得一點紅利分數。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 9,
     "card_type": "occupation",
+    "position": 9,
     "grid_col": 9,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI11",
@@ -28725,11 +28835,16 @@
     "說明": "每回合可使用一次：你可以跳過派遣你的第一個家庭成員，以獲得一隻動物，若你選擇拿牛，則必須支付1份食物。(之後輪到你時仍可正常派遣該名家庭成員。發動此能力時必須其他玩家至少都還有1個家庭成員尚未派遣。)",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 10,
     "card_type": "occupation",
+    "position": 10,
     "grid_col": 0,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "PI12",
@@ -28742,11 +28857,16 @@
     "說明": "每回合開始時你得到2份食物。每當你從累積格取得建築資源或動物時，你必須留1個建築資源或動物在該累積格上。",
     "source_image": "PI職業.jpg",
     "grid_cols": 10,
-    "grid_rows": 3,
+    "grid_rows": 2,
     "grid_index": 11,
     "card_type": "occupation",
+    "position": 11,
     "grid_col": 1,
-    "grid_row": 1
+    "grid_row": 1,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "Z313",
