@@ -4,15 +4,15 @@ const path = require('path');
 // Each deck maps to its image files with slot counts [filename, slots]
 // Most images have 9 slots; S10m2 only has 2 cards (thumbnail shows it's mostly blank)
 const deckImages = {
-  S1:  [['S1m2.jpg',9],  ['S1o1.jpg',9],  ['S1o2m1.jpg',9]],
-  S2:  [['S2m2.jpg',9],  ['S2o1.jpg',9],  ['S2o2m1.jpg',9]],
-  S3:  [['S3m2.jpg',9],  ['S3o1.jpg',9],  ['S3o2m1.jpg',9]],
-  S4:  [['S4m2.jpg',9],  ['S4o1.jpg',9],  ['S4o2m1.jpg',9]],
-  S5:  [['S5m2.jpg',9],  ['S5o1.jpg',9],  ['S5o2m1.jpg',9]],
-  S6:  [['S6m1.jpg',9],  ['S6o1.jpg',9],  ['S6o2m2.jpg',9]],
-  S7:  [['S7m1.jpg',9],  ['S7o1.jpg',9],  ['S7o2m2.jpg',9]],
-  S8:  [['S8m1.jpg',9],  ['S8o1.jpg',9],  ['S8o2m2.jpg',9]],
-  S9:  [['S9m1.jpg',9],  ['S9o1.jpg',9],  ['S9o2m2.jpg',9]],
+  S1:  [['S1m2.jpg',5],  ['S1o1.jpg',9],  ['S1o2m1.jpg',9]],
+  S2:  [['S2m2.jpg',4],  ['S2o1.jpg',9],  ['S2o2m1.jpg',9]],
+  S3:  [['S3m2.jpg',6],  ['S3o1.jpg',9],  ['S3o2m1.jpg',9]],
+  S4:  [['S4m2.jpg',5],  ['S4o1.jpg',9],  ['S4o2m1.jpg',9]],
+  S5:  [['S5m2.jpg',5],  ['S5o1.jpg',9],  ['S5o2m1.jpg',9]],
+  S6:  [['S6m1.jpg',9],  ['S6o1.jpg',9],  ['S6o2m2.jpg',6]],
+  S7:  [['S7m1.jpg',9],  ['S7o1.jpg',9],  ['S7o2m2.jpg',6]],
+  S8:  [['S8m1.jpg',9],  ['S8o1.jpg',9],  ['S8o2m2.jpg',6]],
+  S9:  [['S9m1.jpg',9],  ['S9o1.jpg',8],  ['S9o2m2.jpg',6]],
   S10: [['S10m1.jpg',9], ['S10m2.jpg',2], ['S10o1.jpg',9]],
   S11: [['S11m1.jpg',9], ['S11o1.jpg',9]],
 };
