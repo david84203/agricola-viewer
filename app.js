@@ -88,8 +88,12 @@ let excludeBanned = false;
 let excludeDups = false;
 
 // Card elements are created once and reused; only visibility is toggled on filter
-const cardElMap = new Map(); // cardId → {el, card}
+const cardElMap = new Map(); // unique card key → {el, card}
 const canvasCardMap = new WeakMap(); // canvas → card
+
+function getCardKey(card) {
+  return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
+}
 
 const lazyCanvasObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -147,20 +151,21 @@ function renderGrid() {
   if (cardElMap.size === 0) {
     allCards.forEach((card, idx) => {
       // Remove stale DOM element if this ID was already processed (duplicate guard)
-      if (cardElMap.has(card['卡片ID'])) {
-        cardElMap.get(card['卡片ID']).el.remove();
+      const cardKey = getCardKey(card);
+      if (cardElMap.has(cardKey)) {
+        cardElMap.get(cardKey).el.remove();
       }
       const el = createCardEl(card, idx);
-      cardElMap.set(card['卡片ID'], { el, card });
+      cardElMap.set(cardKey, { el, card });
       grid.appendChild(el);
     });
   }
 
   // Toggle visibility only
-  const filteredSet = new Set(filteredCards.map(c => c['卡片ID']));
+  const filteredSet = new Set(filteredCards.map(c => getCardKey(c)));
   let count = 0;
-  cardElMap.forEach(({ el, card }, id) => {
-    const show = filteredSet.has(id);
+  cardElMap.forEach(({ el, card }) => {
+    const show = filteredSet.has(getCardKey(card));
     const wasHidden = el.hidden;
     el.hidden = !show;
     // Re-observe canvas if card just became visible and wasn't drawn yet
@@ -308,7 +313,7 @@ function drawCrop(canvas, card) {
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('圖片未找到', 150, 110);
-      ctx.fillText(imgFile, 150, 130);
+      ctx.fillText(card.source_image || '', 150, 130);
     };
     img.src = key;
   }
