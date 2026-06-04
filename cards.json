@@ -48036,9 +48036,9 @@
     "說明": "在每個工作階段結束時，若你在當回合沒有花費任何建築資源，你可以打出1張次要發展卡。",
     "card_type": "occupation",
     "source_image": "G8o7.jpg",
-    "position": 5,
-    "grid_col": 2,
-    "grid_row": 1,
+    "position": 6,
+    "grid_col": 0,
+    "grid_row": 2,
     "人數": "1+"
   },
   {
@@ -48051,8 +48051,8 @@
     "說明": "在每個會進入收成階段的回合開始時，你可以將1份貨物播種在1塊空田上。",
     "card_type": "occupation",
     "source_image": "G8o7.jpg",
-    "position": 6,
-    "grid_col": 0,
+    "position": 7,
+    "grid_col": 1,
     "grid_row": 2,
     "人數": "1+"
   },
@@ -48066,8 +48066,8 @@
     "說明": "立即在1個行動格上攔上標記。每個回合開始時，你必須將標記移動到直角相鄰的行動格上。即使標記所在的行動格已被其他玩 家佔據，你仍可以使用該行動格（除了「起始玩家」行動格外）。",
     "card_type": "occupation",
     "source_image": "G8o7.jpg",
-    "position": 7,
-    "grid_col": 1,
+    "position": 8,
+    "grid_col": 2,
     "grid_row": 2,
     "人數": "4+"
   },
