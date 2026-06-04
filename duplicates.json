@@ -2279,5 +2279,15 @@
     ],
     "defaultCanonical": "A067*",
     "type": "similar"
+  },
+  {
+    "id": "n228",
+    "label": "大農莊／大農莊",
+    "cards": [
+      "A033*",
+      "Z321"
+    ],
+    "defaultCanonical": "A033*",
+    "type": "name"
   }
 ]
