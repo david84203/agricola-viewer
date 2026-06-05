@@ -649,13 +649,15 @@ async function init() {
   try {
     setLoading('統計評分場次…');
     // Count sessions first
-    const countRes = await fetch(`${FIRESTORE_BASE.replace('/documents', '')}:runAggregationQuery`, {
+    const countRes = await fetch(`${FIRESTORE_BASE}:runAggregationQuery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         structuredAggregationQuery: {
-          from: [{ collectionId: 'agricola_sessions' }],
-          where: { fieldFilter: { field: { fieldPath: 'raterId' }, op: 'EQUAL', value: { stringValue: raterId } } },
+          structuredQuery: {
+            from: [{ collectionId: 'agricola_sessions' }],
+            where: { fieldFilter: { field: { fieldPath: 'raterId' }, op: 'EQUAL', value: { stringValue: raterId } } }
+          },
           aggregations: [{ count: {}, alias: 'count' }]
         }
       })

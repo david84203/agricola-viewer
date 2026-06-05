@@ -138,7 +138,7 @@ async function loadRaterProgress() {
   if (!raterId) return;
 
   try {
-    const res = await fetch(`${FIRESTORE_BASE.replace('/documents', '')}:runAggregationQuery`, {
+    const res = await fetch(`${FIRESTORE_BASE}:runAggregationQuery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
