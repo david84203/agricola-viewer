@@ -667,6 +667,13 @@
   color: #fbbf24;
   font-weight: 600;
 }
+.progress-profile-link {
+  margin-left: 8px;
+  color: #60c0f0;
+  text-decoration: none;
+  font-weight: 500;
+}
+.progress-profile-link:hover { text-decoration: underline; }
 
 /* ── Draft Score ── */
 .draft-score {

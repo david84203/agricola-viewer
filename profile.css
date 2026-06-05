@@ -1,0 +1,256 @@
+/* ══════════════════════════════════════════════════
+   農家樂 Profile — profile.css
+   ══════════════════════════════════════════════════ */
+
+/* ── Layout ─────────────────────────────────────── */
+.profile-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  min-height: 60vh;
+}
+
+/* ── State screens (loading / locked / auth) ──── */
+.profile-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  gap: 12px;
+}
+.profile-state .state-icon { font-size: 3rem; line-height: 1; }
+.profile-state h2 { font-size: 1.3rem; color: #c8d8e8; margin: 0; }
+.profile-state p  { color: #8899aa; margin: 0; font-size: .95rem; }
+
+.profile-cta-btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  background: #2d6ca8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.profile-cta-btn:hover { background: #3a82c8; }
+
+.profile-lock-wrap { width: 100%; max-width: 360px; margin-top: 8px; }
+.profile-lock-bar-track {
+  height: 10px; background: #1e2b3a; border-radius: 5px; overflow: hidden;
+}
+.profile-lock-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2d6ca8, #7b4fc4);
+  border-radius: 5px;
+  transition: width .5s;
+}
+.profile-lock-count { margin-top: 6px; font-size: .85rem; color: #8899aa; }
+
+/* ── Overview header ──────────────────────────── */
+.profile-overview {
+  background: #141e2d;
+  border: 1px solid #26364a;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.profile-overview-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #c8d8e8;
+  margin-bottom: 16px;
+}
+.profile-overview-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.overview-stat { display: flex; flex-direction: column; gap: 4px; }
+.overview-stat-val {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #8899aa;
+  line-height: 1;
+}
+.overview-stat.highlight .overview-stat-val { color: #f0c040; }
+.overview-stat-lbl { font-size: .78rem; color: #5a7090; text-transform: uppercase; letter-spacing: .04em; }
+
+/* ── Cards & rows ─────────────────────────────── */
+.profile-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) { .profile-row { grid-template-columns: 1fr; } }
+
+.profile-card {
+  background: #141e2d;
+  border: 1px solid #26364a;
+  border-radius: 12px;
+  padding: 16px;
+  overflow: hidden;
+}
+.profile-card-full { grid-column: 1 / -1; margin-bottom: 16px; }
+
+.profile-card-hd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.profile-card-title { font-size: 1rem; font-weight: 600; color: #b8ccd8; }
+.profile-card-sub   { font-size: .78rem; color: #5a7090; }
+
+/* Toggle */
+.pf-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .78rem; color: #7a92a8; cursor: pointer; user-select: none;
+  margin-left: auto;
+}
+.pf-toggle input { accent-color: #4a9eda; cursor: pointer; }
+
+/* ── Card rank list ───────────────────────────── */
+.card-rank-list { display: flex; flex-direction: column; gap: 4px; max-height: 520px; overflow-y: auto; }
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: #1a2638;
+  min-width: 0;
+}
+.rank-row:hover { background: #1f2e42; }
+
+.rank-no { font-size: .75rem; color: #5a7090; min-width: 24px; text-align: right; flex-shrink: 0; }
+
+.rank-thumb { width: 50px; height: 36px; flex-shrink: 0; border-radius: 4px; overflow: hidden; background: #0f1620; }
+.rank-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.rank-info { flex: 1; min-width: 0; overflow: hidden; }
+.rank-name { display: block; font-size: .83rem; color: #c8d8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-id   { display: block; font-size: .7rem; color: #5a7090; }
+
+.rank-val { font-size: .8rem; color: #a0b4c0; white-space: nowrap; flex-shrink: 0; }
+
+.rank-empty { color: #5a7090; font-size: .85rem; padding: 16px 0; text-align: center; }
+
+/* ── Tier pips ─────────────────────────────────── */
+.tier-pip {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; flex-shrink: 0;
+  color: #fff;
+}
+.tier-pip.tier-s { background: #c0392b; }
+.tier-pip.tier-a { background: #e67e22; }
+.tier-pip.tier-b { background: #27ae60; }
+.tier-pip.tier-c { background: #2980b9; }
+.tier-pip.tier-d { background: #7f8c8d; }
+.tier-pip.tier-e { background: #2c3e50; }
+.tier-pip.tier-\? { background: #3a4a5a; }
+
+/* ── Score chart ────────────────────────────────── */
+.score-chart-wrap { width: 100%; overflow-x: auto; }
+.score-chart { display: block; width: 100%; height: auto; }
+
+/* ── Gem stats ──────────────────────────────────── */
+.gem-row {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.gem-item {
+  flex: 1; min-width: 140px;
+  background: #1a2638; border-radius: 8px; padding: 14px;
+  border-left: 4px solid #26364a;
+}
+.gem-item.good { border-left-color: #27ae60; }
+.gem-item.bad  { border-left-color: #c0392b; }
+.gem-val  { font-size: 2rem; font-weight: 700; color: #c8d8e8; line-height: 1; }
+.gem-lbl  { font-size: .85rem; color: #8899aa; margin-top: 4px; }
+.gem-sub  { font-size: .75rem; color: #5a7090; margin-top: 2px; }
+.gem-desc { font-size: .73rem; color: #4a6078; margin-top: 8px; line-height: 1.4; }
+
+/* ── Type preference ─────────────────────────────── */
+.pref-table {
+  width: 100%; border-collapse: collapse; font-size: .85rem;
+}
+.pref-table th, .pref-table td {
+  padding: 8px 10px; text-align: center;
+  border-bottom: 1px solid #26364a;
+  color: #c8d8e8;
+}
+.pref-table th { color: #7a92a8; font-weight: 500; }
+.pref-table td:first-child { text-align: left; color: #8899aa; }
+.pref-bias { margin-top: 12px; font-size: .85rem; color: #f0c040; }
+.pref-note { margin-top: 8px; font-size: .75rem; color: #4a6078; }
+
+/* ── Extremes ────────────────────────────────────── */
+.ext-group { margin-bottom: 20px; }
+.ext-group-title { font-size: .9rem; color: #8899aa; margin-bottom: 10px; font-weight: 600; }
+
+.ext-session {
+  background: #1a2638; border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 8px;
+}
+.ext-meta {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+}
+.ext-rank  { font-size: .8rem; color: #5a7090; }
+.ext-score { font-size: 1.2rem; font-weight: 700; color: #c8d8e8; }
+.ext-score.hi { color: #27ae60; }
+.ext-score.lo { color: #c0392b; }
+.ext-date  { font-size: .75rem; color: #5a7090; margin-left: auto; }
+
+.ext-picks { display: flex; flex-wrap: wrap; gap: 4px; }
+.ext-thumb {
+  width: 44px; height: 32px;
+  border-radius: 4px; overflow: hidden; background: #0f1620;
+  flex-shrink: 0;
+}
+.ext-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ── Common pairs ──────────────────────────────── */
+.pairs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.pair-item {
+  display: flex; align-items: center; gap: 8px;
+  background: #1a2638; border-radius: 8px; padding: 8px 10px;
+}
+.pair-card {
+  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;
+}
+.pair-thumb {
+  width: 44px; height: 32px; border-radius: 4px;
+  overflow: hidden; background: #0f1620; flex-shrink: 0;
+}
+.pair-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pair-name { font-size: .75rem; color: #c8d8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pair-plus { color: #5a7090; font-size: 1rem; flex-shrink: 0; }
+.pair-count { font-size: .8rem; color: #f0c040; white-space: nowrap; flex-shrink: 0; margin-left: auto; }
+
+/* ── Pick priority ──────────────────────────────── */
+.priority-subtitle { font-size: .8rem; color: #7a92a8; font-weight: 600; margin-bottom: 8px; }
+.priority-list { display: flex; flex-direction: column; gap: 4px; }
+
+.priority-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 6px; background: #1a2638;
+}
+.priority-thumb {
+  width: 44px; height: 32px; border-radius: 4px;
+  overflow: hidden; background: #0f1620; flex-shrink: 0;
+}
+.priority-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.priority-info { flex: 1; min-width: 0; }
+.priority-name { display: block; font-size: .83rem; color: #c8d8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.priority-sub  { display: block; font-size: .7rem; color: #5a7090; }
+.priority-round { font-size: .83rem; color: #4a9eda; white-space: nowrap; flex-shrink: 0; }

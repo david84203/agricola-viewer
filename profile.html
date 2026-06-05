@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>個人分析 — 農家樂 Agricola</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="stylesheet" href="profile.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 個人分析</div>
+        <div class="brand-sub">評分者專屬數據</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <a href="draft.html" class="back-link">← 回輪抽模擬器</a>
+    </div>
+  </div>
+
+  <main class="profile-main">
+
+    <!-- Loading -->
+    <div id="profileLoading" class="profile-state">
+      <div class="state-icon">⏳</div>
+      <p id="profileLoadingMsg">載入中…</p>
+    </div>
+
+    <!-- Not logged in -->
+    <div id="profileAuthRequired" class="profile-state" style="display:none">
+      <div class="state-icon">🔐</div>
+      <h2>需要登入</h2>
+      <p>請先以評分者帳號登入，再查看個人分析。</p>
+      <button class="profile-cta-btn" id="profileLoginBtn">評分者登入</button>
+    </div>
+
+    <!-- Locked -->
+    <div id="profileLocked" class="profile-state" style="display:none">
+      <div class="state-icon">🔒</div>
+      <h2>尚未解鎖</h2>
+      <p>累積 500 場評分後解鎖個人數據分析</p>
+      <div class="profile-lock-wrap">
+        <div class="profile-lock-bar-track">
+          <div class="profile-lock-bar-fill" id="profileLockFill" style="width:0%"></div>
+        </div>
+        <div class="profile-lock-count" id="profileLockCount">0 / 500 場</div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div id="profileContent" style="display:none">
+
+      <!-- Overview header -->
+      <div class="profile-overview">
+        <div class="profile-overview-name" id="overviewName">—</div>
+        <div class="profile-overview-stats">
+          <div class="overview-stat">
+            <div class="overview-stat-val" id="statSessions">—</div>
+            <div class="overview-stat-lbl">評分場次</div>
+          </div>
+          <div class="overview-stat highlight">
+            <div class="overview-stat-val" id="statAvgScore">—</div>
+            <div class="overview-stat-lbl">500場平均分</div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-stat-val" id="statGems">—</div>
+            <div class="overview-stat-lbl">撿寶次數</div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-stat-val" id="statMistakes">—</div>
+            <div class="overview-stat-lbl">踩雷次數</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Favorites: occ + min -->
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="profile-card-hd">
+            <span class="profile-card-title">❤️ 最愛職業牌 Top 20</span>
+            <label class="pf-toggle"><input type="checkbox" id="favOccExcS" /> 排除 Tier S</label>
+          </div>
+          <div class="card-rank-list" id="favOccList"></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card-hd">
+            <span class="profile-card-title">❤️ 最愛次要發展牌 Top 20</span>
+            <label class="pf-toggle"><input type="checkbox" id="favMinExcS" /> 排除 Tier S</label>
+          </div>
+          <div class="card-rank-list" id="favMinList"></div>
+        </div>
+      </div>
+
+      <!-- Disliked: occ + min -->
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="profile-card-hd">
+            <span class="profile-card-title">💔 最討厭職業牌 Top 20</span>
+            <label class="pf-toggle"><input type="checkbox" id="hateOccExcE" /> 排除 Tier E</label>
+          </div>
+          <div class="card-rank-list" id="hateOccList"></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card-hd">
+            <span class="profile-card-title">💔 最討厭次要發展牌 Top 20</span>
+            <label class="pf-toggle"><input type="checkbox" id="hateMinExcE" /> 排除 Tier E</label>
+          </div>
+          <div class="card-rank-list" id="hateMinList"></div>
+        </div>
+      </div>
+
+      <!-- Score timeline -->
+      <div class="profile-card profile-card-full">
+        <div class="profile-card-hd">
+          <span class="profile-card-title">📈 分數走勢（每場得分 · 移動平均）</span>
+        </div>
+        <div class="score-chart-wrap" id="scoreChartWrap">
+          <svg id="scoreChart" class="score-chart"></svg>
+        </div>
+      </div>
+
+      <!-- 慧眼 + 牌型偏好 -->
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="profile-card-hd"><span class="profile-card-title">👁 慧眼指數</span></div>
+          <div id="gemContent"></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card-hd"><span class="profile-card-title">🎯 牌型偏好</span></div>
+          <div id="typePrefContent"></div>
+        </div>
+      </div>
+
+      <!-- Best / Worst sessions -->
+      <div class="profile-card profile-card-full">
+        <div class="profile-card-hd"><span class="profile-card-title">🏆 最強局 / 最弱局</span></div>
+        <div id="extremesContent"></div>
+      </div>
+
+      <!-- Common pairs -->
+      <div class="profile-card profile-card-full">
+        <div class="profile-card-hd"><span class="profile-card-title">🤝 最常搭檔 Top 20</span></div>
+        <div class="pairs-grid" id="pairsContent"></div>
+      </div>
+
+      <!-- Pick priority -->
+      <div class="profile-card profile-card-full">
+        <div class="profile-card-hd">
+          <span class="profile-card-title">⚡ 選牌優先級</span>
+          <span class="profile-card-sub">越低輪次 = 越優先　僅顯示出現 10+ 次的牌</span>
+        </div>
+        <div class="profile-row">
+          <div>
+            <div class="priority-subtitle">職業牌（最優先選）</div>
+            <div class="priority-list" id="priorityOccEarly"></div>
+          </div>
+          <div>
+            <div class="priority-subtitle">次要發展牌（最優先選）</div>
+            <div class="priority-list" id="priorityMinEarly"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /profileContent -->
+  </main>
+
+  <script src="auth.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

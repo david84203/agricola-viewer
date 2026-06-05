@@ -163,8 +163,8 @@ async function loadRaterProgress() {
     fillEl.style.width  = `${pct}%`;
 
     if (count >= 500) {
-      hintEl.textContent = '🎉 個人分析已解鎖！';
-      hintEl.className   = 'rater-progress-hint unlocked';
+      hintEl.innerHTML  = '🎉 個人分析已解鎖！<a href="profile.html" class="progress-profile-link">→ 查看個人分析</a>';
+      hintEl.className  = 'rater-progress-hint unlocked';
     } else {
       const left = 500 - count;
       hintEl.textContent = `還差 ${left} 場解鎖個人數據分析`;
