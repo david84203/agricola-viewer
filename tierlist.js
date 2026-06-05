@@ -11,13 +11,30 @@ const MIN_SEEN = 5;
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
 const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
 
-const BANNED_GROUPS = [
-  { label: '過強職業',       ids: ['FL049', 'C093', 'C130', 'A127', 'I251', 'I260', 'I234', 'I255', '舊版E198', 'K270'] },
-  { label: '過強次要發展卡', ids: ['C003*', 'B010*', '906-8', 'A010', 'B021', 'A048', 'C031', 'K138', 'K125'] },
-  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E171', 'K304', '6575-4', 'WA042', 'K317'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', 'K109', 'FL016', 'FL028'] },
+let BANNED_GROUPS = [
+  { label: '過強職業卡',     ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '8720-9', '7873-7', '7252-3', '6022-5', '舊版E198', 'K270', 'NL098', 'PI10', 'PI03', 'PI06', 'Z329', 'Ö03', 'Ö01'] },
+  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', '6515-6', '5869-10', '5881-9', '4988-8', 'I081', 'Z320', 'K138', 'K125', 'Ö13', 'Ö17'] },
+  { label: '過爛職業卡',     ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E198', '舊版E171', '5030-2', 'Ö05', 'K304', 'Ö02', '5698-2', 'WM033', 'Ö09', '6575-4', 'WA042', 'Z333', 'K317'] },
+  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', '8315', '6960-2', 'NL023', 'K109', 'FL016', 'FL028', 'Z324'] },
+  { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*'] },
 ];
-const BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+
+async function loadBanlist() {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
+    if (!res.ok) return;
+    const doc = await res.json();
+    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+      label: g.mapValue.fields.label.stringValue,
+      ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
+    }));
+    if (groups.length) {
+      BANNED_GROUPS = groups;
+      BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+    }
+  } catch { /* 使用 hardcode fallback */ }
+}
 
 function getCardKey(card) {
   return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
@@ -58,6 +75,7 @@ async function init() {
       fetch('./cards.json').then(r => r.json()),
       fetchAllRatings(),
       loadDupExclusions(),
+      loadBanlist(),
     ]);
     allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
