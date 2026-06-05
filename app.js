@@ -358,15 +358,15 @@ function drawCrop(canvas, card) {
     const isNLtmpl = /^NL\d/i.test(src) || /^FL/i.test(src) || /^G\d/i.test(src);
     // O 牌組(Om/Oo，1116×1860)：卡片滿版，均分即可
     const isOdeck = /^O[mo]/i.test(src);
-    const isTTS = src.startsWith('FR') || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
+    const isTTS = src.startsWith('FR') || /^G\d+o/i.test(src) || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
 
     // 依模板決定預設裁切邊界（per-card crop_* 仍最優先）
     let base;
-    if (isNLtmpl)            base = { l: 182, t: 114, r: 166, b: 101 };
-    else if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
+    if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
+    else if (isNLtmpl)       base = { l: 182, t: 114, r: 166, b: 101 };
     else                     base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
 
     const offsetLeft   = card.crop_left   !== undefined ? card.crop_left   : base.l;
