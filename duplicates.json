@@ -634,9 +634,10 @@
     "label": "建築專家",
     "cards": [
       "A163",
-      "WM018"
+      "WM018",
+      "11823-4"
     ],
-    "defaultCanonical": "A163",
+    "defaultCanonical": "11823-4",
     "type": "name"
   },
   {
