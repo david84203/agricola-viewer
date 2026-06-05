@@ -93,6 +93,9 @@ async function loadCards() {
 
   populateDeckFilter();
   document.getElementById('totalCount').textContent = allCards.length;
+  const _bannedKeys = new Set(allCards.filter(c => BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))).map(getCardKey));
+  const _excluded = new Set([..._bannedKeys, ...dupNonCanonical]);
+  document.getElementById('netCount').textContent = allCards.length - _excluded.size;
   applyFilters();
 }
 
