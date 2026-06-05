@@ -606,7 +606,7 @@ body {
   color: var(--text);
   font-weight: 500;
 }
-.field-value.highlight-vp   { color: var(--purple); }
+.field-value.highlight-vp   { color: #DDCC1C; }
 .field-value.highlight-bonus { color: var(--gold); }
 .field-value.highlight-pass  { color: var(--green); }
 .field-value.highlight-replace { color: #9fc0ff; }
