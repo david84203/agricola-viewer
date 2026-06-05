@@ -301,7 +301,7 @@ function createCardEl(card, idx) {
   const tagsHtml = [
     bga   ? `<span class="tag tag-bga">BGA</span>` : '',
     banned ? `<span class="tag tag-ban">禁卡</span>` : '',
-    vp    ? `<span class="tag tag-vp">VP:${card['勝利點數']}</span>` : '',
+    vp    ? `<span class="tag ${String(card['勝利點數']).startsWith('-') ? 'tag-vp-neg' : 'tag-vp'}">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
     pass  ? `<span class="tag tag-pass">←傳遞←</span>` : '',
     replacedCount ? `<span class="tag tag-replaces">取代 ${replacedCount} 張</span>` : '',
@@ -510,7 +510,7 @@ function openModal(card) {
     if (!value) return;
     const row = document.createElement('div');
     row.className = 'field-row';
-    const cls = highlight === 'vp' && value !== '無' ? 'highlight-vp'
+    const cls = highlight === 'vp' && value !== '無' ? (String(value).startsWith('-') ? 'highlight-vp-neg' : 'highlight-vp')
               : highlight === 'bonus' && value === '有' ? 'highlight-bonus'
               : highlight === 'replace' ? 'highlight-replace'
               : '';

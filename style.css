@@ -424,7 +424,8 @@ body {
   border-radius: 4px;
   font-weight: 500;
 }
-.tag-vp    { background: rgba(221,204,28,.18);  color: #DDCC1C; }
+.tag-vp     { background: rgba(221,204,28,.18);  color: #DDCC1C; }
+.tag-vp-neg { background: rgba(136,136,136,.15); color: #888; }
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
@@ -606,7 +607,8 @@ body {
   color: var(--text);
   font-weight: 500;
 }
-.field-value.highlight-vp   { color: #DDCC1C; }
+.field-value.highlight-vp      { color: #DDCC1C; }
+.field-value.highlight-vp-neg  { color: #888; }
 .field-value.highlight-bonus { color: var(--gold); }
 .field-value.highlight-pass  { color: var(--green); }
 .field-value.highlight-replace { color: #9fc0ff; }
