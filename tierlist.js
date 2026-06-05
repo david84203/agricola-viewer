@@ -265,7 +265,7 @@ function drawCrop(canvas, card) {
   const src = card.source_image;
   const isNLtmpl = /^NL\d/i.test(src) || /^FL/i.test(src) || /^G\d/i.test(src);
   const isOdeck  = /^O[mo]/i.test(src);
-  const isTTS    = src.startsWith('FR') || /^G\d+o/i.test(src) || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
+  const isTTS    = src.startsWith('FR') || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('z');
   const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
   const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
   let base;
