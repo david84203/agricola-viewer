@@ -56,6 +56,10 @@ function parseSections(sections) {
         grid_row: Math.floor(position / 3),
         grid_cols: 3,
         grid_rows: 3,
+        crop_left: 0,
+        crop_top: 0,
+        crop_right: 0,
+        crop_bottom: 0,
         '人數': players.trim(),
       });
       position += 1;

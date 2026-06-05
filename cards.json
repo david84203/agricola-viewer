@@ -61028,7 +61028,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "太極宗師",
@@ -61045,7 +61049,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "改良者",
@@ -61062,7 +61070,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "老工匠",
@@ -61079,7 +61091,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "泥漿清掃工",
@@ -61096,7 +61112,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "小偷",
@@ -61113,7 +61133,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "領導顧問",
@@ -61130,7 +61154,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "早期專家",
@@ -61147,7 +61175,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農田夢想家",
@@ -61164,7 +61196,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "山區農民",
@@ -61181,7 +61217,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "後院麵包師",
@@ -61198,7 +61238,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "犁田經銷商",
@@ -61215,7 +61259,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "動物學家",
@@ -61232,7 +61280,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "捐贈者",
@@ -61249,7 +61301,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "貪婪女人",
@@ -61266,7 +61322,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "房地產經紀人",
@@ -61283,7 +61343,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "煤礦超人",
@@ -61300,7 +61364,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "神秘的農夫",
@@ -61317,7 +61385,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "番茄採集者",
@@ -61334,7 +61406,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "姆巴巴姆瓦納",
@@ -61351,7 +61427,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農場教師",
@@ -61368,7 +61448,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "木頭勞工",
@@ -61385,7 +61469,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "偷牛賊",
@@ -61402,7 +61490,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "貴婦",
@@ -61419,7 +61511,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "造船工人",
@@ -61436,7 +61532,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "皮貨商",
@@ -61453,7 +61553,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "陸軍少校",
@@ -61470,7 +61574,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "穀倉建築工",
@@ -61487,7 +61595,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "文字大師",
@@ -61504,7 +61616,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "檢查員",
@@ -61521,7 +61637,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "生計農民",
@@ -61538,7 +61658,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "實習獸醫",
@@ -61555,7 +61679,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "尼羅河農夫",
@@ -61572,7 +61700,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "冒險家",
@@ -61589,7 +61721,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "石頭工人",
@@ -61606,7 +61742,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "烹飪藝術教師",
@@ -61623,7 +61763,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "鑑定員",
@@ -61640,7 +61784,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "冬季持有家",
@@ -61657,7 +61805,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "餃子師傅",
@@ -61674,7 +61826,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "遊客",
@@ -61691,7 +61847,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "美女與野獸",
@@ -61708,7 +61868,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "骰子手",
@@ -61725,7 +61889,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "愛陶器的人",
@@ -61742,7 +61910,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "綿羊領主",
@@ -61759,7 +61931,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "消防員",
@@ -61776,7 +61952,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "樹屋建築工",
@@ -61793,7 +61973,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "最好的朋友",
@@ -61810,7 +61994,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "大人物",
@@ -61827,7 +62015,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "哲學家",
@@ -61844,7 +62036,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "愛綿羊的人",
@@ -61861,7 +62057,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "松露獵手",
@@ -61878,7 +62078,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "內閣老闆",
@@ -61895,7 +62099,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "訓獸師",
@@ -61912,7 +62120,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "王牌建築師",
@@ -61929,7 +62141,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "犁田工人",
@@ -61946,7 +62162,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "瘋狂科學家",
@@ -61963,7 +62183,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "甜菜農夫",
@@ -61980,7 +62204,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "走鋼索的人",
@@ -61997,7 +62225,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "叢林農夫",
@@ -62014,7 +62246,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "播種大師",
@@ -62031,7 +62267,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "燒烤大廚",
@@ -62048,7 +62288,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "榮譽學生",
@@ -62065,7 +62309,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "連根拔起者",
@@ -62082,7 +62330,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "馬術師",
@@ -62099,7 +62351,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "超越者",
@@ -62116,7 +62372,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "草莓生產者",
@@ -62133,7 +62393,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農作物農夫",
@@ -62150,7 +62414,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "掘土工之子",
@@ -62167,7 +62435,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "兒童作家",
@@ -62184,7 +62456,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "生日蛋糕師傅",
@@ -62201,7 +62477,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "討價還價飼養員",
@@ -62218,7 +62498,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農田清掃工",
@@ -62235,7 +62519,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "稻草籬笆者",
@@ -62252,7 +62540,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "訓熊師",
@@ -62269,7 +62561,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "吝嗇麵包師傅",
@@ -62286,7 +62582,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "蒸籠大師",
@@ -62303,7 +62603,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "傳教士",
@@ -62320,7 +62624,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "素食建築師",
@@ -62337,7 +62645,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "愛家的人",
@@ -62354,7 +62666,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農場幫工",
@@ -62371,7 +62687,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "趕牛人",
@@ -62388,7 +62708,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "蔬菜人",
@@ -62405,7 +62729,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "麥子專家",
@@ -62422,7 +62750,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "克羅米",
@@ -62439,7 +62771,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "樹林持有家",
@@ -62456,7 +62792,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "巡迴傳教士",
@@ -62473,7 +62813,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "夜校教師",
@@ -62490,7 +62834,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "南瓜農夫",
@@ -62507,7 +62855,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "移動農夫",
@@ -62524,7 +62876,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "稻草人",
@@ -62541,7 +62897,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "送葬者",
@@ -62558,7 +62918,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "賣主",
@@ -62575,7 +62939,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "採礦者",
@@ -62592,7 +62960,11 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "適性農夫",
@@ -62609,7 +62981,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "蛇油推銷員",
@@ -62626,7 +63002,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "煤礦送貨員",
@@ -62643,7 +63023,11 @@
     "grid_row": 1,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "煉金術士的女兒",
@@ -62660,7 +63044,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "1+"
+    "人數": "1+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "迷人的女巫",
@@ -62677,7 +63065,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "農場所有人",
@@ -62694,7 +63086,11 @@
     "grid_row": 2,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "4+"
+    "人數": "4+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "牌名": "鄉紳",
@@ -62711,6 +63107,10 @@
     "grid_row": 0,
     "grid_cols": 3,
     "grid_rows": 3,
-    "人數": "3+"
+    "人數": "3+",
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   }
 ]
