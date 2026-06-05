@@ -897,7 +897,7 @@ async function uploadRatings() {
       }
     }
 
-    statusEl.textContent = `✓ ELO 更新完成（${state.shownLog.length} 輪 · ${totalMatches} 場對決）`;
+    statusEl.textContent = `✓ ELO 更新完成（${state.shownLog.length} 輪）`;
     statusEl.className = 'upload-status done';
   } catch (err) {
     statusEl.textContent = `⚠ 上傳失敗：${err.message}`;
