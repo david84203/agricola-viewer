@@ -2289,5 +2289,25 @@
     ],
     "defaultCanonical": "A033*",
     "type": "name"
+  },
+  {
+    "id": "n229",
+    "label": "巢穴建築師／巢穴建築師2版",
+    "cards": [
+      "C085",
+      "10438-5|2版牌更新O2.jpg|2"
+    ],
+    "defaultCanonical": "10438-5|2版牌更新O2.jpg|2",
+    "type": "replacement"
+  },
+  {
+    "id": "n230",
+    "label": "教授／教授2版",
+    "cards": [
+      "舊版E148",
+      "8818-5|2版牌更新O4.jpg|7"
+    ],
+    "defaultCanonical": "8818-5|2版牌更新O4.jpg|7",
+    "type": "replacement"
   }
 ]
