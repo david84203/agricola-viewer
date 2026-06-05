@@ -243,14 +243,21 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
 function drawCrop(canvas, card) {
   if (!canvas || !card?.source_image) return;
   const key = IMG_BASE + card.source_image;
-  const isComposite = card.source_image.includes('部分.jpg');
-  const isFR = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go') || card.source_image.toLowerCase().startsWith('wa') || card.source_image.toLowerCase().startsWith('wm');
+  const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
+  const src = card.source_image;
+  const isNLtmpl = /^NL\d/i.test(src) || /^FL/i.test(src) || /^G\d/i.test(src);
+  const isOdeck  = /^O[mo]/i.test(src);
+  const isTTS    = src.startsWith('FR') || /^G\d+o/i.test(src) || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
   const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
   const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
-  const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite || isFR ? 0 : CROP.offsetLeft);
-  const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite || isFR ? 0 : CROP.offsetRight);
-  const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite || isFR ? 0 : CROP.offsetTop);
-  const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isFR ? 0 : CROP.offsetBottom);
+  let base;
+  if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
+  else if (isNLtmpl)                   base = { l: 182, t: 114, r: 166, b: 101 };
+  else                                 base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
+  const oL = card.crop_left   !== undefined ? card.crop_left   : base.l;
+  const oR = card.crop_right  !== undefined ? card.crop_right  : base.r;
+  const oT = card.crop_top    !== undefined ? card.crop_top    : base.t;
+  const oB = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
 
   const draw = (img) => {
     const cellW = (img.naturalWidth  - oL - oR) / cols;

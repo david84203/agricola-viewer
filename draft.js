@@ -15,15 +15,31 @@ const CROP = {
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
-// 禁卡表（不進入輪抽池）
-const BANNED_GROUPS = [
-  { label: '過強職業',       ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '舊版E198', 'K270'] },
-  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', 'K138', 'K125'] },
-  { label: '過爛職業',       ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E171', 'K304', '6575-4', 'WA042', 'K317'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', 'K109', 'FL016', 'FL028'] },
+// 禁卡表（不進入輪抽池）— 從 Firestore 載入後會覆蓋此預設值
+let BANNED_GROUPS = [
+  { label: '過強職業卡',     ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '8720-9', '7873-7', '7252-3', '6022-5', '舊版E198', 'K270', 'NL098', 'PI10', 'PI03', 'PI06', 'Z329', 'Ö03', 'Ö01'] },
+  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', '6515-6', '5869-10', '5881-9', '4988-8', 'I081', 'Z320', 'K138', 'K125', 'Ö13', 'Ö17'] },
+  { label: '過爛職業卡',     ids: ['A107', 'B140', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E198', '舊版E171', '5030-2', 'Ö05', 'K304', 'Ö02', '5698-2', 'WM033', 'Ö09', '6575-4', 'WA042', 'Z333', 'K317'] },
+  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', '8315', '6960-2', 'NL023', 'K109', 'FL016', 'FL028', 'Z324'] },
   { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*'] },
 ];
-const BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+
+async function loadBanlist() {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
+    if (!res.ok) return;
+    const doc = await res.json();
+    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+      label: g.mapValue.fields.label.stringValue,
+      ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
+    }));
+    if (groups.length) {
+      BANNED_GROUPS = groups;
+      BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+    }
+  } catch { /* 使用 hardcode fallback */ }
+}
 
 function getCardKey(card) {
   return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
@@ -164,8 +180,12 @@ async function init() {
   const [cardsData, dupExcluded] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
+    loadBanlist(),
   ]);
-  allCards = cardsData.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
+  allCards = cardsData.filter(c =>
+    !dupExcluded.has(c['卡片ID']) &&
+    !BANNED_IDS.has(c['卡片ID'])
+  );
   buildDeckCheckboxes();
   buildModeSelect();
   bindEvents();
@@ -291,7 +311,7 @@ function buildPacks(cardType) {
     const matchType = cardType === 'occupation'
       ? c.card_type === 'occupation'
       : (c.card_type === 'minor' || c.card_type === 'both');
-    return matchType && state.selectedDecks.includes(c['牌組']) && !BANNED_IDS.has(c['卡片ID']);
+    return matchType && state.selectedDecks.includes(c['牌組']);
   });
 
   if (pool.length < 36) {
@@ -944,18 +964,24 @@ function drawCrop(canvas, card, topFraction = 1) {
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {
-    // Check if the image is a composite (from the older set named ...部分.jpg or 舊版)
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
-    const isFR = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') || card.source_image.startsWith('Go') || card.source_image.toLowerCase().startsWith('wa') || card.source_image.toLowerCase().startsWith('wm');
+    const src = card.source_image;
+    const isNLtmpl = /^NL\d/i.test(src) || /^FL/i.test(src) || /^G\d/i.test(src);
+    const isOdeck  = /^O[mo]/i.test(src);
+    const isTTS    = src.startsWith('FR') || /^G\d+o/i.test(src) || src.startsWith('Gm') || src.startsWith('Go') || src.toLowerCase().startsWith('wa') || src.toLowerCase().startsWith('wm') || src.toLowerCase().startsWith('bi') || src.toLowerCase().startsWith('fl') || src.toLowerCase().startsWith('z');
 
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
 
-    // Default crop offsets unless overridden
-    const offsetLeft = card.crop_left !== undefined ? card.crop_left : (isComposite || isFR ? 0 : CROP.offsetLeft);
-    const offsetRight = card.crop_right !== undefined ? card.crop_right : (isComposite || isFR ? 0 : CROP.offsetRight);
-    const offsetTop = card.crop_top !== undefined ? card.crop_top : (isComposite || isFR ? 0 : CROP.offsetTop);
-    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isFR ? 0 : CROP.offsetBottom);
+    let base;
+    if (isOdeck || isTTS || isComposite) base = { l: 0, t: 0, r: 0, b: 0 };
+    else if (isNLtmpl)                   base = { l: 182, t: 114, r: 166, b: 101 };
+    else                                 base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
+
+    const offsetLeft   = card.crop_left   !== undefined ? card.crop_left   : base.l;
+    const offsetRight  = card.crop_right  !== undefined ? card.crop_right  : base.r;
+    const offsetTop    = card.crop_top    !== undefined ? card.crop_top    : base.t;
+    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
 
     const usableW = img.naturalWidth  - offsetLeft - offsetRight;
     const usableH = img.naturalHeight - offsetTop  - offsetBottom;
