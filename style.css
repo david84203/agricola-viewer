@@ -910,16 +910,34 @@ body {
   gap: 12px;
 }
 .banlist-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition);
+  opacity: .65;
 }
-.banlist-card canvas { display: block; border-radius: 4px; width: 100%; height: auto; }
+.banlist-card:hover {
+  border-color: #f87171;
+  opacity: 1;
+}
+.banlist-card-thumb {
+  width: 100%;
+  aspect-ratio: 6/5;
+  overflow: hidden;
+  background: var(--bg);
+}
+.banlist-card-thumb canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .banlist-card-name {
-  font-size: .75rem;
+  font-size: .7rem;
   color: var(--text2);
   text-align: center;
+  padding: 4px 6px 6px;
   line-height: 1.3;
 }
 .banlist-empty {

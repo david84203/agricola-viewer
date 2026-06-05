@@ -654,23 +654,10 @@ function renderBanlist(container) {
     cards.forEach(card => {
       const item = document.createElement('div');
       item.className = 'banlist-card';
-      item.style.cursor = 'pointer';
-      item.innerHTML = `<canvas></canvas><div class="banlist-card-name">${card['牌名']}</div>`;
+      item.innerHTML = `<div class="banlist-card-thumb"><canvas></canvas></div><div class="banlist-card-name">${card['牌名']}</div>`;
       item.addEventListener('click', () => openModal(card));
       grid.appendChild(item);
-      requestAnimationFrame(() => {
-        const canvas = item.querySelector('canvas');
-        drawCrop(canvas, card);
-        function applySize(retries) {
-          if (canvas.dataset.drawn === '1') {
-            canvas.style.width = '100%';
-            canvas.style.aspectRatio = `${canvas.width} / ${canvas.height}`;
-          } else if (retries > 0) {
-            requestAnimationFrame(() => applySize(retries - 1));
-          }
-        }
-        applySize(60);
-      });
+      requestAnimationFrame(() => drawCrop(item.querySelector('canvas'), card));
     });
 
     section.appendChild(grid);
