@@ -143,12 +143,14 @@ async function loadRaterProgress() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         structuredAggregationQuery: {
-          from: [{ collectionId: 'agricola_sessions' }],
-          where: {
-            fieldFilter: {
-              field: { fieldPath: 'raterId' },
-              op: 'EQUAL',
-              value: { stringValue: raterId }
+          structuredQuery: {
+            from: [{ collectionId: 'agricola_sessions' }],
+            where: {
+              fieldFilter: {
+                field: { fieldPath: 'raterId' },
+                op: 'EQUAL',
+                value: { stringValue: raterId }
+              }
             }
           },
           aggregations: [{ count: {}, alias: 'count' }]
@@ -170,7 +172,8 @@ async function loadRaterProgress() {
       hintEl.textContent = `還差 ${left} 場解鎖個人數據分析`;
       hintEl.className   = 'rater-progress-hint';
     }
-  } catch {
+  } catch (err) {
+    console.error('loadRaterProgress failed:', err);
     countEl.textContent = '— / 500 場';
   }
 }
