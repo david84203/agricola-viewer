@@ -530,6 +530,7 @@ function renderCombinedPickedBar() {
       if (card) {
         div.title = card['牌名'];
         div.innerHTML = '<canvas></canvas>';
+        div.addEventListener('click', () => openModal(card));
         requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card, 0.5));
       } else {
         div.textContent = j === 0 ? '職' : '次';
@@ -744,6 +745,7 @@ function renderPickedBar() {
     div.className = 'picked-thumb';
     div.title = card['牌名'];
     div.innerHTML = '<canvas></canvas>';
+    div.addEventListener('click', () => openModal(card));
     bar.appendChild(div);
     requestAnimationFrame(() => {
       drawCrop(div.querySelector('canvas'), card, 0.5);
@@ -791,7 +793,7 @@ async function uploadRatings() {
   statusEl.className = 'upload-status uploading';
 
   try {
-    const K_PAIR = 1; // ELO K-factor per pairwise match
+    const K_PAIR = 4; // ELO K-factor per pairwise match
 
     // Collect all unique card IDs in this draft
     const uniqueIds = [...new Set(state.shownLog.flatMap(r => [r.picked, ...r.opponents]))];
@@ -808,7 +810,7 @@ async function uploadRatings() {
     const batchData = await batchRes.json();
 
     const ratings = {};
-    uniqueIds.forEach(id => { ratings[id] = { elo: 1000, seenCount: 0, pickCount: 0 }; });
+    uniqueIds.forEach(id => { ratings[id] = { elo: 1200, seenCount: 0, pickCount: 0 }; });
     batchData.forEach(item => {
       if (item.found) {
         const id = item.found.name.split('/').pop();
@@ -933,7 +935,7 @@ async function calculateScore() {
     const batchData = await batchRes.json();
 
     const eloMap = {};
-    uniqueIds.forEach(id => { eloMap[id] = 1000; });
+    uniqueIds.forEach(id => { eloMap[id] = 1200; });
     batchData.forEach(item => {
       if (item.found) {
         const id = item.found.name.split('/').pop();
