@@ -102,17 +102,31 @@ body {
 }
 
 .brand-right {
-  flex: 1;
   display: flex;
-  justify-content: flex-end;
-  font-size: 0.95rem;
-  color: #fff;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
 }
-
-.brand-right .highlight {
+.brand-count {
+  font-size: .9rem;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.brand-count .highlight {
   color: #f7ce46;
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.brand-count-sub {
+  font-size: .78rem;
+  color: var(--text3);
+}
+.brand-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 .draft-nav-btn,
 .draft-nav-btn:link,
@@ -126,8 +140,10 @@ body {
   font-size: .85rem;
   font-weight: 600;
   text-decoration: none;
-  margin-bottom: 8px;
   transition: all 0.2s;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
 }
 .draft-nav-btn:hover {
   background: rgba(232,184,75,.28);

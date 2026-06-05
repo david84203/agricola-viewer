@@ -26,29 +26,18 @@
       翻譯、編輯、排版、網頁編寫為烏嘎嘎桌遊小路獨立製作，禁止用於任何商業用途。
     </div>
     <div class="brand-right">
-      <div style="display:flex; align-items:center; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
-        <div style="text-align:right;">
-          <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
-          <small style="color:var(--text3);">扣除禁卡與重複卡，共 <span id="netCount">—</span> 張</small><br/>
-          <small style="color:var(--text3);">目前收錄：A, B, C, D, E, G, G4, G5, G5+, G6, G6*, G7, G8, AY, FL, FR, I, K, L, NL, S, Wm, WA, PI, Z, O, QQ, Cz, BI, 舊版E</small>
-        </div>
-        <button id="banlistBtn" class="draft-nav-btn" style="cursor:pointer; font-family:inherit;">🚫 禁卡表</button>
-        <button id="banAdminBtn" class="draft-nav-btn" style="cursor:pointer; font-family:inherit; display:none;">⚙️ 禁卡管理</button>
-        <button id="bgaAdminBtn" class="draft-nav-btn" style="cursor:pointer; font-family:inherit; display:none;">🎮 BGA管理</button>
+      <div class="brand-count">
+        共 <span id="totalCount" class="highlight">0</span> 張卡牌
+        <span class="brand-count-sub">（有效 <span id="netCount">—</span> 張）</span>
+      </div>
+      <div class="brand-nav">
+        <button id="banlistBtn" class="draft-nav-btn">🚫 禁卡表</button>
+        <button id="banAdminBtn" class="draft-nav-btn" style="display:none">⚙️ 禁卡管理</button>
+        <button id="bgaAdminBtn" class="draft-nav-btn" style="display:none">🎮 BGA管理</button>
         <a href="draft.html" class="draft-nav-btn">🎲 輪抽模擬器</a>
         <a href="tierlist.html" class="draft-nav-btn">📊 Tier List</a>
         <a href="duplicates.html" class="draft-nav-btn">🔁 重複卡牌</a>
-        <a href="./list.html" style="
-          display:inline-flex; align-items:center; gap:6px;
-          background:var(--bg3); border:1px solid var(--border); border-radius:100px;
-          padding:6px 14px; font-size:.82rem; color:var(--text2);
-          text-decoration:none; transition:all var(--transition);
-          white-space:nowrap;
-        "
-        onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
-          📋 文字列表版
-        </a>
+        <a href="./list.html" class="draft-nav-btn">📋 文字列表版</a>
       </div>
     </div>
   </div>
