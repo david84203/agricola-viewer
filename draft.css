@@ -112,6 +112,18 @@
   border-radius: 4px;
   padding: 1px 5px;
   letter-spacing: .04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.bga-badge::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: url('images/bga-logo.png') center/contain no-repeat;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .start-btn {

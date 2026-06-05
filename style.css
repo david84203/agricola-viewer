@@ -453,7 +453,23 @@ body {
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
-.tag-bga   { background: rgba(91,141,238,.2);  color: #7aadff; font-weight: 600; }
+.tag-bga {
+  background: rgba(91,141,238,.2);
+  color: #7aadff;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tag-bga::before {
+  content: '';
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background: url('images/bga-logo.png') center/contain no-repeat;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
 .tag-replaces {
   background: rgba(91,141,238,.18);
   color: #9fc0ff;
@@ -608,6 +624,18 @@ body {
   padding: 2px 8px;
   border-radius: 100px;
   letter-spacing: .04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.modal-bga-badge::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url('images/bga-logo.png') center/contain no-repeat;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .modal-fields {
