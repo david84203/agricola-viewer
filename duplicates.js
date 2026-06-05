@@ -87,7 +87,7 @@ async function saveStateToFirestore() {
 
 // ── Computed ───────────────────────────────────────
 function getAllPairs() {
-  return [...basePairs, ...state.custom];
+  return [...state.custom, ...basePairs];
 }
 
 function isDismissed(id) { return state.dismissed.includes(id); }
