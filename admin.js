@@ -50,6 +50,10 @@ async function saveCardOverride(cardId, fields) {
 
 let _editAllCards = [];
 
+function getAdminCardRef(card) {
+  return [card?.['卡片ID'] || '', card?.source_image || '', card?.position ?? ''].join('|');
+}
+
 async function removeCardFromBanlist(card, statusEl) {
   const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
   setStatus('處理中…');
@@ -108,8 +112,13 @@ async function addDuplicatePair(cardA, cardB, statusEl) {
       if (json) state = { ...state, ...JSON.parse(json) };
     }
 
+    const refA = getAdminCardRef(cardA);
+    const refB = getAdminCardRef(cardB);
     const allPairs = [...(window._dupBasePairs || []), ...(state.custom || [])];
-    if (allPairs.find(p => p.cards.includes(cardA['卡片ID']) && p.cards.includes(cardB['卡片ID']))) {
+    if (allPairs.find(p =>
+      (p.cards.includes(refA) && p.cards.includes(refB))
+      || (p.cards.includes(cardA['卡片ID']) && p.cards.includes(cardB['卡片ID']))
+    )) {
       setStatus('✗ 這兩張牌已有重複配對', '#f87171');
       return;
     }
@@ -117,8 +126,8 @@ async function addDuplicatePair(cardA, cardB, statusEl) {
     state.custom = [...(state.custom || []), {
       id: 'c' + Date.now(),
       label: `${cardA['牌名']}／${cardB['牌名']}`,
-      cards: [cardA['卡片ID'], cardB['卡片ID']],
-      defaultCanonical: cardA['卡片ID'],
+      cards: [refA, refB],
+      defaultCanonical: refA,
       type: 'custom',
     }];
 
@@ -178,14 +187,16 @@ function renderDupSection(sec, card) {
     resultsEl.innerHTML = '';
     if (!q) { resultsEl.style.display = 'none'; return; }
     const hits = _editAllCards
-      .filter(c => c['卡片ID'] !== card['卡片ID'] && (c['牌名'] || '').toLowerCase().includes(q))
-      .slice(0, 8);
+      .filter(c => getAdminCardRef(c) !== getAdminCardRef(card)
+        && [c['牌名'], c['卡片ID'], c['牌組'], c.source_image].join(' ').toLowerCase().includes(q)
+      )
+      .slice(0, 12);
     if (!hits.length) { resultsEl.style.display = 'none'; return; }
     resultsEl.style.display = 'block';
     hits.forEach(c => {
       const item = document.createElement('div');
       item.className = 'ban-admin-result-item';
-      item.textContent = `${c['牌名']}（${c['卡片ID']} · ${c['牌組']}）`;
+      item.textContent = `${c['牌名']}（${c['卡片ID']} · ${c['牌組']} · ${c.source_image || ''}）`;
       item.addEventListener('click', () => {
         selectedOther = c;
         selectedEl.textContent = `已選：${c['牌名']}（${c['卡片ID']}）`;

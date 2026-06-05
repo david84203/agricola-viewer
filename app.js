@@ -5,6 +5,8 @@
 const IMG_BASE = './images/';
 const GRID_COLS = 3;
 const GRID_ROWS = 3;
+const DUP_LS_KEY = 'agricola_dups';
+const DUP_FS_DOC = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/agricola_dup_state/main';
 
 // Calibrated crop offsets (pixels in original image resolution)
 const CROP = {
@@ -22,6 +24,26 @@ let dupCardToPair = new Map();   // cardId → { pair, canonId }
 let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 let bgaExtraIds = new Set();     // manually marked BGA card IDs
 
+async function loadDuplicateState() {
+  const fallback = (() => {
+    try { return JSON.parse(localStorage.getItem(DUP_LS_KEY) || '{}'); }
+    catch { return {}; }
+  })();
+
+  try {
+    const res = await fetch(DUP_FS_DOC);
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    const json = data.fields?.stateJson?.stringValue;
+    if (!json) return fallback;
+    const state = { picked: {}, dismissed: [], custom: [], ...JSON.parse(json) };
+    localStorage.setItem(DUP_LS_KEY, JSON.stringify(state));
+    return state;
+  } catch {
+    return fallback;
+  }
+}
+
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
   const [base, overrides, banGroups, dupPairs, bgaData] = await Promise.all([
@@ -35,7 +57,7 @@ async function loadCards() {
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
 
   // Build non-canonical duplicate set from localStorage state
-  const dupState = (() => { try { return JSON.parse(localStorage.getItem('agricola_dups') || '{}'); } catch { return {}; } })();
+  const dupState = await loadDuplicateState();
   dupNonCanonical = new Set();
   dupCardToPair = new Map();
   dupCanonicalMap = new Map();
