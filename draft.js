@@ -187,6 +187,7 @@ async function init() {
   ]);
   allCards = cardsData.filter(c =>
     !dupExcluded.has(c['卡片ID']) &&
+    !dupExcluded.has(getCardKey(c)) &&
     !BANNED_IDS.has(c['卡片ID'])
   );
   buildDeckCheckboxes();
