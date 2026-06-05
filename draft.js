@@ -594,6 +594,18 @@ function renderRound() {
   document.getElementById('roundBadge').textContent = `第 ${round + 1} / 7 輪`;
   document.getElementById('packInfo').textContent = `包 ${packKey} · ${toShow.length} 張`;
 
+  // Show occupation picks reference during minor phase
+  const occRefSection = document.getElementById('occRefSection');
+  const pickedBarLabel = document.getElementById('pickedBarLabel');
+  if (state.phase === 'minor') {
+    occRefSection.style.display = '';
+    pickedBarLabel.textContent = '已選次要發展牌';
+    renderOccRefBar();
+  } else {
+    occRefSection.style.display = 'none';
+    pickedBarLabel.textContent = '已選手牌';
+  }
+
   // Reset selection
   state.selectedCard = null;
   updateConfirmBar();
@@ -701,6 +713,21 @@ function confirmPick() {
   }
 
   renderRound();
+}
+
+// ── Occ Reference Bar (shown during minor phase) ──
+function renderOccRefBar() {
+  const bar = document.getElementById('occRefBar');
+  bar.innerHTML = '';
+  state.occPicks.forEach(card => {
+    const div = document.createElement('div');
+    div.className = 'picked-thumb occ-ref-thumb';
+    div.title = card['牌名'];
+    div.innerHTML = '<canvas></canvas>';
+    div.addEventListener('click', () => openModal(card));
+    bar.appendChild(div);
+    requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card, 0.5));
+  });
 }
 
 // ── Picked Bar ─────────────────────────────────────

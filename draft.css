@@ -207,6 +207,41 @@
   font-size: .75rem;
 }
 
+/* Occupation reference bar (visible during minor phase) */
+.occ-ref-section {
+  margin-bottom: 10px;
+}
+.occ-ref-hint {
+  font-weight: 400;
+  color: var(--text3);
+  font-size: .68rem;
+  letter-spacing: normal;
+  text-transform: none;
+  margin-left: 6px;
+  opacity: .8;
+}
+.occ-ref-bar {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.occ-ref-thumb {
+  cursor: pointer;
+  transition: border-color .15s, opacity .15s;
+  flex-shrink: 0;
+}
+.occ-ref-thumb:hover {
+  border-color: #60c0f0;
+  opacity: .85;
+}
+.occ-ref-divider {
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
 /* Draft card grid */
 .draft-instructions {
   font-size: .85rem;
