@@ -9,6 +9,15 @@ const writeMode = process.argv.includes('--write');
 
 const sectionNamePattern = /^G7o\d+$/;
 const cardPattern = /【([^】]+)】(.+?) 類型：(.+?) 需求人數：(.+?) 人 紅利：(.+?) 牌組：(.+?) 說明：([\s\S]*?)(?=\r?\n\r?\n【|$)/g;
+const placementOverrides = {
+  '11464-8': { source_image: 'G7o12.jpg', position: 2 },
+  '10157-10': { source_image: 'G7o12.jpg', position: 3 },
+  '9915-10': { source_image: 'G7o12.jpg', position: 4 },
+  '11492-2': { source_image: 'G7o12.jpg', position: 5 },
+  '11335-4': { source_image: 'G7o12.jpg', position: 6 },
+  '9995-3': { source_image: 'G7o12.jpg', position: 7 },
+  '10636': { source_image: 'G7o12.jpg', position: 8 },
+};
 
 function splitSections(text) {
   const sections = [];
@@ -41,19 +50,24 @@ function parseSections(sections) {
     cardPattern.lastIndex = 0;
     while ((match = cardPattern.exec(body)) !== null) {
       const [, id, name, type, players, bonus, deck, description] = match;
+      const normalizedId = id.trim();
+      const placement = placementOverrides[normalizedId] || {
+        source_image: `${section.name}.jpg`,
+        position,
+      };
       cards.push({
         '牌名': name.trim(),
         '類型': type.trim(),
         '是否傳遞': '否',
         '紅利分數': bonus.trim(),
         '牌組': deck.trim(),
-        '卡片ID': id.trim(),
+        '卡片ID': normalizedId,
         '說明': description.trim().replace(/\s+/g, ' '),
         card_type: 'occupation',
-        source_image: `${section.name}.jpg`,
-        position,
-        grid_col: position % 3,
-        grid_row: Math.floor(position / 3),
+        source_image: placement.source_image,
+        position: placement.position,
+        grid_col: placement.position % 3,
+        grid_row: Math.floor(placement.position / 3),
         grid_cols: 3,
         grid_rows: 3,
         crop_left: 0,
