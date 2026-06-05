@@ -77,7 +77,7 @@ let state = {
   currentPicks: null,
   // Rater mode
   raterMode: false,
-  raterLog: [],        // [{cardId, score}] accumulated across all rounds
+  shownLog: [],        // [{picked, opponents[]}] all rounds, used for score + rater upload
   currentShown: [],    // cards shown this round (separate mode)
   currentOccShown: [], // occ cards shown this round (combined mode)
   currentMinShown: [], // min cards shown this round (combined mode)
@@ -104,9 +104,59 @@ async function loadDupExclusions() {
 // ── Auth callback ──────────────────────────────────
 function onAuthChange() {
   const rater = typeof isRater === 'function' && isRater();
-  document.getElementById('raterWrap').style.display     = rater ? '' : 'none';
-  document.getElementById('raterLoginHint').style.display = rater ? 'none' : '';
-  if (!rater) document.getElementById('raterModeToggle').checked = false;
+  document.getElementById('raterWrap').style.display          = rater ? '' : 'none';
+  document.getElementById('raterLoginHint').style.display      = rater ? 'none' : '';
+  document.getElementById('raterProgressWrap').style.display   = rater ? '' : 'none';
+  if (!rater) {
+    document.getElementById('raterModeToggle').checked = false;
+    return;
+  }
+  loadRaterProgress();
+}
+
+async function loadRaterProgress() {
+  const countEl = document.getElementById('raterProgressCount');
+  const fillEl  = document.getElementById('raterProgressFill');
+  const hintEl  = document.getElementById('raterProgressHint');
+  const raterId = getRaterId();
+  if (!raterId) return;
+
+  try {
+    const res = await fetch(`${FIRESTORE_BASE.replace('/documents', '')}:runAggregationQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        structuredAggregationQuery: {
+          from: [{ collectionId: 'agricola_sessions' }],
+          where: {
+            fieldFilter: {
+              field: { fieldPath: 'raterId' },
+              op: 'EQUAL',
+              value: { stringValue: raterId }
+            }
+          },
+          aggregations: [{ count: {}, alias: 'count' }]
+        }
+      })
+    });
+    const data = await res.json();
+    const count = Number(data[0]?.result?.aggregateFields?.count?.integerValue ?? 0);
+    const pct   = Math.min(count / 500 * 100, 100);
+
+    countEl.textContent = `${count} / 500 場`;
+    fillEl.style.width  = `${pct}%`;
+
+    if (count >= 500) {
+      hintEl.textContent = '🎉 個人分析已解鎖！';
+      hintEl.className   = 'rater-progress-hint unlocked';
+    } else {
+      const left = 500 - count;
+      hintEl.textContent = `還差 ${left} 場解鎖個人數據分析`;
+      hintEl.className   = 'rater-progress-hint';
+    }
+  } catch {
+    countEl.textContent = '— / 500 場';
+  }
 }
 
 // ── Init ───────────────────────────────────────────
@@ -226,8 +276,9 @@ function startDraft() {
 
   state.occPicks = [];
   state.minPicks = [];
-  state.raterLog = [];
+  state.shownLog = [];
   document.getElementById('uploadStatus').style.display = 'none';
+  document.getElementById('draftScore').style.display = 'none';
   if (state.draftMode === 'combined') {
     startCombinedPhase();
   } else {
@@ -475,16 +526,14 @@ function confirmCombinedPick() {
   const config = state.roundConfig[state.currentRound];
   const packKey = config.pack;
 
-  if (state.raterMode) {
-    state.raterLog.push({
-      picked: pickedOcc['卡片ID'],
-      opponents: state.currentOccShown.filter(c => c['卡片ID'] !== pickedOcc['卡片ID']).map(c => c['卡片ID'])
-    });
-    state.raterLog.push({
-      picked: pickedMin['卡片ID'],
-      opponents: state.currentMinShown.filter(c => c['卡片ID'] !== pickedMin['卡片ID']).map(c => c['卡片ID'])
-    });
-  }
+  state.shownLog.push({
+    picked: pickedOcc['卡片ID'],
+    opponents: state.currentOccShown.filter(c => c['卡片ID'] !== pickedOcc['卡片ID']).map(c => c['卡片ID'])
+  });
+  state.shownLog.push({
+    picked: pickedMin['卡片ID'],
+    opponents: state.currentMinShown.filter(c => c['卡片ID'] !== pickedMin['卡片ID']).map(c => c['卡片ID'])
+  });
 
   state.occRemovedIds[packKey].add(pickedOcc['卡片ID']);
   state.minRemovedIds[packKey].add(pickedMin['卡片ID']);
@@ -612,12 +661,10 @@ function confirmPick() {
   const card = state.selectedCard;
   const config = state.roundConfig[state.currentRound];
 
-  if (state.raterMode) {
-    state.raterLog.push({
-      picked: card['卡片ID'],
-      opponents: state.currentShown.filter(c => c['卡片ID'] !== card['卡片ID']).map(c => c['卡片ID'])
-    });
-  }
+  state.shownLog.push({
+    picked: card['卡片ID'],
+    opponents: state.currentShown.filter(c => c['卡片ID'] !== card['卡片ID']).map(c => c['卡片ID'])
+  });
 
   state.removedIds[config.pack].add(card['卡片ID']);
   state.currentPicks.push(card);
@@ -684,6 +731,7 @@ function showResult() {
   renderResultGrid('occResultGrid', state.occPicks);
   renderResultGrid('minResultGrid', state.minPicks);
   if (state.raterMode) uploadRatings();
+  calculateScore();
 }
 
 async function uploadRatings() {
@@ -696,7 +744,7 @@ async function uploadRatings() {
     const K_PAIR = 1; // ELO K-factor per pairwise match
 
     // Collect all unique card IDs in this draft
-    const uniqueIds = [...new Set(state.raterLog.flatMap(r => [r.picked, ...r.opponents]))];
+    const uniqueIds = [...new Set(state.shownLog.flatMap(r => [r.picked, ...r.opponents]))];
 
     // Batch-fetch current ELO for all involved cards
     const batchRes = await fetch(`${FIRESTORE_BASE}:batchGet`, {
@@ -724,7 +772,7 @@ async function uploadRatings() {
     });
 
     // Compute ELO updates round by round (sequential, using pre-round ratings per round)
-    state.raterLog.forEach(({ picked, opponents }) => {
+    state.shownLog.forEach(({ picked, opponents }) => {
       ratings[picked].seenCount++;
       ratings[picked].pickCount++;
       opponents.forEach(id => { ratings[id].seenCount++; });
@@ -743,6 +791,9 @@ async function uploadRatings() {
       Object.entries(deltas).forEach(([id, d]) => { ratings[id].elo += d; });
     });
 
+    const totalMatches = state.shownLog.reduce((s, r) => s + r.opponents.length, 0);
+    const raterId = getRaterId() || 'unknown';
+
     // Write all updated ratings back
     const writes = Object.entries(ratings).map(([cardId, { elo, seenCount, pickCount }]) => ({
       update: {
@@ -751,10 +802,41 @@ async function uploadRatings() {
           elo:       { integerValue: `${Math.round(elo)}` },
           seenCount: { integerValue: `${seenCount}` },
           pickCount: { integerValue: `${pickCount}` },
-          lastRater: { stringValue: getRaterId() || 'unknown' },
+          lastRater: { stringValue: raterId },
         }
       }
     }));
+
+    // Per-rater session record
+    writes.push({
+      update: {
+        name: `projects/project-hub-410cd/databases/(default)/documents/agricola_sessions/${raterId}_${Date.now()}`,
+        fields: {
+          raterId:      { stringValue: raterId },
+          timestamp:    { stringValue: new Date().toISOString() },
+          draftMode:    { stringValue: state.draftMode },
+          totalRounds:  { integerValue: `${state.shownLog.length}` },
+          totalMatches: { integerValue: `${totalMatches}` },
+          picks: {
+            arrayValue: {
+              values: [...state.occPicks, ...state.minPicks].map(c => ({ stringValue: c['卡片ID'] }))
+            }
+          },
+          raterLog: {
+            arrayValue: {
+              values: state.shownLog.map(({ picked, opponents }) => ({
+                mapValue: {
+                  fields: {
+                    picked:    { stringValue: picked },
+                    opponents: { arrayValue: { values: opponents.map(id => ({ stringValue: id })) } }
+                  }
+                }
+              }))
+            }
+          }
+        }
+      }
+    });
 
     for (let i = 0; i < writes.length; i += 500) {
       const res = await fetch(`${FIRESTORE_BASE}:commit`, {
@@ -768,12 +850,61 @@ async function uploadRatings() {
       }
     }
 
-    const totalMatches = state.raterLog.reduce((s, r) => s + r.opponents.length, 0);
-    statusEl.textContent = `✓ ELO 更新完成（${state.raterLog.length} 輪 · ${totalMatches} 場對決）`;
+    statusEl.textContent = `✓ ELO 更新完成（${state.shownLog.length} 輪 · ${totalMatches} 場對決）`;
     statusEl.className = 'upload-status done';
   } catch (err) {
     statusEl.textContent = `⚠ 上傳失敗：${err.message}`;
     statusEl.className = 'upload-status error';
+  }
+}
+
+async function calculateScore() {
+  const scoreEl = document.getElementById('draftScore');
+  scoreEl.style.display = 'flex';
+  scoreEl.textContent = '得分計算中…';
+  scoreEl.className = 'draft-score calculating';
+
+  try {
+    const rounds = state.shownLog.filter(r => r.opponents.length > 0);
+    if (rounds.length === 0) {
+      scoreEl.style.display = 'none';
+      return;
+    }
+
+    const uniqueIds = [...new Set(rounds.flatMap(r => [r.picked, ...r.opponents]))];
+    const batchRes = await fetch(`${FIRESTORE_BASE}:batchGet`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        documents: uniqueIds.map(id =>
+          `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${id}`)
+      })
+    });
+    const batchData = await batchRes.json();
+
+    const eloMap = {};
+    uniqueIds.forEach(id => { eloMap[id] = 1000; });
+    batchData.forEach(item => {
+      if (item.found) {
+        const id = item.found.name.split('/').pop();
+        const f = item.found.fields || {};
+        eloMap[id] = Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1000);
+      }
+    });
+
+    const efficiencies = rounds.map(({ picked, opponents }) => {
+      const all = [picked, ...opponents];
+      const maxElo = Math.max(...all.map(id => eloMap[id]));
+      const pickedElo = eloMap[picked];
+      return maxElo > 0 ? pickedElo / maxElo : 1;
+    });
+
+    const score = Math.round(efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length * 100);
+    scoreEl.textContent = `本局得分：${score} 分`;
+    scoreEl.className = 'draft-score done';
+  } catch (err) {
+    scoreEl.textContent = `得分計算失敗：${err.message}`;
+    scoreEl.className = 'draft-score error';
   }
 }
 

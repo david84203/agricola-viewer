@@ -16,7 +16,7 @@ function clearAuth() {
 }
 
 function getRole()   { return getAuth()?.role || 'anonymous'; }
-function getRaterId(){ return getAuth()?.id   || null; }
+function getRaterId(){ const a = getAuth(); return a?.displayId || a?.id || null; }
 function isRater()   { const r = getRole(); return r === 'rater' || r === 'admin'; }
 function isAdmin()   { return getRole() === 'admin'; }
 
@@ -32,7 +32,9 @@ async function login(id, pin) {
   if (pin !== correctPin) return { ok: false, error: 'PIN 錯誤，請重試' };
 
   const role = id.trim() === adminId ? 'admin' : 'rater';
-  localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id: id.trim(), role }));
+  const adminName = doc.fields?.adminName?.stringValue;
+  const displayId = role === 'admin' && adminName ? adminName : id.trim();
+  localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id: id.trim(), role, displayId }));
   return { ok: true, role, id: id.trim() };
 }
 

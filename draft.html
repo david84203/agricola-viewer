@@ -67,6 +67,16 @@
       <div class="rater-login-hint" id="raterLoginHint">
         <span>🔐 登入後可使用評分者模式</span>
       </div>
+      <div class="rater-progress-wrap" id="raterProgressWrap" style="display:none">
+        <div class="rater-progress-header">
+          <span class="rater-progress-title">個人分析解鎖進度</span>
+          <span class="rater-progress-count" id="raterProgressCount">— / 500 場</span>
+        </div>
+        <div class="rater-progress-bar-track">
+          <div class="rater-progress-bar-fill" id="raterProgressFill" style="width:0%"></div>
+        </div>
+        <div class="rater-progress-hint" id="raterProgressHint">累積 500 場評分後，解鎖個人數據分析</div>
+      </div>
 
       <button class="start-btn" id="startDraft">開始輪抽</button>
     </div>
@@ -115,6 +125,7 @@
         <h3>次要發展牌（7 張）</h3>
         <div class="result-grid" id="minResultGrid"></div>
       </div>
+      <div id="draftScore" class="draft-score" style="display:none"></div>
       <div id="uploadStatus" class="upload-status" style="display:none"></div>
       <div class="result-actions">
         <button class="start-btn" id="restartBtn">重新輪抽</button>

@@ -620,6 +620,82 @@
   border: 1px solid rgba(248,113,113,.25);
 }
 
+/* ── Rater Progress ── */
+.rater-progress-wrap {
+  margin: 12px 0 4px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius-sm);
+}
+.rater-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.rater-progress-title {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.rater-progress-count {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--text1);
+}
+.rater-progress-bar-track {
+  height: 6px;
+  background: rgba(255,255,255,.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.rater-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), #a78bfa);
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.rater-progress-hint {
+  font-size: .78rem;
+  color: var(--text3);
+}
+.rater-progress-hint.unlocked {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+/* ── Draft Score ── */
+.draft-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: .02em;
+}
+.draft-score.calculating {
+  background: rgba(91,141,238,.08);
+  color: var(--text3);
+  border: 1px solid rgba(91,141,238,.15);
+}
+.draft-score.done {
+  background: rgba(251,191,36,.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,.3);
+}
+.draft-score.error {
+  background: rgba(248,113,113,.1);
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,.25);
+}
+
 /* ── Banlist Button ── */
 .banlist-btn {
   background: transparent;
