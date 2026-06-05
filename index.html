@@ -69,14 +69,16 @@
         />
         <button class="clear-btn" id="clearSearch" title="清除">✕</button>
       </div>
-      <div class="filter-chips">
-        <button class="chip active" data-filter="all">全部</button>
-        <button class="chip" data-filter="minor">次要發展卡</button>
-        <button class="chip" data-filter="occupation">職業卡</button>
-        <button class="chip" data-filter="both">雙色卡</button>
+      <div class="filter-chips-row">
+        <div class="filter-chips">
+          <button class="chip active" data-filter="all">全部</button>
+          <button class="chip" data-filter="minor">次要發展卡</button>
+          <button class="chip" data-filter="occupation">職業卡</button>
+          <button class="chip" data-filter="both">雙色卡</button>
+        </div>
+        <button class="chip chip-toggle" id="excludeBanBtn">排除禁卡</button>
+        <button class="chip chip-toggle" id="excludeDupBtn">排除重複</button>
       </div>
-      <button class="chip chip-toggle" id="excludeBanBtn">排除禁卡</button>
-      <button class="chip chip-toggle" id="excludeDupBtn">排除重複</button>
       <div class="deck-filter">
         <label for="deckSelect">牌組</label>
         <select id="deckSelect">

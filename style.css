@@ -162,6 +162,12 @@ body {
   align-items: center;
   margin-bottom: 24px;
 }
+.filter-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .search-wrap {
   flex: 1;
   min-width: 220px;
@@ -655,6 +661,7 @@ body {
   .ugg-logo { max-height: 38px; max-width: 120px; }
   .brand-title { font-size: .92rem; }
   .brand-sub { display: none; }
+  .brand-center { display: none; }
   .brand-right { font-size: .8rem; }
   .brand-left { gap: 10px; }
 
@@ -662,11 +669,38 @@ body {
   .main-container { padding: 14px 12px 60px; }
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 
-  /* Filter bar */
-  .filter-bar { gap: 8px; }
-  .search-wrap { min-width: 0; }
-  .chip { padding: 5px 12px; font-size: .8rem; }
+  /* Filter bar — 三列式佈局 */
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .search-wrap { min-width: 0; width: 100%; }
+
+  /* 橫向捲動 chip 列 */
+  .filter-chips-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .filter-chips-row::-webkit-scrollbar { display: none; }
+  .filter-chips { flex-wrap: nowrap; gap: 6px; }
+
+  .chip { padding: 5px 11px; font-size: .82rem; white-space: nowrap; }
+  .chip-toggle {
+    white-space: nowrap;
+    border-left: none;
+    margin-left: 0;
+    padding-left: 11px;
+  }
+
+  /* 牌組選單獨立一列，全寬 */
+  .deck-filter { width: 100%; }
   .deck-filter label { display: none; }
+  .deck-filter select { width: 100%; }
 
   /* Modal — bottom sheet */
   .modal-overlay { padding: 0; align-items: flex-end; }
