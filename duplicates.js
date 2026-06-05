@@ -90,6 +90,43 @@ function getAllPairs() {
   return [...state.custom, ...basePairs];
 }
 
+function getCardId(card) {
+  return card?.['卡片ID'] || '';
+}
+
+function getCardName(card) {
+  return card?.['牌名'] || '';
+}
+
+function getCardRef(card) {
+  return [getCardId(card), card?.source_image || '', card?.position ?? ''].join('|');
+}
+
+function isPreciseCardRef(ref) {
+  return String(ref || '').includes('|');
+}
+
+function resolveCardRef(ref) {
+  if (!ref) return null;
+  const value = String(ref);
+  if (isPreciseCardRef(value)) {
+    const [id, source, position] = value.split('|');
+    return allCards.find(c => getCardRef(c) === value)
+      || allCards.find(c =>
+        getCardId(c) === id
+        && (c.source_image || '') === source
+        && String(c.position ?? '') === position
+      );
+  }
+  return allCards.find(c => getCardId(c) === value);
+}
+
+function isCardCanonical(card, canonicalRef) {
+  return isPreciseCardRef(canonicalRef)
+    ? getCardRef(card) === canonicalRef
+    : getCardId(card) === canonicalRef;
+}
+
 function isDismissed(id) { return state.dismissed.includes(id); }
 function isPending(id) { return !isDismissed(id) && !state.picked[id]; }
 function getCanonical(pair) { return state.picked[pair.id] || pair.defaultCanonical; }
@@ -100,7 +137,10 @@ function getExcluded() {
     if (isDismissed(pair.id)) return;
     const canon = getCanonical(pair);
     if (!canon) return;
-    pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
+    pair.cards.forEach(ref => {
+      const card = resolveCardRef(ref);
+      if (card && !isCardCanonical(card, canon)) excluded.add(getCardRef(card));
+    });
   });
   return excluded;
 }
@@ -174,12 +214,12 @@ function createPairEl(pair) {
     <div class="dup-cards-row"></div>`;
 
   const row = div.querySelector('.dup-cards-row');
-  pair.cards.forEach((cardId, i) => {
-    const card = allCards.find(c => c['卡片ID'] === cardId);
+  pair.cards.forEach((cardRef, i) => {
+    const card = resolveCardRef(cardRef);
     if (!card) {
       const missing = document.createElement('div');
       missing.className = 'dup-card-wrap';
-      missing.innerHTML = `<div class="dup-card-missing">？${cardId}</div>`;
+      missing.innerHTML = `<div class="dup-card-missing">？${cardRef}</div>`;
       row.appendChild(missing);
     } else {
       row.appendChild(createCardWrap(pair, card, dismissed));
@@ -196,7 +236,7 @@ function createPairEl(pair) {
 }
 
 function createCardWrap(pair, card, dismissed) {
-  const isCanon = card['卡片ID'] === getCanonical(pair);
+  const isCanon = isCardCanonical(card, getCanonical(pair));
   const admin = typeof isAdmin === 'function' && isAdmin();
   const wrap = document.createElement('div');
   wrap.className = 'dup-card-wrap' + (isCanon ? ' dup-card-canon' : '');
@@ -214,7 +254,7 @@ function createCardWrap(pair, card, dismissed) {
     wrap.style.cursor = 'pointer';
     wrap.title = '點擊設為主要版本';
     wrap.addEventListener('click', () => {
-      state.picked[pair.id] = card['卡片ID'];
+      state.picked[pair.id] = getCardRef(card);
       saveState();
       render();
     });
@@ -239,10 +279,11 @@ function openCompareModal(pairId) {
     ? '<span class="dup-type-tag tag-custom">手動新增</span>'
     : '<span class="dup-type-tag tag-name">同名</span>';
 
-  const cardsHtml = pair.cards.map(cardId => {
-    const card = allCards.find(c => c['卡片ID'] === cardId);
-    if (!card) return `<div class="dup-cmp-card"><div class="dup-card-missing">找不到：${cardId}</div></div>`;
-    const isCanon = cardId === getCanonical(pair);
+  const cardsHtml = pair.cards.map(cardRef => {
+    const card = resolveCardRef(cardRef);
+    if (!card) return `<div class="dup-cmp-card"><div class="dup-card-missing">找不到：${cardRef}</div></div>`;
+    const resolvedRef = getCardRef(card);
+    const isCanon = isCardCanonical(card, getCanonical(pair));
     const typeLabel = card.card_type === 'minor' ? '次要發展卡'
                     : card.card_type === 'occupation' ? '職業卡' : '雙色卡';
 
@@ -258,7 +299,7 @@ function openCompareModal(pairId) {
     return `
       <div class="dup-cmp-card ${isCanon ? 'dup-cmp-canon' : ''}">
         <div class="dup-cmp-img-wrap">
-          <canvas data-cmp-card="${cardId}"></canvas>
+          <canvas data-cmp-card="${resolvedRef}"></canvas>
           ${isCanon ? '<div class="dup-cmp-check">✓ 主要版本</div>' : ''}
         </div>
         <div class="dup-cmp-info">
@@ -269,7 +310,7 @@ function openCompareModal(pairId) {
           <div class="dup-cmp-desc">${card['說明'] || '—'}</div>
           ${admin && !dismissed ? `
             <button class="dup-cmp-pick-btn ${isCanon ? 'active' : ''}"
-                    data-pair="${pair.id}" data-card="${cardId}">
+                    data-pair="${pair.id}" data-card="${resolvedRef}">
               ${isCanon ? '✓ 已選為主要版本' : '選為主要版本'}
             </button>` : ''}
         </div>
@@ -288,7 +329,7 @@ function openCompareModal(pairId) {
 
   requestAnimationFrame(() => {
     content.querySelectorAll('canvas[data-cmp-card]').forEach(canvas => {
-      const card = allCards.find(c => c['卡片ID'] === canvas.dataset.cmpCard);
+      const card = resolveCardRef(canvas.dataset.cmpCard);
       if (card) drawCrop(canvas, card);
     });
   });
@@ -401,10 +442,10 @@ function setupEvents() {
 
   document.getElementById('confirmAdd').addEventListener('click', () => {
     if (!selectedA || !selectedB) return alert('請選擇兩張卡牌');
-    if (selectedA['卡片ID'] === selectedB['卡片ID']) return alert('不能選同一張牌');
+    if (getCardRef(selectedA) === getCardRef(selectedB)) return alert('不能選同一張牌');
     const id = 'c' + Date.now();
-    const label = selectedA['牌名'] + '／' + selectedB['牌名'];
-    state.custom.push({ id, label, cards: [selectedA['卡片ID'], selectedB['卡片ID']], defaultCanonical: selectedA['卡片ID'], type: 'custom' });
+    const label = getCardName(selectedA) + '／' + getCardName(selectedB);
+    state.custom.push({ id, label, cards: [getCardRef(selectedA), getCardRef(selectedB)], defaultCanonical: getCardRef(selectedA), type: 'custom' });
     saveState();
     document.getElementById('addDialog').style.display = 'none';
     activeTab = 'all';
@@ -414,12 +455,12 @@ function setupEvents() {
 
   setupSearch('searchA', 'resultsA', card => {
     selectedA = card;
-    document.getElementById('selectedA').textContent = card['牌名'] + '（' + card['卡片ID'] + '）';
+    document.getElementById('selectedA').textContent = `${getCardName(card)}（${getCardId(card)} · ${card.source_image || ''}）`;
     document.getElementById('resultsA').innerHTML = '';
   });
   setupSearch('searchB', 'resultsB', card => {
     selectedB = card;
-    document.getElementById('selectedB').textContent = card['牌名'] + '（' + card['卡片ID'] + '）';
+    document.getElementById('selectedB').textContent = `${getCardName(card)}（${getCardId(card)} · ${card.source_image || ''}）`;
     document.getElementById('resultsB').innerHTML = '';
   });
 
@@ -437,10 +478,14 @@ function setupSearch(inputId, resultsId, onSelect) {
     const q = input.value.trim().toLowerCase();
     results.innerHTML = '';
     if (!q) return;
-    allCards.filter(c => (c['牌名'] || '').toLowerCase().includes(q)).slice(0, 8).forEach(card => {
+    allCards.filter(c => [getCardName(c), getCardId(c), c['牌組'], c.source_image]
+      .join(' ')
+      .toLowerCase()
+      .includes(q)
+    ).slice(0, 12).forEach(card => {
       const el = document.createElement('div');
       el.className = 'dup-search-item';
-      el.textContent = card['牌名'] + '（' + card['卡片ID'] + ' · ' + card['牌組'] + '）';
+      el.textContent = `${getCardName(card)}（${getCardId(card)} · ${card['牌組']} · ${card.source_image || ''}）`;
       el.addEventListener('click', () => { onSelect(card); input.value = ''; });
       results.appendChild(el);
     });
@@ -468,7 +513,14 @@ function getExcludedCardIds() {
       if (dismissed.includes(pair.id)) return;
       const canon = picked[pair.id] || pair.defaultCanonical;
       if (!canon) return;
-      pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
+      pair.cards.forEach(ref => {
+        const card = resolveCardRef(ref);
+        if (card) {
+          if (!isCardCanonical(card, canon)) excluded.add(getCardRef(card));
+        } else if (ref !== canon) {
+          excluded.add(ref);
+        }
+      });
     });
     return excluded;
   } catch { return new Set(); }

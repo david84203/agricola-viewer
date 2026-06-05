@@ -24752,7 +24752,11 @@
     "grid_rows": 3,
     "grid_col": 0,
     "grid_row": 1,
-    "position": 3
+    "position": 3,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 0
   },
   {
     "卡片ID": "WA051",

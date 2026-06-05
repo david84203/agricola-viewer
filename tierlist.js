@@ -19,6 +19,10 @@ const BANNED_GROUPS = [
 ];
 const BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
 
+function getCardKey(card) {
+  return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
+}
+
 function getTier(rankPct) {
   return TIERS[TIER_BOUNDS.findIndex(b => rankPct < b)];
 }
@@ -55,7 +59,7 @@ async function init() {
       fetchAllRatings(),
       loadDupExclusions(),
     ]);
-    allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']));
+    allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
     populateDeckFilter();
     renderTierList();

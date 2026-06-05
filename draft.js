@@ -25,6 +25,10 @@ const BANNED_GROUPS = [
 ];
 const BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
 
+function getCardKey(card) {
+  return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
+}
+
 // Round configs: simPicks = how many cards to randomly remove at the START of this round
 const OCC_ROUNDS = [
   { pack: 'A', simPicks: 0 },  // R1: your pack, fresh
@@ -111,7 +115,7 @@ async function init() {
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
   ]);
-  allCards = cardsData.filter(c => !dupExcluded.has(c['卡片ID']));
+  allCards = cardsData.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
   buildDeckCheckboxes();
   buildModeSelect();
   bindEvents();

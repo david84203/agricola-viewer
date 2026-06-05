@@ -32,6 +32,8 @@ async function loadCards() {
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
   ]);
 
+  allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
+
   // Build non-canonical duplicate set from localStorage state
   const dupState = (() => { try { return JSON.parse(localStorage.getItem('agricola_dups') || '{}'); } catch { return {}; } })();
   dupNonCanonical = new Set();
@@ -42,22 +44,25 @@ async function loadCards() {
     if ((dupState.dismissed || []).includes(pair.id)) return;
     const canon = (dupState.picked || {})[pair.id] || pair.defaultCanonical;
     if (!canon || !Array.isArray(pair.cards)) return;
-    const replacedIds = [];
-    pair.cards.forEach(id => {
-      if (id !== canon) {
-        replacedIds.push(id);
-        dupNonCanonical.add(id);
-        dupCardToPair.set(id, { pair, canonId: canon });
+    const canonCard = resolveCardRef(canon);
+    const canonKey = canonCard ? getCardKey(canonCard) : canon;
+    const replacedRefs = [];
+    pair.cards.forEach(ref => {
+      const card = resolveCardRef(ref);
+      if (card && !isCardCanonical(card, canon)) {
+        const replacedRef = getCardKey(card);
+        replacedRefs.push(replacedRef);
+        dupNonCanonical.add(replacedRef);
+        dupCardToPair.set(replacedRef, { pair, canonId: canon });
       }
     });
-    if (replacedIds.length) {
-      const existing = dupCanonicalMap.get(canon) || [];
-      existing.push({ pair, replacedIds });
-      dupCanonicalMap.set(canon, existing);
+    if (replacedRefs.length) {
+      const existing = dupCanonicalMap.get(canonKey) || [];
+      existing.push({ pair, replacedRefs });
+      dupCanonicalMap.set(canonKey, existing);
     }
   });
 
-  allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
   if (banGroups) {
     BANNED_GROUPS.length = 0;
     banGroups.forEach(g => BANNED_GROUPS.push(g));
@@ -112,16 +117,45 @@ function getCardKey(card) {
   return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
 }
 
+function getCardId(card) {
+  return card?.['卡片ID'] || '';
+}
+
+function isPreciseCardRef(ref) {
+  return String(ref || '').includes('|');
+}
+
+function resolveCardRef(ref) {
+  if (!ref) return null;
+  const value = String(ref);
+  if (isPreciseCardRef(value)) {
+    const [id, source, position] = value.split('|');
+    return allCards.find(c => getCardKey(c) === value)
+      || allCards.find(c =>
+        getCardId(c) === id
+        && (c.source_image || '') === source
+        && String(c.position ?? '') === position
+      );
+  }
+  return allCards.find(c => getCardId(c) === value);
+}
+
+function isCardCanonical(card, canonicalRef) {
+  return isPreciseCardRef(canonicalRef)
+    ? getCardKey(card) === canonicalRef
+    : getCardId(card) === canonicalRef;
+}
+
 function getCanonicalReplacedIds(card) {
-  const entries = dupCanonicalMap.get(card['卡片ID']) || [];
-  return [...new Set(entries.flatMap(entry => entry.replacedIds))];
+  const entries = dupCanonicalMap.get(getCardKey(card)) || [];
+  return [...new Set(entries.flatMap(entry => entry.replacedRefs))];
 }
 
 function getReplacedCardsText(card) {
   return getCanonicalReplacedIds(card)
-    .map(id => {
-      const replaced = allCards.find(c => c['卡片ID'] === id);
-      return replaced ? `${replaced['牌名'] || '未命名'}（${id}）` : id;
+    .map(ref => {
+      const replaced = resolveCardRef(ref);
+      return replaced ? `${replaced['牌名'] || '未命名'}（${replaced['卡片ID']}）` : ref;
     })
     .join('、');
 }
@@ -150,7 +184,7 @@ function applyFilters() {
     // exclude banned toggle
     if (excludeBanned && BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
     // exclude non-canonical duplicates toggle
-    if (excludeDups && dupNonCanonical.has(c['卡片ID'])) return false;
+    if (excludeDups && dupNonCanonical.has(getCardKey(c))) return false;
     // deck filter
     if (activeDeck !== 'all') {
       if (activeDeck === 'BGA') {
@@ -229,7 +263,7 @@ function createCardEl(card, idx) {
                  : card.card_type === 'occupation' ? '職業卡'
                  : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
-  const isDupNonCanon = dupNonCanonical.has(card['卡片ID']);
+  const isDupNonCanon = dupNonCanonical.has(getCardKey(card));
   const replacedCount = getCanonicalReplacedIds(card).length;
   const banned = BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
   const bga = isCardBga(card);
@@ -270,7 +304,7 @@ function createCardEl(card, idx) {
   `;
 
   div.addEventListener('click', () => {
-    if (dupNonCanonical.has(card['卡片ID'])) openDupCompare(card);
+    if (dupNonCanonical.has(getCardKey(card))) openDupCompare(card);
     else openModal(card);
   });
 
@@ -356,9 +390,9 @@ function drawCrop(canvas, card) {
 
 // ── Duplicate Compare Modal ────────────────────────
 function openDupCompare(nonCanonCard) {
-  const info = dupCardToPair.get(nonCanonCard['卡片ID']);
+  const info = dupCardToPair.get(getCardKey(nonCanonCard));
   if (!info) { openModal(nonCanonCard); return; }
-  const canonCard = allCards.find(c => c['卡片ID'] === info.canonId);
+  const canonCard = resolveCardRef(info.canonId);
   if (!canonCard) { openModal(nonCanonCard); return; }
 
   // Inject overlay if not present
@@ -373,7 +407,7 @@ function openDupCompare(nonCanonCard) {
 
   const cardHtml = (card, isCanon) => `
     <div class="dup-ci-card${isCanon ? ' dup-ci-canon' : ''}">
-      <div class="dup-ci-thumb"><canvas data-card-id="${card['卡片ID']}"></canvas></div>
+      <div class="dup-ci-thumb"><canvas data-card-key="${getCardKey(card)}"></canvas></div>
       <div class="dup-ci-label">${isCanon ? '✓ 選用此版本' : '✕ 此版本被取代'}</div>
       <div class="dup-ci-name">${card['牌名'] || '—'}</div>
       <div class="dup-ci-id">${card['卡片ID']}</div>
@@ -397,7 +431,7 @@ function openDupCompare(nonCanonCard) {
 
   // Draw canvases
   [canonCard, nonCanonCard].forEach(card => {
-    const canvas = overlay.querySelector(`canvas[data-card-id="${card['卡片ID']}"]`);
+    const canvas = overlay.querySelector(`canvas[data-card-key="${getCardKey(card)}"]`);
     if (canvas) requestAnimationFrame(() => drawCrop(canvas, card));
   });
 }
