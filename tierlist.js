@@ -26,6 +26,31 @@ let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
 const BANLIST_CACHE_KEY = 'agricola_banlist_cache';
 const BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (shared with draft.js)
 
+const BGA_CACHE_KEY = 'agricola_bga_cache';
+const BGA_CACHE_TTL = 24 * 60 * 60 * 1000;
+const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
+let bgaExtraIds = new Set();
+
+async function loadBgaIds() {
+  try {
+    const cached = (() => {
+      try {
+        const s = JSON.parse(localStorage.getItem(BGA_CACHE_KEY));
+        return s && Date.now() - s.cachedAt < BGA_CACHE_TTL ? s.data : null;
+      } catch { return null; }
+    })();
+    const ids = cached ?? await fetch(`${FIRESTORE_BASE}/settings/bga_cards`)
+      .then(r => r.json())
+      .then(doc => (doc.fields?.ids?.arrayValue?.values || []).map(v => v.stringValue).filter(Boolean));
+    bgaExtraIds = new Set(ids);
+    if (!cached) localStorage.setItem(BGA_CACHE_KEY, JSON.stringify({ data: ids, cachedAt: Date.now() }));
+  } catch {}
+}
+
+function isCardBga(card) {
+  return BGA_DECKS.includes(card['牌組']) || bgaExtraIds.has(card['卡片ID']);
+}
+
 async function loadBanlist() {
   try {
     let groups = null;
@@ -98,6 +123,7 @@ async function init() {
       fetchAllRatings(),
       loadDupExclusions(),
       loadBanlist(),
+      loadBgaIds(),
     ]);
     allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
@@ -169,6 +195,7 @@ function renderTierList() {
   const typeOk = c => {
     if (activeFilter === 'occupation') return c.card_type === 'occupation';
     if (activeFilter === 'minor') return c.card_type === 'minor' || c.card_type === 'both';
+    if (activeFilter === 'bga') return isCardBga(c);
     return true;
   };
 
@@ -203,12 +230,14 @@ function renderTierList() {
     section.className = 'tier-section';
     section.innerHTML = `
       <div class="tier-header tier-${tier.toLowerCase()}">
+        <span class="tier-collapse-arrow">▼</span>
         <span class="tier-badge">${tier}</span>
         <span class="tier-range">${tierRangeLabel(tier)}</span>
         <span class="tier-count">${groups[tier].length} 張</span>
       </div>
       <div class="tier-card-grid"></div>
     `;
+    section.querySelector('.tier-header').addEventListener('click', () => section.classList.toggle('collapsed'));
     const grid = section.querySelector('.tier-card-grid');
     groups[tier].forEach(({ card, elo, seenCount, pickCount }) => {
       grid.appendChild(createTierCardEl(card, elo, seenCount, pickCount));

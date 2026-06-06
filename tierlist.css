@@ -77,6 +77,20 @@
   padding: 10px 16px;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   margin-bottom: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+.tier-collapse-arrow {
+  font-size: .75rem;
+  opacity: .65;
+  flex-shrink: 0;
+  transition: transform .2s ease;
+}
+.tier-section.collapsed .tier-collapse-arrow {
+  transform: rotate(-90deg);
+}
+.tier-section.collapsed .tier-card-grid {
+  display: none;
 }
 .tier-badge {
   font-family: 'Cinzel', serif;
