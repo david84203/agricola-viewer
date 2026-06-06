@@ -176,7 +176,7 @@ async function fetchAllRatings() {
     const data = await res.json();
     (data.documents || []).forEach(doc => {
       const cardId = doc.name.split('/').pop();
-      const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1000);
+      const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1200);
       const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
       const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
       map[cardId] = { elo, seenCount, pickCount };

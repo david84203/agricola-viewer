@@ -946,7 +946,7 @@ async function uploadRatings() {
         const id = item.found.name.split('/').pop();
         const f = item.found.fields || {};
         ratings[id] = {
-          elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1000),
+          elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
           seenCount: Number(f.seenCount?.integerValue ?? 0),
           pickCount: Number(f.pickCount?.integerValue ?? 0),
         };
@@ -1072,7 +1072,7 @@ async function calculateScore() {
       if (item.found) {
         const id = item.found.name.split('/').pop();
         const f = item.found.fields || {};
-        eloMap[id] = Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1000);
+        eloMap[id] = Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200);
       }
     });
 

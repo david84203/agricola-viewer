@@ -120,7 +120,7 @@ async function fetchAllRatings() {
       const id = doc.name.split('/').pop();
       const f  = doc.fields || {};
       map[id] = {
-        elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1000),
+        elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
         seenCount: Number(f.seenCount?.integerValue ?? 0),
         pickCount: Number(f.pickCount?.integerValue ?? 0),
       };
