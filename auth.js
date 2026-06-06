@@ -6,6 +6,8 @@
 const AUTH_LS_KEY       = 'agricola_auth';
 const AUTH_SETTINGS_KEY = 'agricola_auth_settings';
 const AUTH_SETTINGS_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const AUTH_LINE_INVITE_KEY = 'agricola_line_invite_seen';
+const UGG_LINE_URL = 'https://lin.ee/TLqRqdc';
 const FIRESTORE_AUTH = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/settings/auth';
 
 // ── State ──────────────────────────────────────────
@@ -110,6 +112,49 @@ function closeLoginModal() {
   document.getElementById('authModal').style.display = 'none';
 }
 
+function shouldShowLineInvite() {
+  return !localStorage.getItem(AUTH_LINE_INVITE_KEY);
+}
+
+function markLineInviteSeen() {
+  localStorage.setItem(AUTH_LINE_INVITE_KEY, '1');
+}
+
+function openLineInviteModal() {
+  if (!document.getElementById('lineInviteModal')) injectLineInviteModal();
+  document.getElementById('lineInviteModal').style.display = 'flex';
+}
+
+function closeLineInviteModal() {
+  markLineInviteSeen();
+  const modal = document.getElementById('lineInviteModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function injectLineInviteModal() {
+  const modal = document.createElement('div');
+  modal.id = 'lineInviteModal';
+  modal.className = 'auth-modal-overlay';
+  modal.style.display = 'none';
+  modal.innerHTML = `
+    <div class="auth-modal line-invite-modal">
+      <div class="auth-modal-title">想一起玩農家樂？</div>
+      <p class="line-invite-text">
+        烏嘎嘎會不定期揪團、開桌與分享活動資訊，歡迎加入官方 LINE。
+      </p>
+      <div class="auth-modal-footer">
+        <button class="auth-btn-cancel" id="lineInviteLater">先不用</button>
+        <a class="auth-btn-submit line-invite-link" id="lineInviteJoin" href="${UGG_LINE_URL}" target="_blank" rel="noopener noreferrer">加入烏嘎嘎 LINE</a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('lineInviteLater').addEventListener('click', closeLineInviteModal);
+  document.getElementById('lineInviteJoin').addEventListener('click', closeLineInviteModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeLineInviteModal(); });
+}
+
 function injectLoginModal() {
   const modal = document.createElement('div');
   modal.id = 'authModal';
@@ -158,6 +203,7 @@ async function doLogin() {
     if (result.ok) {
       closeLoginModal();
       refreshAuthBar();
+      if (shouldShowLineInvite()) openLineInviteModal();
     } else {
       err.textContent = result.error;
     }

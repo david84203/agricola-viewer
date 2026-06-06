@@ -178,6 +178,32 @@ body {
     var(--bg);
 }
 
+.home-page .top-brand-bar {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) auto minmax(220px, 1fr);
+  gap: 24px;
+}
+
+.home-page .brand-left {
+  justify-self: start;
+}
+
+.home-page .brand-center {
+  flex: none;
+  justify-self: center;
+  min-width: 0;
+  max-width: 760px;
+}
+
+.home-page .brand-right {
+  justify-self: end;
+}
+
+.home-brand-auth .auth-bar {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
 .home-main {
   max-width: 1120px;
   margin: 0 auto;
@@ -289,9 +315,9 @@ body {
   justify-content: space-between;
   gap: 24px;
   margin-top: 24px;
-  border: 1px solid rgba(76,175,125,.45);
+  border: 1px solid rgba(232,184,75,.38);
   border-radius: var(--radius-sm);
-  background: rgba(76,175,125,.1);
+  background: rgba(232,184,75,.08);
   padding: 20px;
 }
 
@@ -308,14 +334,14 @@ body {
 
 .home-line-btn {
   flex-shrink: 0;
-  background: rgba(76,175,125,.2);
-  border: 1px solid rgba(76,175,125,.7);
-  color: #bff5d8;
+  background: rgba(232,184,75,.16);
+  border: 1px solid rgba(232,184,75,.58);
+  color: var(--gold2);
 }
 
 .home-line-btn:hover {
-  background: rgba(76,175,125,.28);
-  border-color: #bff5d8;
+  background: rgba(232,184,75,.24);
+  border-color: var(--gold);
 }
 
 /* ─── Filter Bar ─────────────────────────────────────────────── */
@@ -839,6 +865,16 @@ body {
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
+  .home-page .top-brand-bar {
+    display: flex;
+  }
+  .home-page .brand-right {
+    align-items: flex-start;
+    justify-self: auto;
+  }
+  .home-brand-auth .auth-bar {
+    justify-content: flex-start;
+  }
   .home-tool-grid {
     grid-template-columns: 1fr;
   }

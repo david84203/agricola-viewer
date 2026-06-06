@@ -137,3 +137,21 @@
 }
 .auth-btn-submit:hover { opacity: .85; }
 .auth-btn-submit:disabled { opacity: .5; cursor: default; }
+
+.line-invite-modal {
+  width: 380px;
+}
+.line-invite-text {
+  color: var(--text2);
+  font-size: .92rem;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.line-invite-link,
+.line-invite-link:link,
+.line-invite-link:visited {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
