@@ -5,6 +5,9 @@
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
+
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache';
+const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 
 const MIN_SEEN = 5;
@@ -107,7 +110,18 @@ function populateDeckFilter() {
 }
 
 // ── Fetch Firestore ────────────────────────────────
+function getCachedRatings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(RATINGS_CACHE_KEY));
+    if (s && Date.now() - s.cachedAt < RATINGS_CACHE_TTL) return s.data;
+  } catch {}
+  return null;
+}
+
 async function fetchAllRatings() {
+  const cached = getCachedRatings();
+  if (cached) return cached;
+
   const map = {};
   let pageToken = null;
   do {
@@ -117,13 +131,15 @@ async function fetchAllRatings() {
     const data = await res.json();
     (data.documents || []).forEach(doc => {
       const cardId = doc.name.split('/').pop();
-      const elo      = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1000);
+      const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1000);
       const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
       const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
       map[cardId] = { elo, seenCount, pickCount };
     });
     pageToken = data.nextPageToken ?? null;
   } while (pageToken);
+
+  try { localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
   return map;
 }
 
@@ -347,6 +363,7 @@ document.querySelectorAll('.chip').forEach(chip => {
 });
 
 document.getElementById('refreshBtn').addEventListener('click', async () => {
+  localStorage.removeItem(RATINGS_CACHE_KEY);
   document.getElementById('tierContent').style.display = 'none';
   document.getElementById('tierEmpty').style.display = 'none';
   document.getElementById('tierLoading').style.display = 'flex';
