@@ -203,6 +203,16 @@
   border: 1px solid var(--border);
   background: var(--bg3);
   flex-shrink: 0;
+  transition: border-color var(--transition), opacity var(--transition);
+}
+.picked-thumb:not(.empty) {
+  cursor: pointer;
+}
+.picked-thumb:not(.empty):hover {
+  border-color: var(--gold);
+}
+.picked-thumb:not(.empty):active {
+  opacity: 0.7;
 }
 .picked-thumb canvas {
   width: 100%;
