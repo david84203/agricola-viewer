@@ -109,11 +109,27 @@ async function loadDupExclusions() {
     const s = await loadDuplicateState();
     const allPairs = [...pairs, ...(s.custom || [])];
     const excluded = new Set();
+    const keepRefs = new Set();
+    const keepIds = new Set();
+    const getRefId = ref => String(ref || '').split('|')[0];
+
+    allPairs.forEach(pair => {
+      if (!(s.dismissed || []).includes(pair.id)) return;
+      (pair.cards || []).forEach(ref => {
+        keepRefs.add(ref);
+        keepIds.add(getRefId(ref));
+      });
+    });
+
     allPairs.forEach(pair => {
       if ((s.dismissed || []).includes(pair.id)) return;
       const canon = (s.picked || {})[pair.id] || pair.defaultCanonical;
       if (!canon) return;
-      pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
+      pair.cards.forEach(ref => {
+        if (ref === canon) return;
+        if (keepRefs.has(ref) || keepIds.has(getRefId(ref))) return;
+        excluded.add(ref);
+      });
     });
     return excluded;
   } catch { return new Set(); }
