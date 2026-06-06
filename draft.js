@@ -923,7 +923,7 @@ async function uploadRatings() {
   statusEl.className = 'upload-status uploading';
 
   try {
-    const K_PAIR = 4; // ELO K-factor per pairwise match
+    const K_PAIR = 16; // ELO K-factor per pairwise match
 
     // Collect all unique card IDs in this draft
     const uniqueIds = [...new Set(state.shownLog.flatMap(r => [r.picked, ...r.opponents]))];
@@ -981,7 +981,7 @@ async function uploadRatings() {
       update: {
         name: `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${cardId}`,
         fields: {
-          elo:       { integerValue: `${Math.round(elo)}` },
+          elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(elo)))}` },
           seenCount: { integerValue: `${seenCount}` },
           pickCount: { integerValue: `${pickCount}` },
           lastRater: { stringValue: raterId },
