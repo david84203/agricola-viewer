@@ -165,6 +165,9 @@ function onAuthChange() {
     document.getElementById('raterModeToggle').checked = false;
     return;
   }
+  const toggle = document.getElementById('raterModeToggle');
+  toggle.checked = true;
+  toggle.dispatchEvent(new Event('change'));
   loadRaterProgress();
 }
 
