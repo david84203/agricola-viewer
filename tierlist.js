@@ -238,7 +238,10 @@ function renderTierList() {
       </div>
       <div class="tier-card-grid"></div>
     `;
-    section.querySelector('.tier-header').addEventListener('click', () => section.classList.toggle('collapsed'));
+    section.querySelector('.tier-header').addEventListener('click', () => {
+      section.classList.toggle('collapsed');
+      if (!section.classList.contains('collapsed')) drawPendingCanvases(section);
+    });
     const grid = section.querySelector('.tier-card-grid');
     groups[tier].forEach(({ card, elo, seenCount, pickCount }) => {
       grid.appendChild(createTierCardEl(card, elo, seenCount, pickCount));
@@ -273,7 +276,10 @@ function renderBanSection(container, typeOk) {
   const title = document.createElement('div');
   title.className = 'tier-ban-title';
   title.innerHTML = `<span class="tier-collapse-arrow">▼</span>🚫 禁卡`;
-  title.addEventListener('click', () => banSection.classList.toggle('collapsed'));
+  title.addEventListener('click', () => {
+    banSection.classList.toggle('collapsed');
+    if (!banSection.classList.contains('collapsed')) drawPendingCanvases(banSection);
+  });
   banSection.appendChild(title);
 
   const body = document.createElement('div');
@@ -296,7 +302,7 @@ function renderBanSection(container, typeOk) {
       el.className = 'tier-ban-card';
       el.innerHTML = `<div class="tier-card-thumb"><canvas></canvas></div><div class="tier-ban-name">${card['牌名']}</div>`;
       el.addEventListener('click', () => openModal(card));
-      requestAnimationFrame(() => drawCrop(el.querySelector('canvas'), card));
+      el.querySelector('canvas')._pendingCard = card;
       grid.appendChild(el);
     });
     body.appendChild(group);
@@ -327,11 +333,20 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
     </div>
   `;
   div.addEventListener('click', () => openModal(card));
-  requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card));
+  div.querySelector('canvas')._pendingCard = card;
   return div;
 }
 
 // ── Canvas ─────────────────────────────────────────
+function drawPendingCanvases(container) {
+  container.querySelectorAll('canvas').forEach(canvas => {
+    if (canvas._pendingCard) {
+      drawCrop(canvas, canvas._pendingCard);
+      canvas._pendingCard = null;
+    }
+  });
+}
+
 function drawCrop(canvas, card) {
   if (!canvas || !card?.source_image) return;
   const key = IMG_BASE + card.source_image;
