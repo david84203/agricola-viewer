@@ -83,6 +83,7 @@ let state = {
   occPacks: {}, minPacks: {},
   occRemovedIds: {}, minRemovedIds: {},
   appliedSimRounds: new Set(),
+  eloCache: {},          // { cardId: { elo, seenCount } } — loaded at draft start for sim picks
   currentRound: 0,
   occPicks: [],
   minPicks: [],
@@ -354,6 +355,12 @@ function startCombinedPhase() {
   state.selectedOcc = null;
   state.selectedMin = null;
 
+  const allPackIds = [
+    ...Object.values(state.occPacks).flatMap(p => p.map(c => c['卡片ID'])),
+    ...Object.values(state.minPacks).flatMap(p => p.map(c => c['卡片ID'])),
+  ];
+  fetchEloForDraft(allPackIds);
+
   showScreen('draftScreen');
   renderCombinedRound();
 }
@@ -365,6 +372,7 @@ function startOccupationPhase() {
   state.roundConfig = OCC_ROUNDS;
   state.currentPicks = state.occPicks;
   state.selectedCard = null;
+  fetchEloForDraft(Object.values(state.packs).flatMap(p => p.map(c => c['卡片ID'])));
   showScreen('draftScreen');
   renderRound();
 }
@@ -376,8 +384,58 @@ function startMinorPhase() {
   state.roundConfig = MIN_ROUNDS;
   state.currentPicks = state.minPicks;
   state.selectedCard = null;
+  fetchEloForDraft(Object.values(state.packs).flatMap(p => p.map(c => c['卡片ID'])));
   showScreen('draftScreen');
   renderRound();
+}
+
+// ── ELO-weighted sim picks ─────────────────────────
+async function fetchEloForDraft(cardIds) {
+  state.eloCache = {};
+  if (cardIds.length === 0) return;
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}:batchGet`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        documents: cardIds.map(id =>
+          `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${id}`)
+      })
+    });
+    const data = await res.json();
+    data.forEach(item => {
+      if (item.found) {
+        const id = item.found.name.split('/').pop();
+        const f = item.found.fields || {};
+        state.eloCache[id] = {
+          elo: Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
+          seenCount: Number(f.seenCount?.integerValue ?? 0),
+        };
+      }
+    });
+  } catch { /* fail silently — sim picks fall back to uniform random */ }
+}
+
+function simPickWeighted(avail, count) {
+  if (count <= 0 || avail.length === 0) return [];
+  const pool = avail.map(c => {
+    const r = state.eloCache[c['卡片ID']];
+    const w = (r && r.seenCount >= 10) ? Math.max(r.elo, 100) : 1200;
+    return { c, w };
+  });
+  const result = [];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    const total = pool.reduce((s, x) => s + x.w, 0);
+    let rand = Math.random() * total;
+    let idx = 0;
+    while (idx < pool.length - 1) {
+      if (rand < pool[idx].w) break;
+      rand -= pool[idx].w;
+      idx++;
+    }
+    result.push(pool.splice(idx, 1)[0].c);
+  }
+  return result;
 }
 
 // ── Combined Mode Render ───────────────────────────
@@ -393,7 +451,7 @@ function renderCombinedRound() {
       { pack: state.minPacks[packKey], removed: state.minRemovedIds[packKey] },
     ].forEach(({ pack, removed }) => {
       const avail = pack.filter(c => !removed.has(c['卡片ID']));
-      shuffle(avail).slice(0, config.simPicks).forEach(c => removed.add(c['卡片ID']));
+      simPickWeighted(avail, config.simPicks).forEach(c => removed.add(c['卡片ID']));
     });
     state.appliedSimRounds.add(round);
   }
@@ -586,7 +644,7 @@ function renderRound() {
     const pack = state.packs[packKey];
     const removed = state.removedIds[packKey];
     const available = pack.filter(c => !removed.has(c['卡片ID']));
-    shuffle(available).slice(0, config.simPicks).forEach(c => removed.add(c['卡片ID']));
+    simPickWeighted(available, config.simPicks).forEach(c => removed.add(c['卡片ID']));
     state.appliedSimRounds.add(round);
   }
 
