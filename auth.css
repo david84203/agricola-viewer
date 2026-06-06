@@ -42,6 +42,17 @@
   border-color: #f87171;
   color: #f87171;
 }
+.auth-admin-link {
+  font-size: .8rem;
+  color: #7ab8e8;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid #2d6ca8;
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+.auth-admin-link:hover { background: #1e3a5a; color: #a8d0f0; }
 
 /* ── Login Modal ── */
 .auth-modal-overlay {

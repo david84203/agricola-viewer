@@ -644,7 +644,9 @@ async function init() {
     return;
   }
 
-  const raterId = getRaterId();
+  const urlRater  = new URLSearchParams(location.search).get('rater');
+  const adminView = isAdmin() && !!urlRater;
+  const raterId   = adminView ? urlRater : getRaterId();
 
   try {
     setLoading('統計評分場次…');
@@ -665,7 +667,7 @@ async function init() {
     const countData = await countRes.json();
     const count = Number(countData[0]?.result?.aggregateFields?.count?.integerValue ?? 0);
 
-    if (count < UNLOCK_THRESHOLD) {
+    if (!adminView && count < UNLOCK_THRESHOLD) {
       document.getElementById('profileLoading').style.display = 'none';
       document.getElementById('profileLocked').style.display = '';
       const pct = Math.min(count / UNLOCK_THRESHOLD * 100, 100);

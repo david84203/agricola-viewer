@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>評分者管理 — 農家樂 Agricola</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="stylesheet" href="raters.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 評分者管理</div>
+        <div class="brand-sub">管理員後台</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <a href="draft.html" class="back-link">← 回輪抽模擬器</a>
+    </div>
+  </div>
+
+  <main class="raters-main">
+
+    <!-- Loading -->
+    <div id="ratersLoading" class="profile-state">
+      <div class="state-icon">⏳</div>
+      <p id="ratersLoadingMsg">載入中…</p>
+    </div>
+
+    <!-- Not admin -->
+    <div id="ratersAuthRequired" class="profile-state" style="display:none">
+      <div class="state-icon">🔐</div>
+      <h2>需要管理員權限</h2>
+      <p>請以管理員帳號登入後再查看此頁面。</p>
+      <button class="profile-cta-btn" id="ratersLoginBtn">管理員登入</button>
+    </div>
+
+    <!-- Main content -->
+    <div id="ratersContent" style="display:none">
+
+      <div class="raters-header">
+        <div class="raters-summary" id="ratersSummary"></div>
+        <div class="raters-sort">
+          排序：
+          <button class="sort-btn active" data-sort="count">場次</button>
+          <button class="sort-btn" data-sort="lastActive">最近活躍</button>
+        </div>
+      </div>
+
+      <div class="raters-table-wrap">
+        <table class="raters-table">
+          <thead>
+            <tr>
+              <th>評分者</th>
+              <th>總場次</th>
+              <th>最後活躍</th>
+              <th>職業</th>
+              <th>次發</th>
+              <th>混合</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ratersTableBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="auth.js"></script>
+  <script src="raters.js"></script>
+</body>
+</html>

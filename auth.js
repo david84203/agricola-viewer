@@ -58,8 +58,11 @@ function refreshAuthBar() {
     wrap.querySelector('#authLoginBtn').addEventListener('click', openLoginModal);
   } else {
     const roleLabel = auth.role === 'admin' ? '👑 管理員' : '✅ 評分者';
+    const adminLink = auth.role === 'admin'
+      ? `<a href="./raters.html" class="auth-admin-link">評分者管理</a>` : '';
     wrap.innerHTML = `
       <span class="auth-user">${roleLabel}｜${auth.id}</span>
+      ${adminLink}
       <button class="auth-logout-btn" id="authLogoutBtn">登出</button>
     `;
     wrap.querySelector('#authLogoutBtn').addEventListener('click', () => {
