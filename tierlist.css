@@ -18,6 +18,10 @@
   display: flex;
   gap: 8px;
 }
+.chip-bga {
+  margin-left: 8px;
+  border-style: dashed;
+}
 .tier-stats {
   font-size: .8rem;
   color: var(--text3);

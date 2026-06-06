@@ -95,6 +95,7 @@ let allCards = [];
 let ratingsMap = {};
 let imageCache = {};
 let activeFilter = 'all';
+let activeBga = false;
 let activeDecks = new Set();
 
 // ── Duplicate exclusions ───────────────────────────
@@ -193,9 +194,9 @@ function renderTierList() {
   document.getElementById('tierLoading').style.display = 'none';
 
   const typeOk = c => {
+    if (activeBga && !isCardBga(c)) return false;
     if (activeFilter === 'occupation') return c.card_type === 'occupation';
     if (activeFilter === 'minor') return c.card_type === 'minor' || c.card_type === 'both';
-    if (activeFilter === 'bga') return isCardBga(c);
     return true;
   };
 
@@ -410,13 +411,19 @@ function closeModal() {
 }
 
 // ── Events ─────────────────────────────────────────
-document.querySelectorAll('.chip').forEach(chip => {
+document.querySelectorAll('.chip[data-filter]').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     activeFilter = chip.dataset.filter;
     renderTierList();
   });
+});
+
+document.getElementById('bgaChip').addEventListener('click', () => {
+  activeBga = !activeBga;
+  document.getElementById('bgaChip').classList.toggle('active', activeBga);
+  renderTierList();
 });
 
 document.getElementById('refreshBtn').addEventListener('click', async () => {
