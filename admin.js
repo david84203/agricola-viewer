@@ -38,7 +38,8 @@ async function saveCardOverride(cardId, fields) {
   });
   const body = JSON.stringify({ fields: firestoreFields });
   const id   = encodeURIComponent(cardId);
-  const res  = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides/${id}`, {
+  const mask = Object.keys(fields).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+  const res  = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides/${id}?${mask}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body,
@@ -81,7 +82,8 @@ async function addCardToBanlist(card, reason, statusEl) {
   const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
   setStatus('處理中…');
   try {
-    const groups = await loadBanlistFromFirestore() || [];
+    const groups = await loadBanlistFromFirestore();
+    if (groups === null) { setStatus('✗ 載入失敗，請重試', '#f87171'); return; }
     const existing = groups.find(g => g.ids.includes(card['卡片ID']));
     if (existing) {
       setStatus(`✗ 已在「${existing.label}」中`, '#f87171');
