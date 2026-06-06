@@ -3,127 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>農家樂 Agricola — 卡牌圖鑑</title>
-  <meta name="description" content="農家樂（Agricola）繁體中文化卡牌資料庫，收錄次要發展卡與職業卡的完整效果說明與卡片圖像。" />
+  <title>烏嘎嘎農家樂卡牌中心</title>
+  <meta name="description" content="烏嘎嘎農家樂卡牌中心，提供卡牌列表、輪抽模擬與牌力排行工具。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="auth.css" />
-  <link rel="stylesheet" href="admin.css" />
 </head>
-<body>
-  <div class="top-brand-bar">
+<body class="home-page">
+  <header class="top-brand-bar">
     <div class="brand-left">
       <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
       <div class="brand-text">
-        <div class="brand-title">農家樂 Agricola 卡牌圖鑑</div>
-        <div class="brand-sub">台灣繁體中文版翻譯</div>
+        <div class="brand-title">烏嘎嘎農家樂卡牌中心</div>
+        <div class="brand-sub">卡牌查詢、輪抽模擬與牌力排行工具</div>
         <div id="authBarMount"></div>
       </div>
     </div>
     <div class="brand-center">
       翻譯、編輯、排版、網頁編寫為烏嘎嘎桌遊小路獨立製作，禁止用於任何商業用途。
     </div>
-    <div class="brand-right">
-      <div class="brand-count">
-        共 <span id="totalCount" class="highlight">0</span> 張卡牌
-        <span class="brand-count-sub">（有效 <span id="netCount">—</span> 張）</span>
-      </div>
-      <div class="brand-nav">
-        <button id="banlistBtn" class="draft-nav-btn">🚫 禁卡表</button>
-        <button id="banAdminBtn" class="draft-nav-btn" style="display:none">⚙️ 禁卡管理</button>
-        <button id="bgaAdminBtn" class="draft-nav-btn" style="display:none">🎮 BGA管理</button>
-        <a href="draft.html" class="draft-nav-btn">🎲 輪抽模擬器</a>
-        <a href="tierlist.html" class="draft-nav-btn">📊 Tier List</a>
-        <a href="duplicates.html" class="draft-nav-btn">🔁 重複卡牌</a>
-        <a href="./list.html" class="draft-nav-btn">📋 文字列表版</a>
-      </div>
-    </div>
-  </div>
+  </header>
 
-
-
-  <main class="main-container">
-    <!-- Filters -->
-    <section class="filter-bar">
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input
-          type="text"
-          id="searchInput"
-          class="search-input"
-          placeholder="搜尋牌名、說明、卡片ID…"
-          autocomplete="off"
-        />
-        <button class="clear-btn" id="clearSearch" title="清除">✕</button>
-      </div>
-      <div class="filter-chips-row">
-        <div class="filter-chips">
-          <button class="chip active" data-filter="all">全部</button>
-          <button class="chip" data-filter="minor">次要發展卡</button>
-          <button class="chip" data-filter="occupation">職業卡</button>
-          <button class="chip" data-filter="both">雙色卡</button>
-        </div>
-        <button class="chip chip-toggle" id="excludeBanBtn">排除禁卡</button>
-        <button class="chip chip-toggle" id="excludeDupBtn">排除重複</button>
-      </div>
-      <div class="deck-filter">
-        <label for="deckSelect">牌組</label>
-        <select id="deckSelect">
-          <option value="all">全部</option>
-        </select>
+  <main class="home-main">
+    <section class="home-hero">
+      <div class="home-kicker">Agricola Tools</div>
+      <h1>烏嘎嘎農家樂卡牌中心</h1>
+      <p>
+        整理農家樂各版本卡牌，提供查牌、輪抽模擬與牌力排行，
+        方便開局、測牌與討論。
+      </p>
+      <div class="home-actions" aria-label="主要工具">
+        <a class="home-action primary" href="./cards.html">查看卡牌列表</a>
+        <a class="home-action" href="./draft.html">開始輪抽模擬</a>
+        <a class="home-action" href="./tierlist.html">查看牌力排行</a>
       </div>
     </section>
 
-    <!-- Results info -->
-    <div class="results-info" id="resultsInfo">載入中…</div>
+    <section class="home-tool-grid" aria-label="網站功能">
+      <article class="home-tool">
+        <h2>卡牌資料庫</h2>
+        <p>收錄各牌組卡牌，可依牌名、牌組、類型快速查找。</p>
+      </article>
+      <article class="home-tool">
+        <h2>輪抽模擬</h2>
+        <p>支援職業卡、次要發展卡與混合輪抽，會排除禁卡與被取代的重複牌。</p>
+      </article>
+      <article class="home-tool">
+        <h2>牌力排行</h2>
+        <p>透過玩家選牌紀錄建立卡牌強度排行，方便比較不同卡牌在輪抽中的表現。</p>
+      </article>
+    </section>
 
-    <!-- Card grid -->
-    <section class="card-grid" id="cardGrid"></section>
+    <section class="home-line">
+      <div>
+        <h2>想一起玩農家樂？</h2>
+        <p>烏嘎嘎會不定期揪團、開桌與分享活動資訊，歡迎加入官方 LINE。</p>
+      </div>
+      <a class="home-line-btn" href="https://lin.ee/TLqRqdc" target="_blank" rel="noopener noreferrer">加入烏嘎嘎 LINE</a>
+    </section>
   </main>
 
-  <!-- Detail Modal -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal" id="modal">
-      <button class="modal-close" id="modalClose">✕</button>
-      <div class="modal-inner">
-        <div class="modal-image-wrap">
-          <canvas id="modalCanvas"></canvas>
-        </div>
-        <div class="modal-info">
-          <div class="modal-title-row">
-            <h2 class="modal-title" id="modalTitle"></h2>
-            <div class="modal-badge" id="modalBadge"></div>
-          </div>
-          <div class="modal-sub-row">
-            <div class="modal-id" id="modalId"></div>
-            <span id="modalBanBadge" class="modal-ban-badge" style="display:none">禁卡</span>
-            <span id="modalBgaBadge" class="modal-bga-badge" style="display:none">BGA</span>
-          </div>
-          <div class="modal-fields" id="modalFields"></div>
-          <div class="modal-desc-wrap">
-            <div class="modal-desc-label">說明</div>
-            <div class="modal-desc" id="modalDesc"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Banlist Modal -->
-  <div class="banlist-overlay" id="banlistOverlay">
-    <div class="banlist-modal">
-      <div class="banlist-header">
-        <h2 class="banlist-title">禁卡表</h2>
-        <button class="modal-close" id="banlistClose">✕</button>
-      </div>
-      <div class="banlist-body" id="banlistBody"></div>
-    </div>
-  </div>
-
   <script src="auth.js"></script>
-  <script src="admin.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>

@@ -170,6 +170,154 @@ body {
   padding: 28px 24px 60px;
 }
 
+/* Home */
+.home-page {
+  background:
+    linear-gradient(180deg, rgba(28,25,20,.94), rgba(28,25,20,1) 42%),
+    radial-gradient(circle at 20% 0%, rgba(232,184,75,.16), transparent 34%),
+    var(--bg);
+}
+
+.home-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 64px 24px 72px;
+}
+
+.home-hero {
+  max-width: 820px;
+}
+
+.home-kicker {
+  color: var(--gold);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.home-hero h1 {
+  font-size: clamp(2.1rem, 4vw, 4.3rem);
+  line-height: 1.14;
+  letter-spacing: 0;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.home-hero p {
+  max-width: 680px;
+  color: var(--text2);
+  font-size: 1.08rem;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.home-action,
+.home-action:link,
+.home-action:visited,
+.home-line-btn,
+.home-line-btn:link,
+.home-line-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+  transition: border-color var(--transition), background var(--transition), color var(--transition), transform var(--transition);
+}
+
+.home-action {
+  background: rgba(232,184,75,.12);
+  border: 1px solid rgba(232,184,75,.42);
+  color: var(--gold2);
+}
+
+.home-action.primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #211a10;
+}
+
+.home-action:hover,
+.home-line-btn:hover {
+  transform: translateY(-1px);
+}
+
+.home-action:not(.primary):hover {
+  background: rgba(232,184,75,.22);
+  border-color: var(--gold);
+}
+
+.home-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 54px;
+}
+
+.home-tool {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(47,41,33,.7);
+  padding: 18px;
+}
+
+.home-tool h2 {
+  font-size: 1.05rem;
+  color: var(--gold2);
+  margin-bottom: 8px;
+}
+
+.home-tool p {
+  color: var(--text2);
+  font-size: .92rem;
+}
+
+.home-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 24px;
+  border: 1px solid rgba(76,175,125,.45);
+  border-radius: var(--radius-sm);
+  background: rgba(76,175,125,.1);
+  padding: 20px;
+}
+
+.home-line h2 {
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.home-line p {
+  color: var(--text2);
+  font-size: .94rem;
+}
+
+.home-line-btn {
+  flex-shrink: 0;
+  background: rgba(76,175,125,.2);
+  border: 1px solid rgba(76,175,125,.7);
+  color: #bff5d8;
+}
+
+.home-line-btn:hover {
+  background: rgba(76,175,125,.28);
+  border-color: #bff5d8;
+}
+
 /* ─── Filter Bar ─────────────────────────────────────────────── */
 .filter-bar {
   display: flex;
@@ -690,6 +838,16 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .home-tool-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-line {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 700px) {
   .modal-inner { grid-template-columns: 1fr; }
   .modal-image-wrap { border-radius: var(--radius-lg) var(--radius-lg) 0 0; min-height: 200px; }
@@ -790,6 +948,31 @@ body {
   padding: 20px;
 }
 @media (max-width: 540px) {
+  .home-main {
+    padding: 44px 16px 56px;
+  }
+  .home-hero h1 {
+    font-size: 2.1rem;
+  }
+  .home-hero p {
+    font-size: 1rem;
+  }
+  .home-actions,
+  .home-action {
+    width: 100%;
+  }
+  .home-tool-grid {
+    grid-template-columns: 1fr;
+    margin-top: 36px;
+  }
+  .home-line {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .home-line-btn {
+    width: 100%;
+  }
+
   .dup-cmp-overlay-inline { padding: 0; align-items: flex-end; }
   .dup-ci-modal {
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
