@@ -106,11 +106,11 @@ async function addDuplicatePair(cardA, cardB, statusEl) {
     // 從 Firestore 載入最新狀態
     let state = { picked: {}, dismissed: [], custom: [] };
     const res = await fetch(FS_DUP_DOC);
-    if (res.ok) {
-      const data = await res.json();
-      const json = data.fields?.stateJson?.stringValue;
-      if (json) state = { ...state, ...JSON.parse(json) };
-    }
+    if (!res.ok) throw new Error(`載入失敗 HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.fields) throw new Error('載入失敗，請稍後再試');
+    const json = data.fields?.stateJson?.stringValue;
+    if (json) state = { ...state, ...JSON.parse(json) };
 
     const refA = getAdminCardRef(cardA);
     const refB = getAdminCardRef(cardB);
@@ -605,8 +605,9 @@ async function loadBgaFromFirestore() {
   try {
     const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards`);
     const doc = await res.json();
-    return (doc.fields?.ids?.arrayValue?.values || []).map(v => v.stringValue).filter(Boolean);
-  } catch { return []; }
+    if (!doc.fields) return null; // 429 or other API error
+    return (doc.fields.ids?.arrayValue?.values || []).map(v => v.stringValue).filter(Boolean);
+  } catch { return null; }
 }
 
 async function saveBgaToFirestore(ids) {
@@ -615,7 +616,7 @@ async function saveBgaToFirestore(ids) {
       ids: { arrayValue: { values: ids.map(s => ({ stringValue: s })) } }
     }
   });
-  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards`, {
+  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards?updateMask.fieldPaths=ids`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body,
@@ -628,6 +629,7 @@ async function addCardToBga(card, statusEl) {
   setStatus('處理中…');
   try {
     const ids = await loadBgaFromFirestore();
+    if (ids === null) { setStatus('✗ 載入失敗，請重試', '#f87171'); return; }
     if (ids.includes(card['卡片ID'])) { setStatus('✗ 已在 BGA 牌組中', '#f87171'); return; }
     ids.push(card['卡片ID']);
     await saveBgaToFirestore(ids);
@@ -642,10 +644,11 @@ async function removeCardFromBga(card, statusEl) {
   const setStatus = (text, color) => { if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text3)'; } };
   setStatus('處理中…');
   try {
-    let ids = await loadBgaFromFirestore();
+    const ids = await loadBgaFromFirestore();
+    if (ids === null) { setStatus('✗ 載入失敗，請重試', '#f87171'); return; }
     if (!ids.includes(card['卡片ID'])) { setStatus('✗ 此牌不在 BGA 牌組中', '#f87171'); return; }
-    ids = ids.filter(x => x !== card['卡片ID']);
-    await saveBgaToFirestore(ids);
+    const newIds = ids.filter(x => x !== card['卡片ID']);
+    await saveBgaToFirestore(newIds);
     if (typeof bgaExtraIds !== 'undefined') bgaExtraIds.delete(card['卡片ID']);
     setStatus('✓ 已移除 BGA 牌組', '#4ade80');
   } catch (e) {
