@@ -220,6 +220,17 @@
   font-weight: 600;
   color: var(--text2);
   margin-bottom: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+.tier-ban-section.collapsed .tier-collapse-arrow {
+  transform: rotate(-90deg);
+}
+.tier-ban-section.collapsed .tier-ban-body {
+  display: none;
 }
 .tier-ban-group {
   margin-bottom: 20px;

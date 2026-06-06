@@ -227,7 +227,7 @@ function renderTierList() {
   TIERS.forEach(tier => {
     if (!groups[tier].length) return;
     const section = document.createElement('div');
-    section.className = 'tier-section';
+    section.className = 'tier-section collapsed';
     section.innerHTML = `
       <div class="tier-header tier-${tier.toLowerCase()}">
         <span class="tier-collapse-arrow">▼</span>
@@ -267,8 +267,16 @@ function renderTierList() {
 
 function renderBanSection(container, typeOk) {
   const banSection = document.createElement('div');
-  banSection.className = 'tier-ban-section';
-  banSection.innerHTML = `<div class="tier-ban-title">🚫 禁卡</div>`;
+  banSection.className = 'tier-ban-section collapsed';
+
+  const title = document.createElement('div');
+  title.className = 'tier-ban-title';
+  title.innerHTML = `<span class="tier-collapse-arrow">▼</span>🚫 禁卡`;
+  title.addEventListener('click', () => banSection.classList.toggle('collapsed'));
+  banSection.appendChild(title);
+
+  const body = document.createElement('div');
+  body.className = 'tier-ban-body';
 
   let hasAny = false;
   BANNED_GROUPS.forEach(({ label, ids }) => {
@@ -290,9 +298,10 @@ function renderBanSection(container, typeOk) {
       requestAnimationFrame(() => drawCrop(el.querySelector('canvas'), card));
       grid.appendChild(el);
     });
-    banSection.appendChild(group);
+    body.appendChild(group);
   });
 
+  banSection.appendChild(body);
   if (hasAny) container.appendChild(banSection);
 }
 
