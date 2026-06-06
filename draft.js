@@ -14,6 +14,8 @@ const CROP = {
 
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+const DUP_LS_KEY = 'agricola_dups';
+const DUP_FS_DOC = `${FIRESTORE_BASE}/agricola_dup_state/main`;
 
 // 禁卡表（不進入輪抽池）— 從 Firestore 載入後會覆蓋此預設值
 let BANNED_GROUPS = [
@@ -104,8 +106,7 @@ let state = {
 async function loadDupExclusions() {
   try {
     const pairs = await fetch('./duplicates.json').then(r => r.json());
-    const raw = localStorage.getItem('agricola_dups');
-    const s = raw ? JSON.parse(raw) : { picked: {}, dismissed: [], custom: [] };
+    const s = await loadDuplicateState();
     const allPairs = [...pairs, ...(s.custom || [])];
     const excluded = new Set();
     allPairs.forEach(pair => {
@@ -116,6 +117,26 @@ async function loadDupExclusions() {
     });
     return excluded;
   } catch { return new Set(); }
+}
+
+async function loadDuplicateState() {
+  const fallback = (() => {
+    try { return { picked: {}, dismissed: [], custom: [], ...JSON.parse(localStorage.getItem(DUP_LS_KEY) || '{}') }; }
+    catch { return { picked: {}, dismissed: [], custom: [] }; }
+  })();
+
+  try {
+    const res = await fetch(DUP_FS_DOC);
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    const json = data.fields?.stateJson?.stringValue;
+    if (!json) return fallback;
+    const state = { picked: {}, dismissed: [], custom: [], ...JSON.parse(json) };
+    localStorage.setItem(DUP_LS_KEY, JSON.stringify(state));
+    return state;
+  } catch {
+    return fallback;
+  }
 }
 
 // ── Auth callback ──────────────────────────────────
