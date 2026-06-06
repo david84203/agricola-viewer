@@ -58,8 +58,9 @@ async function loadBanlist() {
     }
 
     if (groups?.length) {
+      const hardcodedIds = BANNED_IDS; // capture before overwrite
       BANNED_GROUPS = groups;
-      BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+      BANNED_IDS = new Set([...hardcodedIds, ...BANNED_GROUPS.flatMap(g => g.ids)]);
     }
   } catch { /* 使用 hardcode fallback */ }
 }
