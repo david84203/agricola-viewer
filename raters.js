@@ -9,10 +9,30 @@ let ratersData = []; // sorted array of rater objects
 let currentSort = 'count';
 let ratersLoaded = false;
 
+const RATERS_CACHE_KEY = 'agricola_raters_cache';
+const RATERS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
 // ── Fetch ──────────────────────────────────────────
 
+function getCachedRaters() {
+  try {
+    const s = JSON.parse(localStorage.getItem(RATERS_CACHE_KEY));
+    if (s && Date.now() - s.cachedAt < RATERS_CACHE_TTL) return s.data;
+  } catch {}
+  return null;
+}
+
+function setCachedRaters(data) {
+  try {
+    localStorage.setItem(RATERS_CACHE_KEY, JSON.stringify({ data, cachedAt: Date.now() }));
+  } catch {}
+}
+
 async function fetchAllSessions() {
-  const map = {}; // { raterId: { count, lastActive, occ, min, combined } }
+  const cached = getCachedRaters();
+  if (cached) return cached;
+
+  const map = {}; // { raterId: { count, lastActive, occ, mixed } }
   let lastTimestamp = null;
 
   while (true) {
@@ -59,7 +79,9 @@ async function fetchAllSessions() {
     if (!lastTimestamp) break;
   }
 
-  return Object.values(map);
+  const result = Object.values(map);
+  setCachedRaters(result);
+  return result;
 }
 
 // ── Sort & Render ──────────────────────────────────
@@ -123,13 +145,21 @@ async function loadRatersContent() {
     renderSummary();
     renderTable();
 
-    document.querySelectorAll('.sort-btn').forEach(btn => {
+    document.querySelectorAll('.sort-btn[data-sort]').forEach(btn => {
       btn.addEventListener('click', () => {
         currentSort = btn.dataset.sort;
-        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sort-btn[data-sort]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         renderTable();
       });
+    });
+
+    document.getElementById('refreshRatersBtn').addEventListener('click', async () => {
+      localStorage.removeItem(RATERS_CACHE_KEY);
+      ratersLoaded = false;
+      document.getElementById('ratersContent').style.display = 'none';
+      document.getElementById('ratersLoading').style.display = '';
+      await loadRatersContent();
     });
 
   } catch (err) {
