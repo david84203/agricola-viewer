@@ -217,7 +217,16 @@ function renderTierList() {
 
   document.getElementById('tierEmpty').style.display = 'none';
 
-  rated.sort((a, b) => b.elo - a.elo);
+  rated.sort((a, b) => {
+    const score = ({ elo, seenCount, pickCount }) => {
+      if (!seenCount) return elo;
+      const pickRate = pickCount / seenCount;
+      const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
+      const conf = Math.min(seenCount / 30, 1);
+      return conf * elo + (1 - conf) * prior;
+    };
+    return score(b) - score(a);
+  });
   const n = rated.length;
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
   rated.forEach((item, i) => { groups[getTier(i / n)].push(item); });
