@@ -32,17 +32,22 @@ function applyOverrides(cards, overrides) {
 }
 
 async function saveCardOverride(cardId, fields) {
-  const firestoreFields = {};
-  Object.entries(fields).forEach(([k, v]) => {
-    firestoreFields[k] = { stringValue: String(v) };
-  });
-  const body = JSON.stringify({ fields: firestoreFields });
-  const id   = encodeURIComponent(cardId);
-  const mask = Object.keys(fields).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
-  const res  = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides/${id}?${mask}`, {
+  const id = encodeURIComponent(cardId);
+
+  // Load existing overrides first so we don't wipe fields not being edited
+  let existingFields = {};
+  try {
+    const r = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides/${id}`);
+    if (r.ok) { const d = await r.json(); if (d.fields) existingFields = d.fields; }
+  } catch {}
+
+  const newFields = {};
+  Object.entries(fields).forEach(([k, v]) => { newFields[k] = { stringValue: String(v) }; });
+
+  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body,
+    body: JSON.stringify({ fields: { ...existingFields, ...newFields } }),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
