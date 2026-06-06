@@ -7,6 +7,7 @@ const FIRESTORE_BASE_RATERS = 'https://firestore.googleapis.com/v1/projects/proj
 
 let ratersData = []; // sorted array of rater objects
 let currentSort = 'count';
+let ratersLoaded = false;
 
 // ── Fetch ──────────────────────────────────────────
 
@@ -103,22 +104,14 @@ function renderSummary() {
     `共 ${ratersData.length} 位評分者　總場次 ${total}`;
 }
 
-// ── Init ───────────────────────────────────────────
+// ── Load content (after auth confirmed) ────────────
 
-async function init() {
-  await new Promise(r => {
-    if (document.readyState === 'complete') { r(); return; }
-    window.addEventListener('load', r);
-  });
+async function loadRatersContent() {
+  if (ratersLoaded) return;
+  ratersLoaded = true;
 
-  const auth = typeof getAuth === 'function' ? getAuth() : null;
-
-  if (!auth || !isAdmin()) {
-    document.getElementById('ratersLoading').style.display = 'none';
-    document.getElementById('ratersAuthRequired').style.display = '';
-    document.getElementById('ratersLoginBtn').addEventListener('click', openLoginModal);
-    return;
-  }
+  document.getElementById('ratersAuthRequired').style.display = 'none';
+  document.getElementById('ratersLoading').style.display = '';
 
   try {
     document.getElementById('ratersLoadingMsg').textContent = '載入評分紀錄…';
@@ -142,6 +135,33 @@ async function init() {
   } catch (err) {
     document.getElementById('ratersLoadingMsg').textContent = `載入失敗：${err.message}`;
   }
+}
+
+// ── Auth callback (login after page load) ──────────
+
+function onAuthChange() {
+  if (ratersLoaded) return;
+  if (typeof isAdmin === 'function' && isAdmin()) loadRatersContent();
+}
+
+// ── Init ───────────────────────────────────────────
+
+async function init() {
+  await new Promise(r => {
+    if (document.readyState === 'complete') { r(); return; }
+    window.addEventListener('load', r);
+  });
+
+  const auth = typeof getAuth === 'function' ? getAuth() : null;
+
+  if (!auth || !isAdmin()) {
+    document.getElementById('ratersLoading').style.display = 'none';
+    document.getElementById('ratersAuthRequired').style.display = '';
+    document.getElementById('ratersLoginBtn').addEventListener('click', openLoginModal);
+    return;
+  }
+
+  loadRatersContent();
 }
 
 document.addEventListener('DOMContentLoaded', init);
