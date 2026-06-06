@@ -420,9 +420,10 @@ function openCardEditModal(card, allCardsRef) {
 
 async function loadBanlistFromFirestore() {
   try {
-    const res  = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/banlist`);
-    const doc  = await res.json();
-    return (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+    const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/banlist`);
+    const doc = await res.json();
+    if (!doc.fields) return null; // 429 quota exceeded or other API error
+    return (doc.fields.groups?.arrayValue?.values || []).map(g => ({
       label: g.mapValue.fields.label.stringValue,
       ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
     }));
@@ -444,7 +445,7 @@ async function saveBanlistToFirestore(groups) {
       }
     }
   });
-  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/banlist`, {
+  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/banlist?updateMask.fieldPaths=groups`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body,
@@ -510,6 +511,7 @@ function injectBanAdminPanel() {
     st.style.color = 'var(--text3)';
     try {
       await saveBanlistToFirestore(adminBanGroups);
+      localStorage.removeItem('agricola_banlist_cache');
       st.style.color = '#4ade80';
       st.textContent = '✓ 已儲存';
     } catch (e) {
