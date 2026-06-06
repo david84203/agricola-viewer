@@ -23,16 +23,35 @@ let BANNED_GROUPS = [
 ];
 let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
 
+const BANLIST_CACHE_KEY = 'agricola_banlist_cache';
+const BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (shared with draft.js)
+
 async function loadBanlist() {
   try {
-    const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
-    if (!res.ok) return;
-    const doc = await res.json();
-    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-      label: g.mapValue.fields.label.stringValue,
-      ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-    }));
-    if (groups.length) {
+    let groups = null;
+    const cached = (() => {
+      try {
+        const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
+        return s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL ? s.data : null;
+      } catch { return null; }
+    })();
+
+    if (cached) {
+      groups = cached;
+    } else {
+      const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
+      if (!res.ok) return;
+      const doc = await res.json();
+      groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+        label: g.mapValue.fields.label.stringValue,
+        ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
+      }));
+      if (groups.length) {
+        localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() }));
+      }
+    }
+
+    if (groups?.length) {
       BANNED_GROUPS = groups;
       BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
     }

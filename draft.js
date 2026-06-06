@@ -27,16 +27,37 @@ let BANNED_GROUPS = [
 ];
 let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
 
+const BANLIST_CACHE_KEY  = 'agricola_banlist_cache';
+const BANLIST_CACHE_TTL  = 24 * 60 * 60 * 1000; // 24 hours
+const PROGRESS_CACHE_KEY = 'agricola_progress_cache';
+const PROGRESS_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 async function loadBanlist() {
   try {
-    const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
-    if (!res.ok) return;
-    const doc = await res.json();
-    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-      label: g.mapValue.fields.label.stringValue,
-      ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-    }));
-    if (groups.length) {
+    let groups = null;
+    const cached = (() => {
+      try {
+        const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
+        return s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL ? s.data : null;
+      } catch { return null; }
+    })();
+
+    if (cached) {
+      groups = cached;
+    } else {
+      const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
+      if (!res.ok) return;
+      const doc = await res.json();
+      groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+        label: g.mapValue.fields.label.stringValue,
+        ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
+      }));
+      if (groups.length) {
+        localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() }));
+      }
+    }
+
+    if (groups?.length) {
       BANNED_GROUPS = groups;
       BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
     }
@@ -181,29 +202,38 @@ async function loadRaterProgress() {
   if (!raterId) return;
 
   try {
-    const res = await fetch(`${FIRESTORE_BASE}:runAggregationQuery`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        structuredAggregationQuery: {
-          structuredQuery: {
-            from: [{ collectionId: 'agricola_sessions' }],
-            where: {
-              fieldFilter: {
-                field: { fieldPath: 'raterId' },
-                op: 'EQUAL',
-                value: { stringValue: raterId }
-              }
-            }
-          },
-          aggregations: [{ count: {}, alias: 'count' }]
-        }
-      })
-    });
-    const data = await res.json();
-    const count = Number(data[0]?.result?.aggregateFields?.count?.integerValue ?? 0);
-    const pct   = Math.min(count / 500 * 100, 100);
+    let count = null;
+    try {
+      const s = JSON.parse(localStorage.getItem(PROGRESS_CACHE_KEY));
+      if (s && s.raterId === raterId && Date.now() - s.cachedAt < PROGRESS_CACHE_TTL) count = s.count;
+    } catch {}
 
+    if (count === null) {
+      const res = await fetch(`${FIRESTORE_BASE}:runAggregationQuery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredAggregationQuery: {
+            structuredQuery: {
+              from: [{ collectionId: 'agricola_sessions' }],
+              where: {
+                fieldFilter: {
+                  field: { fieldPath: 'raterId' },
+                  op: 'EQUAL',
+                  value: { stringValue: raterId }
+                }
+              }
+            },
+            aggregations: [{ count: {}, alias: 'count' }]
+          }
+        })
+      });
+      const data = await res.json();
+      count = Number(data[0]?.result?.aggregateFields?.count?.integerValue ?? 0);
+      localStorage.setItem(PROGRESS_CACHE_KEY, JSON.stringify({ raterId, count, cachedAt: Date.now() }));
+    }
+
+    const pct = Math.min(count / 500 * 100, 100);
     countEl.textContent = `${count} / 500 場`;
     fillEl.style.width  = `${pct}%`;
 
@@ -211,12 +241,10 @@ async function loadRaterProgress() {
       hintEl.innerHTML  = '🎉 個人分析已解鎖！<a href="profile.html" class="progress-profile-link">→ 查看個人分析</a>';
       hintEl.className  = 'rater-progress-hint unlocked';
     } else {
-      const left = 500 - count;
-      hintEl.textContent = `還差 ${left} 場解鎖個人數據分析`;
+      hintEl.textContent = `還差 ${500 - count} 場解鎖個人數據分析`;
       hintEl.className   = 'rater-progress-hint';
     }
   } catch (err) {
-    console.error('loadRaterProgress failed:', err);
     countEl.textContent = '— / 500 場';
   }
 }
@@ -1003,6 +1031,8 @@ async function uploadRatings() {
       }
     }
 
+    localStorage.removeItem(PROGRESS_CACHE_KEY);
+    localStorage.removeItem('agricola_ratings_cache');
     statusEl.textContent = `✓ ELO 更新完成（${state.shownLog.length} 輪）`;
     statusEl.className = 'upload-status done';
   } catch (err) {
