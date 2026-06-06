@@ -491,7 +491,9 @@ function simPickWeighted(avail, count) {
   if (count <= 0 || avail.length === 0) return [];
   const pool = avail.map(c => {
     const r = state.eloCache[c['卡片ID']];
-    const w = (r && r.seenCount >= 10) ? Math.max(r.elo, 100) : 1200;
+    const confidence = r ? Math.min(r.seenCount / 30, 1) : 0;
+    const elo = r ? Math.max(r.elo ?? 1200, 100) : 1200;
+    const w = 1200 + (elo - 1200) * confidence;
     return { c, w };
   });
   const result = [];
