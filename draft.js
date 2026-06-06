@@ -178,7 +178,6 @@ async function loadRaterProgress() {
   const fillEl  = document.getElementById('raterProgressFill');
   const hintEl  = document.getElementById('raterProgressHint');
   const raterId = getRaterId();
-  console.log('[progress] querying raterId:', raterId);
   if (!raterId) return;
 
   try {
