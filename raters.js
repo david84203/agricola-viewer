@@ -46,13 +46,11 @@ async function fetchAllSessions() {
       const ts   = f.timestamp?.stringValue || '';
       const mode = f.draftMode?.stringValue || 'separate';
 
-      if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, min: 0, combined: 0 };
+      if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, mixed: 0 };
       map[id].count++;
       if (ts > map[id].lastActive) map[id].lastActive = ts;
-      if      (mode === 'occ')      map[id].occ++;
-      else if (mode === 'min')      map[id].min++;
-      else if (mode === 'combined') map[id].combined++;
-      else                          map[id].occ++;  // legacy 'separate' treated as occ
+      if (mode === 'combined') map[id].mixed++;
+      else                     map[id].occ++;  // occ / min / legacy 'separate'
     }
 
     if (docs.length < 300) break;
@@ -92,8 +90,7 @@ function renderTable() {
       <td class="rater-count">${r.count}</td>
       <td class="rater-date">${formatDate(r.lastActive)}</td>
       <td class="rater-mode">${r.occ || '—'}</td>
-      <td class="rater-mode">${r.min || '—'}</td>
-      <td class="rater-mode">${r.combined || '—'}</td>
+      <td class="rater-mode">${r.mixed || '—'}</td>
       <td><a href="profile.html?rater=${encodeURIComponent(r.id)}" class="rater-link-btn">查看分析 →</a></td>
     `;
     tbody.appendChild(tr);
