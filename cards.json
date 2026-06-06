@@ -60935,7 +60935,13 @@
     "source_image": "2版牌更新O5.jpg",
     "position": 0,
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "grid_cols": 1,
+    "grid_rows": 1,
+    "crop_left": 143,
+    "crop_top": 91,
+    "crop_right": 925,
+    "crop_bottom": 1292
   },
   {
     "牌名": "極簡主義者2版",
@@ -60949,8 +60955,14 @@
     "人數": "3+",
     "source_image": "2版牌更新O5.jpg",
     "position": 1,
-    "grid_col": 1,
-    "grid_row": 0
+    "grid_col": 0,
+    "grid_row": 0,
+    "grid_cols": 1,
+    "grid_rows": 1,
+    "crop_left": 583,
+    "crop_top": 91,
+    "crop_right": 485,
+    "crop_bottom": 1292
   },
   {
     "卡片ID": "FR041",
