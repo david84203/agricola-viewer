@@ -102,18 +102,7 @@ let activeDecks = new Set();
 // ── Duplicate exclusions ───────────────────────────
 async function loadDupExclusions() {
   try {
-    const pairs = await fetch('./duplicates.json').then(r => r.json());
-    const raw = localStorage.getItem('agricola_dups');
-    const s = raw ? JSON.parse(raw) : { picked: {}, dismissed: [], custom: [] };
-    const allPairs = [...pairs, ...(s.custom || [])];
-    const excluded = new Set();
-    allPairs.forEach(pair => {
-      if ((s.dismissed || []).includes(pair.id)) return;
-      const canon = (s.picked || {})[pair.id] || pair.defaultCanonical;
-      if (!canon) return;
-      pair.cards.forEach(id => { if (id !== canon) excluded.add(id); });
-    });
-    return excluded;
+    return (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
   } catch { return new Set(); }
 }
 

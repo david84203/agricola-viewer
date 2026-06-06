@@ -14,8 +14,6 @@ const CROP = {
 
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-const DUP_LS_KEY = 'agricola_dups';
-const DUP_FS_DOC = `${FIRESTORE_BASE}/agricola_dup_state/main`;
 
 // 禁卡表（不進入輪抽池）— 從 Firestore 載入後會覆蓋此預設值
 let BANNED_GROUPS = [
@@ -127,54 +125,8 @@ let state = {
 // ── Duplicate exclusions ───────────────────────────
 async function loadDupExclusions() {
   try {
-    const pairs = await fetch('./duplicates.json').then(r => r.json());
-    const s = await loadDuplicateState();
-    const allPairs = [...pairs, ...(s.custom || [])];
-    const excluded = new Set();
-    const keepRefs = new Set();
-    const keepIds = new Set();
-    const getRefId = ref => String(ref || '').split('|')[0];
-
-    allPairs.forEach(pair => {
-      if (!(s.dismissed || []).includes(pair.id)) return;
-      (pair.cards || []).forEach(ref => {
-        keepRefs.add(ref);
-        keepIds.add(getRefId(ref));
-      });
-    });
-
-    allPairs.forEach(pair => {
-      if ((s.dismissed || []).includes(pair.id)) return;
-      const canon = (s.picked || {})[pair.id] || pair.defaultCanonical;
-      if (!canon) return;
-      pair.cards.forEach(ref => {
-        if (ref === canon) return;
-        if (keepRefs.has(ref) || keepIds.has(getRefId(ref))) return;
-        excluded.add(ref);
-      });
-    });
-    return excluded;
+    return (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
   } catch { return new Set(); }
-}
-
-async function loadDuplicateState() {
-  const fallback = (() => {
-    try { return { picked: {}, dismissed: [], custom: [], ...JSON.parse(localStorage.getItem(DUP_LS_KEY) || '{}') }; }
-    catch { return { picked: {}, dismissed: [], custom: [] }; }
-  })();
-
-  try {
-    const res = await fetch(DUP_FS_DOC);
-    if (!res.ok) return fallback;
-    const data = await res.json();
-    const json = data.fields?.stateJson?.stringValue;
-    if (!json) return fallback;
-    const state = { picked: {}, dismissed: [], custom: [], ...JSON.parse(json) };
-    localStorage.setItem(DUP_LS_KEY, JSON.stringify(state));
-    return state;
-  } catch {
-    return fallback;
-  }
 }
 
 // ── Auth callback ──────────────────────────────────
