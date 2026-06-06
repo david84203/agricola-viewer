@@ -190,6 +190,7 @@ function onAuthChange() {
   const toggle = document.getElementById('raterModeToggle');
   if (toggle) {
     toggle.checked = true;
+    toggle.dispatchEvent(new Event('change'));
   }
   loadRaterProgress();
 }
@@ -320,7 +321,15 @@ function bindEvents() {
   document.getElementById('presetBGA').addEventListener('click', setBGAChecked);
   document.getElementById('presetAll').addEventListener('click', () => setAllChecked(true));
   document.getElementById('presetNone').addEventListener('click', () => setAllChecked(false));
-  document.getElementById('raterModeToggle').addEventListener('change', () => {});
+  document.getElementById('raterModeToggle').addEventListener('change', e => {
+    const locked = e.target.checked;
+    document.querySelectorAll('#deckCheckboxes .deck-checkbox-label').forEach(el => {
+      el.classList.toggle('locked', locked);
+      if (locked) el.classList.add('checked');
+    });
+    document.querySelectorAll('.preset-btn').forEach(btn => { btn.disabled = locked; });
+    document.getElementById('raterDeckNote').style.display = locked ? '' : 'none';
+  });
   document.getElementById('startDraft').addEventListener('click', startDraft);
   document.getElementById('continueBtn').addEventListener('click', startMinorPhase);
   document.getElementById('confirmBtn').addEventListener('click', confirmPick);
@@ -350,7 +359,9 @@ function shuffle(arr) {
 function startDraft() {
   state.raterMode = document.getElementById('raterModeToggle').checked;
 
-  {
+  if (state.raterMode) {
+    state.selectedDecks = [...new Set(allCards.map(c => c['牌組']).filter(Boolean))];
+  } else {
     const checked = getCheckedDecks();
     if (checked.length === 0) {
       alert('請至少選擇一個牌組');
