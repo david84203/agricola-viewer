@@ -249,6 +249,34 @@
 .pref-subtitle:first-child { margin-top: 0; }
 .pref-bias-inline { font-size: .78rem; font-weight: 500; color: #f0c040; }
 
+/* ── 計分型 vs 引擎型偏好（光譜指標） ─────────────── */
+.se-cat { margin-bottom: 26px; }
+.se-cat:last-of-type { margin-bottom: 12px; }
+.se-cat-title { font-size: .9rem; font-weight: 600; color: #b8ccd8; margin-bottom: 12px; }
+.se-gauge { padding: 0 9px; }
+.se-gauge-track {
+  position: relative; height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg, #4a9eda 0%, #2a3a4e 42%, #2a3a4e 58%, #f0c040 100%);
+}
+.se-gauge-marker {
+  position: absolute; top: 50%; left: 50%;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; border: 3px solid #141e2d;
+  box-shadow: 0 0 0 2px #c8d8e8, 0 2px 6px rgba(0,0,0,.4);
+  transform: translate(-50%, -50%);
+  transition: left .4s;
+}
+.se-gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: .73rem; }
+.se-gauge-lbl.engine { color: #4a9eda; }
+.se-gauge-lbl.score  { color: #f0c040; }
+.se-gauge-lbl.mid    { color: #5a7090; }
+.se-verdict { margin-top: 12px; font-size: .88rem; font-weight: 500; line-height: 1.5; }
+.se-verdict b { font-weight: 700; }
+.se-verdict.score  { color: #f0c040; }
+.se-verdict.engine { color: #4a9eda; }
+.se-verdict.even   { color: #8899aa; }
+.se-detail { margin-top: 8px; font-size: .72rem; color: #5a7090; line-height: 1.7; }
+
 /* ── Extremes ────────────────────────────────────── */
 .ext-group { margin-bottom: 20px; }
 .ext-group-title { font-size: .9rem; color: #8899aa; margin-bottom: 10px; font-weight: 600; }

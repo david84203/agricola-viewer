@@ -644,28 +644,57 @@ function renderScoreEnginePref() {
   const { occ, min } = gAnalytics.scoreEnginePref;
   const fmtPct = v => v !== null ? `${Math.round(v * 100)}%` : '—';
   const fmtElo = v => v !== null ? Math.round(v) : '—';
-  const biasOf = pref => pref === null ? ''
-    : pref > 0.58 ? '偏好計分型卡'
-    : pref < 0.42 ? '偏好引擎型卡'
-    : '計分型與引擎型選擇均衡';
 
-  const block = (title, p) => `
-    <div class="pref-subtitle">${title}　${p.pref !== null ? `<span class="pref-bias-inline">${biasOf(p.pref)}</span>` : ''}</div>
-    <table class="pref-table">
-      <thead><tr><th></th><th>計分型卡</th><th>引擎型卡</th></tr></thead>
-      <tbody>
-        <tr><td>選牌次數</td><td>${p.scorePicks}</td><td>${p.enginePicks}</td></tr>
-        <tr><td>出現次數</td><td>${p.scoreSeen}</td><td>${p.engineSeen}</td></tr>
-        <tr><td>選取率</td><td>${fmtPct(p.scoreRate)}</td><td>${fmtPct(p.engineRate)}</td></tr>
-        <tr><td>選牌平均 ELO</td><td>${fmtElo(p.scoreAvgElo)}</td><td>${fmtElo(p.engineAvgElo)}</td></tr>
-      </tbody>
-    </table>
-  `;
+  // 把兩個選取率換算成「機率高了百分之幾」，比倍數更貼近直覺
+  const verdictOf = (scoreRate, engineRate) => {
+    if (scoreRate === null || engineRate === null || (scoreRate === 0 && engineRate === 0)) {
+      return { dir: 'even', icon: '📊', text: '資料還太少，看不出明顯偏好' };
+    }
+    const higher = Math.max(scoreRate, engineRate);
+    const lower  = Math.min(scoreRate, engineRate);
+    const diffPct = lower > 0 ? Math.round((higher / lower - 1) * 100) : 999;
+    if (diffPct < 12) {
+      return { dir: 'even', icon: '⚖️', text: '看到計分型或引擎型的卡時，選擇它的機率差不多，沒有明顯偏好' };
+    }
+    const dir = scoreRate > engineRate ? 'score' : 'engine';
+    const lbl = dir === 'score' ? '計分型' : '引擎型';
+    const strength = diffPct >= 50 ? '明顯' : '稍微';
+    return {
+      dir, icon: '👉',
+      text: `${strength}偏好<b>${lbl}卡</b>——遇到${lbl}卡時，比遇到另一種卡多了約 ${diffPct}% 的機率會選它`,
+    };
+  };
+
+  const block = (title, p) => {
+    // pref: 0 = 完全偏引擎型、0.5 = 均衡、1 = 完全偏計分型
+    const pref = p.pref;
+    const markerPct = pref !== null ? Math.round(pref * 100) : 50;
+    const v = verdictOf(p.scoreRate, p.engineRate);
+
+    return `
+    <div class="se-cat">
+      <div class="se-cat-title">${title}</div>
+      <div class="se-gauge">
+        <div class="se-gauge-track">
+          <div class="se-gauge-marker" style="left:${markerPct}%"></div>
+        </div>
+        <div class="se-gauge-labels">
+          <span class="se-gauge-lbl engine">⚙️ 偏引擎型</span>
+          <span class="se-gauge-lbl mid">均衡</span>
+          <span class="se-gauge-lbl score">💰 偏計分型</span>
+        </div>
+      </div>
+      <div class="se-verdict ${v.dir}">${v.icon} ${v.text}</div>
+      <div class="se-detail">
+        看到時選了它的比例　計分型卡 ${fmtPct(p.scoreRate)}（${p.scorePicks}/${p.scoreSeen} 次）　·　引擎型卡 ${fmtPct(p.engineRate)}（${p.enginePicks}/${p.engineSeen} 次）　　選牌平均 ELO　計分型 ${fmtElo(p.scoreAvgElo)}　·　引擎型 ${fmtElo(p.engineAvgElo)}
+      </div>
+    </div>`;
+  };
 
   document.getElementById('scoreEnginePrefContent').innerHTML = `
     ${block('職業卡', occ)}
     ${block('次要發展卡', min)}
-    <div class="pref-note">計分型卡＝職業卡看「紅利分數」、次要發展卡則勝利點數或紅利分數有一項即算；選取率＝選牌次數 ÷ 出現次數，避免卡池數量不對等造成偏差</div>
+    <div class="pref-note">指標位置＝你「看到計分型卡就選它」與「看到引擎型卡就選它」這兩個機率的相對位置，避免卡池中兩種卡數量不對等造成偏差；計分型卡＝職業卡看「紅利分數」、次要發展卡則勝利點數或紅利分數有一項即算</div>
   `;
 }
 
