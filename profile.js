@@ -178,8 +178,13 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     return Math.min(conf * r.elo + (1 - conf) * 1200, SCORE_ELO_CEILING);
   };
   const SCORE_REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
-  const efficiencyOf = (pickedElo, maxElo) =>
-    Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / SCORE_REFERENCE_GAP));
+  const NEAR_TIE_TOLERANCE = 20; // 包內最佳/次佳常常只差 20~30 分（接近評分系統雜訊水準），落在此範圍內視為勢均力敵，不扣分
+  const efficiencyOf = (pickedElo, maxElo) => {
+    const gap = maxElo - pickedElo;
+    return gap <= NEAR_TIE_TOLERANCE
+      ? 1
+      : Math.min(1, Math.max(0, 1 - (gap - NEAR_TIE_TOLERANCE) / SCORE_REFERENCE_GAP));
+  };
 
   // ── pick / seen counts ──
   const pickCounts = {}, seenCounts = {};

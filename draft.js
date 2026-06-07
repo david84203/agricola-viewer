@@ -1136,6 +1136,7 @@ async function calculateScore() {
     });
 
     const REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
+    const NEAR_TIE_TOLERANCE = 20; // 包內最佳/次佳常常只差 20~30 分（接近評分系統雜訊水準），落在此範圍內視為勢均力敵，不扣分
     const cardById = {};
     allCards.forEach(c => { cardById[c['卡片ID']] = c; });
 
@@ -1143,9 +1144,12 @@ async function calculateScore() {
       const all = [picked, ...opponents];
       const maxElo = Math.max(...all.map(id => eloMap[id]));
       const pickedElo = eloMap[picked];
-      const efficiency = Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / REFERENCE_GAP));
+      const gap = maxElo - pickedElo;
+      const efficiency = gap <= NEAR_TIE_TOLERANCE
+        ? 1
+        : Math.min(1, Math.max(0, 1 - (gap - NEAR_TIE_TOLERANCE) / REFERENCE_GAP));
       const bestId = all.find(id => eloMap[id] === maxElo);
-      return { picked, bestId, gap: Math.round(maxElo - pickedElo), roundScore: Math.round(efficiency * 100), efficiency };
+      return { picked, bestId, gap: Math.round(gap), roundScore: Math.round(efficiency * 100), efficiency };
     });
 
     const score = Math.round(roundDetails.reduce((s, r) => s + r.efficiency, 0) / roundDetails.length * 100);
