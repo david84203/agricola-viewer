@@ -1121,9 +1121,11 @@ async function calculateScore() {
 
     const efficiencies = rounds.map(({ picked, opponents }) => {
       const all = [picked, ...opponents];
-      const maxElo = Math.max(...all.map(id => eloMap[id]));
+      const elos = all.map(id => eloMap[id]);
+      const maxElo = Math.max(...elos);
+      const minElo = Math.min(...elos);
       const pickedElo = eloMap[picked];
-      return maxElo > 0 ? pickedElo / maxElo : 1;
+      return maxElo > minElo ? (pickedElo - minElo) / (maxElo - minElo) : 1;
     });
 
     const score = Math.round(efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length * 100);

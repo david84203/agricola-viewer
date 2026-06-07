@@ -186,8 +186,10 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     if (rounds.length === 0) return;
     const effs = rounds.map(({ picked, opponents }) => {
       const all = [picked, ...opponents];
-      const maxElo = Math.max(...all.map(eloOf));
-      return maxElo > 0 ? eloOf(picked) / maxElo : 1;
+      const elos = all.map(eloOf);
+      const maxElo = Math.max(...elos);
+      const minElo = Math.min(...elos);
+      return maxElo > minElo ? (eloOf(picked) - minElo) / (maxElo - minElo) : 1;
     });
     sessionScores.push({
       score: Math.round(effs.reduce((a, b) => a + b, 0) / effs.length * 100),
@@ -230,9 +232,11 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
       if (!isOcc && !isMin) return;
 
       const all = [picked, ...opponents];
-      const maxElo = Math.max(...all.map(eloOf));
+      const elos = all.map(eloOf);
+      const maxElo = Math.max(...elos);
+      const minElo = Math.min(...elos);
       const elo = eloOf(picked);
-      const efficiency = maxElo > 0 ? elo / maxElo : 1;
+      const efficiency = maxElo > minElo ? (elo - minElo) / (maxElo - minElo) : 1;
       if (isOcc) { occTotal++; occEloSum += elo; occEffSum += efficiency; }
       else        { minTotal++; minEloSum += elo; minEffSum += efficiency; }
     });
