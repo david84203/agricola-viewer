@@ -135,16 +135,22 @@ function onAuthChange() {
   document.getElementById('raterWrap').style.display          = rater ? '' : 'none';
   document.getElementById('raterLoginHint').style.display      = rater ? 'none' : '';
   document.getElementById('raterProgressWrap').style.display   = rater ? '' : 'none';
-  if (!rater) {
-    document.getElementById('raterModeToggle').checked = false;
-    return;
-  }
   const toggle = document.getElementById('raterModeToggle');
-  if (toggle) {
-    toggle.checked = true;
-    toggle.dispatchEvent(new Event('change'));
-  }
+  if (toggle) toggle.checked = rater;
+  applyRaterDeckLock(rater);
+  if (!rater) return;
   loadRaterProgress();
+}
+
+// ── Rater deck lock (forces "all decks") ───────────
+function applyRaterDeckLock(locked) {
+  document.querySelectorAll('#deckCheckboxes .deck-checkbox-label').forEach(el => {
+    el.classList.toggle('locked', locked);
+    if (locked) el.classList.add('checked');
+  });
+  document.querySelectorAll('.preset-btn').forEach(btn => { btn.disabled = locked; });
+  const note = document.getElementById('raterDeckNote');
+  if (note) note.style.display = locked ? '' : 'none';
 }
 
 async function loadRaterProgress() {
@@ -250,6 +256,9 @@ function buildDeckCheckboxes() {
     });
     container.appendChild(label);
   });
+
+  const toggle = document.getElementById('raterModeToggle');
+  if (toggle && toggle.checked) applyRaterDeckLock(true);
 }
 
 function getCheckedDecks() {
@@ -275,13 +284,7 @@ function bindEvents() {
   document.getElementById('presetAll').addEventListener('click', () => setAllChecked(true));
   document.getElementById('presetNone').addEventListener('click', () => setAllChecked(false));
   document.getElementById('raterModeToggle').addEventListener('change', e => {
-    const locked = e.target.checked;
-    document.querySelectorAll('#deckCheckboxes .deck-checkbox-label').forEach(el => {
-      el.classList.toggle('locked', locked);
-      if (locked) el.classList.add('checked');
-    });
-    document.querySelectorAll('.preset-btn').forEach(btn => { btn.disabled = locked; });
-    document.getElementById('raterDeckNote').style.display = locked ? '' : 'none';
+    applyRaterDeckLock(e.target.checked);
   });
   document.getElementById('startDraft').addEventListener('click', startDraft);
   document.getElementById('continueBtn').addEventListener('click', startMinorPhase);
