@@ -1119,13 +1119,12 @@ async function calculateScore() {
       }
     });
 
+    const REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
     const efficiencies = rounds.map(({ picked, opponents }) => {
       const all = [picked, ...opponents];
-      const elos = all.map(id => eloMap[id]);
-      const maxElo = Math.max(...elos);
-      const minElo = Math.min(...elos);
+      const maxElo = Math.max(...all.map(id => eloMap[id]));
       const pickedElo = eloMap[picked];
-      return maxElo > minElo ? (pickedElo - minElo) / (maxElo - minElo) : 1;
+      return Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / REFERENCE_GAP));
     });
 
     const score = Math.round(efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length * 100);
