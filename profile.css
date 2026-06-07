@@ -287,10 +287,6 @@
 .tp-fill { height: 100%; border-radius: 7px; transition: width .4s; }
 .tp-fill.occ { background: linear-gradient(90deg, #a8590e, #e67e22); }
 .tp-fill.min { background: linear-gradient(90deg, #1c8a4c, #27ae60); }
-.tp-baseline {
-  position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px;
-  background: #c8d8e8; opacity: .65;
-}
 .tp-row-vals { margin-top: 9px; font-size: .74rem; color: #5a7090; line-height: 1.6; }
 .tp-row-vals b { color: #c8d8e8; font-weight: 700; }
 .tp-row-verdict { margin-top: 4px; font-size: .82rem; font-weight: 500; }

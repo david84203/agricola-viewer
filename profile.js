@@ -218,9 +218,9 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     });
   });
 
-  // ── 選牌精準度（與「亂猜基準」比較）──
-  let occPrecise = 0, occTotal = 0, occEloSum = 0, occBaselineSum = 0;
-  let minPrecise = 0, minTotal = 0, minEloSum = 0, minBaselineSum = 0;
+  // ── 分類效率分數（與總覽「平均得分」同一套算法，依職業/次發拆開）──
+  let occEffSum = 0, occTotal = 0, occEloSum = 0;
+  let minEffSum = 0, minTotal = 0, minEloSum = 0;
   sessions.forEach(s => {
     s.raterLog.forEach(({ picked, opponents }) => {
       const card = cardMeta[picked];
@@ -232,9 +232,9 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
       const all = [picked, ...opponents];
       const maxElo = Math.max(...all.map(eloOf));
       const elo = eloOf(picked);
-      const baseline = 1 / all.length; // 隨機亂選時，平均能選到當輪最強牌的機率
-      if (isOcc) { occTotal++; occEloSum += elo; occBaselineSum += baseline; if (elo >= maxElo) occPrecise++; }
-      else        { minTotal++; minEloSum += elo; minBaselineSum += baseline; if (elo >= maxElo) minPrecise++; }
+      const efficiency = maxElo > 0 ? elo / maxElo : 1;
+      if (isOcc) { occTotal++; occEloSum += elo; occEffSum += efficiency; }
+      else        { minTotal++; minEloSum += elo; minEffSum += efficiency; }
     });
   });
 
@@ -375,10 +375,8 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     seenCounts,
     gemCount,
     mistakeCount,
-    occPrecision: occTotal > 0 ? occPrecise / occTotal : null,
-    minPrecision: minTotal > 0 ? minPrecise / minTotal : null,
-    occPrecisionBaseline: occTotal > 0 ? occBaselineSum / occTotal : null,
-    minPrecisionBaseline: minTotal > 0 ? minBaselineSum / minTotal : null,
+    occEfficiency: occTotal > 0 ? Math.round(occEffSum / occTotal * 100) : null,
+    minEfficiency: minTotal > 0 ? Math.round(minEffSum / minTotal * 100) : null,
     occAvgElo: occTotal > 0 ? occEloSum / occTotal : null,
     minAvgElo: minTotal > 0 ? minEloSum / minTotal : null,
     topPairs,
@@ -619,45 +617,38 @@ function renderGem() {
 
 function renderTypePref() {
   if (lockedOut('typePref', 'typePrefContent')) return;
-  const {
-    occPrecision, minPrecision,
-    occPrecisionBaseline, minPrecisionBaseline,
-    occAvgElo, minAvgElo,
-  } = gAnalytics;
-  const fmtPct = v => v !== null ? `${Math.round(v * 100)}%` : '—';
+  const { occEfficiency, minEfficiency, avgScore, occAvgElo, minAvgElo } = gAnalytics;
   const fmtElo = v => v !== null ? Math.round(v) : '—';
 
-  const row = (cls, title, actual, baseline, avgElo) => {
-    if (actual === null || baseline === null) {
+  const row = (cls, title, score, avgElo) => {
+    if (score === null) {
       return `
       <div class="tp-row">
         <div class="tp-row-title ${cls}">${title}</div>
         <div class="tp-empty">資料還太少，看不出結果</div>
       </div>`;
     }
-    const diffPP = Math.round((actual - baseline) * 100);
-    const verdict = diffPP >= 15 ? '精準度明顯優於亂猜，眼光值得信賴'
-      : diffPP >= 5  ? '精準度優於亂猜，看得出有在判斷牌的強度'
-      : diffPP >= -4 ? '跟亂猜差不多，選牌比較憑直覺'
-      : '比亂猜還容易選到弱牌，可以多留意該類型卡的強度';
-    const actualPct   = Math.max(Math.round(actual   * 100), 0);
-    const baselinePct = Math.min(Math.max(Math.round(baseline * 100), 0), 100);
+    const diff = avgScore !== null ? score - avgScore : null;
+    const verdict = diff === null ? ''
+      : diff >= 4  ? `比你的整體平均得分（${avgScore} 分）高出 ${diff} 分，是你挑得特別準的牌型`
+      : diff <= -4 ? `比你的整體平均得分（${avgScore} 分）低了 ${Math.abs(diff)} 分，挑這類牌時準度稍微下滑`
+      : `跟你的整體平均得分（${avgScore} 分）差不多，挑這類牌時表現穩定`;
+    const pct = Math.min(Math.max(score, 0), 100);
     return `
     <div class="tp-row">
       <div class="tp-row-title ${cls}">${title}</div>
       <div class="tp-track">
-        <div class="tp-fill ${cls}" style="width:${actualPct}%"></div>
-        <div class="tp-baseline" style="left:${baselinePct}%"></div>
+        <div class="tp-fill ${cls}" style="width:${pct}%"></div>
       </div>
-      <div class="tp-row-vals">你的精準率 <b>${fmtPct(actual)}</b>　·　亂猜基準 ${fmtPct(baseline)}　·　高出 ${diffPP >= 0 ? '+' : ''}${diffPP} 個百分點　·　選牌平均 ELO ${fmtElo(avgElo)}</div>
+      <div class="tp-row-vals">效率分數 <b>${score}</b> 分　·　選牌平均 ELO ${fmtElo(avgElo)}</div>
       <div class="tp-row-verdict ${cls}">${verdict}</div>
     </div>`;
   };
 
   document.getElementById('typePrefContent').innerHTML = `
-    ${row('occ', '職業牌', occPrecision, occPrecisionBaseline, occAvgElo)}
-    ${row('min', '次要發展牌', minPrecision, minPrecisionBaseline, minAvgElo)}
-    <div class="pref-note">「亂猜基準」＝若每次都隨機選擇，平均能選到「該輪社群評分最高那張牌」的機率（候選牌越多，基準越低）；長條尺標代表你的實際精準率，灰色刻度代表亂猜基準，差距越大代表你越能掌握牌的真實強度</div>
+    ${row('occ', '職業牌', occEfficiency, occAvgElo)}
+    ${row('min', '次要發展牌', minEfficiency, minAvgElo)}
+    <div class="pref-note">「效率分數」與上方總覽的「平均得分」用同一套算法──每次選擇取「你選的牌 ELO ÷ 當輪候選牌中最高 ELO」的比例，平均後換算成 0~100 分；分數越高代表你越常選到接近當輪最強的牌。這裡依「職業牌」「次要發展卡」分開計算，可以看出你在哪一種牌型上挑得比較準</div>
   `;
 }
 
