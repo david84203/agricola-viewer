@@ -29262,10 +29262,14 @@
     "說明": "在打出此卡前，先獲得4份食物，再支付所需費用。在打出此卡後，將此卡收回手上。",
     "card_type": "occupation",
     "grid_cols": 3,
-    "grid_rows": 3,
+    "grid_rows": 1,
     "source_image": "Zo2.jpg",
     "grid_col": 0,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 1276
   },
   {
     "卡片ID": "Z335",
@@ -29280,10 +29284,14 @@
     "說明": "在你的收成階段，收割作物時，你可以支付至多1根木頭與1份食物；若你如此做，則你獲得1點紅利分數（將這些分數紀錄於遊戲所附便籤上。）",
     "card_type": "occupation",
     "grid_cols": 3,
-    "grid_rows": 3,
+    "grid_rows": 1,
     "source_image": "Zo2.jpg",
     "grid_col": 1,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 1276
   },
   {
     "卡片ID": "Z336",
@@ -29298,10 +29306,14 @@
     "說明": "當你增加家庭成員時，你可以支付3份食物；若你如此做，則你獲得額外的1名新生家庭成員。此額外的家庭成員不需要房間。",
     "card_type": "occupation",
     "grid_cols": 3,
-    "grid_rows": 3,
+    "grid_rows": 1,
     "source_image": "Zo2.jpg",
     "grid_col": 2,
-    "grid_row": 0
+    "grid_row": 0,
+    "crop_left": 0,
+    "crop_top": 0,
+    "crop_right": 0,
+    "crop_bottom": 1276
   },
   {
     "source_image": "Om1.jpg?v=2",
