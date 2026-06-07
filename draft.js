@@ -1126,11 +1126,13 @@ async function calculateScore() {
     });
 
     // 樣本數不足的卡牌，原始 ELO 容易被結構性機制衝出異常值，往基準值收斂以避免污染最佳/最差判斷
+    // 另夾一道天花板：樣本充足卡牌目前實測最高約 1288，超過 1300 多半是尚未自然修正的幽靈高分
+    const SCORE_ELO_CEILING = 1300;
     const eloMap = {};
     uniqueIds.forEach(id => {
       const { elo, seenCount } = ratingMap[id];
       const conf = Math.min(seenCount / 30, 1);
-      eloMap[id] = conf * elo + (1 - conf) * 1200;
+      eloMap[id] = Math.min(conf * elo + (1 - conf) * 1200, SCORE_ELO_CEILING);
     });
 
     const REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
