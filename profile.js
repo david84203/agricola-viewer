@@ -265,26 +265,59 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     .map(id => ({ id, avgRound: prSums[id] / prCounts[id], count: prCounts[id] }))
     .sort((a, b) => a.avgRound - b.avgRound);
 
-  // ── 計分型 vs 引擎型偏好 ──
-  const hasDirectVP = id => {
-    const vp = (cardMeta[id]?.['勝利點數'] || '').trim();
-    return vp !== '' && vp !== '無';
+  // ── 計分型 vs 引擎型偏好（職業卡 / 次要發展卡分開計算）──
+  // 職業卡無「勝利點數」欄位，計分與否看「紅利分數」；次要發展卡則勝利點數或紅利分數有一項即算計分型
+  const isScoringCard = id => {
+    const c = cardMeta[id];
+    if (!c) return null;
+    const bonus = (c['紅利分數'] || '').trim();
+    const hasBonus = bonus === '有' || bonus.startsWith('有');
+    if (c.card_type === 'occupation') return hasBonus;
+    const vp = (c['勝利點數'] || '').trim();
+    const hasVP = vp !== '' && vp !== '無';
+    return hasVP || hasBonus;
   };
-  let scorePicks = 0, scoreEloSum = 0, enginePicks = 0, engineEloSum = 0;
+  const makeTypeStat = () => ({
+    scoreSeen: 0, scorePicked: 0, scoreEloSum: 0,
+    engineSeen: 0, enginePicked: 0, engineEloSum: 0,
+  });
+  const occStat = makeTypeStat(), minStat = makeTypeStat();
   sessions.forEach(s => {
-    s.raterLog.forEach(({ picked }) => {
-      if (!cardMeta[picked]) return;
-      const elo = eloOf(picked);
-      if (hasDirectVP(picked)) { scorePicks++;  scoreEloSum  += elo; }
-      else                     { enginePicks++; engineEloSum += elo; }
+    s.raterLog.forEach(({ picked, opponents }) => {
+      [picked, ...opponents].forEach(id => {
+        const c = cardMeta[id];
+        if (!c) return;
+        const isOcc = c.card_type === 'occupation';
+        const isMin = c.card_type === 'minor' || c.card_type === 'both';
+        if (!isOcc && !isMin) return;
+        const stat = isOcc ? occStat : minStat;
+        const isPicked = id === picked;
+        if (isScoringCard(id)) {
+          stat.scoreSeen++;
+          if (isPicked) { stat.scorePicked++; stat.scoreEloSum += eloOf(id); }
+        } else {
+          stat.engineSeen++;
+          if (isPicked) { stat.enginePicked++; stat.engineEloSum += eloOf(id); }
+        }
+      });
     });
   });
-  const totalTyped = scorePicks + enginePicks;
+  const buildPref = stat => {
+    const scoreRate  = stat.scoreSeen  > 0 ? stat.scorePicked  / stat.scoreSeen  : null;
+    const engineRate = stat.engineSeen > 0 ? stat.enginePicked / stat.engineSeen : null;
+    const sum = (scoreRate ?? 0) + (engineRate ?? 0);
+    return {
+      scorePicks: stat.scorePicked, enginePicks: stat.enginePicked,
+      scoreSeen: stat.scoreSeen,    engineSeen: stat.engineSeen,
+      scoreRate, engineRate,
+      pref: (scoreRate !== null && engineRate !== null && sum > 0) ? scoreRate / sum : null,
+      scoreAvgElo:  stat.scorePicked  > 0 ? stat.scoreEloSum  / stat.scorePicked  : null,
+      engineAvgElo: stat.enginePicked > 0 ? stat.engineEloSum / stat.enginePicked : null,
+    };
+  };
   const scoreEnginePref = {
-    scorePicks, enginePicks,
-    scoreRatio:   totalTyped  > 0 ? scorePicks  / totalTyped  : null,
-    scoreAvgElo:  scorePicks  > 0 ? scoreEloSum  / scorePicks  : null,
-    engineAvgElo: enginePicks > 0 ? engineEloSum / enginePicks : null,
+    occ: buildPref(occStat),
+    min: buildPref(minStat),
   };
 
   // ── 盲區清單：社群評為 S/A 但你常放棄的卡 ──
@@ -608,26 +641,31 @@ function renderTypePref() {
 
 function renderScoreEnginePref() {
   if (lockedOut('scoreEnginePref', 'scoreEnginePrefContent')) return;
-  const { scoreEnginePref } = gAnalytics;
-  const { scorePicks, enginePicks, scoreRatio, scoreAvgElo, engineAvgElo } = scoreEnginePref;
-  const fmtPct  = v => v !== null ? `${Math.round(v * 100)}%` : '—';
-  const fmtElo  = v => v !== null ? Math.round(v) : '—';
-  const bias = scoreRatio === null ? ''
-    : scoreRatio > 0.58 ? '你偏好直接帶來勝利點數的計分型卡'
-    : scoreRatio < 0.42 ? '你偏好堆資源、做連動的引擎型卡'
-    : '計分型與引擎型卡的選擇相當均衡';
+  const { occ, min } = gAnalytics.scoreEnginePref;
+  const fmtPct = v => v !== null ? `${Math.round(v * 100)}%` : '—';
+  const fmtElo = v => v !== null ? Math.round(v) : '—';
+  const biasOf = pref => pref === null ? ''
+    : pref > 0.58 ? '偏好計分型卡'
+    : pref < 0.42 ? '偏好引擎型卡'
+    : '計分型與引擎型選擇均衡';
 
-  document.getElementById('scoreEnginePrefContent').innerHTML = `
+  const block = (title, p) => `
+    <div class="pref-subtitle">${title}　${p.pref !== null ? `<span class="pref-bias-inline">${biasOf(p.pref)}</span>` : ''}</div>
     <table class="pref-table">
       <thead><tr><th></th><th>計分型卡</th><th>引擎型卡</th></tr></thead>
       <tbody>
-        <tr><td>選牌次數</td><td>${scorePicks}</td><td>${enginePicks}</td></tr>
-        <tr><td>選牌比例</td><td>${fmtPct(scoreRatio)}</td><td>${scoreRatio !== null ? fmtPct(1 - scoreRatio) : '—'}</td></tr>
-        <tr><td>選牌平均 ELO</td><td>${fmtElo(scoreAvgElo)}</td><td>${fmtElo(engineAvgElo)}</td></tr>
+        <tr><td>選牌次數</td><td>${p.scorePicks}</td><td>${p.enginePicks}</td></tr>
+        <tr><td>出現次數</td><td>${p.scoreSeen}</td><td>${p.engineSeen}</td></tr>
+        <tr><td>選取率</td><td>${fmtPct(p.scoreRate)}</td><td>${fmtPct(p.engineRate)}</td></tr>
+        <tr><td>選牌平均 ELO</td><td>${fmtElo(p.scoreAvgElo)}</td><td>${fmtElo(p.engineAvgElo)}</td></tr>
       </tbody>
     </table>
-    ${bias ? `<div class="pref-bias">${bias}</div>` : ''}
-    <div class="pref-note">計分型卡＝有勝利點數欄位的卡；引擎型卡＝主要靠資源生產／連動運作的卡</div>
+  `;
+
+  document.getElementById('scoreEnginePrefContent').innerHTML = `
+    ${block('職業卡', occ)}
+    ${block('次要發展卡', min)}
+    <div class="pref-note">計分型卡＝職業卡看「紅利分數」、次要發展卡則勝利點數或紅利分數有一項即算；選取率＝選牌次數 ÷ 出現次數，避免卡池數量不對等造成偏差</div>
   `;
 }
 

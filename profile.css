@@ -245,6 +245,9 @@
 .pref-table td:first-child { text-align: left; color: #8899aa; }
 .pref-bias { margin-top: 12px; font-size: .85rem; color: #f0c040; }
 .pref-note { margin-top: 8px; font-size: .75rem; color: #4a6078; }
+.pref-subtitle { font-size: .85rem; color: #8899aa; font-weight: 600; margin: 14px 0 8px; }
+.pref-subtitle:first-child { margin-top: 0; }
+.pref-bias-inline { font-size: .78rem; font-weight: 500; color: #f0c040; }
 
 /* ── Extremes ────────────────────────────────────── */
 .ext-group { margin-bottom: 20px; }
