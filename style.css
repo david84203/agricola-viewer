@@ -268,18 +268,12 @@ body {
   color: var(--gold2);
 }
 
-.home-action.primary {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #211a10;
-}
-
 .home-action:hover,
 .home-line-btn:hover {
   transform: translateY(-1px);
 }
 
-.home-action:not(.primary):hover {
+.home-action:hover {
   background: rgba(232,184,75,.22);
   border-color: var(--gold);
 }

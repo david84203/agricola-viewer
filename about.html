@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>關於本網站 — 烏嘎嘎農家樂卡牌中心</title>
+  <meta name="description" content="關於烏嘎嘎農家樂卡牌中心：製作初衷、功能介紹與常見問答。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <style>
+    .about-main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+    .about-main h1 {
+      font-size: 1.6rem;
+      color: var(--gold2);
+      margin-bottom: 8px;
+    }
+    .about-intro {
+      color: var(--text2);
+      font-size: .96rem;
+      margin-bottom: 32px;
+    }
+    .about-section {
+      margin-bottom: 32px;
+    }
+    .about-section h2 {
+      font-size: 1.15rem;
+      color: var(--text);
+      border-left: 3px solid var(--gold);
+      padding-left: 10px;
+      margin-bottom: 14px;
+    }
+    .about-section p {
+      color: var(--text2);
+      font-size: .94rem;
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+    .about-section ul {
+      color: var(--text2);
+      font-size: .94rem;
+      line-height: 1.75;
+      padding-left: 1.4em;
+      margin-bottom: 10px;
+    }
+    .about-section ul li strong {
+      color: var(--text);
+    }
+    .qa-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .qa-item .q {
+      color: var(--gold2);
+      font-weight: 600;
+      font-size: .96rem;
+      margin-bottom: 6px;
+    }
+    .qa-item .a {
+      color: var(--text2);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body class="home-page">
+  <header class="top-brand-bar">
+    <div class="brand-left">
+      <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+      <div class="brand-text">
+        <div class="brand-title">烏嘎嘎農家樂卡牌中心</div>
+        <div class="brand-sub">關於本網站</div>
+      </div>
+    </div>
+    <div class="brand-center">
+      翻譯、編輯、排版、網頁編寫為烏嘎嘎桌遊小路獨立製作，禁止用於任何商業用途。
+    </div>
+    <div class="brand-right">
+      <div class="brand-nav">
+        <a href="./index.html" class="draft-nav-btn">首頁</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="about-main">
+    <h1>關於本網站</h1>
+    <p class="about-intro">
+      烏嘎嘎農家樂卡牌中心是由烏嘎嘎桌遊小路獨立製作的非商業性質工具站，
+      希望能讓更多玩家輕鬆查詢卡牌、模擬開局，並一起討論農家樂這款遊戲。
+    </p>
+
+    <section class="about-section">
+      <h2>為什麼要做這個網站？</h2>
+      <p>
+        農家樂的卡牌數量龐大、版本眾多，繁體中文資料分散又不齊全，
+        每次開局前要查卡、選牌都得花不少時間。
+        小路因此把手邊整理、翻譯好的卡牌資料做成網站，
+        一方面方便自己與店內玩家查詢，一方面也希望能幫助到其他喜歡農家樂的玩家，
+        讓大家能更快上手、更專心享受遊戲本身。
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>本網站有哪些功能？</h2>
+      <ul>
+        <li><strong>卡牌資料庫</strong>：收錄各牌組的次要發展卡與職業卡，可依牌名、說明、卡片 ID 搜尋，也能依類型、牌組篩選。</li>
+        <li><strong>輪抽模擬</strong>：模擬職業卡、次要發展卡或混合輪抽，並自動排除禁卡與被取代的重複牌，方便練習選牌與討論策略。</li>
+        <li><strong>牌力排行（Tier List）</strong>：根據玩家在輪抽模擬中的實際選牌紀錄，統計出每張卡的強度排行，作為選牌參考。</li>
+        <li><strong>重複卡牌</strong>：列出名稱或效果高度相似的卡牌組合，幫助辨認哪些是被取代或重製的版本。</li>
+      </ul>
+    </section>
+
+    <section class="about-section">
+      <h2>常見問答 Q&A</h2>
+
+      <div class="qa-item">
+        <div class="q">Q. 卡牌的翻譯與資料是依據什麼來源整理的？</div>
+        <div class="a">
+          站上卡牌的翻譯、效果說明與圖片，都是小路依照各版本原文卡牌內容自行整理、校對與排版而成，
+          並非官方授權翻譯，若與正式中文版用語有出入，請以遊戲實際內容為準。
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="q">Q. 卡牌資料庫、輪抽模擬、牌力排行該怎麼操作？</div>
+        <div class="a">
+          卡牌資料庫可直接用搜尋框輸入牌名或關鍵字，並透過上方的類型、牌組篩選縮小範圍；
+          點進輪抽模擬後，依畫面指示選擇牌組與抽牌方式即可開始模擬選牌；
+          牌力排行則會依玩家累積的輪抽選牌紀錄自動分級，點選卡牌可以看到詳細數據。
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="q">Q. 輪抽模擬器跟牌力排行裡的數字代表什麼意思？</div>
+        <div class="a">
+          牌力排行上每張卡會顯示一組分數與「選取率 · 出現次數」：
+          選取率是這張卡出現在輪抽選項中時，被玩家選中的比例；
+          出現次數代表這張卡被抽到、出現在選項中的次數。
+          分數則是套用「ELO 等級分」算出來的牌力評等——跟西洋棋、遊戲排位系統用的是同一套邏輯，
+          每張卡一開始都是 1200 分，之後會隨著大家在輪抽時實際選了什麼慢慢浮動，分數越高代表越多人優先選它。
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="q">Q. 牌力分數是用 S / A / B 那種人工分級去打的嗎？</div>
+        <div class="a">
+          不是，分數完全是靠大家「實際選牌的行為數據」算出來的，沒有人工貼標籤。
+          做法是：每次輪抽時你從一包卡裡選了 X、沒選 Y、Z、W，系統就把這次選擇換算成
+          「X 對 Y、Z、W 各打了一場 1 對 1 對決，且 X 贏了」，再用 ELO 公式（贏家分數高時加分加得少、爆冷門贏了則加分加得多）
+          逐步調整每張卡的分數。所以分數是長期累積、由真人選擇推算出來的統計結果。
+          另外為了避免樣本太少時分數失真，出現次數不足 30 次的卡會用「分數 + 一個保守基準值」混合計算，
+          樣本越多、混合比例就越偏向真實 ELO 分數，等累積到 30 次以上才會完全採用 ELO 評等。
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="q">Q. 這樣的算法會不會很難顧到牌與牌之間的搭配（連動）關係？</div>
+        <div class="a">
+          這個觀察很準確。ELO 本質上是把每張卡當成單獨個體互相比較，看的是「這張卡單獨亮相時，有多大機率被選走」，
+          並不會去理解「這張卡其實要搭配另一張卡才會威力大增」這種組合技。
+          所以強力 combo 卡如果單看不起眼，分數可能會偏低；
+          反過來說，有些卡看起來普通、卻因為玩家常為了搭配而優先選走，分數反而會偏高——但系統並不真的「知道」原因是搭配。
+          如果想觀察牌組之間的連動效果，搭配「常常一起被留下來的卡牌組合」這類分析來看，
+          會比單看牌力分數更接近真實的牌組強度判斷。
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="q">Q. 發現翻譯錯誤、資料有問題，或有其他建議該怎麼辦？</div>
+        <div class="a">
+          歡迎透過烏嘎嘎官方 LINE 直接告訴小路，無論是翻譯用詞、卡牌資料錯誤，
+          還是希望增加的功能與想法，都很樂意聽聽大家的回饋，一起把工具做得更好用。
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="auth.js"></script>
+</body>
+</html>
