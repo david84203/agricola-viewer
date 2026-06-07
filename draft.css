@@ -853,6 +853,41 @@
   border: 1px solid rgba(248,113,113,.25);
 }
 
+.draft-score-analysis {
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  font-size: .85rem;
+}
+.draft-score-analysis-title {
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.draft-score-analysis-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.draft-score-analysis-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.5;
+  color: var(--text3);
+}
+.draft-score-analysis-idx {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--gold);
+}
+.draft-score-analysis-item strong {
+  color: var(--text);
+}
+
 /* ── Banlist Button ── */
 .banlist-btn {
   background: transparent;

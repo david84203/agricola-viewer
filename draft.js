@@ -356,6 +356,7 @@ function startDraft() {
   state.pendingComboFrom = [];
   document.getElementById('uploadStatus').style.display = 'none';
   document.getElementById('draftScore').style.display = 'none';
+  document.getElementById('draftScoreAnalysis').style.display = 'none';
   if (state.draftMode === 'combined') {
     startCombinedPhase();
   } else {
@@ -1087,9 +1088,11 @@ async function uploadRatings() {
 
 async function calculateScore() {
   const scoreEl = document.getElementById('draftScore');
+  const analysisEl = document.getElementById('draftScoreAnalysis');
   scoreEl.style.display = 'flex';
   scoreEl.textContent = '得分計算中…';
   scoreEl.className = 'draft-score calculating';
+  analysisEl.style.display = 'none';
 
   try {
     const rounds = state.shownLog.filter(r => r.opponents.length > 0);
@@ -1120,16 +1123,43 @@ async function calculateScore() {
     });
 
     const REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
-    const efficiencies = rounds.map(({ picked, opponents }) => {
+    const cardById = {};
+    allCards.forEach(c => { cardById[c['卡片ID']] = c; });
+
+    const roundDetails = rounds.map(({ picked, opponents }) => {
       const all = [picked, ...opponents];
       const maxElo = Math.max(...all.map(id => eloMap[id]));
       const pickedElo = eloMap[picked];
-      return Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / REFERENCE_GAP));
+      const efficiency = Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / REFERENCE_GAP));
+      const bestId = all.find(id => eloMap[id] === maxElo);
+      return { picked, bestId, gap: Math.round(maxElo - pickedElo), roundScore: Math.round(efficiency * 100), efficiency };
     });
 
-    const score = Math.round(efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length * 100);
+    const score = Math.round(roundDetails.reduce((s, r) => s + r.efficiency, 0) / roundDetails.length * 100);
     scoreEl.textContent = `本局得分：${score} 分`;
     scoreEl.className = 'draft-score done';
+
+    const worst = roundDetails
+      .map((r, i) => ({ ...r, idx: i + 1 }))
+      .filter(r => r.roundScore < 60 && r.picked !== r.bestId)
+      .sort((a, b) => a.roundScore - b.roundScore)
+      .slice(0, 3);
+
+    if (worst.length > 0) {
+      const nameOf = id => cardById[id]?.['牌名'] || id;
+      analysisEl.innerHTML = `
+        <div class="draft-score-analysis-title">這幾次選擇拉低了分數：</div>
+        <ul class="draft-score-analysis-list">
+          ${worst.map(r => `
+            <li class="draft-score-analysis-item">
+              <span class="draft-score-analysis-idx">第 ${r.idx} 次選擇</span>
+              <span>選了「<strong>${nameOf(r.picked)}</strong>」，但「<strong>${nameOf(r.bestId)}</strong>」評分明顯更高（差距約 ${r.gap} 分），這次只拿到 ${r.roundScore} 分</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+      analysisEl.style.display = 'block';
+    }
   } catch (err) {
     scoreEl.textContent = `得分計算失敗：${err.message}`;
     scoreEl.className = 'draft-score error';
