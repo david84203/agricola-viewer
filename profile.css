@@ -266,23 +266,37 @@
   transform: translate(-50%, -50%);
   transition: left .4s;
 }
-.se-gauge-track.tp {
-  background: linear-gradient(90deg, #27ae60 0%, #2a3a4e 42%, #2a3a4e 58%, #e67e22 100%);
-}
 .se-gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: .73rem; }
 .se-gauge-lbl.engine { color: #4a9eda; }
 .se-gauge-lbl.score  { color: #f0c040; }
-.se-gauge-lbl.occ    { color: #e67e22; }
-.se-gauge-lbl.min    { color: #27ae60; }
 .se-gauge-lbl.mid    { color: #5a7090; }
 .se-verdict { margin-top: 12px; font-size: .88rem; font-weight: 500; line-height: 1.5; }
 .se-verdict b { font-weight: 700; }
 .se-verdict.score  { color: #f0c040; }
 .se-verdict.engine { color: #4a9eda; }
-.se-verdict.occ    { color: #e67e22; }
-.se-verdict.min    { color: #27ae60; }
 .se-verdict.even   { color: #8899aa; }
 .se-detail { margin-top: 8px; font-size: .72rem; color: #5a7090; line-height: 1.7; }
+
+/* ── 選牌精準度（與亂猜基準比較） ─────────────────── */
+.tp-row { margin-bottom: 22px; }
+.tp-row:last-of-type { margin-bottom: 12px; }
+.tp-row-title { font-size: .88rem; font-weight: 600; margin-bottom: 10px; }
+.tp-row-title.occ { color: #e67e22; }
+.tp-row-title.min { color: #27ae60; }
+.tp-track { position: relative; height: 14px; background: #1a2638; border-radius: 7px; }
+.tp-fill { height: 100%; border-radius: 7px; transition: width .4s; }
+.tp-fill.occ { background: linear-gradient(90deg, #a8590e, #e67e22); }
+.tp-fill.min { background: linear-gradient(90deg, #1c8a4c, #27ae60); }
+.tp-baseline {
+  position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px;
+  background: #c8d8e8; opacity: .65;
+}
+.tp-row-vals { margin-top: 9px; font-size: .74rem; color: #5a7090; line-height: 1.6; }
+.tp-row-vals b { color: #c8d8e8; font-weight: 700; }
+.tp-row-verdict { margin-top: 4px; font-size: .82rem; font-weight: 500; }
+.tp-row-verdict.occ { color: #e67e22; }
+.tp-row-verdict.min { color: #27ae60; }
+.tp-empty { font-size: .8rem; color: #5a7090; padding: 6px 0 0; }
 
 /* ── Extremes ────────────────────────────────────── */
 .ext-group { margin-bottom: 20px; }
