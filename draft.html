@@ -43,6 +43,7 @@
           <div class="mode-desc">每包各含 9 張職業＋9 張次要，每輪各選 1 張，固定向左傳</div>
         </label>
       </div>
+      <div id="raterModeNote" class="rater-deck-note" style="display:none">⚠ 評分者模式僅支援分開輪抽，確保評分資料一致性</div>
 
       <div class="deck-preset">
         <button class="preset-btn" id="presetBGA">BGA 牌組</button>
@@ -101,6 +102,11 @@
 
       <div class="draft-instructions">點選卡牌選擇，再按右下角「確認選擇」；點 ℹ 查看詳情</div>
       <div class="draft-card-grid" id="draftCardGrid"></div>
+
+      <div class="combo-tag-wrap" id="comboTagWrap" style="display:none">
+        <div class="combo-tag-label">這張是因為搭配以下哪張已選的牌嗎？（可複選，非必填）</div>
+        <div class="combo-tag-list" id="comboTagList"></div>
+      </div>
 
       <div class="confirm-bar">
         <div class="confirm-selected-name" id="confirmName">尚未選擇</div>

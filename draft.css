@@ -365,6 +365,54 @@
   letter-spacing: .03em;
 }
 
+/* Combo tag picker */
+.combo-tag-wrap {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.combo-tag-label {
+  font-size: .8rem;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+.combo-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.combo-tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px 5px 5px;
+  transition: all var(--transition);
+  user-select: none;
+}
+.combo-tag-chip:hover { border-color: var(--border2); }
+.combo-tag-chip.checked {
+  border-color: var(--gold);
+  background: rgba(232,184,75,.08);
+}
+.combo-tag-chip canvas {
+  width: 32px;
+  height: 23px;
+  border-radius: 3px;
+  display: block;
+}
+.combo-tag-chip-name {
+  font-size: .75rem;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.combo-tag-chip.checked .combo-tag-chip-name { color: var(--gold); }
+
 /* Confirm bar */
 .confirm-bar {
   position: sticky;
@@ -469,6 +517,7 @@
   user-select: none;
 }
 .mode-option:hover { border-color: var(--border2); }
+.mode-option.locked { opacity: .5; pointer-events: none; }
 .mode-option.selected {
   border-color: var(--gold);
   background: rgba(232,184,75,.07);

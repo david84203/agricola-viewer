@@ -117,6 +117,8 @@ let state = {
   // Rater mode
   raterMode: false,
   shownLog: [],        // [{picked, opponents[]}] all rounds, used for score + rater upload
+  comboTags: [],       // [{from, to, phase, round}] — "picked `to` because already holding `from`"
+  pendingComboFrom: [],// 卡片ID[] — currently toggled combo-source cards for the active selection
   currentShown: [],    // cards shown this round (separate mode)
   currentOccShown: [], // occ cards shown this round (combined mode)
   currentMinShown: [], // min cards shown this round (combined mode)
@@ -138,8 +140,24 @@ function onAuthChange() {
   const toggle = document.getElementById('raterModeToggle');
   if (toggle) toggle.checked = rater;
   applyRaterDeckLock(rater);
+  applyRaterModeLock(rater);
   if (!rater) return;
   loadRaterProgress();
+}
+
+// ── Rater mode lock (forces "separate" draft mode) ─
+function applyRaterModeLock(locked) {
+  const options = document.querySelectorAll('#modeSelect .mode-option');
+  options.forEach(el => {
+    el.classList.toggle('locked', locked && el.dataset.mode === 'combined');
+  });
+  if (locked) {
+    options.forEach(o => o.classList.remove('selected'));
+    document.querySelector('#modeSelect .mode-option[data-mode="separate"]')?.classList.add('selected');
+    state.draftMode = 'separate';
+  }
+  const note = document.getElementById('raterModeNote');
+  if (note) note.style.display = locked ? '' : 'none';
 }
 
 // ── Rater deck lock (forces "all decks") ───────────
@@ -235,6 +253,9 @@ function buildModeSelect() {
       state.draftMode = el.dataset.mode;
     });
   });
+
+  const toggle = document.getElementById('raterModeToggle');
+  if (toggle && toggle.checked) applyRaterModeLock(true);
 }
 
 // ── Deck Checkboxes ────────────────────────────────
@@ -285,6 +306,7 @@ function bindEvents() {
   document.getElementById('presetNone').addEventListener('click', () => setAllChecked(false));
   document.getElementById('raterModeToggle').addEventListener('change', e => {
     applyRaterDeckLock(e.target.checked);
+    applyRaterModeLock(e.target.checked);
   });
   document.getElementById('startDraft').addEventListener('click', startDraft);
   document.getElementById('continueBtn').addEventListener('click', startMinorPhase);
@@ -316,6 +338,7 @@ function startDraft() {
   state.raterMode = document.getElementById('raterModeToggle').checked;
 
   if (state.raterMode) {
+    state.draftMode = 'separate'; // 評分者模式僅支援分開輪抽，確保評分資料一致性
     state.selectedDecks = [...new Set(allCards.map(c => c['牌組']).filter(Boolean))];
   } else {
     const checked = getCheckedDecks();
@@ -329,6 +352,8 @@ function startDraft() {
   state.occPicks = [];
   state.minPicks = [];
   state.shownLog = [];
+  state.comboTags = [];
+  state.pendingComboFrom = [];
   document.getElementById('uploadStatus').style.display = 'none';
   document.getElementById('draftScore').style.display = 'none';
   if (state.draftMode === 'combined') {
@@ -472,6 +497,8 @@ function renderCombinedRound() {
   const round = state.currentRound;
   const config = state.roundConfig[round];
   const packKey = config.pack;
+
+  document.getElementById('comboTagWrap').style.display = 'none';
 
   // Apply sim picks once per round for both occ and min packs
   if (!state.appliedSimRounds.has(round)) {
@@ -700,7 +727,9 @@ function renderRound() {
 
   // Reset selection
   state.selectedCard = null;
+  state.pendingComboFrom = [];
   updateConfirmBar();
+  renderComboTagPicker();
   renderPickedBar();
 
   // Render cards
@@ -763,7 +792,44 @@ function selectCard(card, el) {
     el.appendChild(badge);
   }
 
+  state.pendingComboFrom = [];
   updateConfirmBar();
+  renderComboTagPicker();
+}
+
+// ── Combo Tag Picker (separate mode only) ─────────
+// Lets a rater optionally mark "I picked this because I already hold X" —
+// raw events are stored alongside the session for later synergy analysis.
+function getComboTagCandidates() {
+  return state.phase === 'minor' ? [...state.occPicks, ...state.minPicks] : [...state.occPicks];
+}
+
+function renderComboTagPicker() {
+  const wrap = document.getElementById('comboTagWrap');
+  const list = document.getElementById('comboTagList');
+  const candidates = getComboTagCandidates();
+
+  if (!state.raterMode || !state.selectedCard || candidates.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = '';
+  list.innerHTML = '';
+  candidates.forEach(card => {
+    const id = card['卡片ID'];
+    const chip = document.createElement('div');
+    chip.className = `combo-tag-chip${state.pendingComboFrom.includes(id) ? ' checked' : ''}`;
+    chip.innerHTML = `<canvas></canvas><span class="combo-tag-chip-name">${card['牌名'] || '—'}</span>`;
+    chip.addEventListener('click', () => {
+      const idx = state.pendingComboFrom.indexOf(id);
+      if (idx === -1) state.pendingComboFrom.push(id);
+      else state.pendingComboFrom.splice(idx, 1);
+      renderComboTagPicker();
+    });
+    list.appendChild(chip);
+    requestAnimationFrame(() => drawCrop(chip.querySelector('canvas'), card, 0.5));
+  });
 }
 
 function updateConfirmBar() {
@@ -790,9 +856,14 @@ function confirmPick() {
     opponents: state.currentShown.filter(c => c['卡片ID'] !== card['卡片ID']).map(c => c['卡片ID'])
   });
 
+  state.pendingComboFrom.forEach(fromId => {
+    state.comboTags.push({ from: fromId, to: card['卡片ID'], phase: state.phase, round: state.currentRound });
+  });
+
   state.removedIds[config.pack].add(card['卡片ID']);
   state.currentPicks.push(card);
   state.selectedCard = null;
+  state.pendingComboFrom = [];
   state.currentRound++;
 
   if (state.currentRound >= 7) {
@@ -969,6 +1040,20 @@ async function uploadRatings() {
                   fields: {
                     picked:    { stringValue: picked },
                     opponents: { arrayValue: { values: opponents.map(id => ({ stringValue: id })) } }
+                  }
+                }
+              }))
+            }
+          },
+          comboTags: {
+            arrayValue: {
+              values: state.comboTags.map(({ from, to, phase, round }) => ({
+                mapValue: {
+                  fields: {
+                    from:  { stringValue: from },
+                    to:    { stringValue: to },
+                    phase: { stringValue: phase },
+                    round: { integerValue: `${round}` },
                   }
                 }
               }))
