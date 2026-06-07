@@ -11,7 +11,25 @@ const MIN_SEEN_TIER  = 5;  // minimum raterLog appearances to be assigned a tier
 const MIN_SEEN_HATE  = 10; // minimum appearances required to appear in "disliked" list
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
 const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
-const UNLOCK_THRESHOLD = 500;
+const UNLOCK_THRESHOLD = 500;       // 完整解鎖所需場次
+const MIN_UNLOCK_THRESHOLD = 100;   // 進入個人分析頁所需最低場次
+
+// 各分析卡片的解鎖門檻（場次數）── 樣本需求越大的越晚解鎖
+const SECTION_TIERS = {
+  overview:        100,
+  favHate:         100,
+  scoreChart:      100,
+  gem:             100,
+  typePref:        200,
+  scoreEnginePref: 200,
+  stability:       200,
+  extremes:        300,
+  pickPriority:    300,
+  blindSpots:      300,
+  pairs:           400,
+  toughCalls:      400,
+};
+const UNLOCK_TIER_LIST = [...new Set(Object.values(SECTION_TIERS))].sort((a, b) => a - b);
 
 let imageCache = {};
 let gAnalytics = null; // global after compute
@@ -247,6 +265,74 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     .map(id => ({ id, avgRound: prSums[id] / prCounts[id], count: prCounts[id] }))
     .sort((a, b) => a.avgRound - b.avgRound);
 
+  // ── 計分型 vs 引擎型偏好 ──
+  const hasDirectVP = id => {
+    const vp = (cardMeta[id]?.['勝利點數'] || '').trim();
+    return vp !== '' && vp !== '無';
+  };
+  let scorePicks = 0, scoreEloSum = 0, enginePicks = 0, engineEloSum = 0;
+  sessions.forEach(s => {
+    s.raterLog.forEach(({ picked }) => {
+      if (!cardMeta[picked]) return;
+      const elo = eloOf(picked);
+      if (hasDirectVP(picked)) { scorePicks++;  scoreEloSum  += elo; }
+      else                     { enginePicks++; engineEloSum += elo; }
+    });
+  });
+  const totalTyped = scorePicks + enginePicks;
+  const scoreEnginePref = {
+    scorePicks, enginePicks,
+    scoreRatio:   totalTyped  > 0 ? scorePicks  / totalTyped  : null,
+    scoreAvgElo:  scorePicks  > 0 ? scoreEloSum  / scorePicks  : null,
+    engineAvgElo: enginePicks > 0 ? engineEloSum / enginePicks : null,
+  };
+
+  // ── 盲區清單：社群評為 S/A 但你常放棄的卡 ──
+  const blindSpots = Object.keys(seenCounts)
+    .filter(id => {
+      const c = cardMeta[id];
+      if (!c || seenCounts[id] < MIN_SEEN_HATE) return false;
+      return tierMap[id] === 'S' || tierMap[id] === 'A';
+    })
+    .map(id => {
+      const seen = seenCounts[id];
+      const picked = pickCounts[id] || 0;
+      return { id, value: (seen - picked) / seen, seen };
+    })
+    .filter(x => x.value >= 0.5)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 20);
+
+  // ── 分數穩定度（標準差）──
+  let scoreStdDev = null;
+  if (sessionScores.length > 1) {
+    const mean = sessionScores.reduce((s, x) => s + x.score, 0) / sessionScores.length;
+    const variance = sessionScores.reduce((s, x) => s + (x.score - mean) ** 2, 0) / sessionScores.length;
+    scoreStdDev = Math.sqrt(variance);
+  }
+
+  // ── 最難抉擇時刻：picked 與最接近的對手 ELO 差距最小的回合 ──
+  const toughCalls = [];
+  sessions.forEach(s => {
+    s.raterLog.forEach(({ picked, opponents }) => {
+      if (opponents.length === 0 || !cardMeta[picked]) return;
+      const pickedElo = eloOf(picked);
+      let closestId = null, closestGap = Infinity;
+      opponents.forEach(oppId => {
+        if (!cardMeta[oppId]) return;
+        const gap = Math.abs(eloOf(oppId) - pickedElo);
+        if (gap < closestGap) { closestGap = gap; closestId = oppId; }
+      });
+      if (closestId === null) return;
+      toughCalls.push({
+        picked, pickedElo,
+        rivalId: closestId, rivalElo: eloOf(closestId),
+        gap: closestGap, timestamp: s.timestamp,
+      });
+    });
+  });
+  toughCalls.sort((a, b) => a.gap - b.gap);
+
   return {
     totalSessions: sessions.length,
     sessionScores,
@@ -261,10 +347,57 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     minAvgElo: minTotal > 0 ? minEloSum / minTotal : null,
     topPairs,
     pickPriority,
+    scoreEnginePref,
+    blindSpots,
+    scoreStdDev,
+    toughCalls: toughCalls.slice(0, 8),
     cardMeta,
     ratingsMap,
     tierMap,
   };
+}
+
+// ── Section Unlock Helpers ─────────────────────────
+
+// Returns true if the section is locked (and renders the lock placeholder); false if unlocked
+function lockedOut(section, containerId, compact = false) {
+  const threshold = SECTION_TIERS[section] ?? MIN_UNLOCK_THRESHOLD;
+  const count = gAnalytics.unlockCount;
+  if (count >= threshold) return false;
+
+  const el = document.getElementById(containerId);
+  if (el) {
+    el.innerHTML = compact
+      ? `<span class="section-locked-inline">🔒 累積 ${threshold} 場解鎖（目前 ${count} / ${threshold}）</span>`
+      : `
+      <div class="section-locked">
+        <div class="section-locked-icon">🔒</div>
+        <div class="section-locked-text">累積 ${threshold} 場評分解鎖</div>
+        <div class="section-locked-sub">目前 ${count} / ${threshold} 場</div>
+      </div>`;
+  }
+  return true;
+}
+
+function renderUnlockProgress() {
+  const el = document.getElementById('unlockProgress');
+  if (!el) return;
+  const count = gAnalytics.unlockCount;
+
+  if (count >= UNLOCK_THRESHOLD) {
+    el.innerHTML = `<span class="unlock-step done">🔓 已全部解鎖（${UNLOCK_THRESHOLD}+ 場）</span>`;
+    return;
+  }
+
+  const steps = UNLOCK_TIER_LIST.map(t => {
+    const cls = count >= t ? 'done' : 'todo';
+    return `<span class="unlock-step ${cls}">${t}${count >= t ? ' ✓' : ''}</span>`;
+  }).join('<span class="unlock-arrow">→</span>');
+
+  const next = UNLOCK_TIER_LIST.find(t => count < t);
+  const nextHint = next ? `<span class="unlock-next">再 ${next - count} 場解鎖下一階段</span>` : '';
+
+  el.innerHTML = `<span class="unlock-lbl">解鎖進度</span>${steps}${nextHint}`;
 }
 
 // ── Card Rank List ─────────────────────────────────
@@ -348,6 +481,7 @@ function renderCardList(containerId, items, labelFn) {
 // ── Score Chart ────────────────────────────────────
 
 function renderScoreChart() {
+  if (lockedOut('scoreChart', 'scoreChartWrap')) return;
   const { sessionScores } = gAnalytics;
   if (sessionScores.length < 2) return;
 
@@ -421,6 +555,7 @@ function renderScoreChart() {
 // ── 慧眼指數 ──────────────────────────────────────
 
 function renderGem() {
+  if (lockedOut('gem', 'gemContent')) return;
   const { gemCount, mistakeCount, totalSessions, sessionScores } = gAnalytics;
   const rounds = sessionScores.reduce((s, x) => s + (x.picks?.length || 0), 0);
   const gemRate    = rounds > 0 ? ((gemCount / rounds) * 100).toFixed(1) : '—';
@@ -447,6 +582,7 @@ function renderGem() {
 // ── 牌型偏好 ──────────────────────────────────────
 
 function renderTypePref() {
+  if (lockedOut('typePref', 'typePrefContent')) return;
   const { occPrecision, minPrecision, occAvgElo, minAvgElo, ratingsMap } = gAnalytics;
   const fmt = v => v !== null ? `${Math.round(v * 100)}%` : '—';
   const fmtElo = v => v !== null ? Math.round(v) : '—';
@@ -468,9 +604,107 @@ function renderTypePref() {
   `;
 }
 
+// ── 計分型 vs 引擎型偏好 ───────────────────────────
+
+function renderScoreEnginePref() {
+  if (lockedOut('scoreEnginePref', 'scoreEnginePrefContent')) return;
+  const { scoreEnginePref } = gAnalytics;
+  const { scorePicks, enginePicks, scoreRatio, scoreAvgElo, engineAvgElo } = scoreEnginePref;
+  const fmtPct  = v => v !== null ? `${Math.round(v * 100)}%` : '—';
+  const fmtElo  = v => v !== null ? Math.round(v) : '—';
+  const bias = scoreRatio === null ? ''
+    : scoreRatio > 0.58 ? '你偏好直接帶來勝利點數的計分型卡'
+    : scoreRatio < 0.42 ? '你偏好堆資源、做連動的引擎型卡'
+    : '計分型與引擎型卡的選擇相當均衡';
+
+  document.getElementById('scoreEnginePrefContent').innerHTML = `
+    <table class="pref-table">
+      <thead><tr><th></th><th>計分型卡</th><th>引擎型卡</th></tr></thead>
+      <tbody>
+        <tr><td>選牌次數</td><td>${scorePicks}</td><td>${enginePicks}</td></tr>
+        <tr><td>選牌比例</td><td>${fmtPct(scoreRatio)}</td><td>${scoreRatio !== null ? fmtPct(1 - scoreRatio) : '—'}</td></tr>
+        <tr><td>選牌平均 ELO</td><td>${fmtElo(scoreAvgElo)}</td><td>${fmtElo(engineAvgElo)}</td></tr>
+      </tbody>
+    </table>
+    ${bias ? `<div class="pref-bias">${bias}</div>` : ''}
+    <div class="pref-note">計分型卡＝有勝利點數欄位的卡；引擎型卡＝主要靠資源生產／連動運作的卡</div>
+  `;
+}
+
+// ── 盲區清單 ───────────────────────────────────────
+
+function renderBlindSpots() {
+  if (lockedOut('blindSpots', 'blindSpotList')) return;
+  const { blindSpots } = gAnalytics;
+  renderCardList('blindSpotList', blindSpots, item => `${Math.round(item.value * 100)}% 跳過率`);
+  if (blindSpots.length === 0) {
+    document.getElementById('blindSpotList').innerHTML = '<div class="rank-empty">目前沒有明顯盲區，眼光不錯！</div>';
+  }
+}
+
+// ── 分數穩定度 ─────────────────────────────────────
+
+function renderStability() {
+  if (lockedOut('stability', 'scoreStability', true)) return;
+  const { scoreStdDev } = gAnalytics;
+  const el = document.getElementById('scoreStability');
+  if (!el) return;
+  if (scoreStdDev === null) { el.innerHTML = ''; return; }
+  const sd = Math.round(scoreStdDev * 10) / 10;
+  const label = sd < 10 ? '表現相當穩定' : sd < 18 ? '表現中規中矩，偶有起伏' : '表現起伏較大，時而神準時而失手';
+  el.innerHTML = `<span class="stability-val">標準差 ±${sd} 分</span><span class="stability-lbl">${label}</span>`;
+}
+
+// ── 最難抉擇時刻 ───────────────────────────────────
+
+function renderToughCalls() {
+  if (lockedOut('toughCalls', 'toughCallsContent')) return;
+  const { toughCalls, cardMeta, tierMap } = gAnalytics;
+  const el = document.getElementById('toughCallsContent');
+  el.innerHTML = '';
+
+  toughCalls.forEach(({ picked, pickedElo, rivalId, rivalElo, gap, timestamp }) => {
+    const cP = cardMeta[picked], cR = cardMeta[rivalId];
+    const nameP = cP?.['牌名'] || picked, nameR = cR?.['牌名'] || rivalId;
+    const tierP = tierMap[picked] || '?', tierR = tierMap[rivalId] || '?';
+    const date = timestamp ? new Date(timestamp).toLocaleDateString('zh-TW') : '—';
+
+    const item = document.createElement('div');
+    item.className = 'tough-item';
+    item.innerHTML = `
+      <div class="tough-meta">
+        <span class="tough-gap">差距僅 ${Math.round(gap)} 分</span>
+        <span class="tough-date">${date}</span>
+      </div>
+      <div class="tough-cards">
+        <div class="tough-card picked">
+          <div class="tough-thumb"><canvas data-slot="p"></canvas></div>
+          <span class="tier-pip tier-${tierP.toLowerCase()}">${tierP}</span>
+          <span class="tough-name">${nameP}</span>
+          <span class="tough-elo">${Math.round(pickedElo)}</span>
+          <span class="tough-pick-badge">你選了這張</span>
+        </div>
+        <span class="tough-vs">vs</span>
+        <div class="tough-card">
+          <div class="tough-thumb"><canvas data-slot="r"></canvas></div>
+          <span class="tier-pip tier-${tierR.toLowerCase()}">${tierR}</span>
+          <span class="tough-name">${nameR}</span>
+          <span class="tough-elo">${Math.round(rivalElo)}</span>
+        </div>
+      </div>
+    `;
+    if (cP) requestAnimationFrame(() => drawCrop(item.querySelector('canvas[data-slot="p"]'), cP, 0.5));
+    if (cR) requestAnimationFrame(() => drawCrop(item.querySelector('canvas[data-slot="r"]'), cR, 0.5));
+    el.appendChild(item);
+  });
+
+  if (toughCalls.length === 0) el.innerHTML = '<div class="rank-empty">資料不足</div>';
+}
+
 // ── Best / Worst Sessions ──────────────────────────
 
 function renderExtremes() {
+  if (lockedOut('extremes', 'extremesContent')) return;
   const { sessionScores, cardMeta } = gAnalytics;
   if (sessionScores.length === 0) { document.getElementById('extremesContent').innerHTML = '<p class="rank-empty">資料不足</p>'; return; }
 
@@ -511,6 +745,7 @@ function renderExtremes() {
 // ── Common Pairs ──────────────────────────────────
 
 function renderPairs() {
+  if (lockedOut('pairs', 'pairsContent')) return;
   const { topPairs, cardMeta, tierMap } = gAnalytics;
   const el = document.getElementById('pairsContent');
   el.innerHTML = '';
@@ -548,6 +783,7 @@ function renderPairs() {
 // ── Pick Priority ─────────────────────────────────
 
 function renderPickPriority() {
+  if (lockedOut('pickPriority', 'pickPriorityContent')) return;
   const { pickPriority, cardMeta, tierMap } = gAnalytics;
 
   const occItems = pickPriority.filter(x => cardMeta[x.id]?.card_type === 'occupation').slice(0, 10);
@@ -602,6 +838,7 @@ function renderProfile(raterId) {
   document.getElementById('profileContent').style.display = '';
 
   document.getElementById('overviewName').textContent = raterId;
+  renderUnlockProgress();
   document.getElementById('statSessions').textContent = gAnalytics.totalSessions;
   document.getElementById('statAvgScore').textContent = gAnalytics.avgScore !== null ? `${gAnalytics.avgScore} 分` : '—';
   document.getElementById('statGems').textContent    = gAnalytics.gemCount;
@@ -613,9 +850,13 @@ function renderProfile(raterId) {
   buildHateList('hateMinList', 'minor',      false);
 
   renderScoreChart();
+  renderStability();
   renderGem();
   renderTypePref();
+  renderScoreEnginePref();
+  renderBlindSpots();
   renderExtremes();
+  renderToughCalls();
   renderPairs();
   renderPickPriority();
 
@@ -667,12 +908,12 @@ async function init() {
     const countData = await countRes.json();
     const count = Number(countData[0]?.result?.aggregateFields?.count?.integerValue ?? 0);
 
-    if (!adminView && count < UNLOCK_THRESHOLD) {
+    if (!adminView && count < MIN_UNLOCK_THRESHOLD) {
       document.getElementById('profileLoading').style.display = 'none';
       document.getElementById('profileLocked').style.display = '';
-      const pct = Math.min(count / UNLOCK_THRESHOLD * 100, 100);
+      const pct = Math.min(count / MIN_UNLOCK_THRESHOLD * 100, 100);
       document.getElementById('profileLockFill').style.width  = `${pct}%`;
-      document.getElementById('profileLockCount').textContent = `${count} / ${UNLOCK_THRESHOLD} 場`;
+      document.getElementById('profileLockCount').textContent = `${count} / ${MIN_UNLOCK_THRESHOLD} 場`;
       return;
     }
 
@@ -686,6 +927,7 @@ async function init() {
     setLoading('計算分析數據…');
     const tierMap = computeTierMap(ratingsMap, cards);
     gAnalytics = computeAnalytics(sessions, cards, ratingsMap, tierMap);
+    gAnalytics.unlockCount = adminView ? Infinity : count;
 
     document.getElementById('profileLoading').style.display = 'none';
     renderProfile(raterId);

@@ -45,12 +45,12 @@
     <div id="profileLocked" class="profile-state" style="display:none">
       <div class="state-icon">🔒</div>
       <h2>尚未解鎖</h2>
-      <p>累積 500 場評分後解鎖個人數據分析</p>
+      <p>累積 100 場評分後即可開始查看個人數據分析，後續隨場次增加陸續解鎖更多項目（100 / 200 / 300 / 400 / 500 場）</p>
       <div class="profile-lock-wrap">
         <div class="profile-lock-bar-track">
           <div class="profile-lock-bar-fill" id="profileLockFill" style="width:0%"></div>
         </div>
-        <div class="profile-lock-count" id="profileLockCount">0 / 500 場</div>
+        <div class="profile-lock-count" id="profileLockCount">0 / 100 場</div>
       </div>
     </div>
 
@@ -60,6 +60,7 @@
       <!-- Overview header -->
       <div class="profile-overview">
         <div class="profile-overview-name" id="overviewName">—</div>
+        <div class="unlock-progress" id="unlockProgress"></div>
         <div class="profile-overview-stats">
           <div class="overview-stat">
             <div class="overview-stat-val" id="statSessions">—</div>
@@ -124,6 +125,7 @@
         <div class="score-chart-wrap" id="scoreChartWrap">
           <svg id="scoreChart" class="score-chart"></svg>
         </div>
+        <div id="scoreStability" class="score-stability"></div>
       </div>
 
       <!-- 慧眼 + 牌型偏好 -->
@@ -138,10 +140,34 @@
         </div>
       </div>
 
+      <!-- 計分/引擎偏好 + 盲區清單 -->
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="profile-card-hd"><span class="profile-card-title">📊 計分型 vs 引擎型偏好</span></div>
+          <div id="scoreEnginePrefContent"></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card-hd">
+            <span class="profile-card-title">🙈 你的盲區</span>
+            <span class="profile-card-sub">社群評為 S/A，但你常常跳過的卡</span>
+          </div>
+          <div class="card-rank-list" id="blindSpotList"></div>
+        </div>
+      </div>
+
       <!-- Best / Worst sessions -->
       <div class="profile-card profile-card-full">
         <div class="profile-card-hd"><span class="profile-card-title">🏆 最強局 / 最弱局</span></div>
         <div id="extremesContent"></div>
+      </div>
+
+      <!-- Tough calls -->
+      <div class="profile-card profile-card-full">
+        <div class="profile-card-hd">
+          <span class="profile-card-title">🤔 最難抉擇時刻</span>
+          <span class="profile-card-sub">ELO 分數最接近的選擇瞬間</span>
+        </div>
+        <div id="toughCallsContent"></div>
       </div>
 
       <!-- Common pairs -->
@@ -156,14 +182,16 @@
           <span class="profile-card-title">⚡ 選牌優先級</span>
           <span class="profile-card-sub">越低輪次 = 越優先　僅顯示出現 10+ 次的牌</span>
         </div>
-        <div class="profile-row">
-          <div>
-            <div class="priority-subtitle">職業牌（最優先選）</div>
-            <div class="priority-list" id="priorityOccEarly"></div>
-          </div>
-          <div>
-            <div class="priority-subtitle">次要發展牌（最優先選）</div>
-            <div class="priority-list" id="priorityMinEarly"></div>
+        <div id="pickPriorityContent">
+          <div class="profile-row">
+            <div>
+              <div class="priority-subtitle">職業牌（最優先選）</div>
+              <div class="priority-list" id="priorityOccEarly"></div>
+            </div>
+            <div>
+              <div class="priority-subtitle">次要發展牌（最優先選）</div>
+              <div class="priority-list" id="priorityMinEarly"></div>
+            </div>
           </div>
         </div>
       </div>

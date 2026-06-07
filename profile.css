@@ -159,6 +159,62 @@
 /* ── Score chart ────────────────────────────────── */
 .score-chart-wrap { width: 100%; overflow-x: auto; }
 .score-chart { display: block; width: 100%; height: auto; }
+.score-stability {
+  margin-top: 10px; display: flex; align-items: baseline; gap: 10px;
+}
+.stability-val { font-size: .95rem; font-weight: 600; color: #c8d8e8; }
+.stability-lbl { font-size: .8rem; color: #7a92a8; }
+
+/* ── Section locked placeholder ──────────────────── */
+.section-locked {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 36px 16px; text-align: center;
+}
+.section-locked-icon { font-size: 1.6rem; opacity: .6; }
+.section-locked-text { font-size: .9rem; color: #8899aa; font-weight: 600; }
+.section-locked-sub  { font-size: .78rem; color: #5a7090; }
+.section-locked-inline { font-size: .8rem; color: #5a7090; margin-top: 6px; display: inline-block; }
+
+/* ── Unlock progress stepper ─────────────────────── */
+.unlock-progress {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  margin-top: 8px; font-size: .78rem;
+}
+.unlock-lbl { color: #5a7090; margin-right: 2px; }
+.unlock-step {
+  padding: 2px 8px; border-radius: 10px; color: #5a7090;
+  background: #1a2638; border: 1px solid #26364a;
+}
+.unlock-step.done { color: #27ae60; border-color: #27ae60; }
+.unlock-step.todo { color: #6b7e99; }
+.unlock-arrow { color: #3a4e66; }
+.unlock-next  { color: #f0c040; margin-left: 6px; }
+
+/* ── Tough calls ─────────────────────────────────── */
+.tough-item {
+  background: #1a2638; border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 8px;
+}
+.tough-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.tough-gap  { font-size: .9rem; font-weight: 600; color: #f0c040; }
+.tough-date { font-size: .75rem; color: #5a7090; margin-left: auto; }
+.tough-cards { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tough-card {
+  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 200px;
+  background: #0f1620; border-radius: 6px; padding: 6px 8px;
+}
+.tough-card.picked { border: 1px solid #4a9eda; }
+.tough-thumb {
+  width: 44px; height: 32px; border-radius: 4px;
+  overflow: hidden; background: #0f1620; flex-shrink: 0;
+}
+.tough-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tough-name { font-size: .8rem; color: #c8d8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tough-elo  { font-size: .78rem; color: #7a92a8; margin-left: auto; flex-shrink: 0; }
+.tough-pick-badge {
+  font-size: .68rem; color: #4a9eda; white-space: nowrap; flex-shrink: 0;
+}
+.tough-vs { font-size: .8rem; color: #5a7090; flex-shrink: 0; }
 
 /* ── Gem stats ──────────────────────────────────── */
 .gem-row {
