@@ -186,19 +186,20 @@ async function loadRaterProgress() {
       localStorage.setItem(PROGRESS_CACHE_KEY, JSON.stringify({ raterId, count, cachedAt: Date.now() }));
     }
 
-    const pct = Math.min(count / 500 * 100, 100);
-    countEl.textContent = `${count} / 500 場`;
+    const unlockAt = 100;
+    const pct = Math.min(count / unlockAt * 100, 100);
+    countEl.textContent = `${count} / ${unlockAt} 場`;
     fillEl.style.width  = `${pct}%`;
 
-    if (count >= 500) {
+    if (count >= unlockAt) {
       hintEl.innerHTML  = '🎉 個人分析已解鎖！<a href="profile.html" class="progress-profile-link">→ 查看個人分析</a>';
       hintEl.className  = 'rater-progress-hint unlocked';
     } else {
-      hintEl.textContent = `還差 ${500 - count} 場解鎖個人數據分析`;
+      hintEl.textContent = `還差 ${unlockAt - count} 場解鎖個人數據分析`;
       hintEl.className   = 'rater-progress-hint';
     }
   } catch (err) {
-    countEl.textContent = '— / 500 場';
+    countEl.textContent = `— / 100 場`;
   }
 }
 
