@@ -616,24 +616,43 @@ function renderGem() {
 
 function renderTypePref() {
   if (lockedOut('typePref', 'typePrefContent')) return;
-  const { occPrecision, minPrecision, occAvgElo, minAvgElo, ratingsMap } = gAnalytics;
-  const fmt = v => v !== null ? `${Math.round(v * 100)}%` : '—';
+  const { occPrecision, minPrecision, occAvgElo, minAvgElo } = gAnalytics;
+  const fmtPct = v => v !== null ? `${Math.round(v * 100)}%` : '—';
   const fmtElo = v => v !== null ? Math.round(v) : '—';
 
-  const diff = occPrecision !== null && minPrecision !== null
-    ? occPrecision - minPrecision : null;
-  const bias = diff === null ? '' : diff > 0.02 ? '你對職業牌更謹慎選擇' : diff < -0.02 ? '你對次要發展牌更謹慎選擇' : '職業 / 次發判斷力相近';
+  let markerPct = 50;
+  let verdict;
+  if (occPrecision === null || minPrecision === null) {
+    verdict = { dir: 'even', icon: '📊', text: '資料還太少，看不出明顯差異' };
+  } else {
+    const sum = occPrecision + minPrecision;
+    markerPct = sum > 0 ? Math.round(occPrecision / sum * 100) : 50;
+    const diffPP = Math.round((occPrecision - minPrecision) * 100);
+    if (Math.abs(diffPP) < 5) {
+      verdict = { dir: 'even', icon: '⚖️', text: '挑職業牌、挑次要發展牌時，眼光準確度差不多' };
+    } else if (diffPP > 0) {
+      verdict = { dir: 'occ', icon: '👉', text: `挑<b>職業牌</b>時眼光比較準——同一輪選到「社群公認最強」那張牌的比例，比挑次要發展牌時高了約 ${diffPP} 個百分點` };
+    } else {
+      verdict = { dir: 'min', icon: '👉', text: `挑<b>次要發展牌</b>時眼光比較準——同一輪選到「社群公認最強」那張牌的比例，比挑職業牌時高了約 ${-diffPP} 個百分點` };
+    }
+  }
 
   document.getElementById('typePrefContent').innerHTML = `
-    <table class="pref-table">
-      <thead><tr><th></th><th>職業牌</th><th>次要發展牌</th></tr></thead>
-      <tbody>
-        <tr><td>精準率</td><td>${fmt(occPrecision)}</td><td>${fmt(minPrecision)}</td></tr>
-        <tr><td>選牌平均 ELO</td><td>${fmtElo(occAvgElo)}</td><td>${fmtElo(minAvgElo)}</td></tr>
-      </tbody>
-    </table>
-    ${bias ? `<div class="pref-bias">${bias}</div>` : ''}
-    <div class="pref-note">精準率 = 在同輪選了最高 ELO 牌的比例</div>
+    <div class="se-gauge">
+      <div class="se-gauge-track tp">
+        <div class="se-gauge-marker" style="left:${markerPct}%"></div>
+      </div>
+      <div class="se-gauge-labels">
+        <span class="se-gauge-lbl min">次發較準</span>
+        <span class="se-gauge-lbl mid">差不多</span>
+        <span class="se-gauge-lbl occ">職業較準</span>
+      </div>
+    </div>
+    <div class="se-verdict ${verdict.dir}">${verdict.icon} ${verdict.text}</div>
+    <div class="se-detail">
+      選到當輪最強牌的比例　職業牌 ${fmtPct(occPrecision)}　·　次要發展牌 ${fmtPct(minPrecision)}　　選牌平均 ELO　職業牌 ${fmtElo(occAvgElo)}　·　次要發展牌 ${fmtElo(minAvgElo)}
+    </div>
+    <div class="pref-note">「當輪最強牌」＝該輪所有候選卡中，依社群長期評分（ELO）排名最高的那張；精準率＝你最後選到的剛好就是那張的比例</div>
   `;
 }
 

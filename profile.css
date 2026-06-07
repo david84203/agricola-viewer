@@ -266,14 +266,21 @@
   transform: translate(-50%, -50%);
   transition: left .4s;
 }
+.se-gauge-track.tp {
+  background: linear-gradient(90deg, #27ae60 0%, #2a3a4e 42%, #2a3a4e 58%, #e67e22 100%);
+}
 .se-gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: .73rem; }
 .se-gauge-lbl.engine { color: #4a9eda; }
 .se-gauge-lbl.score  { color: #f0c040; }
+.se-gauge-lbl.occ    { color: #e67e22; }
+.se-gauge-lbl.min    { color: #27ae60; }
 .se-gauge-lbl.mid    { color: #5a7090; }
 .se-verdict { margin-top: 12px; font-size: .88rem; font-weight: 500; line-height: 1.5; }
 .se-verdict b { font-weight: 700; }
 .se-verdict.score  { color: #f0c040; }
 .se-verdict.engine { color: #4a9eda; }
+.se-verdict.occ    { color: #e67e22; }
+.se-verdict.min    { color: #27ae60; }
 .se-verdict.even   { color: #8899aa; }
 .se-detail { margin-top: 8px; font-size: .72rem; color: #5a7090; line-height: 1.7; }
 
