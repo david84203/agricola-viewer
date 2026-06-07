@@ -953,7 +953,7 @@ async function uploadRatings() {
   statusEl.className = 'upload-status uploading';
 
   try {
-    const K_PAIR = 16; // ELO K-factor per pairwise match
+    const K_PAIR = 8; // ELO K-factor per pairwise match（從 16 調降，避免低樣本卡在尚未輸過的情況下被結構性不對稱機制衝到異常高分）
 
     // Collect all unique card IDs in this draft
     const uniqueIds = [...new Set(state.shownLog.flatMap(r => [r.picked, ...r.opponents]))];
@@ -1112,14 +1112,25 @@ async function calculateScore() {
     });
     const batchData = await batchRes.json();
 
-    const eloMap = {};
-    uniqueIds.forEach(id => { eloMap[id] = 1200; });
+    const ratingMap = {};
+    uniqueIds.forEach(id => { ratingMap[id] = { elo: 1200, seenCount: 0 }; });
     batchData.forEach(item => {
       if (item.found) {
         const id = item.found.name.split('/').pop();
         const f = item.found.fields || {};
-        eloMap[id] = Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200);
+        ratingMap[id] = {
+          elo:       Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
+          seenCount: Number(f.seenCount?.integerValue ?? 0),
+        };
       }
+    });
+
+    // 樣本數不足的卡牌，原始 ELO 容易被結構性機制衝出異常值，往基準值收斂以避免污染最佳/最差判斷
+    const eloMap = {};
+    uniqueIds.forEach(id => {
+      const { elo, seenCount } = ratingMap[id];
+      const conf = Math.min(seenCount / 30, 1);
+      eloMap[id] = conf * elo + (1 - conf) * 1200;
     });
 
     const REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）

@@ -168,6 +168,13 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
   cards.forEach(c => { cardMeta[c['卡片ID']] = c; });
 
   const eloOf = id => ratingsMap[id]?.elo ?? 1000;
+  // 樣本數不足的卡牌，原始 ELO 容易被結構性機制衝出異常值，算分時往基準值收斂以避免污染最佳/最差判斷
+  const eloForScore = id => {
+    const r = ratingsMap[id];
+    if (!r) return 1200;
+    const conf = Math.min(r.seenCount / 30, 1);
+    return conf * r.elo + (1 - conf) * 1200;
+  };
   const SCORE_REFERENCE_GAP = 150; // 視為「明顯選差」的 ELO 差距基準（取自全卡庫中段 50% 的典型差距）
   const efficiencyOf = (pickedElo, maxElo) =>
     Math.min(1, Math.max(0, 1 - (maxElo - pickedElo) / SCORE_REFERENCE_GAP));
@@ -189,8 +196,8 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
     if (rounds.length === 0) return;
     const effs = rounds.map(({ picked, opponents }) => {
       const all = [picked, ...opponents];
-      const maxElo = Math.max(...all.map(eloOf));
-      return efficiencyOf(eloOf(picked), maxElo);
+      const maxElo = Math.max(...all.map(eloForScore));
+      return efficiencyOf(eloForScore(picked), maxElo);
     });
     sessionScores.push({
       score: Math.round(effs.reduce((a, b) => a + b, 0) / effs.length * 100),
@@ -233,9 +240,8 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
       if (!isOcc && !isMin) return;
 
       const all = [picked, ...opponents];
-      const maxElo = Math.max(...all.map(eloOf));
       const elo = eloOf(picked);
-      const efficiency = efficiencyOf(elo, maxElo);
+      const efficiency = efficiencyOf(eloForScore(picked), Math.max(...all.map(eloForScore)));
       if (isOcc) { occTotal++; occEloSum += elo; occEffSum += efficiency; }
       else        { minTotal++; minEloSum += elo; minEffSum += efficiency; }
     });
