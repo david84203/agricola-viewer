@@ -1304,12 +1304,22 @@ function drawCrop(canvas, card, topFraction = 1) {
     const cellH   = usableH / rows;
     const drawH   = cellH * topFraction;
 
-    canvas.width  = cellW;
+    let scale = 1;
+    if (canvas.id === 'modalCanvas' || (canvas.id && canvas.id.startsWith('dup'))) {
+      scale = 2; // Upscale modal canvas for better sharpness
+    }
+    const drawW = cellW * scale;
+    const drawH = cellH * 1 * scale;
+
+    canvas.width  = drawW;
     canvas.height = drawH;
+
     const ctx = canvas.getContext('2d');
-    const sx  = oL + (card.grid_col || 0) * cellW;
-    const sy  = oT + (card.grid_row || 0) * cellH;
-    ctx.drawImage(img, sx, sy, cellW, drawH, 0, 0, cellW, drawH);
+    if (scale > 1) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+    }
+    ctx.drawImage(img, sx, sy, cellW, cellH * 1, 0, 0, drawW, drawH);
   };
 
   if (imageCache[key]) {
