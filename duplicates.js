@@ -368,13 +368,23 @@ function drawCrop(canvas, card) {
   const oB = card.crop_bottom !== undefined ? card.crop_bottom : (noOffset ? 0 : CROP.offsetBottom);
 
   const draw = (img) => {
-    const cellW = (img.naturalWidth  - oL - oR) / cols;
-    const cellH = (img.naturalHeight - oT - oB) / rows;
+    let sx, sy, cellW, cellH;
+    if (src.startsWith('Zm')) {
+      const cols_x = [16, 388, 760];
+      const rows_y = [30, 651, 1274];
+      cellW = 342;
+      cellH = 558;
+      sx = cols_x[card.grid_col || 0];
+      sy = rows_y[card.grid_row || 0];
+    } else {
+      cellW = (img.naturalWidth  - oL - oR) / cols;
+      cellH = (img.naturalHeight - oT - oB) / rows;
+      sx = oL + (card.grid_col || 0) * cellW;
+      sy = oT + (card.grid_row || 0) * cellH;
+    }
     canvas.width  = cellW;
     canvas.height = cellH;
-    canvas.getContext('2d').drawImage(img,
-      oL + (card.grid_col || 0) * cellW, oT + (card.grid_row || 0) * cellH,
-      cellW, cellH, 0, 0, cellW, cellH);
+    canvas.getContext('2d').drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
   };
 
   if (imageCache[key]) { draw(imageCache[key]); return; }

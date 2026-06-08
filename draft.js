@@ -1233,24 +1233,32 @@ function drawCrop(canvas, card, topFraction = 1) {
     else if (isNLtmpl)                   base = { l: 182, t: 114, r: 166, b: 101 };
     else                                 base = { l: CROP.offsetLeft, t: CROP.offsetTop, r: CROP.offsetRight, b: CROP.offsetBottom };
 
-    const offsetLeft   = card.crop_left   !== undefined ? card.crop_left   : base.l;
-    const offsetRight  = card.crop_right  !== undefined ? card.crop_right  : base.r;
-    const offsetTop    = card.crop_top    !== undefined ? card.crop_top    : base.t;
-    const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
+    let sx, sy, cellW, cellH;
+    if (src.startsWith('Zm')) {
+      const cols_x = [16, 388, 760];
+      const rows_y = [30, 651, 1274];
+      cellW = 342;
+      cellH = 558;
+      sx = cols_x[card.grid_col || 0];
+      sy = rows_y[card.grid_row || 0];
+    } else {
+      const offsetLeft   = card.crop_left   !== undefined ? card.crop_left   : base.l;
+      const offsetRight  = card.crop_right  !== undefined ? card.crop_right  : base.r;
+      const offsetTop    = card.crop_top    !== undefined ? card.crop_top    : base.t;
+      const offsetBottom = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
 
-    const usableW = img.naturalWidth  - offsetLeft - offsetRight;
-    const usableH = img.naturalHeight - offsetTop  - offsetBottom;
-    const cellW = usableW / cols;
-    const cellH = usableH / rows;
+      const usableW = img.naturalWidth  - offsetLeft - offsetRight;
+      const usableH = img.naturalHeight - offsetTop  - offsetBottom;
+      cellW = usableW / cols;
+      cellH = usableH / rows;
+      sx = offsetLeft + (card.grid_col || 0) * cellW;
+      sy = offsetTop + (card.grid_row || 0) * cellH;
+    }
     const drawH = cellH * topFraction;
     
     canvas.width  = cellW;
     canvas.height = drawH;
     const ctx = canvas.getContext('2d');
-    
-    const sx = offsetLeft + (card.grid_col || 0) * cellW;
-    const sy = offsetTop + (card.grid_row || 0) * cellH;
-    
     ctx.drawImage(img, sx, sy, cellW, drawH, 0, 0, cellW, drawH);
   };
 

@@ -46,21 +46,35 @@ function drawCrop(canvas, card, topFraction = 1) {
   const draw = img => {
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
     const isFR = card.source_image.startsWith('FR') || card.source_image.startsWith('Gm') ||
-      card.source_image.startsWith('Go') || /^wa/i.test(card.source_image) || /^wm/i.test(card.source_image);
+      card.source_image.startsWith('Go') || /^wa/i.test(card.source_image) || /^wm/i.test(card.source_image) ||
+      card.source_image.toLowerCase().startsWith('z');
     const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
     const rows = card.grid_rows || (isComposite ? 3  : GRID_ROWS);
-    const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite || isFR ? 0 : CROP.offsetLeft);
-    const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite || isFR ? 0 : CROP.offsetRight);
-    const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite || isFR ? 0 : CROP.offsetTop);
-    const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isFR ? 0 : CROP.offsetBottom);
-    const cellW = (img.naturalWidth  - oL - oR) / cols;
-    const cellH = (img.naturalHeight - oT - oB) / rows;
+    
+    let sx, sy, cellW, cellH;
+    if (card.source_image.startsWith('Zm')) {
+      const cols_x = [16, 388, 760];
+      const rows_y = [30, 651, 1274];
+      cellW = 342;
+      cellH = 558;
+      sx = cols_x[card.grid_col || 0];
+      sy = rows_y[card.grid_row || 0];
+    } else {
+      const oL = card.crop_left   !== undefined ? card.crop_left   : (isComposite || isFR ? 0 : CROP.offsetLeft);
+      const oR = card.crop_right  !== undefined ? card.crop_right  : (isComposite || isFR ? 0 : CROP.offsetRight);
+      const oT = card.crop_top    !== undefined ? card.crop_top    : (isComposite || isFR ? 0 : CROP.offsetTop);
+      const oB = card.crop_bottom !== undefined ? card.crop_bottom : (isComposite || isFR ? 0 : CROP.offsetBottom);
+      cellW = (img.naturalWidth  - oL - oR) / cols;
+      cellH = (img.naturalHeight - oT - oB) / rows;
+      sx = oL + (card.grid_col || 0) * cellW;
+      sy = oT + (card.grid_row || 0) * cellH;
+    }
     const drawH = cellH * topFraction;
+    
     canvas.width  = cellW;
     canvas.height = drawH;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, oL + (card.grid_col || 0) * cellW, oT + (card.grid_row || 0) * cellH,
-      cellW, drawH, 0, 0, cellW, drawH);
+    ctx.drawImage(img, sx, sy, cellW, drawH, 0, 0, cellW, drawH);
   };
   if (imageCache[key]) {
     draw(imageCache[key]);
