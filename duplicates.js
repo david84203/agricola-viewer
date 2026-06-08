@@ -24,7 +24,7 @@ let selectedA = null, selectedB = null;
 // ── Init ───────────────────────────────────────────
 async function init() {
   const [cards, pairs] = await Promise.all([
-    fetch('./cards.json').then(r => r.json()),
+    fetch('./cards.json?v=20260608').then(r => r.json()),
     fetch('./duplicates.json').then(r => r.json()),
   ]);
   allCards = cards;

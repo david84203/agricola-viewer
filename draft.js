@@ -236,7 +236,7 @@ async function loadRaterProgress() {
 // ── Init ───────────────────────────────────────────
 async function init() {
   const [cardsData, dupExcluded] = await Promise.all([
-    fetch('./cards.json').then(r => r.json()),
+    fetch('./cards.json?v=20260608').then(r => r.json()),
     loadDupExclusions(),
     loadBanlist(),
   ]);
@@ -1327,23 +1327,26 @@ function drawCrop(canvas, card, topFraction = 1) {
     const cellW = usableW / cols;
     const cellH = usableH / rows;
     const drawH = cellH * topFraction;
-    
+
+    const sx = offsetLeft + (card.grid_col || 0) * cellW;
+    const sy = offsetTop  + (card.grid_row || 0) * cellH;
+
     let scale = 1;
     if (canvas.id === 'modalCanvas' || (canvas.id && canvas.id.startsWith('dup'))) {
       scale = 2; // Upscale modal canvas for better sharpness
     }
     const drawW = cellW * scale;
-    const drawH = cellH * 1 * scale;
+    const scaledDrawH = drawH * scale;
 
     canvas.width  = drawW;
-    canvas.height = drawH;
+    canvas.height = scaledDrawH;
 
     const ctx = canvas.getContext('2d');
     if (scale > 1) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
     }
-    ctx.drawImage(img, sx, sy, cellW, cellH * 1, 0, 0, drawW, drawH);
+    ctx.drawImage(img, sx, sy, cellW, drawH, 0, 0, drawW, scaledDrawH);
   };
 
   if (imageCache[key]) {

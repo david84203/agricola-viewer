@@ -25,7 +25,7 @@ let bgaExtraIds = new Set();     // manually marked BGA card IDs
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
   const [base, overrides, banGroups, dupPairs, bgaData] = await Promise.all([
-    fetch('./cards.json').then(r => r.json()),
+    fetch('./cards.json?v=20260608').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),

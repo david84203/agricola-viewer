@@ -235,7 +235,7 @@
 <script>
 // Load cards.json to map image → card names
 let cardsData = [];
-fetch('./cards.json').then(r=>r.json()).then(d=>{ cardsData = d; }).catch(()=>{});
+fetch('./cards.json?v=20260608').then(r=>r.json()).then(d=>{ cardsData = d; }).catch(()=>{});
 
 // Image files list (from the images/ directory)
 const IMAGE_FILES = [

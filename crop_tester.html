@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>裁切測試工具</title>
+<style>
+  body { background: #1a1a1a; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  .controls { display: flex; gap: 20px; margin-bottom: 20px; background: #333; padding: 20px; border-radius: 8px; }
+  .control-group { display: flex; flex-direction: column; }
+  label { margin-bottom: 5px; font-size: 14px; }
+  input[type="range"] { width: 200px; }
+  input[type="number"] { width: 60px; margin-top: 5px; }
+  .preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  canvas { background: #000; border: 1px solid #555; }
+  img { max-width: 600px; display: none; }
+</style>
+</head>
+<body>
+  <h2>FR 圖片裁切測試工具</h2>
+  <div class="controls">
+    <div class="control-group">
+      <label>Top (上)</label>
+      <input type="range" id="cTop" min="0" max="300" value="113">
+      <input type="number" id="nTop" value="113">
+    </div>
+    <div class="control-group">
+      <label>Bottom (下)</label>
+      <input type="range" id="cBottom" min="0" max="300" value="99">
+      <input type="number" id="nBottom" value="99">
+    </div>
+    <div class="control-group">
+      <label>Left (左)</label>
+      <input type="range" id="cLeft" min="0" max="300" value="182">
+      <input type="number" id="nLeft" value="182">
+    </div>
+    <div class="control-group">
+      <label>Right (右)</label>
+      <input type="range" id="cRight" min="0" max="300" value="164">
+      <input type="number" id="nRight" value="164">
+    </div>
+  </div>
+  
+  <div>
+    <select id="imgSelect">
+      <option value="images/舊版改新.jpg">舊版改新.jpg</option>
+      <option value="images/舊版改新2.jpg">舊版改新2.jpg</option>
+      <option value="images/FRm1.jpg">FRm1.jpg</option>
+      <option value="images/FRm2.jpg">FRm2.jpg</option>
+      <option value="images/FRm3.jpg">FRm3.jpg</option>
+      <option value="images/FRm4.jpg">FRm4.jpg</option>
+      <option value="images/FRm5.jpg">FRm5.jpg</option>
+      <option value="images/FRm6.jpg">FRm6.jpg</option>
+      <option value="images/FRo1.jpg">FRo1.jpg</option>
+      <option value="images/FRo2.jpg">FRo2.jpg</option>
+      <option value="images/FRo3.jpg">FRo3.jpg</option>
+      <option value="images/FRo4.jpg">FRo4.jpg</option>
+      <option value="images/FRo5.jpg">FRo5.jpg</option>
+      <option value="images/FRo6.jpg">FRo6.jpg</option>
+      <option value="images/E_Minor1.jpg">E_Minor1.jpg (作為對照)</option>
+    </select>
+  </div>
+
+  <div style="margin-top: 10px;">
+    <button id="recordBtn" style="padding: 8px 16px; background: var(--gold, #e8b84b); border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">記錄此圖數值</button>
+  </div>
+  
+  <div style="margin-top: 20px; width: 100%; max-width: 600px;">
+    <textarea id="resultText" rows="10" style="width: 100%; padding: 10px; background: #222; color: #fff; border: 1px solid #555;" placeholder="這裡會顯示你記錄的數值..."></textarea>
+  </div>
+
+  <br>
+  <div class="preview" id="previewGrid"></div>
+  <img id="sourceImage" src="images/FRm1.jpg">
+
+<script>
+  const img = document.getElementById('sourceImage');
+  const grid = document.getElementById('previewGrid');
+  const selects = ['Top', 'Bottom', 'Left', 'Right'];
+  const recordBtn = document.getElementById('recordBtn');
+  const resultText = document.getElementById('resultText');
+  const imgSelect = document.getElementById('imgSelect');
+  
+  const state = { top: 113, bottom: 99, left: 182, right: 164 };
+  const records = {};
+
+  function render() {
+    grid.innerHTML = '';
+    if (!img.complete || img.naturalWidth === 0) return;
+    
+    const cols = 3; const rows = 3;
+    const usableW = img.naturalWidth - state.left - state.right;
+    const usableH = img.naturalHeight - state.top - state.bottom;
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = cellW;
+        canvas.height = cellH;
+        canvas.style.width = '200px'; // display size
+        const ctx = canvas.getContext('2d');
+        const sx = state.left + c * cellW;
+        const sy = state.top + r * cellH;
+        ctx.drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
+        grid.appendChild(canvas);
+      }
+    }
+  }
+
+  selects.forEach(s => {
+    const range = document.getElementById('c' + s);
+    const num = document.getElementById('n' + s);
+    const key = s.toLowerCase();
+    
+    const update = (val) => {
+      state[key] = parseInt(val);
+      range.value = val;
+      num.value = val;
+      render();
+    };
+    
+    range.addEventListener('input', e => update(e.target.value));
+    num.addEventListener('input', e => update(e.target.value));
+  });
+
+  imgSelect.addEventListener('change', e => {
+    img.src = e.target.value;
+    const fileName = e.target.value.split('/').pop();
+    if (records[fileName]) {
+       // Restore previous values if available
+       ['top', 'bottom', 'left', 'right'].forEach(k => {
+           const val = records[fileName][k];
+           state[k] = val;
+           const s = k.charAt(0).toUpperCase() + k.slice(1);
+           document.getElementById('c' + s).value = val;
+           document.getElementById('n' + s).value = val;
+       });
+       render();
+    }
+  });
+
+  recordBtn.addEventListener('click', () => {
+    const fileName = imgSelect.value.split('/').pop();
+    records[fileName] = { ...state };
+    
+    let text = '';
+    for (const [file, vals] of Object.entries(records)) {
+      text += `'${file}': { crop_top: ${vals.top}, crop_bottom: ${vals.bottom}, crop_left: ${vals.left}, crop_right: ${vals.right} },\n`;
+    }
+    resultText.value = text;
+  });
+
+
+  img.onload = render;
+</script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
+</body>
+</html>

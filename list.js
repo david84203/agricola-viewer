@@ -137,7 +137,7 @@ COLUMNS.forEach(col => {
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const res = await fetch('./cards.json');
+  const res = await fetch('./cards.json?v=20260608');
   allCards = await res.json();
   populateDeckFilter();
   document.getElementById('totalCount').textContent = allCards.length;
