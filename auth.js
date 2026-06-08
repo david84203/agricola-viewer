@@ -8,8 +8,9 @@ const AUTH_SETTINGS_KEY = 'agricola_auth_settings';
 const AUTH_SETTINGS_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const AUTH_LINE_INVITE_KEY = 'agricola_line_invite_seen';
 const UGG_LINE_URL = 'https://lin.ee/TLqRqdc';
-const FIRESTORE_AUTH = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/settings/auth';
-const FIRESTORE_PLAYERS = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/agricola_players';
+const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+const FIRESTORE_AUTH = `${FIRESTORE_BASE}/settings/auth`;
+const FIRESTORE_PLAYERS = `${FIRESTORE_BASE}/agricola_players`;
 
 // ── State ──────────────────────────────────────────
 function getAuth() {
@@ -53,6 +54,44 @@ function isPlayer()  { return getRole() === 'player'; }
 // 玩家／評分者／管理員都會累積個人輪抽紀錄，可查看個人分析
 function hasProfileAccess() { const r = getRole(); return r === 'rater' || r === 'admin' || r === 'player'; }
 
+// ── Cross-role ID collision checks ─────────────────
+// 評分者不需要註冊（共用 PIN），玩家需要自行註冊帳號；
+// 為避免同一個 ID 被兩邊各自使用造成混淆，登入前互相檢查對方陣營是否已用過此 ID。
+
+// 此 ID 是否已是註冊過的玩家帳號
+async function isRegisteredPlayerId(id) {
+  try {
+    const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id)}`);
+    return res.status === 200;
+  } catch {
+    return false;
+  }
+}
+
+// 此 ID 是否曾以評分者身份留下場次紀錄（agricola_sessions 中 role 不是 'player' 的紀錄）
+async function isUsedAsRaterId(id) {
+  try {
+    const query = {
+      structuredQuery: {
+        from: [{ collectionId: 'agricola_sessions' }],
+        select: { fields: [{ fieldPath: 'role' }] },
+        where: { fieldFilter: { field: { fieldPath: 'raterId' }, op: 'EQUAL', value: { stringValue: id } } },
+        limit: 20,
+      }
+    };
+    const res = await fetch(`${FIRESTORE_BASE}:runQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+    });
+    const data = await res.json();
+    const docs = (Array.isArray(data) ? data : []).filter(d => d.document);
+    return docs.some(d => d.document.fields?.role?.stringValue !== 'player');
+  } catch {
+    return false;
+  }
+}
+
 // ── Login ──────────────────────────────────────────
 async function login(id, pin) {
   const trimmedId = id.trim();
@@ -60,6 +99,10 @@ async function login(id, pin) {
 
   if (trimmedId.toLowerCase() === 'bay' || trimmedId.toLowerCase() === 'chris') {
     return { ok: false, error: '此 ID 已被限制，若要使用請改由「玩家登入」註冊一般帳號' };
+  }
+
+  if (await isRegisteredPlayerId(trimmedId)) {
+    return { ok: false, error: `「${trimmedId}」已是一般玩家帳號，你登入錯入口囉，請改用「玩家登入」` };
   }
 
   const settings = await fetchAuthSettings();
@@ -90,6 +133,10 @@ async function loginPlayer(id, pin) {
   const res = await fetch(docUrl);
 
   if (res.status === 404) {
+    if (await isUsedAsRaterId(trimmedId)) {
+      return { ok: false, error: `「${trimmedId}」已是評分者身份，你登入錯入口囉，請改用「評分者登入」（或換一個 ID 註冊玩家帳號）` };
+    }
+
     // ID 尚未被使用 → 直接以此 ID + PIN 建立新帳號
     const createRes = await fetch(docUrl, {
       method: 'PATCH',
