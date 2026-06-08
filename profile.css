@@ -37,6 +37,14 @@
 }
 .profile-cta-btn:hover { background: #3a82c8; }
 
+.profile-auth-btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.profile-auth-btn-row .profile-cta-btn { margin-top: 0; }
+
 .profile-lock-wrap { width: 100%; max-width: 360px; margin-top: 8px; }
 .profile-lock-bar-track {
   height: 10px; background: #1e2b3a; border-radius: 5px; overflow: hidden;

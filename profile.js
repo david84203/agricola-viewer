@@ -976,10 +976,11 @@ async function init() {
 
   const auth = typeof getAuth === 'function' ? getAuth() : null;
 
-  if (!auth || !isRater()) {
+  if (!auth || !hasProfileAccess()) {
     document.getElementById('profileLoading').style.display = 'none';
     document.getElementById('profileAuthRequired').style.display = '';
     document.getElementById('profileLoginBtn').addEventListener('click', openLoginModal);
+    document.getElementById('profilePlayerLoginBtn').addEventListener('click', openPlayerLoginModal);
     return;
   }
 
@@ -1040,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', init);
 // Re-init after login
 function onAuthChange() {
   const auth = typeof getAuth === 'function' ? getAuth() : null;
-  if (auth && isRater() && document.getElementById('profileAuthRequired').style.display !== 'none') {
+  if (auth && hasProfileAccess() && document.getElementById('profileAuthRequired').style.display !== 'none') {
     document.getElementById('profileAuthRequired').style.display = 'none';
     document.getElementById('profileLoading').style.display = '';
     init();
