@@ -8,9 +8,9 @@ const AUTH_SETTINGS_KEY = 'agricola_auth_settings';
 const AUTH_SETTINGS_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const AUTH_LINE_INVITE_KEY = 'agricola_line_invite_seen';
 const UGG_LINE_URL = 'https://lin.ee/TLqRqdc';
-const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-const FIRESTORE_AUTH = `${FIRESTORE_BASE}/settings/auth`;
-const FIRESTORE_PLAYERS = `${FIRESTORE_BASE}/agricola_players`;
+const FIRESTORE_DOCS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+const FIRESTORE_AUTH = `${FIRESTORE_DOCS_BASE}/settings/auth`;
+const FIRESTORE_PLAYERS = `${FIRESTORE_DOCS_BASE}/agricola_players`;
 
 // ── State ──────────────────────────────────────────
 function getAuth() {
@@ -79,7 +79,7 @@ async function isUsedAsRaterId(id) {
         limit: 20,
       }
     };
-    const res = await fetch(`${FIRESTORE_BASE}:runQuery`, {
+    const res = await fetch(`${FIRESTORE_DOCS_BASE}:runQuery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(query),
