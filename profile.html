@@ -17,11 +17,13 @@
       <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
       <div class="brand-text">
         <div class="brand-title">農家樂 Agricola — 個人分析</div>
-        <div class="brand-sub">評分者專屬數據</div>
+        <div class="brand-sub">評分者／玩家個人數據</div>
       </div>
     </div>
     <div class="brand-right">
-      <a href="draft.html" class="back-link">← 回輪抽模擬器</a>
+      <div class="brand-nav">
+        <a href="draft.html" class="draft-nav-btn">← 回輪抽模擬器</a>
+      </div>
     </div>
   </div>
 
@@ -37,8 +39,11 @@
     <div id="profileAuthRequired" class="profile-state" style="display:none">
       <div class="state-icon">🔐</div>
       <h2>需要登入</h2>
-      <p>請先以評分者帳號登入，再查看個人分析。</p>
-      <button class="profile-cta-btn" id="profileLoginBtn">評分者登入</button>
+      <p>請先以評分者或玩家帳號登入，再查看個人分析。</p>
+      <div class="profile-auth-btn-row">
+        <button class="profile-cta-btn" id="profileLoginBtn">評分者登入</button>
+        <button class="profile-cta-btn" id="profilePlayerLoginBtn">玩家登入</button>
+      </div>
     </div>
 
     <!-- Locked -->
@@ -201,5 +206,9 @@
 
   <script src="auth.js"></script>
   <script src="profile.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
 </body>
 </html>

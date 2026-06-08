@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════
+   BUG 回報頁面樣式
+   ══════════════════════════════════════════════════ */
+
+.bug-main {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.bug-screen {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 未登入狀態 */
+.bug-unauth-container {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 40px;
+  text-align: center;
+}
+
+.bug-unauth-container h2 {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.bug-unauth-container p {
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* 表單區塊 */
+.bug-form-section, .bug-list-section {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.bug-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.bug-form-group {
+  margin-bottom: 16px;
+}
+
+.bug-form-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.bug-reporter-id {
+  font-size: 1.1rem;
+  color: var(--text);
+  font-weight: 700;
+  background: var(--bg3);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  border: 1px solid var(--border2);
+}
+
+.bug-select, .bug-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+
+.bug-select:focus, .bug-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.bug-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.bug-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.bug-form-error {
+  color: #ff5e5e;
+  font-size: 0.9rem;
+}
+
+.bug-submit-btn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bug-submit-btn:hover {
+  background: var(--gold2);
+  transform: translateY(-2px);
+}
+
+.bug-submit-btn:disabled {
+  background: var(--border);
+  color: var(--text3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 歷史紀錄區塊 */
+.bug-list-hint {
+  font-size: 0.85rem;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+.bug-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bug-loading, .bug-empty {
+  text-align: center;
+  color: var(--text3);
+  padding: 20px;
+  font-style: italic;
+}
+
+.bug-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bug-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--border2);
+  padding-bottom: 8px;
+}
+
+.bug-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text3);
+}
+
+.bug-item-reporter {
+  color: var(--gold2);
+  font-weight: 700;
+}
+
+.bug-item-interface {
+  background: var(--surface);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+}
+
+/* 狀態標籤 */
+.bug-status-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.bug-status-pending {
+  background: rgba(255, 94, 94, 0.15);
+  color: #ff5e5e;
+  border: 1px solid rgba(255, 94, 94, 0.3);
+}
+
+.bug-status-resolved {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.bug-item-desc {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.bug-item.resolved .bug-item-desc {
+  text-decoration: line-through;
+  color: var(--text3);
+}

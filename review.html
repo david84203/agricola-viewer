@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 覆盤輪抽模擬</title>
+  <meta name="description" content="輸入實際對局的四包牌，記錄每位玩家的選牌，並依 ELO 評分分析每人的輪抽決策。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="review.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 覆盤輪抽模擬</div>
+        <div class="brand-sub">輸入實際對局牌組，還原輪抽過程並評分</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <div class="brand-nav">
+        <a href="index.html" class="draft-nav-btn">← 回首頁</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="review-main">
+
+    <!-- ══ 畫面一：設定包牌 ══ -->
+    <div id="setupScreen" class="review-screen active">
+      <div class="review-section-title">設定玩家與牌包</div>
+      <div class="review-section-sub">填入玩家名稱，再為每位玩家的牌包選入 9 張職業牌 + 9 張次要發展牌</div>
+
+      <!-- BGA 模式切換 -->
+      <div class="bga-mode-bar" id="bgaModeBar">
+        <label class="bga-toggle-wrap">
+          <input type="checkbox" id="bgaModeToggle" />
+          <span class="bga-toggle-track"><span class="bga-toggle-thumb"></span></span>
+          <div class="bga-toggle-text">
+            <div class="bga-toggle-title">BGA 模式</div>
+            <div class="bga-toggle-sub">限 A / B / C / D / E 牌組，開放重複卡與禁卡選取（切換時會清空已選包牌）</div>
+          </div>
+        </label>
+        <div class="bga-preset-hints">
+          <span class="bga-preset-tag ban-strong">禁｜過強 → ELO 1300</span>
+          <span class="bga-preset-tag ban-weak">禁｜過爛 → ELO 850</span>
+          <span class="bga-preset-tag ban-disrupt">禁｜擾亂 → ELO 1200</span>
+          <span class="bga-preset-tag dup">重複卡 → ELO 1150</span>
+        </div>
+      </div>
+
+      <!-- 玩家名稱 -->
+      <div class="player-names-row">
+        <div class="player-name-cell">
+          <div class="player-name-label"><span class="player-color-dot dot-A"></span>玩家 A 名稱</div>
+          <input class="player-name-input" id="nameA" type="text" placeholder="玩家A" maxlength="12" autocomplete="off" />
+        </div>
+        <div class="player-name-cell">
+          <div class="player-name-label"><span class="player-color-dot dot-B"></span>玩家 B 名稱</div>
+          <input class="player-name-input" id="nameB" type="text" placeholder="玩家B" maxlength="12" autocomplete="off" />
+        </div>
+        <div class="player-name-cell">
+          <div class="player-name-label"><span class="player-color-dot dot-C"></span>玩家 C 名稱</div>
+          <input class="player-name-input" id="nameC" type="text" placeholder="玩家C" maxlength="12" autocomplete="off" />
+        </div>
+        <div class="player-name-cell">
+          <div class="player-name-label"><span class="player-color-dot dot-D"></span>玩家 D 名稱</div>
+          <input class="player-name-input" id="nameD" type="text" placeholder="玩家D" maxlength="12" autocomplete="off" />
+        </div>
+      </div>
+
+      <!-- 包牌進度總覽 -->
+      <div class="pack-progress-row" id="packProgressRow">
+        <!-- JS 動態生成 -->
+      </div>
+
+      <!-- 包牌分頁 -->
+      <div class="pack-tabs" id="packTabs">
+        <!-- JS 動態生成 -->
+      </div>
+
+      <!-- 包牌面板 -->
+      <div id="packPanels">
+        <!-- JS 動態生成 -->
+      </div>
+
+      <!-- 模式選擇 -->
+      <div class="mode-selection-section">
+        <div class="review-section-title">選擇模擬模式</div>
+        <div class="mode-cards">
+          <label class="mode-card">
+            <input type="radio" name="draftMode" value="1" checked />
+            <div class="mode-card-content">
+              <div class="mode-card-title">📝 歷史紀錄輸入</div>
+              <div class="mode-card-sub">依序輸入四位玩家的完整扣牌，用於分析歷史對局</div>
+            </div>
+          </label>
+          <label class="mode-card">
+            <input type="radio" name="draftMode" value="2" />
+            <div class="mode-card-content">
+              <div class="mode-card-title">🤖 單人挑戰 AI</div>
+              <div class="mode-card-sub">指定一個座位親自扣牌，另外三家 AI 自動選擇最高 ELO 的牌</div>
+            </div>
+          </label>
+          <label class="mode-card">
+            <input type="radio" name="draftMode" value="3" />
+            <div class="mode-card-content">
+              <div class="mode-card-title">👥 四人單機輪抽</div>
+              <div class="mode-card-sub">四位玩家共用螢幕輪流扣牌（有換人防窺機制）</div>
+            </div>
+          </label>
+          <label class="mode-card">
+            <input type="radio" name="draftMode" value="4" />
+            <div class="mode-card-content">
+              <div class="mode-card-title">⚡ 全 AI 自動展示</div>
+              <div class="mode-card-sub">四家皆由 AI 自動扣牌，直接查看結果</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="mode-options" id="modeOptions" style="display:none;">
+          <div class="mode-option-label">選擇你的座位：</div>
+          <select id="humanSeatSelect" class="mode-select">
+            <option value="A">玩家 A</option>
+            <option value="B">玩家 B</option>
+            <option value="C">玩家 C</option>
+            <option value="D">玩家 D</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="review-start-btn" id="startInputBtn" disabled>
+        ✦ 開始模擬
+      </button>
+    </div>
+
+    <!-- ══ 畫面二：逐人輸入扣牌 ══ -->
+    <div id="inputScreen" class="review-screen">
+
+      <!-- 進度列 -->
+      <div class="input-progress" id="inputProgress">
+        <!-- JS 動態生成 -->
+      </div>
+
+      <!-- 當前玩家標頭 -->
+      <div class="input-phase-header">
+        <div>
+          <div class="input-phase-player-name" id="inputPlayerName">玩家A</div>
+          <div class="input-phase-hint">點選每個輪次的格子，選出該輪實際扣的牌</div>
+        </div>
+        <div class="input-phase-player-badge badge-player-A" id="inputPlayerBadge">A</div>
+      </div>
+
+      <!-- 職業牌輸入區 -->
+      <div class="input-phase-section">
+        <div class="input-phase-section-title occ-title">
+          <span class="phase-type-badge phase-type-occ">職業牌</span>
+          職業卡輪抽
+          <span class="phase-title-round">共 7 輪</span>
+        </div>
+        <div class="round-slots" id="occSlots">
+          <!-- JS 動態生成 -->
+        </div>
+      </div>
+
+      <!-- 次要發展牌輸入區 -->
+      <div class="input-phase-section">
+        <div class="input-phase-section-title min-title">
+          <span class="phase-type-badge phase-type-min">次要發展</span>
+          次要發展卡輪抽
+          <span class="phase-title-round">共 7 輪</span>
+        </div>
+        <div class="round-slots" id="minSlots">
+          <!-- JS 動態生成 -->
+        </div>
+      </div>
+
+      <!-- 底部操作列 -->
+      <div class="input-action-bar">
+        <div class="input-pick-count" id="inputPickCount">
+          已選 <strong>0</strong> / 14 張
+        </div>
+        <button class="input-next-btn" id="inputNextBtn" disabled>
+          下一位玩家 →
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ 動態輪抽畫面（模式二、三） ══ -->
+    <div id="activeDraftScreen" class="review-screen">
+      <div class="active-draft-header">
+        <div class="active-draft-info">
+          <div class="active-draft-round" id="adRoundLabel">職業卡 第 1 / 7 輪</div>
+          <div class="active-draft-turn">現在輪到 <strong id="adTurnName" class="ad-turn-name">玩家A</strong> 扣牌</div>
+        </div>
+      </div>
+
+      <!-- 顯示該玩家已扣下的牌 -->
+      <div class="ad-board-section">
+        <div class="ad-board-title">已扣下的牌</div>
+        <div class="ad-board-grid" id="adBoardGrid">
+          <!-- JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 當前傳過來的牌包 -->
+      <div class="ad-pack-section">
+        <div class="ad-pack-title" id="adPackTitle">傳來的牌包</div>
+        <div class="ad-pack-grid" id="adPackGrid">
+          <!-- JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 換人防窺遮罩 -->
+      <div class="ad-pass-overlay" id="adPassOverlay" style="display:none;">
+        <div class="ad-pass-content">
+          <div class="ad-pass-icon">👀</div>
+          <div class="ad-pass-title">接下來輪到 <strong id="adPassNextName">玩家B</strong></div>
+          <div class="ad-pass-sub">請將裝置交給下一位玩家，準備好後點擊按鈕</div>
+          <button class="ad-pass-btn" id="adPassReadyBtn">我準備好了</button>
+        </div>
+      </div>
+    </div>
+    <!-- ══ 畫面三：評分結果 ══ -->
+    <div id="resultScreen" class="review-screen">
+      <div class="result-top-bar">
+        <div class="result-title">📊 覆盤輪抽結果</div>
+        <button class="result-restart-btn" id="resultRestartBtn">↩ 重新選擇模式</button>
+      </div>
+
+      <div class="result-player-grid" id="resultPlayerGrid">
+        <!-- JS 動態生成 -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 卡牌詳情 Modal（與 draft.html 相同） -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-inner">
+        <div class="modal-image-wrap">
+          <canvas id="modalCanvas"></canvas>
+        </div>
+        <div class="modal-info">
+          <div class="modal-title-row">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-badge" id="modalBadge"></div>
+          </div>
+          <div class="modal-sub-row">
+            <div class="modal-id" id="modalId"></div>
+          </div>
+          <div class="modal-fields" id="modalFields"></div>
+          <div class="modal-desc-wrap">
+            <div class="modal-desc-label">說明</div>
+            <div class="modal-desc" id="modalDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slot Picker（選牌彈出層） -->
+  <div class="slot-picker-backdrop" id="pickerBackdrop" style="display:none"></div>
+  <div class="slot-picker" id="slotPicker" style="display:none">
+    <div class="slot-picker-header">
+      <div class="slot-picker-title" id="slotPickerTitle">選擇扣牌</div>
+      <input class="slot-picker-search" id="slotPickerSearch" type="text" placeholder="搜尋卡名或 ID…" autocomplete="off" />
+    </div>
+    <div class="slot-picker-grid" id="slotPickerGrid">
+      <!-- JS 動態生成 -->
+    </div>
+  </div>
+
+  <!-- Global Loading Overlay -->
+  <div class="global-loading-overlay" id="globalLoading" style="display:none;">
+    <div class="spinner"></div>
+    <div class="loading-text">載入 ELO 資料與計算中...</div>
+  </div>
+
+  <script src="duplicate-utils.js"></script>
+  <script src="review.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
+</body>
+</html>

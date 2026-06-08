@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BUG 回報 - 烏嘎嘎農家樂卡牌中心</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="stylesheet" href="bug-report.css" />
+</head>
+<body>
+  <!-- 頂部導覽列 -->
+  <header class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" style="display:flex; align-items:center; text-decoration:none;">
+        <img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" />
+        <div class="brand-text">
+          <div class="brand-title">烏嘎嘎農家樂卡牌中心</div>
+          <div class="brand-sub">回首頁</div>
+        </div>
+      </a>
+    </div>
+    <div class="brand-center">BUG 回報與追蹤</div>
+    <div class="brand-right" id="authBarMount"></div>
+  </header>
+
+  <main class="bug-main">
+    
+    <!-- 未登入畫面 -->
+    <div id="unauthScreen" class="bug-screen" style="display: none;">
+      <div class="bug-unauth-container">
+        <h2>🔒 需登入才能回報 BUG</h2>
+        <p>請先使用右上角的按鈕登入（玩家或評分者皆可），登入後即可填寫與查看回報紀錄。</p>
+      </div>
+    </div>
+
+    <!-- 已登入畫面 -->
+    <div id="authScreen" class="bug-screen" style="display: none;">
+      
+      <!-- 表單區 -->
+      <section class="bug-form-section">
+        <h2 class="bug-section-title">新增 BUG 回報</h2>
+        
+        <div class="bug-form-group">
+          <label>回報者 ID：</label>
+          <div class="bug-reporter-id" id="reporterIdDisplay">讀取中...</div>
+        </div>
+
+        <div class="bug-form-group">
+          <label for="bugInterfaceSelect">發生問題的介面：</label>
+          <select id="bugInterfaceSelect" class="bug-select">
+            <option value="卡牌資料庫">卡牌資料庫</option>
+            <option value="輪抽模擬">輪抽模擬</option>
+            <option value="覆盤輪抽模擬">覆盤輪抽模擬</option>
+            <option value="牌力排行">牌力排行</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="bug-form-group">
+          <label for="bugDescInput">BUG 詳細內容描述：</label>
+          <textarea id="bugDescInput" class="bug-textarea" placeholder="請盡可能詳細描述您遇到的問題、操作步驟或出現的錯誤訊息..." rows="5"></textarea>
+        </div>
+
+        <div class="bug-form-actions">
+          <span class="bug-form-error" id="bugFormError"></span>
+          <button id="bugSubmitBtn" class="bug-submit-btn">送出回報</button>
+        </div>
+      </section>
+
+      <!-- 歷史紀錄區 -->
+      <section class="bug-list-section">
+        <h2 class="bug-section-title">📋 歷史回報紀錄</h2>
+        <p class="bug-list-hint">已處理的回報將會在 7 天後自動從系統中刪除。</p>
+        
+        <div id="bugListContainer" class="bug-list-container">
+          <div class="bug-loading">讀取資料中...</div>
+          <!-- JS 動態渲染 -->
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="auth.js"></script>
+  <script src="bug-report.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
+</body>
+</html>

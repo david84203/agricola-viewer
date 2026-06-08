@@ -116,6 +116,8 @@ let state = {
   currentPicks: null,
   // Rater mode
   raterMode: false,
+  // Player mode (records personal session, never feeds ELO/Tier list)
+  playerMode: false,
   shownLog: [],        // [{picked, opponents[]}] all rounds, used for score + rater upload
   comboTags: [],       // [{from, to, phase, round}] — "picked `to` because already holding `from`"
   pendingComboFrom: [],// 卡片ID[] — currently toggled combo-source cards for the active selection
@@ -133,15 +135,19 @@ async function loadDupExclusions() {
 
 // ── Auth callback ──────────────────────────────────
 function onAuthChange() {
-  const rater = typeof isRater === 'function' && isRater();
+  const rater   = typeof isRater === 'function' && isRater();
+  const player  = typeof isPlayer === 'function' && isPlayer();
+  const tracked = rater || player; // 兩者皆會累積個人輪抽紀錄
+
   document.getElementById('raterWrap').style.display          = rater ? '' : 'none';
-  document.getElementById('raterLoginHint').style.display      = rater ? 'none' : '';
-  document.getElementById('raterProgressWrap').style.display   = rater ? '' : 'none';
+  document.getElementById('raterLoginHint').style.display      = tracked ? 'none' : '';
+  document.getElementById('playerModeNote').style.display      = player ? '' : 'none';
+  document.getElementById('raterProgressWrap').style.display   = tracked ? '' : 'none';
   const toggle = document.getElementById('raterModeToggle');
   if (toggle) toggle.checked = rater;
   applyRaterDeckLock(rater);
   applyRaterModeLock(rater);
-  if (!rater) return;
+  if (!tracked) return;
   loadRaterProgress();
 }
 
@@ -335,7 +341,8 @@ function shuffle(arr) {
 
 // ── Start Draft ────────────────────────────────────
 function startDraft() {
-  state.raterMode = document.getElementById('raterModeToggle').checked;
+  state.raterMode  = document.getElementById('raterModeToggle').checked;
+  state.playerMode = !state.raterMode && typeof isPlayer === 'function' && isPlayer();
 
   if (state.raterMode) {
     state.draftMode = 'separate'; // 評分者模式僅支援分開輪抽，確保評分資料一致性
@@ -810,7 +817,7 @@ function renderComboTagPicker() {
   const list = document.getElementById('comboTagList');
   const candidates = getComboTagCandidates();
 
-  if (!state.raterMode || !state.selectedCard || candidates.length === 0) {
+  if (!(state.raterMode || state.playerMode) || !state.selectedCard || candidates.length === 0) {
     wrap.style.display = 'none';
     return;
   }
@@ -943,6 +950,7 @@ function showResult() {
   renderResultGrid('occResultGrid', state.occPicks);
   renderResultGrid('minResultGrid', state.minPicks);
   if (state.raterMode) uploadRatings();
+  else if (state.playerMode) uploadPlayerSession();
   calculateScore();
 }
 
@@ -1079,6 +1087,82 @@ async function uploadRatings() {
     localStorage.removeItem(PROGRESS_CACHE_KEY);
     localStorage.removeItem('agricola_ratings_cache');
     statusEl.textContent = `✓ ELO 更新完成（${state.shownLog.length} 輪）`;
+    statusEl.className = 'upload-status done';
+  } catch (err) {
+    statusEl.textContent = `⚠ 上傳失敗：${err.message}`;
+    statusEl.className = 'upload-status error';
+  }
+}
+
+// 玩家模式：只記錄個人場次（用於個人分析），不更新 ELO / Tier list
+async function uploadPlayerSession() {
+  const statusEl = document.getElementById('uploadStatus');
+  statusEl.style.display = 'flex';
+  statusEl.textContent = '紀錄上傳中…';
+  statusEl.className = 'upload-status uploading';
+
+  try {
+    const totalMatches = state.shownLog.reduce((s, r) => s + r.opponents.length, 0);
+    const playerId = getRaterId() || 'unknown';
+
+    const write = {
+      update: {
+        name: `projects/project-hub-410cd/databases/(default)/documents/agricola_sessions/${playerId}_${Date.now()}`,
+        fields: {
+          raterId:      { stringValue: playerId },
+          role:         { stringValue: 'player' },
+          excludeFromElo: { booleanValue: true },
+          timestamp:    { stringValue: new Date().toISOString() },
+          draftMode:    { stringValue: state.draftMode },
+          totalRounds:  { integerValue: `${state.shownLog.length}` },
+          totalMatches: { integerValue: `${totalMatches}` },
+          picks: {
+            arrayValue: {
+              values: [...state.occPicks, ...state.minPicks].map(c => ({ stringValue: c['卡片ID'] }))
+            }
+          },
+          raterLog: {
+            arrayValue: {
+              values: state.shownLog.map(({ picked, opponents }) => ({
+                mapValue: {
+                  fields: {
+                    picked:    { stringValue: picked },
+                    opponents: { arrayValue: { values: opponents.map(id => ({ stringValue: id })) } }
+                  }
+                }
+              }))
+            }
+          },
+          comboTags: {
+            arrayValue: {
+              values: state.comboTags.map(({ from, to, phase, round }) => ({
+                mapValue: {
+                  fields: {
+                    from:  { stringValue: from },
+                    to:    { stringValue: to },
+                    phase: { stringValue: phase },
+                    round: { integerValue: `${round}` },
+                  }
+                }
+              }))
+            }
+          }
+        }
+      }
+    };
+
+    const res = await fetch(`${FIRESTORE_BASE}:commit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writes: [write] })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    localStorage.removeItem(PROGRESS_CACHE_KEY);
+    statusEl.textContent = `✓ 紀錄已儲存（${state.shownLog.length} 輪，已計入個人分析，不影響 ELO）`;
     statusEl.className = 'upload-status done';
   } catch (err) {
     statusEl.textContent = `⚠ 上傳失敗：${err.message}`;

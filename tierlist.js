@@ -110,7 +110,7 @@ async function loadDupExclusions() {
 async function init() {
   try {
     const [cards, ratings, dupExcluded] = await Promise.all([
-      fetch('./cards.json').then(r => r.json()),
+      fetch('./cards.json?v=20260608').then(r => r.json()),
       fetchAllRatings(),
       loadDupExclusions(),
       loadBanlist(),

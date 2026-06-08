@@ -21,7 +21,9 @@
       </div>
     </div>
     <div class="brand-right">
-      <a href="index.html" class="back-link">← 回首頁</a>
+      <div class="brand-nav">
+        <a href="index.html" class="draft-nav-btn">← 回首頁</a>
+      </div>
     </div>
   </div>
 
@@ -66,7 +68,10 @@
       </div>
       <div id="raterDeckNote" class="rater-deck-note" style="display:none">⚠ 評分模式固定使用全牌池，確保資料公平性</div>
       <div class="rater-login-hint" id="raterLoginHint">
-        <span>🔐 登入後可使用評分者模式</span>
+        <span>🔐 登入後可使用評分者模式／玩家模式</span>
+      </div>
+      <div class="rater-login-hint player-mode-note" id="playerModeNote" style="display:none">
+        <span>🎮 玩家模式：本次輪抽紀錄將自動累積到你的個人分析（不影響 ELO 評分／牌力排行）</span>
       </div>
       <div class="rater-progress-wrap" id="raterProgressWrap" style="display:none">
         <div class="rater-progress-header">
@@ -184,5 +189,9 @@
   <script src="auth.js"></script>
   <script src="duplicate-utils.js"></script>
   <script src="draft.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
 </body>
 </html>

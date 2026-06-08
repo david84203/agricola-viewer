@@ -109,6 +109,12 @@
   min-height: 20px;
   margin-bottom: 8px;
 }
+.player-auth-hint {
+  font-size: .8rem;
+  color: var(--text3);
+  line-height: 1.6;
+  margin: -12px 0 20px;
+}
 .auth-modal-footer {
   display: flex;
   gap: 10px;

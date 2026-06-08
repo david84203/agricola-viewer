@@ -43,6 +43,7 @@ async function fetchAllSessions() {
           { fieldPath: 'raterId' },
           { fieldPath: 'timestamp' },
           { fieldPath: 'draftMode' },
+          { fieldPath: 'role' },
         ]},
         orderBy: [{ field: { fieldPath: 'timestamp' }, direction: 'ASCENDING' }],
         limit: 300,
@@ -64,6 +65,7 @@ async function fetchAllSessions() {
       const f    = d.document.fields || {};
       const id   = f.raterId?.stringValue;
       if (!id) continue;
+      if (f.role?.stringValue === 'player') continue; // 玩家模式紀錄不算評分者場次
       const ts   = f.timestamp?.stringValue || '';
       const mode = f.draftMode?.stringValue || 'separate';
 
