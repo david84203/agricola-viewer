@@ -823,6 +823,7 @@ function renderExtremes() {
             <span class="ext-rank">#${i + 1}</span>
             <span class="ext-score ${s.score >= 80 ? 'hi' : s.score <= 50 ? 'lo' : ''}">${s.score} 分</span>
             <span class="ext-date">${date}</span>
+            <button class="ext-expand-btn">🔍 展開</button>
           </div>
           <div class="ext-picks">${thumbs}</div>
         </div>`;
@@ -837,6 +838,19 @@ function renderExtremes() {
   wrap.querySelectorAll('canvas[data-id]').forEach(canvas => {
     const card = cardMeta[canvas.dataset.id];
     if (card) requestAnimationFrame(() => drawCrop(canvas, card, 0.5));
+  });
+
+  // Bind expand buttons
+  wrap.querySelectorAll('.ext-expand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const picks = btn.parentElement.nextElementSibling;
+      const isExpanded = picks.classList.toggle('expanded');
+      btn.textContent = isExpanded ? '🔍 收合' : '🔍 展開';
+      picks.querySelectorAll('canvas[data-id]').forEach(canvas => {
+        const card = cardMeta[canvas.dataset.id];
+        if (card) requestAnimationFrame(() => drawCrop(canvas, card, isExpanded ? 1 : 0.5));
+      });
+    });
   });
 }
 
