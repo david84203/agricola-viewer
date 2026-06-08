@@ -1187,3 +1187,13 @@ body {
   font-style: italic;
   padding: 4px 0;
 }
+
+/* Site Footer */
+.site-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text3);
+  padding: 24px 20px;
+  opacity: 0.8;
+  margin-top: auto;
+}

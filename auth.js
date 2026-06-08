@@ -55,7 +55,12 @@ function hasProfileAccess() { const r = getRole(); return r === 'rater' || r ===
 
 // ── Login ──────────────────────────────────────────
 async function login(id, pin) {
-  if (!id.trim()) return { ok: false, error: '請輸入 ID' };
+  const trimmedId = id.trim();
+  if (!trimmedId) return { ok: false, error: '請輸入 ID' };
+
+  if (trimmedId.toLowerCase() === 'bay' || trimmedId.toLowerCase() === 'chris') {
+    return { ok: false, error: '此 ID 已被限制，若要使用請改由「玩家登入」註冊一般帳號' };
+  }
 
   const settings = await fetchAuthSettings();
 
