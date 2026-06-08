@@ -25,7 +25,7 @@ let bgaExtraIds = new Set();     // manually marked BGA card IDs
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
   const [base, overrides, banGroups, dupPairs, bgaData] = await Promise.all([
-    fetch('./cards.json?v=20260608').then(r => r.json()),
+    fetch('./cards.json').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
@@ -335,22 +335,11 @@ function drawCrop(canvas, card) {
     const sx = offsetLeft + (card.grid_col || 0) * cellW;
     const sy = offsetTop  + (card.grid_row || 0) * cellH;
 
-    let scale = 1;
-    if (canvas.id === 'modalCanvas' || (canvas.id && canvas.id.startsWith('dup'))) {
-      scale = 2; // Upscale modal canvas for better sharpness
-    }
-    const drawW = cellW * scale;
-    const drawH = cellH * 1 * scale;
-
-    canvas.width  = drawW;
-    canvas.height = drawH;
+    canvas.width  = cellW;
+    canvas.height = cellH;
 
     const ctx = canvas.getContext('2d');
-    if (scale > 1) {
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-    }
-    ctx.drawImage(img, sx, sy, cellW, cellH * 1, 0, 0, drawW, drawH);
+    ctx.drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
     canvas.dataset.drawn = '1';
   };
 

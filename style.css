@@ -733,8 +733,6 @@ body {
   height: 100%;
   object-fit: contain;
   display: block;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 .modal-badge {
   font-size: .75rem;
