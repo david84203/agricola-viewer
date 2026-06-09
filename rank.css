@@ -145,8 +145,8 @@
   border-color: var(--gold);
 }
 
-/* Dim all cards after all 8 are ranked */
-.rank-card-grid.all-ranked .rank-card:not(.ranked) {
+/* 整排排完後，其餘未排的牌變暗（class 加在 .rank-row 上） */
+.rank-row.all-ranked .rank-card:not(.ranked) {
   opacity: 0.4;
 }
 
@@ -231,3 +231,49 @@
 .rank-delta.flat { color: var(--text3); }
 
 #rankResultNextBtn { width: 100%; }
+
+/* ─── 手機版優化 ──────────────────────────────────────── */
+@media (max-width: 800px) {
+  /* 操作說明：縮短、降低存在感 */
+  .rank-instructions {
+    font-size: .78rem;
+    line-height: 1.45;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+  }
+
+  /* 進度狀態列黏在頂端，捲動時隨時看得到 X/7 進度 */
+  .rank-status-bar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    margin: 0 -12px 12px;       /* 對齊 .draft-main 手機側邊距，背景滿版 */
+    padding: 8px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .rank-status-group { justify-content: center; gap: 6px 10px; }
+  .rank-status-count { min-width: auto; font-weight: 700; }
+
+  /* 區段標題更緊湊 */
+  .rank-section-label { font-size: .8rem; margin-bottom: 6px; }
+
+  /* 名次徽章放大、更醒目 */
+  .rank-badge {
+    width: 30px;
+    height: 30px;
+    top: -14px;
+    font-size: .9rem;
+  }
+
+  /* 卡片資訊鈕(i)加大，手指好點 */
+  .rank-card .draft-card-info-btn {
+    width: 30px;
+    height: 30px;
+    font-size: .8rem;
+  }
+
+  /* 牌名易讀一些 */
+  .rank-card .draft-card-name { font-size: .76rem; }
+  .rank-card .draft-card-id   { font-size: .62rem; }
+}
