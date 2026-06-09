@@ -98,6 +98,7 @@ let imageCache = {};
 let activeFilter = 'all';
 let activeBga = false;
 let activeDecks = new Set();
+let tierSearchQuery = '';   // 原地高亮搜尋的關鍵字
 
 // ── Duplicate exclusions ───────────────────────────
 async function loadDupExclusions() {
@@ -268,6 +269,9 @@ function renderTierList() {
   const totalSeen = Object.values(ratingsMap).reduce((s, r) => s + r.seenCount + (r.rankSeen || 0), 0);
   document.getElementById('tierStats').textContent =
     `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
+
+  // 重畫後若正在搜尋，維持高亮
+  if (tierSearchQuery.trim()) applyTierSearch();
 }
 
 function renderBanSection(container, typeOk) {
@@ -301,6 +305,7 @@ function renderBanSection(container, typeOk) {
     cards.forEach(card => {
       const el = document.createElement('div');
       el.className = 'tier-ban-card';
+      el.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
       el.innerHTML = `<div class="tier-card-thumb"><canvas></canvas></div><div class="tier-ban-name">${card['牌名']}</div>`;
       el.addEventListener('click', () => openModal(card));
       el.querySelector('canvas')._pendingCard = card;
@@ -323,6 +328,7 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
   const pickRate = seenCount > 0 ? Math.round(pickCount / seenCount * 100) : 0;
   const div = document.createElement('div');
   div.className = 'tier-card';
+  div.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
   div.innerHTML = `
     <div class="tier-card-thumb"><canvas></canvas></div>
     <div class="tier-card-info">
@@ -336,6 +342,74 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
   div.addEventListener('click', () => openModal(card));
   div.querySelector('canvas')._pendingCard = card;
   return div;
+}
+
+// ── 原地高亮搜尋 ─────────────────────────────────────
+// 在現有 S~E 分組裡點亮符合的卡、收起不符的；有符合的分組自動展開，
+// 沒符合的整組收起。利用 tierlist 獨有的分組脈絡，不另開結果清單。
+function applyTierSearch() {
+  const q = tierSearchQuery.trim().toLowerCase();
+  const container = document.getElementById('tierContent');
+  const clearBtn = document.getElementById('tierSearchClear');
+  const hintEl = document.getElementById('tierSearchHint');
+  if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+
+  const tierSections = container.querySelectorAll('.tier-section');
+  const banSection = container.querySelector('.tier-ban-section');
+
+  if (!q) {
+    container.querySelectorAll('.search-hit, .search-hide')
+      .forEach(el => el.classList.remove('search-hit', 'search-hide'));
+    tierSections.forEach(s => { s.classList.add('collapsed'); s.style.display = ''; });
+    if (banSection) {
+      banSection.classList.add('collapsed');
+      banSection.style.display = '';
+      banSection.querySelectorAll('.tier-ban-group').forEach(g => { g.style.display = ''; });
+    }
+    if (hintEl) hintEl.textContent = '';
+    return;
+  }
+
+  const lightUp = c => {
+    const canvas = c.querySelector('canvas');
+    if (canvas && canvas._pendingCard) { drawCrop(canvas, canvas._pendingCard); canvas._pendingCard = null; }
+  };
+  let totalHits = 0;
+
+  tierSections.forEach(section => {
+    const cards = section.querySelectorAll('.tier-card');
+    if (!cards.length) { section.style.display = 'none'; return; } // 資料不足區（只有標題）
+    let hits = 0;
+    cards.forEach(c => {
+      const match = (c.dataset.search || '').includes(q);
+      c.classList.toggle('search-hit', match);
+      c.classList.toggle('search-hide', !match);
+      if (match) { hits++; lightUp(c); }
+    });
+    if (hits) { section.classList.remove('collapsed'); section.style.display = ''; totalHits += hits; }
+    else section.style.display = 'none';
+  });
+
+  if (banSection) {
+    const cards = banSection.querySelectorAll('.tier-ban-card');
+    let hits = 0;
+    cards.forEach(c => {
+      const match = (c.dataset.search || '').includes(q);
+      c.classList.toggle('search-hit', match);
+      c.classList.toggle('search-hide', !match);
+      if (match) { hits++; lightUp(c); }
+    });
+    if (hits) {
+      banSection.classList.remove('collapsed');
+      banSection.style.display = '';
+      banSection.querySelectorAll('.tier-ban-group').forEach(g => {
+        g.style.display = g.querySelector('.tier-ban-card.search-hit') ? '' : 'none';
+      });
+      totalHits += hits;
+    } else banSection.style.display = 'none';
+  }
+
+  if (hintEl) hintEl.textContent = totalHits ? `點亮 ${totalHits} 張` : '查無符合';
 }
 
 // ── Canvas ─────────────────────────────────────────
@@ -459,6 +533,22 @@ document.getElementById('refreshBtn').addEventListener('click', async () => {
   ratingsMap = await fetchAllRatings();
   renderTierList();
 });
+
+const tierSearchInput = document.getElementById('tierSearch');
+if (tierSearchInput) {
+  tierSearchInput.addEventListener('input', () => {
+    tierSearchQuery = tierSearchInput.value;
+    applyTierSearch();
+  });
+}
+const tierSearchClearBtn = document.getElementById('tierSearchClear');
+if (tierSearchClearBtn) {
+  tierSearchClearBtn.addEventListener('click', () => {
+    tierSearchQuery = '';
+    if (tierSearchInput) { tierSearchInput.value = ''; tierSearchInput.focus(); }
+    applyTierSearch();
+  });
+}
 
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalOverlay').addEventListener('click', e => {

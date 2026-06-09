@@ -42,6 +42,15 @@
       <button class="tier-refresh-btn" id="refreshBtn">↺ 重新載入</button>
     </div>
 
+    <!-- Search (highlight in place) -->
+    <div class="tier-search-wrap">
+      <span class="tier-search-icon">🔍</span>
+      <input id="tierSearch" class="tier-search-input" type="search" autocomplete="off"
+             placeholder="搜尋牌名或牌組（例：綿羊、G7）— 點亮它在哪個 Tier" />
+      <span id="tierSearchHint" class="tier-search-hint"></span>
+      <button id="tierSearchClear" class="tier-search-clear" style="display:none" aria-label="清除">✕</button>
+    </div>
+
     <!-- Deck filter -->
     <div class="tier-deck-row" id="deckFilterRow"></div>
 

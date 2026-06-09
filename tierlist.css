@@ -271,6 +271,65 @@
   line-height: 1.3;
 }
 
+/* ── Search (highlight in place) ── */
+.tier-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.tier-search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: .95rem;
+  opacity: .6;
+  pointer-events: none;
+}
+.tier-search-input {
+  width: 100%;
+  padding: 11px 96px 11px 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: .9rem;
+  transition: border-color var(--transition);
+}
+.tier-search-input:focus { outline: none; border-color: var(--gold); }
+.tier-search-input::placeholder { color: var(--text3); }
+.tier-search-hint {
+  position: absolute;
+  right: 38px;
+  font-size: .72rem;
+  color: var(--text3);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.tier-search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: .9rem;
+  padding: 4px 6px;
+  line-height: 1;
+}
+.tier-search-clear:hover { color: var(--gold); }
+
+/* 搜尋時：點亮符合的卡、收起不符的 */
+.tier-card.search-hit {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  border-color: var(--gold);
+}
+.tier-card.search-hide,
+.tier-ban-card.search-hide { display: none; }
+.tier-ban-card.search-hit { outline: 2px solid var(--gold); outline-offset: 1px; opacity: 1; }
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .tier-main { padding: 16px 12px 80px; }
