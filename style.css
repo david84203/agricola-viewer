@@ -1237,6 +1237,26 @@ body {
   font-size: .88rem;
   color: var(--text3);
 }
+.donate-qr-hint {
+  font-size: .82rem;
+  color: var(--text3);
+  opacity: .75;
+}
+.donate-thanks {
+  margin-top: 24px;
+  text-align: center;
+}
+.donate-thanks-title {
+  font-size: .9rem;
+  color: var(--text2);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.donate-thanks-empty {
+  font-size: .84rem;
+  color: var(--text3);
+  opacity: .6;
+}
 
 /* ─── Homepage donate CTA ────────────────────────────────────── */
 .home-donate {
