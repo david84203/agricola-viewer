@@ -323,16 +323,25 @@ async function uploadRankingElo() {
   function applyRanking(ranked) {
     // 排序模式只累加 rankSeen，不碰 seenCount/pickCount，避免污染 tier list 的 pick rate
     ranked.forEach(id => { ratings[id].rankSeen++; });
-    // C(9,2) = 36 pairwise comparisons
+
+    // 用「本輪開始時」的分數快照，一次算完所有對戰再套用（避免邊算邊改造成順序相依）
+    const base  = {};
+    const delta = {};
+    ranked.forEach(id => { base[id] = ratings[id].elo; delta[id] = 0; });
+
+    // 名次高者為贏家，與每張名次較低的牌比一場（C(7,2)=21 組）
     for (let i = 0; i < ranked.length; i++) {
       for (let j = i + 1; j < ranked.length; j++) {
-        const wId = ranked[i];
-        const lId = ranked[j];
-        const E_w = 1 / (1 + Math.pow(10, (ratings[lId].elo - ratings[wId].elo) / 400));
-        ratings[wId].elo += RANK_K_PAIR * (1 - E_w);
-        ratings[lId].elo += RANK_K_PAIR * (0 - E_w);
+        const wId = ranked[i];  // 名次較高 = 贏家
+        const lId = ranked[j];  // 名次較低 = 輸家
+        const E_w = 1 / (1 + Math.pow(10, (base[lId] - base[wId]) / 400));
+        const change = RANK_K_PAIR * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
+        delta[wId] += change;
+        delta[lId] -= change;
       }
     }
+
+    ranked.forEach(id => { ratings[id].elo += delta[id]; });
   }
 
   applyRanking(occRanked);
