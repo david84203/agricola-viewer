@@ -1198,11 +1198,16 @@ body {
   margin-top: auto;
 }
 .footer-donate-link {
-  color: var(--text3);
+  color: var(--gold);
   text-decoration: none;
-  transition: color var(--transition);
+  border-bottom: 1px solid rgba(232,184,75,.35);
+  padding-bottom: 1px;
+  transition: color var(--transition), border-color var(--transition);
 }
-.footer-donate-link:hover { color: var(--gold2); }
+.footer-donate-link:hover {
+  color: var(--gold2);
+  border-color: var(--gold2);
+}
 
 /* ─── Donate Section (about page) ───────────────────────────── */
 .donate-box {
