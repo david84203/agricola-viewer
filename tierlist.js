@@ -92,29 +92,12 @@ function getTier(rankPct) {
   return TIERS[TIER_BOUNDS.findIndex(b => rankPct < b)];
 }
 
-// 排序用的綜合分數（ELO + 依信心度混入選取率先驗）
-function ratingScore({ elo, seenCount, pickCount }) {
-  if (!seenCount) return elo;
-  const pickRate = pickCount / seenCount;
-  const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
-  const conf = Math.min(seenCount / 30, 1);
-  return conf * elo + (1 - conf) * prior;
-}
-
-const normalizeQuery = s => (s || '').toString().trim().toLowerCase();
-function escapeHtml(s) {
-  return (s || '').toString().replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
 let allCards = [];
 let ratingsMap = {};
 let imageCache = {};
 let activeFilter = 'all';
 let activeBga = false;
 let activeDecks = new Set();
-let searchQuery = '';
-let searchIndex = [];   // 全卡池快取，供搜尋用（Tier 以完整牌池計算，不受上方篩選影響）
 
 // ── Duplicate exclusions ───────────────────────────
 async function loadDupExclusions() {
@@ -135,7 +118,6 @@ async function init() {
     ]);
     allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
-    buildSearchIndex();
     populateDeckFilter();
     renderTierList();
   } catch (err) {
@@ -161,118 +143,6 @@ function populateDeckFilter() {
     });
     row.appendChild(btn);
   });
-}
-
-// ── Search ──────────────────────────────────────────
-// 以「完整牌池（所有牌組與類型、排除禁卡）」算出每張牌的 Tier，
-// 讓搜尋結果的 ELO／Tier 穩定一致，不受上方篩選 chip 影響。
-function buildSearchIndex() {
-  const rated = [];
-  allCards.forEach(card => {
-    if (BANNED_IDS.has(card['卡片ID'])) return;
-    const r = ratingsMap[card['卡片ID']];
-    if (r && r.seenCount >= MIN_SEEN) {
-      rated.push({ card, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount });
-    }
-  });
-  rated.sort((a, b) => ratingScore(b) - ratingScore(a));
-  const n = rated.length;
-  const tierById = new Map();
-  rated.forEach((item, i) => tierById.set(item.card['卡片ID'], getTier(i / n)));
-
-  searchIndex = allCards.map(card => {
-    const r = ratingsMap[card['卡片ID']];
-    const banned = BANNED_IDS.has(card['卡片ID']);
-    const enough = !!(r && r.seenCount >= MIN_SEEN);
-    return {
-      card,
-      elo: r ? r.elo : null,
-      seenCount: r ? r.seenCount : 0,
-      pickCount: r ? r.pickCount : 0,
-      banned,
-      enough,
-      tier: !banned && enough ? tierById.get(card['卡片ID']) : null,
-    };
-  });
-}
-
-function renderSearch() {
-  const q = normalizeQuery(searchQuery);
-  const resultsEl = document.getElementById('searchResults');
-  const tierContentEl = document.getElementById('tierContent');
-  document.getElementById('tierSearchClear').style.display = q ? '' : 'none';
-
-  if (!q) {
-    resultsEl.style.display = 'none';
-    resultsEl.innerHTML = '';
-    if (tierContentEl.innerHTML) tierContentEl.style.display = 'block';
-    return;
-  }
-
-  tierContentEl.style.display = 'none';
-  document.getElementById('tierEmpty').style.display = 'none';
-
-  const matches = searchIndex.filter(it => {
-    const name = normalizeQuery(it.card['牌名']);
-    const deck = normalizeQuery(it.card['牌組']);
-    const id   = normalizeQuery(it.card['卡片ID']);
-    return name.includes(q) || deck === q || deck.includes(q) || id.includes(q);
-  });
-  matches.sort((a, b) => {
-    if (a.banned !== b.banned) return a.banned ? 1 : -1;
-    if (a.enough !== b.enough) return a.enough ? -1 : 1;
-    return (b.elo ?? -Infinity) - (a.elo ?? -Infinity);
-  });
-
-  resultsEl.style.display = 'block';
-  resultsEl.innerHTML =
-    `<div class="search-results-head">找到 <strong>${matches.length}</strong> 張符合「${escapeHtml(searchQuery.trim())}」的卡牌</div>`;
-  if (!matches.length) {
-    resultsEl.innerHTML += `<div class="search-results-empty">沒有符合的牌名或牌組，換個關鍵字試試。</div>`;
-    return;
-  }
-  const grid = document.createElement('div');
-  grid.className = 'tier-card-grid search-result-grid';
-  matches.forEach(it => grid.appendChild(createSearchCardEl(it)));
-  resultsEl.appendChild(grid);
-  drawPendingCanvases(resultsEl);
-}
-
-function createSearchCardEl(it) {
-  const { card, elo, seenCount, pickCount, tier, banned, enough } = it;
-  const pickRate = seenCount > 0 ? Math.round(pickCount / seenCount * 100) : 0;
-  const typeName = card.card_type === 'occupation' ? '職業牌'
-    : (card.card_type === 'minor' || card.card_type === 'both') ? '次要發展牌' : '其他';
-
-  let badgeHtml, scoreHtml, metaHtml;
-  if (banned) {
-    badgeHtml = `<div class="search-card-tier tier-banned" title="禁卡">🚫</div>`;
-    scoreHtml = `<span class="tier-card-score tier-card-score--ban">禁卡</span>`;
-    metaHtml  = elo != null ? `<span class="tier-card-seen">ELO ${Math.round(elo)}</span>` : '';
-  } else if (enough) {
-    badgeHtml = `<div class="search-card-tier tier-${tier.toLowerCase()}">${tier}</div>`;
-    scoreHtml = `<span class="tier-card-score">${Math.round(elo)}</span>`;
-    metaHtml  = `<span class="tier-card-seen">${pickRate}% · ${seenCount}次</span>`;
-  } else {
-    badgeHtml = `<div class="search-card-tier tier-unrated" title="資料不足">?</div>`;
-    scoreHtml = `<span class="tier-card-score tier-card-score--na">資料不足</span>`;
-    metaHtml  = seenCount ? `<span class="tier-card-seen">${seenCount}次</span>` : '';
-  }
-
-  const div = document.createElement('div');
-  div.className = 'tier-card search-card';
-  div.innerHTML = `
-    ${badgeHtml}
-    <div class="tier-card-thumb"><canvas></canvas></div>
-    <div class="tier-card-info">
-      <div class="tier-card-name">${card['牌名'] || '—'}</div>
-      <div class="tier-card-meta">${scoreHtml}${metaHtml}</div>
-      <div class="search-card-sub">${card['牌組'] || '—'} · ${typeName}</div>
-    </div>
-  `;
-  div.addEventListener('click', () => openModal(card));
-  div.querySelector('canvas')._pendingCard = card;
-  return div;
 }
 
 // ── Fetch Firestore ────────────────────────────────
@@ -337,7 +207,16 @@ function renderTierList() {
 
   document.getElementById('tierEmpty').style.display = 'none';
 
-  rated.sort((a, b) => ratingScore(b) - ratingScore(a));
+  rated.sort((a, b) => {
+    const score = ({ elo, seenCount, pickCount }) => {
+      if (!seenCount) return elo;
+      const pickRate = pickCount / seenCount;
+      const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
+      const conf = Math.min(seenCount / 30, 1);
+      return conf * elo + (1 - conf) * prior;
+    };
+    return score(b) - score(a);
+  });
   const n = rated.length;
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
   rated.forEach((item, i) => { groups[getTier(i / n)].push(item); });
@@ -389,9 +268,6 @@ function renderTierList() {
   const totalSeen = Object.values(ratingsMap).reduce((s, r) => s + r.seenCount + (r.rankSeen || 0), 0);
   document.getElementById('tierStats').textContent =
     `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
-
-  // 若正在搜尋，重畫後仍維持搜尋結果視圖
-  if (normalizeQuery(searchQuery)) renderSearch();
 }
 
 function renderBanSection(container, typeOk) {
@@ -569,15 +445,6 @@ document.querySelectorAll('.chip[data-filter]').forEach(chip => {
   });
 });
 
-const searchInput = document.getElementById('tierSearch');
-searchInput.addEventListener('input', () => { searchQuery = searchInput.value; renderSearch(); });
-document.getElementById('tierSearchClear').addEventListener('click', () => {
-  searchInput.value = '';
-  searchQuery = '';
-  renderSearch();
-  searchInput.focus();
-});
-
 document.getElementById('bgaChip').addEventListener('click', () => {
   activeBga = !activeBga;
   document.getElementById('bgaChip').classList.toggle('active', activeBga);
@@ -590,7 +457,6 @@ document.getElementById('refreshBtn').addEventListener('click', async () => {
   document.getElementById('tierEmpty').style.display = 'none';
   document.getElementById('tierLoading').style.display = 'flex';
   ratingsMap = await fetchAllRatings();
-  buildSearchIndex();
   renderTierList();
 });
 
