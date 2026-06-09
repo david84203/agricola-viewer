@@ -45,7 +45,7 @@
 /* ── Rank row: 9 cards per row ── */
 .rank-row {
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   margin-bottom: 4px;
   padding-top: 16px; /* 留空間給浮在卡片頭頂的名次徽章 */

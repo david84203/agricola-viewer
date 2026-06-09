@@ -4,7 +4,7 @@
 
 const RANK_IMG_BASE      = './images/';
 const RANK_FS_BASE       = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-const RANK_CARDS_PER_ROUND = 9;
+const RANK_CARDS_PER_ROUND = 7;
 const RANK_TARGET        = 100;
 const RANK_K_PAIR        = 8;
 const RANK_STORAGE_KEY   = 'agricola_rank_count';
