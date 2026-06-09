@@ -109,6 +109,27 @@
     </div>
   </div>
 
+  <!-- Round Result (ELO 變動回饋) -->
+  <div class="modal-overlay" id="rankResultOverlay">
+    <div class="modal rank-result-modal">
+      <div class="rank-result-head">
+        <h2>本輪 ELO 變動</h2>
+        <p>每張牌的原始分數 → 更新後分數，以及增減幅度。</p>
+      </div>
+      <div class="rank-result-cols">
+        <div class="rank-result-col">
+          <div class="rank-result-coltitle">職業牌</div>
+          <div id="rankResultOcc"></div>
+        </div>
+        <div class="rank-result-col">
+          <div class="rank-result-coltitle">次要發展牌</div>
+          <div id="rankResultMin"></div>
+        </div>
+      </div>
+      <button class="start-btn" id="rankResultNextBtn">下一輪 →</button>
+    </div>
+  </div>
+
   <script src="auth.js"></script>
   <script src="duplicate-utils.js"></script>
   <script src="rank.js"></script>

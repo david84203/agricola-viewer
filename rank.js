@@ -30,6 +30,7 @@ async function rankInit() {
   document.getElementById('rankModalOverlay').addEventListener('click', e => {
     if (e.target === document.getElementById('rankModalOverlay')) closeRankModal();
   });
+  document.getElementById('rankResultNextBtn').addEventListener('click', closeRankResultAndContinue);
 
   await Promise.all([loadRankBanlist(), loadRankCards(), loadRankDupExclusions()]);
 
@@ -246,7 +247,7 @@ async function confirmRanking() {
   btn.textContent = '上傳中…';
 
   try {
-    await uploadRankingElo();
+    const result = await uploadRankingElo();
 
     rankState.roundCount++;
     rankState.cardType = rankState.cardType === 'occupation' ? 'minor' : 'occupation';
@@ -259,7 +260,7 @@ async function confirmRanking() {
     updateRankProgress();
     btn.textContent = '✓ 已上傳';
 
-    setTimeout(() => startRankRound(), 800);
+    showRankResult(result);
   } catch (err) {
     console.error('Ranking upload failed:', err);
     btn.disabled = false;
@@ -298,6 +299,10 @@ async function uploadRankingElo() {
       };
     }
   });
+
+  // 記錄變動前的 ELO（四捨五入後，與寫入 Firestore 的整數一致）
+  const eloBefore = {};
+  allIds.forEach(id => { eloBefore[id] = Math.round(ratings[id].elo); });
 
   // Apply rankings independently for each type
   function applyRanking(ranked) {
@@ -352,6 +357,22 @@ async function uploadRankingElo() {
     body: JSON.stringify({ writes })
   });
   if (!res.ok) throw new Error(`Firestore commit failed: ${res.status}`);
+
+  // 回傳本輪每張牌的 ELO 變動，供回饋面板顯示
+  const cardMap = {};
+  [...rankState.occCards, ...rankState.minCards].forEach(c => { cardMap[c['卡片ID']] = c; });
+  const buildResults = ranked => ranked.map((id, i) => {
+    const after = Math.min(2000, Math.max(500, Math.round(ratings[id].elo)));
+    return {
+      cardId: id,
+      name:   cardMap[id]?.['牌名'] || id,
+      rank:   i + 1,
+      before: eloBefore[id],
+      after,
+      delta:  after - eloBefore[id],
+    };
+  });
+  return { occResults: buildResults(occRanked), minResults: buildResults(minRanked) };
 }
 
 // ── Card image crop (mirrors draft.js drawCrop) ───
@@ -441,11 +462,36 @@ function openRankModal(card) {
   const canvas = document.getElementById('rankModalCanvas');
   rankDrawCrop(canvas, card);
 
-  document.getElementById('rankModalOverlay').classList.add('active');
+  document.getElementById('rankModalOverlay').classList.add('open');
 }
 
 function closeRankModal() {
-  document.getElementById('rankModalOverlay').classList.remove('active');
+  document.getElementById('rankModalOverlay').classList.remove('open');
+}
+
+// ── 本輪 ELO 變動回饋 ──────────────────────────────
+function showRankResult({ occResults, minResults }) {
+  const fmtDelta = d => {
+    if (d > 0) return `<span class="rank-delta up">▲ +${d}</span>`;
+    if (d < 0) return `<span class="rank-delta down">▼ ${d}</span>`;
+    return `<span class="rank-delta flat">±0</span>`;
+  };
+  const rowsHtml = list => list.map(r => `
+    <div class="rank-result-row">
+      <span class="rank-result-rank" data-rank="${r.rank}">${r.rank}</span>
+      <span class="rank-result-name" title="${r.name}">${r.name}</span>
+      <span class="rank-result-elo">${r.before} → <strong>${r.after}</strong></span>
+      ${fmtDelta(r.delta)}
+    </div>`).join('');
+
+  document.getElementById('rankResultOcc').innerHTML = rowsHtml(occResults);
+  document.getElementById('rankResultMin').innerHTML = rowsHtml(minResults);
+  document.getElementById('rankResultOverlay').classList.add('open');
+}
+
+function closeRankResultAndContinue() {
+  document.getElementById('rankResultOverlay').classList.remove('open');
+  startRankRound();
 }
 
 // ── Screen switch ─────────────────────────────────

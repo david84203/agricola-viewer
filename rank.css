@@ -48,10 +48,11 @@
   grid-template-columns: repeat(9, 1fr);
   gap: 8px;
   margin-bottom: 4px;
+  padding-top: 16px; /* 留空間給浮在卡片頭頂的名次徽章 */
 }
 
 @media (max-width: 800px) {
-  .rank-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .rank-row { grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 16px; }
 }
 
 /* ── Status bar ── */
@@ -78,6 +79,7 @@
   position: relative;
   cursor: pointer;
   transition: opacity .15s, transform .15s;
+  overflow: visible; /* 讓名次徽章可浮出卡片上緣（卡圖仍由 .draft-card-thumb 裁切） */
 }
 
 .rank-card.ranked {
@@ -86,8 +88,9 @@
 
 .rank-badge {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   width: 28px;
   height: 28px;
@@ -98,6 +101,7 @@
   font-size: .85rem;
   font-weight: 700;
   color: #fff;
+  border: 2px solid var(--bg);
   box-shadow: 0 2px 6px rgba(0,0,0,.5);
   pointer-events: none;
 }
@@ -111,6 +115,7 @@
 .rank-badge[data-rank="6"] { background: #4a7aaa; }
 .rank-badge[data-rank="7"] { background: #666; }
 .rank-badge[data-rank="8"] { background: #666; }
+.rank-badge[data-rank="9"] { background: #666; }
 
 /* Highlight unranked cards when hovering */
 .rank-card:not(.ranked):hover {
@@ -122,3 +127,77 @@
 .rank-card-grid.all-ranked .rank-card:not(.ranked) {
   opacity: 0.4;
 }
+
+/* ─── Round result (ELO 變動回饋) ──────────────────────── */
+.rank-result-modal {
+  max-width: 760px;
+  padding: 24px;
+  overflow-y: auto;
+}
+.rank-result-head { text-align: center; margin-bottom: 18px; }
+.rank-result-head h2 { font-size: 1.3rem; color: var(--text); margin: 0 0 4px; }
+.rank-result-head p { font-size: .85rem; color: var(--text3); margin: 0; }
+
+.rank-result-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+@media (max-width: 640px) {
+  .rank-result-cols { grid-template-columns: 1fr; gap: 14px; }
+}
+.rank-result-coltitle {
+  font-size: .78rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rank-result-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .85rem;
+}
+.rank-result-rank {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: .75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rank-result-rank[data-rank="1"] { background: #c9a227; color: #1a1000; }
+.rank-result-name {
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rank-result-elo {
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rank-result-elo strong { color: var(--text); }
+.rank-delta {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 52px;
+  text-align: right;
+}
+.rank-delta.up   { color: #5fb55f; }
+.rank-delta.down { color: #d96666; }
+.rank-delta.flat { color: var(--text3); }
+
+#rankResultNextBtn { width: 100%; }
