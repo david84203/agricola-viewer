@@ -143,10 +143,6 @@ function onAuthChange() {
   document.getElementById('raterLoginHint').style.display      = tracked ? 'none' : '';
   document.getElementById('playerModeNote').style.display      = player ? '' : 'none';
   document.getElementById('raterProgressWrap').style.display   = tracked ? '' : 'none';
-  const toggle = document.getElementById('raterModeToggle');
-  if (toggle) toggle.checked = rater;
-  applyRaterDeckLock(rater);
-  applyRaterModeLock(rater);
   if (!tracked) return;
   loadRaterProgress();
 }
@@ -259,9 +255,6 @@ function buildModeSelect() {
       state.draftMode = el.dataset.mode;
     });
   });
-
-  const toggle = document.getElementById('raterModeToggle');
-  if (toggle && toggle.checked) applyRaterModeLock(true);
 }
 
 // ── Deck Checkboxes ────────────────────────────────
@@ -283,9 +276,6 @@ function buildDeckCheckboxes() {
     });
     container.appendChild(label);
   });
-
-  const toggle = document.getElementById('raterModeToggle');
-  if (toggle && toggle.checked) applyRaterDeckLock(true);
 }
 
 function getCheckedDecks() {
@@ -310,10 +300,6 @@ function bindEvents() {
   document.getElementById('presetBGA').addEventListener('click', setBGAChecked);
   document.getElementById('presetAll').addEventListener('click', () => setAllChecked(true));
   document.getElementById('presetNone').addEventListener('click', () => setAllChecked(false));
-  document.getElementById('raterModeToggle').addEventListener('change', e => {
-    applyRaterDeckLock(e.target.checked);
-    applyRaterModeLock(e.target.checked);
-  });
   document.getElementById('startDraft').addEventListener('click', startDraft);
   document.getElementById('continueBtn').addEventListener('click', startMinorPhase);
   document.getElementById('confirmBtn').addEventListener('click', confirmPick);
@@ -341,20 +327,16 @@ function shuffle(arr) {
 
 // ── Start Draft ────────────────────────────────────
 function startDraft() {
-  state.raterMode  = document.getElementById('raterModeToggle').checked;
+  // 評分者輪抽不再灌 ELO，與玩家一樣可自由選牌組/模式；資料僅進個人分析
+  state.raterMode  = typeof isRater === 'function' && isRater();
   state.playerMode = !state.raterMode && typeof isPlayer === 'function' && isPlayer();
 
-  if (state.raterMode) {
-    state.draftMode = 'separate'; // 評分者模式僅支援分開輪抽，確保評分資料一致性
-    state.selectedDecks = [...new Set(allCards.map(c => c['牌組']).filter(Boolean))];
-  } else {
-    const checked = getCheckedDecks();
-    if (checked.length === 0) {
-      alert('請至少選擇一個牌組');
-      return;
-    }
-    state.selectedDecks = checked;
+  const checked = getCheckedDecks();
+  if (checked.length === 0) {
+    alert('請至少選擇一個牌組');
+    return;
   }
+  state.selectedDecks = checked;
 
   state.occPicks = [];
   state.minPicks = [];
@@ -949,12 +931,18 @@ function showResult() {
   showScreen('resultScreen');
   renderResultGrid('occResultGrid', state.occPicks);
   renderResultGrid('minResultGrid', state.minPicks);
-  if (state.raterMode) uploadRatings();
-  else if (state.playerMode) uploadPlayerSession();
+  // 評分者與玩家輪抽都只記個人場次（excludeFromElo），ELO 一律改由「快速牌力排序」產生
+  if (state.raterMode) uploadPlayerSession('rater');
+  else if (state.playerMode) uploadPlayerSession('player');
   calculateScore();
 }
 
+// ⚠ 已停用：輪抽不再產生 ELO（牌力評分一律改由「快速牌力排序」rank.js 提供）。
+// 此函式保留僅供參考，已無任何呼叫處；防呆 early-return 確保即使被誤呼叫也不會寫入 agricola_ratings。
 async function uploadRatings() {
+  console.warn('uploadRatings 已停用：輪抽不再灌 ELO，請使用快速牌力排序');
+  return;
+  /* eslint-disable no-unreachable */
   const statusEl = document.getElementById('uploadStatus');
   statusEl.style.display = 'flex';
   statusEl.textContent = '評分資料上傳中…';
@@ -1094,8 +1082,9 @@ async function uploadRatings() {
   }
 }
 
-// 玩家模式：只記錄個人場次（用於個人分析），不更新 ELO / Tier list
-async function uploadPlayerSession() {
+// 個人場次：玩家與評分者輪抽共用，只記錄個人場次（用於個人分析），不更新 ELO / Tier list
+// role：'player' 或 'rater'，excludeFromElo 一律 true，確保任何重算流程都不會納入
+async function uploadPlayerSession(role = 'player') {
   const statusEl = document.getElementById('uploadStatus');
   statusEl.style.display = 'flex';
   statusEl.textContent = '紀錄上傳中…';
@@ -1110,7 +1099,7 @@ async function uploadPlayerSession() {
         name: `projects/project-hub-410cd/databases/(default)/documents/agricola_sessions/${playerId}_${Date.now()}`,
         fields: {
           raterId:      { stringValue: playerId },
-          role:         { stringValue: 'player' },
+          role:         { stringValue: role },
           excludeFromElo: { booleanValue: true },
           timestamp:    { stringValue: new Date().toISOString() },
           draftMode:    { stringValue: state.draftMode },

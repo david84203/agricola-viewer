@@ -713,6 +713,46 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+
+/* 評分者引導橫幅（導向快速牌力排序） */
+.rater-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.rater-guide-text { flex: 1; min-width: 220px; }
+.rater-guide-text strong {
+  display: block;
+  color: var(--gold);
+  font-size: .95rem;
+  margin-bottom: 4px;
+}
+.rater-guide-text span {
+  font-size: .82rem;
+  color: var(--text3);
+  line-height: 1.5;
+}
+.rater-guide-text b { color: var(--text2); }
+.rater-guide-btn {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 10px 18px;
+  background: var(--gold);
+  color: #1a1000;
+  font-weight: 700;
+  font-size: .9rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter .15s;
+}
+.rater-guide-btn:hover { filter: brightness(1.08); }
+
+@media (max-width: 640px) {
+  .rater-guide-btn { width: 100%; text-align: center; }
+}
 .rater-toggle-label {
   display: flex;
   align-items: center;
