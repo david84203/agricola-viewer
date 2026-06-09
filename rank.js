@@ -145,6 +145,7 @@ async function startRankRound() {
 
   renderRankingScreen();
   showRankScreen('rankingScreen');
+  window.scrollTo({ top: 0, behavior: 'smooth' }); // 新一輪拉回最上方，方便從職業牌重新點選
 }
 
 // ── Render ────────────────────────────────────────
