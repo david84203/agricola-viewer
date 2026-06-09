@@ -33,6 +33,28 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Confirm bar（兩排牌下方，整排寬度） ── */
+.rank-confirm-bar {
+  margin-top: 24px;
+}
+.rank-confirm-bar .confirm-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+}
+
+@media (max-width: 800px) {
+  /* 手機版：確認按鈕固定在畫面最底 */
+  .rank-confirm-bar {
+    position: sticky;
+    bottom: 0;
+    margin-top: 16px;
+    padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    z-index: 20;
+  }
+}
+
 /* ── Section label ── */
 .rank-section-label {
   font-size: .75rem;
