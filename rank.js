@@ -120,8 +120,9 @@ function rankShuffle(arr) {
 
 // ── Start round ───────────────────────────────────
 async function startRankRound() {
-  const occPool = rankAllCards.filter(c => c.card_type === 'occupation' || c.card_type === 'both');
-  const minPool = rankAllCards.filter(c => c.card_type === 'minor'      || c.card_type === 'both');
+  // 'both'（烤爐/廚房等）實為次要發展卡，只歸入次要牌庫，避免跑到職業排，也避免同一張同時出現在兩排
+  const occPool = rankAllCards.filter(c => c.card_type === 'occupation');
+  const minPool = rankAllCards.filter(c => c.card_type === 'minor' || c.card_type === 'both');
 
   if (occPool.length < RANK_CARDS_PER_ROUND || minPool.length < RANK_CARDS_PER_ROUND) {
     alert('牌庫不足，無法開始');
