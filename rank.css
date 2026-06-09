@@ -128,6 +128,14 @@
   opacity: 0.4;
 }
 
+/* 詳情彈窗 canvas：與 #modalCanvas 一致，避免圖片爆出框 */
+#rankModalCanvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 /* ─── Round result (ELO 變動回饋) ──────────────────────── */
 .rank-result-modal {
   max-width: 760px;
