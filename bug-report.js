@@ -148,9 +148,16 @@ function renderBugList(bugs) {
       hour: '2-digit', minute: '2-digit'
     });
 
-    const statusHtml = bug.status === 'resolved' 
-      ? `<span class="bug-status-badge bug-status-resolved">🟢 已處理</span>`
-      : `<span class="bug-status-badge bug-status-pending">🔴 未處理</span>`;
+    const admin = typeof isAdmin === 'function' && isAdmin();
+    const isPending = bug.status !== 'resolved';
+
+    const statusHtml = isPending
+      ? `<span class="bug-status-badge bug-status-pending">🔴 未處理</span>`
+      : `<span class="bug-status-badge bug-status-resolved">🟢 已處理</span>`;
+
+    const resolveBtn = (admin && isPending)
+      ? `<button class="bug-resolve-btn" data-id="${bug.id}">✅ 標記處理完畢</button>`
+      : '';
 
     item.innerHTML = `
       <div class="bug-item-header">
@@ -159,16 +166,48 @@ function renderBugList(bugs) {
           <span class="bug-item-interface">${escapeHtml(bug.interface)}</span>
           <span class="bug-item-date">${dateStr}</span>
         </div>
-        ${statusHtml}
+        <div class="bug-item-actions">
+          ${resolveBtn}
+          ${statusHtml}
+        </div>
       </div>
       <div class="bug-item-desc">${escapeHtml(bug.description)}</div>
     `;
+
+    if (admin && isPending) {
+      item.querySelector('.bug-resolve-btn').addEventListener('click', () => resolveBug(bug.id));
+    }
 
     container.appendChild(item);
   });
 }
 
 // ── Helper ─────────────────────────────────────────
+async function resolveBug(id) {
+  const btn = document.querySelector(`.bug-resolve-btn[data-id="${id}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '處理中...'; }
+
+  try {
+    const res = await fetch(
+      `${FIRESTORE_BUGS}/${id}?updateMask.fieldPaths=status&updateMask.fieldPaths=resolvedAt`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            status: { stringValue: 'resolved' },
+            resolvedAt: { stringValue: new Date().toISOString() }
+          }
+        })
+      }
+    );
+    if (res.ok) fetchBugList();
+    else if (btn) { btn.disabled = false; btn.textContent = '✅ 標記處理完畢'; }
+  } catch {
+    if (btn) { btn.disabled = false; btn.textContent = '✅ 標記處理完畢'; }
+  }
+}
+
 async function deleteBug(id) {
   try {
     await fetch(`${FIRESTORE_BUGS}/${id}`, { method: 'DELETE' });
