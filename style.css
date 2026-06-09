@@ -1197,3 +1197,89 @@ body {
   opacity: 0.8;
   margin-top: auto;
 }
+.footer-donate-link {
+  color: var(--text3);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.footer-donate-link:hover { color: var(--gold2); }
+
+/* ─── Donate Section (about page) ───────────────────────────── */
+.donate-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.donate-qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+}
+.donate-qr {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 6px;
+}
+.donate-qr-label {
+  font-size: .88rem;
+  color: var(--text3);
+}
+
+/* ─── Homepage donate CTA ────────────────────────────────────── */
+.home-donate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: var(--radius);
+  background: rgba(76,175,125,.07);
+  border: 1px solid rgba(76,175,125,.22);
+  padding: 20px;
+}
+.home-donate h2 {
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.home-donate p {
+  color: var(--text2);
+  font-size: .94rem;
+}
+.home-donate-btn,
+.home-donate-btn:link,
+.home-donate-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-sm);
+  font-size: .95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  flex-shrink: 0;
+  background: rgba(76,175,125,.16);
+  border: 1px solid rgba(76,175,125,.5);
+  color: #6fcfa0;
+}
+.home-donate-btn:hover {
+  background: rgba(76,175,125,.26);
+  border-color: var(--green);
+  transform: translateY(-1px);
+}
+@media (max-width: 640px) {
+  .home-donate {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .home-donate-btn { width: 100%; }
+}
