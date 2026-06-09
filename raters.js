@@ -9,7 +9,7 @@ let ratersData = []; // sorted array of rater objects
 let currentSort = 'count';
 let ratersLoaded = false;
 
-const RATERS_CACHE_KEY = 'agricola_raters_cache';
+const RATERS_CACHE_KEY = 'agricola_raters_cache_v2'; // v2：加入排序評分次數
 const RATERS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // ── Fetch ──────────────────────────────────────────
@@ -28,23 +28,15 @@ function setCachedRaters(data) {
   } catch {}
 }
 
-async function fetchAllSessions() {
-  const cached = getCachedRaters();
-  if (cached) return cached;
-
-  const map = {}; // { raterId: { count, lastActive, occ, mixed } }
+// 依 timestamp 分頁掃描一個 collection，每筆 doc 的 fields 交給 onDoc 處理
+async function scanSessions(collectionId, fieldPaths, onDoc) {
   let lastTimestamp = null;
 
   while (true) {
     const query = {
       structuredQuery: {
-        from: [{ collectionId: 'agricola_sessions' }],
-        select: { fields: [
-          { fieldPath: 'raterId' },
-          { fieldPath: 'timestamp' },
-          { fieldPath: 'draftMode' },
-          { fieldPath: 'role' },
-        ]},
+        from: [{ collectionId }],
+        select: { fields: fieldPaths.map(fp => ({ fieldPath: fp })) },
         orderBy: [{ field: { fieldPath: 'timestamp' }, direction: 'ASCENDING' }],
         limit: 300,
       }
@@ -61,25 +53,50 @@ async function fetchAllSessions() {
     const data = await res.json();
     const docs = (Array.isArray(data) ? data : []).filter(d => d.document);
 
-    for (const d of docs) {
-      const f    = d.document.fields || {};
-      const id   = f.raterId?.stringValue;
-      if (!id) continue;
-      if (f.role?.stringValue === 'player') continue; // 玩家模式紀錄不算評分者場次
-      const ts   = f.timestamp?.stringValue || '';
-      const mode = f.draftMode?.stringValue || 'separate';
-
-      if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, mixed: 0 };
-      map[id].count++;
-      if (ts > map[id].lastActive) map[id].lastActive = ts;
-      if (mode === 'combined') map[id].mixed++;
-      else                     map[id].occ++;  // occ / min / legacy 'separate'
-    }
+    for (const d of docs) onDoc(d.document.fields || {});
 
     if (docs.length < 300) break;
     lastTimestamp = docs[docs.length - 1].document.fields?.timestamp?.stringValue;
     if (!lastTimestamp) break;
   }
+}
+
+function ensureRater(map, id) {
+  if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, mixed: 0, rank: 0 };
+  return map[id];
+}
+
+async function fetchAllSessions() {
+  const cached = getCachedRaters();
+  if (cached) return cached;
+
+  const map = {}; // { raterId: { count, lastActive, occ, mixed, rank } }
+
+  // 輪抽模擬器場次（agricola_sessions）
+  await scanSessions('agricola_sessions', ['raterId', 'timestamp', 'draftMode', 'role'], f => {
+    const id = f.raterId?.stringValue;
+    if (!id) return;
+    if (f.role?.stringValue === 'player') return; // 玩家模式紀錄不算評分者場次
+    const ts   = f.timestamp?.stringValue || '';
+    const mode = f.draftMode?.stringValue || 'separate';
+
+    const r = ensureRater(map, id);
+    r.count++;
+    if (ts > r.lastActive) r.lastActive = ts;
+    if (mode === 'combined') r.mixed++;
+    else                     r.occ++;  // occ / min / legacy 'separate'
+  });
+
+  // 排序評分（快速）次數（agricola_rank_sessions，每輪一筆）
+  await scanSessions('agricola_rank_sessions', ['raterId', 'timestamp'], f => {
+    const id = f.raterId?.stringValue;
+    if (!id) return;
+    const ts = f.timestamp?.stringValue || '';
+
+    const r = ensureRater(map, id);
+    r.rank++;
+    if (ts > r.lastActive) r.lastActive = ts;
+  });
 
   const result = Object.values(map);
   setCachedRaters(result);
@@ -91,6 +108,7 @@ async function fetchAllSessions() {
 function sortRaters(arr, by) {
   return [...arr].sort((a, b) => {
     if (by === 'lastActive') return b.lastActive.localeCompare(a.lastActive);
+    if (by === 'rank')       return b.rank - a.rank;
     return b.count - a.count;
   });
 }
@@ -116,6 +134,7 @@ function renderTable() {
       <td class="rater-date">${formatDate(r.lastActive)}</td>
       <td class="rater-mode">${r.occ || '—'}</td>
       <td class="rater-mode">${r.mixed || '—'}</td>
+      <td class="rater-count">${r.rank || '—'}</td>
       <td><a href="profile.html?rater=${encodeURIComponent(r.id)}" class="rater-link-btn">查看分析 →</a></td>
     `;
     tbody.appendChild(tr);
@@ -123,9 +142,10 @@ function renderTable() {
 }
 
 function renderSummary() {
-  const total = ratersData.reduce((s, r) => s + r.count, 0);
+  const total     = ratersData.reduce((s, r) => s + r.count, 0);
+  const totalRank = ratersData.reduce((s, r) => s + (r.rank || 0), 0);
   document.getElementById('ratersSummary').textContent =
-    `共 ${ratersData.length} 位評分者　總場次 ${total}`;
+    `共 ${ratersData.length} 位評分者　輪抽總場次 ${total}　排序評分總輪數 ${totalRank}`;
 }
 
 // ── Load content (after auth confirmed) ────────────
