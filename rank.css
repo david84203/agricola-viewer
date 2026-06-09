@@ -1,0 +1,124 @@
+/* ─── Ranking Mode Styles ──────────────────────────────── */
+
+.rank-screen { display: none; }
+.rank-screen.active { display: block; }
+
+.rank-instructions {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: .9rem;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+
+.rank-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.rank-status-text {
+  font-size: .95rem;
+  color: var(--text3);
+  flex: 1;
+}
+
+.rank-progress-inline {
+  font-size: .85rem;
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Section label ── */
+.rank-section-label {
+  font-size: .75rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+
+/* ── Rank row: 9 cards per row ── */
+.rank-row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 800px) {
+  .rank-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+}
+
+/* ── Status bar ── */
+.rank-status-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.rank-status-label {
+  font-size: .8rem;
+  color: var(--text3);
+}
+.rank-status-count {
+  font-size: .9rem;
+  color: var(--text2);
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+}
+
+/* ── Rank badge overlay ── */
+.rank-card {
+  position: relative;
+  cursor: pointer;
+  transition: opacity .15s, transform .15s;
+}
+
+.rank-card.ranked {
+  opacity: 0.75;
+}
+
+.rank-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.5);
+  pointer-events: none;
+}
+
+/* Rank 1 = gold, 2-3 = green, 4-6 = blue, 7-8 = grey */
+.rank-badge[data-rank="1"] { background: #c9a227; }
+.rank-badge[data-rank="2"] { background: #7ab87a; }
+.rank-badge[data-rank="3"] { background: #7ab87a; }
+.rank-badge[data-rank="4"] { background: #4a7aaa; }
+.rank-badge[data-rank="5"] { background: #4a7aaa; }
+.rank-badge[data-rank="6"] { background: #4a7aaa; }
+.rank-badge[data-rank="7"] { background: #666; }
+.rank-badge[data-rank="8"] { background: #666; }
+
+/* Highlight unranked cards when hovering */
+.rank-card:not(.ranked):hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+}
+
+/* Dim all cards after all 8 are ranked */
+.rank-card-grid.all-ranked .rank-card:not(.ranked) {
+  opacity: 0.4;
+}

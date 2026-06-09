@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 排序評分</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="draft.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="stylesheet" href="rank.css" />
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 排序評分</div>
+        <div class="brand-sub">快速牌力排序，貢獻評分資料</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <div class="brand-nav">
+        <a href="index.html" class="draft-nav-btn">← 回首頁</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="draft-main">
+
+    <!-- ── Setup Screen ── -->
+    <div id="setupScreen" class="rank-screen active">
+      <h1 class="setup-title">排序評分</h1>
+      <p class="setup-sub">每輪顯示職業牌與次要發展牌各 9 張，依強到弱分別排序。一輪產生 72 組比較，比輪抽模式收集資料更快。</p>
+
+      <div class="rater-progress-wrap">
+        <div class="rater-progress-header">
+          <span class="rater-progress-title">本輪目標</span>
+          <span class="rater-progress-count" id="rankProgressCount">0 / 100 輪</span>
+        </div>
+        <div class="rater-progress-bar-track">
+          <div class="rater-progress-bar-fill" id="rankProgressFill" style="width:0%"></div>
+        </div>
+        <div class="rater-progress-hint" id="rankProgressHint">還需 100 輪達成目標</div>
+      </div>
+
+      <div class="rater-login-hint" id="rankLoginHint">
+        <span>🔐 需要登入評分者帳號才能使用排序評分</span>
+      </div>
+
+      <button class="start-btn" id="startRankBtn" disabled>開始排序</button>
+    </div>
+
+    <!-- ── Ranking Screen ── -->
+    <div id="rankingScreen" class="rank-screen">
+      <div class="draft-header">
+        <div class="draft-phase-label">排序評分</div>
+        <div class="draft-round-badge" id="rankRoundLabel">第 1 輪</div>
+        <div class="rank-progress-inline" id="rankProgressInline">0 / 100</div>
+      </div>
+
+      <div class="rank-instructions">
+        依<strong>強到弱</strong>依序點選（先點最強的牌）。點已排序的牌可從該位置重新排。兩排各自獨立排序。
+      </div>
+
+      <div class="rank-status-bar">
+        <div class="rank-status-group">
+          <span class="rank-status-label">職業牌</span>
+          <span class="rank-status-count" id="rankOccStatus">0 / 9</span>
+          <span class="rank-status-label">次要發展牌</span>
+          <span class="rank-status-count" id="rankMinStatus">0 / 9</span>
+        </div>
+        <button class="confirm-btn" id="confirmRankBtn" disabled>確認本輪</button>
+      </div>
+
+      <div class="rank-section-label">職業牌</div>
+      <div class="rank-row" id="rankOccRow"></div>
+
+      <div class="rank-section-label" style="margin-top:20px">次要發展牌</div>
+      <div class="rank-row" id="rankMinRow"></div>
+    </div>
+
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="rankModalOverlay">
+    <div class="modal" id="rankModal">
+      <button class="modal-close" id="rankModalClose">✕</button>
+      <div class="modal-inner">
+        <div class="modal-image-wrap">
+          <canvas id="rankModalCanvas"></canvas>
+        </div>
+        <div class="modal-info">
+          <div class="modal-title-row">
+            <h2 class="modal-title" id="rankModalTitle"></h2>
+          </div>
+          <div class="modal-sub-row">
+            <div class="modal-id" id="rankModalId"></div>
+          </div>
+          <div class="modal-fields" id="rankModalFields"></div>
+          <div class="modal-desc-wrap">
+            <div class="modal-desc-label">說明</div>
+            <div class="modal-desc" id="rankModalDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="duplicate-utils.js"></script>
+  <script src="rank.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用
+  </footer>
+</body>
+</html>
