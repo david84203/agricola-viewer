@@ -32,7 +32,9 @@ async function rankInit() {
   });
   document.getElementById('rankResultNextBtn').addEventListener('click', closeRankResultAndContinue);
 
-  await Promise.all([loadRankBanlist(), loadRankCards(), loadRankDupExclusions()]);
+  // 先載禁卡表與重複卡清單，再過濾卡庫，避免 race（過濾時清單尚未就緒）
+  await Promise.all([loadRankBanlist(), loadRankDupExclusions()]);
+  await loadRankCards();
 
   const raterId = typeof getRaterId === 'function' ? getRaterId() : null;
   if (raterId) {
