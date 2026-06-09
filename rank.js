@@ -83,6 +83,11 @@ async function loadRankDupExclusions() {
   } catch { rankDupExclusions = new Set(); }
 }
 
+// 與 draft.js / duplicate-utils 一致的複合 key（重複卡可能以此 key 被排除）
+function rankGetCardKey(card) {
+  return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
+}
+
 // ── Load cards ────────────────────────────────────
 async function loadRankCards() {
   try {
@@ -92,7 +97,9 @@ async function loadRankCards() {
       const id = c['卡片ID'];
       if (!id) return false;
       if (rankBannedIds.has(id)) return false;
+      // 重複卡：純 ID 與複合 key 都要比對，跟輪抽一致
       if (rankDupExclusions.has(id)) return false;
+      if (rankDupExclusions.has(rankGetCardKey(c))) return false;
       return c.card_type === 'occupation' || c.card_type === 'minor' || c.card_type === 'both';
     });
   } catch {}
