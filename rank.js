@@ -161,6 +161,9 @@ function renderRankingScreen() {
   const minRow = document.getElementById('rankMinRow');
   occRow.innerHTML = '';
   minRow.innerHTML = '';
+  // 清掉上一輪排滿時加上的 all-ranked，否則新一輪整排牌會殘留變暗
+  occRow.classList.remove('all-ranked');
+  minRow.classList.remove('all-ranked');
 
   rankState.occCards.forEach(card => occRow.appendChild(createRankCardEl(card, 'occ')));
   rankState.minCards.forEach(card => minRow.appendChild(createRankCardEl(card, 'min')));
