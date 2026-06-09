@@ -9,7 +9,7 @@ let ratersData = []; // sorted array of rater objects
 let currentSort = 'count';
 let ratersLoaded = false;
 
-const RATERS_CACHE_KEY = 'agricola_raters_cache_v2'; // v2：加入排序評分次數
+const RATERS_CACHE_KEY = 'agricola_raters_cache_v3'; // v3：加入排序評分最後活躍時間
 const RATERS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // ── Fetch ──────────────────────────────────────────
@@ -62,7 +62,7 @@ async function scanSessions(collectionId, fieldPaths, onDoc) {
 }
 
 function ensureRater(map, id) {
-  if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, mixed: 0, rank: 0 };
+  if (!map[id]) map[id] = { id, count: 0, lastActive: '', occ: 0, mixed: 0, rank: 0, rankLastActive: '' };
   return map[id];
 }
 
@@ -95,7 +95,7 @@ async function fetchAllSessions() {
 
     const r = ensureRater(map, id);
     r.rank++;
-    if (ts > r.lastActive) r.lastActive = ts;
+    if (ts > r.rankLastActive) r.rankLastActive = ts;
   });
 
   const result = Object.values(map);
@@ -135,6 +135,7 @@ function renderTable() {
       <td class="rater-mode">${r.occ || '—'}</td>
       <td class="rater-mode">${r.mixed || '—'}</td>
       <td class="rater-count">${r.rank || '—'}</td>
+      <td class="rater-date">${formatDate(r.rankLastActive)}</td>
       <td><a href="profile.html?rater=${encodeURIComponent(r.id)}" class="rater-link-btn">查看分析 →</a></td>
     `;
     tbody.appendChild(tr);
