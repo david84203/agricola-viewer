@@ -301,15 +301,16 @@ async function uploadRankingElo() {
   const batchData = await batchRes.json();
 
   const ratings = {};
-  allIds.forEach(id => { ratings[id] = { elo: 1200, seenCount: 0, pickCount: 0 }; });
+  allIds.forEach(id => { ratings[id] = { elo: 1200, seenCount: 0, pickCount: 0, rankSeen: 0 }; });
   batchData.forEach(item => {
     if (item.found) {
       const id = item.found.name.split('/').pop();
       const f  = item.found.fields || {};
       ratings[id] = {
         elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
-        seenCount: Number(f.seenCount?.integerValue ?? 0),
-        pickCount: Number(f.pickCount?.integerValue ?? 0),
+        seenCount: Number(f.seenCount?.integerValue ?? 0),  // 輪抽展示數，排序模式不動它（保持 pick rate 純淨）
+        pickCount: Number(f.pickCount?.integerValue ?? 0),  // 輪抽選取數，排序模式不動它
+        rankSeen:  Number(f.rankSeen?.integerValue  ?? 0),  // 排序模式專用展示數
       };
     }
   });
@@ -320,10 +321,8 @@ async function uploadRankingElo() {
 
   // Apply rankings independently for each type
   function applyRanking(ranked) {
-    ranked.forEach((id, i) => {
-      ratings[id].seenCount++;
-      if (i === 0) ratings[id].pickCount++;
-    });
+    // 排序模式只累加 rankSeen，不碰 seenCount/pickCount，避免污染 tier list 的 pick rate
+    ranked.forEach(id => { ratings[id].rankSeen++; });
     // C(9,2) = 36 pairwise comparisons
     for (let i = 0; i < ranked.length; i++) {
       for (let j = i + 1; j < ranked.length; j++) {
@@ -339,14 +338,15 @@ async function uploadRankingElo() {
   applyRanking(occRanked);
   applyRanking(minRanked);
 
-  // Build writes
-  const writes = Object.entries(ratings).map(([cardId, { elo, seenCount, pickCount }]) => ({
+  // Build writes（seenCount/pickCount 原值寫回，避免被清空；rankSeen 為排序展示數）
+  const writes = Object.entries(ratings).map(([cardId, { elo, seenCount, pickCount, rankSeen }]) => ({
     update: {
       name: `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${cardId}`,
       fields: {
         elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(elo)))}` },
         seenCount: { integerValue: `${seenCount}` },
         pickCount: { integerValue: `${pickCount}` },
+        rankSeen:  { integerValue: `${rankSeen}` },
         lastRater: { stringValue: raterId },
       }
     }
