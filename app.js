@@ -88,6 +88,128 @@ let searchQuery = '';
 let excludeBanned = false;
 let excludeDups = false;
 
+// ── 牌力評分（ELO / Tier）─────────────────────────
+// 預設不顯示、不抓資料；使用者選「牌力排序」才懶載入。
+// 快取與 tierlist 共用同一把 key，零額外 Firestore 成本。
+const RATINGS_FS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v2';
+const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
+const RATING_MIN_SEEN = 5;
+const RATING_TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
+const RATING_TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
+
+let activeSort = 'default';
+let domSorted = false;          // DOM 目前是否已被牌力排序重排
+let ratingsMap = null;          // 卡片ID → { elo, seenCount, pickCount, rankSeen }
+let ratingsLoading = null;      // 載入中的 Promise（避免重複抓）
+let tierMap = new Map();        // 卡片ID → 'S'..'E'（完整牌池排名）
+let ratingScoreMap = new Map(); // 卡片ID → 綜合分數（排序用）
+
+function ratingTierGet(pct) {
+  return RATING_TIERS[RATING_TIER_BOUNDS.findIndex(b => pct < b)];
+}
+function ratingCompositeScore({ elo, seenCount, pickCount }) {
+  if (!seenCount) return elo;
+  const pickRate = pickCount / seenCount;
+  const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
+  const conf = Math.min(seenCount / 30, 1);
+  return conf * elo + (1 - conf) * prior;
+}
+function isCardBannedById(id) {
+  return BANNED_GROUPS.some(g => g.ids.includes(id));
+}
+
+async function fetchAllRatings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(RATINGS_CACHE_KEY));
+    if (s && Date.now() - s.cachedAt < RATINGS_CACHE_TTL) return s.data;
+  } catch {}
+
+  const map = {};
+  let pageToken = null;
+  do {
+    let url = `${RATINGS_FS_BASE}/agricola_ratings?pageSize=300`;
+    if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    (data.documents || []).forEach(doc => {
+      const cardId = doc.name.split('/').pop();
+      const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue ?? 1200);
+      const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
+      const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
+      const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
+      map[cardId] = { elo, seenCount, pickCount, rankSeen };
+    });
+    pageToken = data.nextPageToken ?? null;
+  } while (pageToken);
+
+  try { localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
+  return map;
+}
+
+// 以完整牌池（排除禁卡）計算 canonical Tier，與牌力排行頁一致
+function buildTierMap() {
+  const rated = [];
+  allCards.forEach(card => {
+    const id = card['卡片ID'];
+    if (isCardBannedById(id)) return;
+    const r = ratingsMap[id];
+    if (r && r.seenCount >= RATING_MIN_SEEN) rated.push({ id, score: ratingCompositeScore(r) });
+  });
+  rated.sort((a, b) => b.score - a.score);
+  const n = rated.length;
+  tierMap = new Map();
+  ratingScoreMap = new Map();
+  rated.forEach((item, i) => {
+    tierMap.set(item.id, ratingTierGet(i / n));
+    ratingScoreMap.set(item.id, item.score);
+  });
+}
+
+async function ensureRatings() {
+  if (ratingsMap) return;
+  if (!ratingsLoading) {
+    ratingsLoading = (async () => {
+      ratingsMap = await fetchAllRatings();
+      buildTierMap();
+      applyRatingBadges();
+    })();
+  }
+  await ratingsLoading;
+}
+
+// 把 ELO/Tier 徽章注入每張已建立的卡片（只跑一次；顯示與否由 grid 的 .show-rating class 控制）
+function applyRatingBadges() {
+  cardElMap.forEach(({ el, card }) => {
+    const wrap = el.querySelector('.card-thumb-wrap');
+    if (!wrap) return;
+    let badge = wrap.querySelector('.card-rating');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'card-rating';
+      wrap.appendChild(badge);
+    }
+    const id = card['卡片ID'];
+    const r = ratingsMap[id];
+    if (isCardBannedById(id)) {
+      badge.className = 'card-rating rating-banned';
+      badge.innerHTML = `<span class="rating-tier">🚫</span>`;
+    } else if (r && r.seenCount >= RATING_MIN_SEEN) {
+      const tier = tierMap.get(id) || '?';
+      badge.className = `card-rating rating-tier-${tier.toLowerCase()}`;
+      badge.innerHTML = `<span class="rating-tier">${tier}</span><span class="rating-elo">${Math.round(r.elo)}</span>`;
+    } else {
+      badge.className = 'card-rating rating-na';
+      badge.innerHTML = `<span class="rating-tier">?</span>`;
+    }
+  });
+}
+
+function ratingSortValue(card) {
+  const id = card['卡片ID'];
+  return ratingScoreMap.has(id) ? ratingScoreMap.get(id) : null; // 未上榜/禁卡 → null（排到最後）
+}
+
 // Card elements are created once and reused; only visibility is toggled on filter
 const cardElMap = new Map(); // unique card key → {el, card}
 const canvasCardMap = new WeakMap(); // canvas → card
@@ -180,6 +302,18 @@ function applyFilters() {
     return true;
   });
 
+  // 牌力排序（選了才生效；未上榜的牌固定排到最後）
+  if (activeSort !== 'default') {
+    const dir = activeSort === 'elo_asc' ? 1 : -1;
+    filteredCards.sort((a, b) => {
+      const sa = ratingSortValue(a), sb = ratingSortValue(b);
+      if (sa === null && sb === null) return 0;
+      if (sa === null) return 1;
+      if (sb === null) return -1;
+      return (sa - sb) * dir;
+    });
+  }
+
   renderGrid();
   document.getElementById('resultsInfo').textContent =
     filteredCards.length === allCards.length
@@ -219,6 +353,25 @@ function renderGrid() {
     }
     if (show) count++;
   });
+
+  // 牌力排序時重排 DOM；切回預設時還原原始順序
+  if (activeSort !== 'default') {
+    const frag = document.createDocumentFragment();
+    filteredCards.forEach(c => {
+      const entry = cardElMap.get(getCardKey(c));
+      if (entry) frag.appendChild(entry.el); // appendChild 會把既有節點搬到新位置
+    });
+    grid.appendChild(frag);
+    domSorted = true;
+  } else if (domSorted) {
+    const frag = document.createDocumentFragment();
+    allCards.forEach(c => {
+      const entry = cardElMap.get(getCardKey(c));
+      if (entry) frag.appendChild(entry.el);
+    });
+    grid.appendChild(frag);
+    domSorted = false;
+  }
 
   // Empty state
   let emptyEl = grid.querySelector('.empty-state');
@@ -473,6 +626,18 @@ function openModal(card) {
   const replacedCardsText = getReplacedCardsText(card);
   if (replacedCardsText) fieldDefs.push(['取代卡牌', replacedCardsText, 'replace']);
 
+  // 牌力資訊（僅在使用者已啟用牌力排序、資料載入後顯示）
+  if (ratingsMap) {
+    const rid = card['卡片ID'];
+    const rr = ratingsMap[rid];
+    if (isCardBannedById(rid)) {
+      fieldDefs.push(['牌力', '禁卡']);
+    } else if (rr && rr.seenCount >= RATING_MIN_SEEN) {
+      fieldDefs.push(['牌力 Tier', tierMap.get(rid) || '—']);
+      fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
+    }
+  }
+
   fieldDefs.forEach(([label, value, highlight]) => {
     if (!value) return;
     const row = document.createElement('div');
@@ -563,6 +728,25 @@ document.getElementById('deckSelect').addEventListener('change', e => {
   activeDeck = e.target.value;
   applyFilters();
 });
+
+// Sort select（選牌力排序才懶載入評分、顯示徽章）
+const sortSelect = document.getElementById('sortSelect');
+if (sortSelect) {
+  sortSelect.addEventListener('change', async e => {
+    activeSort = e.target.value;
+    const grid = document.getElementById('cardGrid');
+    if (activeSort !== 'default') {
+      sortSelect.disabled = true;
+      try { await ensureRatings(); }
+      catch (err) { console.error('載入牌力資料失敗', err); }
+      finally { sortSelect.disabled = false; }
+      grid.classList.add('show-rating');
+    } else {
+      grid.classList.remove('show-rating');
+    }
+    applyFilters();
+  });
+}
 
 // Search
 const searchInput = document.getElementById('searchInput');

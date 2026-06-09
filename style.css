@@ -538,6 +538,42 @@ body {
   vertical-align: top;
 }
 
+/* ── 牌力徽章（ELO / Tier）：預設隱藏，選牌力排序才顯示 ── */
+.card-rating { display: none; }
+.card-grid.show-rating .card-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+  padding: 2px 7px 2px 5px;
+  border-radius: 7px;
+  font-size: .72rem;
+  font-weight: 700;
+  background: rgba(15, 20, 33, .82);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+}
+.card-rating .rating-tier {
+  font-family: 'Cinzel', serif;
+  font-size: .85rem;
+  line-height: 1;
+}
+.card-rating .rating-elo {
+  color: var(--text);
+  font-weight: 600;
+}
+.rating-tier-s .rating-tier { color: #f5c842; }
+.rating-tier-a .rating-tier { color: #4ade80; }
+.rating-tier-b .rating-tier { color: #60a5fa; }
+.rating-tier-c .rating-tier { color: #c084fc; }
+.rating-tier-d .rating-tier { color: #fb923c; }
+.rating-tier-e .rating-tier { color: #f87171; }
+.rating-na .rating-tier,
+.rating-banned .rating-tier { color: var(--text3); }
+
 .card-body {
   padding: 12px 14px 14px;
 }
