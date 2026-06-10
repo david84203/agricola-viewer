@@ -200,7 +200,7 @@ function renderTierList() {
   eligible.forEach(card => {
     const r = ratingsMap[card['卡片ID']];
     if (r && r.seenCount >= MIN_SEEN) {
-      rated.push({ card, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount });
+      rated.push({ card, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount, rankSeen: r.rankSeen || 0 });
     } else {
       unrated.push(card);
     }
@@ -244,8 +244,8 @@ function renderTierList() {
       if (!section.classList.contains('collapsed')) drawPendingCanvases(section);
     });
     const grid = section.querySelector('.tier-card-grid');
-    groups[tier].forEach(({ card, elo, seenCount, pickCount }) => {
-      grid.appendChild(createTierCardEl(card, elo, seenCount, pickCount));
+    groups[tier].forEach(({ card, elo, seenCount, pickCount, rankSeen }) => {
+      grid.appendChild(createTierCardEl(card, elo, seenCount, pickCount, rankSeen));
     });
     container.appendChild(section);
   });
@@ -267,8 +267,18 @@ function renderTierList() {
 
   // 累計展示 = 輪抽展示 + 排序展示（pick rate 仍只用 seenCount，不受影響）
   const totalSeen = Object.values(ratingsMap).reduce((s, r) => s + r.seenCount + (r.rankSeen || 0), 0);
-  document.getElementById('tierStats').textContent =
-    `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
+  const statsEl = document.getElementById('tierStats');
+  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
+  statsEl.textContent = baseStats;
+  // 全站實際局數：從 session log 算（一場輪抽=一份文件，非展示張數）
+  fetchGameCounts().then(({ draft, rank }) => {
+    if (draft == null && rank == null) return;
+    const parts = [];
+    if (draft != null) parts.push(`輪抽 ${draft.toLocaleString()} 場`);
+    if (rank != null) parts.push(`快排 ${rank.toLocaleString()} 次`);
+    const total = (draft || 0) + (rank || 0);
+    statsEl.textContent = `全站 ${total.toLocaleString()} 局（${parts.join(' · ')}）· ${baseStats}`;
+  });
 
   // 重畫後若正在搜尋，維持高亮
   if (tierSearchQuery.trim()) applyTierSearch();
@@ -323,9 +333,55 @@ function tierRangeLabel(tier) {
   return pcts[TIERS.indexOf(tier)] || '';
 }
 
+// ── 全站場數（從 session log 用聚合 COUNT 算，非加總卡片展示數）──
+let gameCountsCache = null;
+async function fetchGameCounts() {
+  if (gameCountsCache) return gameCountsCache;
+  const countColl = async (coll) => {
+    try {
+      const res = await fetch(`${FIRESTORE_BASE}:runAggregationQuery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredAggregationQuery: {
+            structuredQuery: { from: [{ collectionId: coll }] },
+            aggregations: [{ alias: 'c', count: {} }],
+          },
+        }),
+      });
+      const data = await res.json();
+      return Number(data?.[0]?.result?.aggregateFields?.c?.integerValue ?? 0);
+    } catch { return null; }
+  };
+  const [draft, rank] = await Promise.all([
+    countColl('agricola_sessions'),
+    countColl('agricola_rank_sessions'),
+  ]);
+  const result = { draft, rank };
+  if (draft != null || rank != null) gameCountsCache = result; // 失敗不快取，下次重試
+  return result;
+}
+
 // ── Card elements ──────────────────────────────────
-function createTierCardEl(card, elo, seenCount, pickCount) {
+// 信心等級：依有效場數（輪抽 seenCount + 快排 rankSeen）分級
+// 門檻參考收斂經驗：<30 暖機、30~49 有參考性、50+ 收斂（理想 80~100）
+function confidenceLevel(n) {
+  if (n >= 80) return { key: 'solid', label: '穩固' };
+  if (n >= 50) return { key: 'converged', label: '收斂' };
+  if (n >= 30) return { key: 'ref', label: '參考' };
+  return { key: 'warm', label: '暖機' };
+}
+// 搶手度顏色：冷藍(冷門) → 火紅(搶手)。隨機基準約 11%(1/9)，45%+ 視為極搶手到頂
+function heatColor(pickRate) {
+  const t = Math.min(pickRate / 45, 1);
+  const hue = 210 - t * 210; // 210°藍 → 0°紅
+  return `hsl(${hue}, 75%, 52%)`;
+}
+
+function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
   const pickRate = seenCount > 0 ? Math.round(pickCount / seenCount * 100) : 0;
+  const eff = seenCount + rankSeen;
+  const conf = confidenceLevel(eff);
   const div = document.createElement('div');
   div.className = 'tier-card';
   div.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
@@ -335,7 +391,11 @@ function createTierCardEl(card, elo, seenCount, pickCount) {
       <div class="tier-card-name">${card['牌名'] || '—'}</div>
       <div class="tier-card-meta">
         <span class="tier-card-score">${Math.round(elo)}</span>
-        <span class="tier-card-seen">${pickRate}% · ${seenCount}次</span>
+        <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}（輪抽 ${seenCount}＋快排 ${rankSeen}）">${conf.label}·${eff}</span>
+      </div>
+      <div class="tier-heat" title="搶手度 ${pickRate}%（被選 ${pickCount} / 展示 ${seenCount}）">
+        <div class="tier-heat-fill" style="width:${Math.min(pickRate, 100)}%;background:${heatColor(pickRate)}"></div>
+        <span class="tier-heat-label">${pickRate}%</span>
       </div>
     </div>
   `;
