@@ -966,11 +966,13 @@ async function uploadRatings() {
     const batchData = await batchRes.json();
 
     const ratings = {};
+    const existingIds = new Set();
     uniqueIds.forEach(id => { ratings[id] = { elo: 1200, seenCount: 0, pickCount: 0 }; });
     batchData.forEach(item => {
       if (item.found) {
         const id = item.found.name.split('/').pop();
         const f = item.found.fields || {};
+        existingIds.add(id);
         ratings[id] = {
           elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
           seenCount: Number(f.seenCount?.integerValue ?? 0),
@@ -978,6 +980,23 @@ async function uploadRatings() {
         };
       }
     });
+
+    // 評分者權重（從 Firestore settings/rater_weights 載入，預設 1.0；查無時行為與過去完全一致）
+    const raterId = getRaterId() || 'unknown';
+    let raterWeight = 1;
+    try {
+      const wRes = await fetch(`${FIRESTORE_BASE}/settings/rater_weights`);
+      if (wRes.ok) {
+        const wf = (await wRes.json()).fields?.weights?.mapValue?.fields?.[raterId];
+        const wv = wf?.doubleValue ?? wf?.integerValue;
+        if (wv != null && Number(wv) > 0) raterWeight = Number(wv);
+      }
+    } catch {}
+    const K_eff = K_PAIR * raterWeight;
+
+    // 快照初始值，供增量寫入計算淨變化（解決多人同時評分互相覆蓋）
+    const eloInit = {}, seenInit = {}, pickInit = {};
+    uniqueIds.forEach(id => { eloInit[id] = ratings[id].elo; seenInit[id] = ratings[id].seenCount; pickInit[id] = ratings[id].pickCount; });
 
     // Compute ELO updates round by round (sequential, using pre-round ratings per round)
     state.shownLog.forEach(({ picked, opponents }) => {
@@ -992,28 +1011,42 @@ async function uploadRatings() {
       opponents.forEach(oppId => {
         const R_o = ratings[oppId].elo;
         const E_p = 1 / (1 + Math.pow(10, (R_o - R_p) / 400));
-        deltas[picked]  = (deltas[picked]  || 0) + K_PAIR * (1 - E_p);
-        deltas[oppId]   = (deltas[oppId]   || 0) + K_PAIR * (0 - E_p);
+        deltas[picked]  = (deltas[picked]  || 0) + K_eff * (1 - E_p);
+        deltas[oppId]   = (deltas[oppId]   || 0) + K_eff * (0 - E_p);
       });
 
       Object.entries(deltas).forEach(([id, d]) => { ratings[id].elo += d; });
     });
 
     const totalMatches = state.shownLog.reduce((s, r) => s + r.opponents.length, 0);
-    const raterId = getRaterId() || 'unknown';
 
-    // Write all updated ratings back
-    const writes = Object.entries(ratings).map(([cardId, { elo, seenCount, pickCount }]) => ({
-      update: {
-        name: `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${cardId}`,
-        fields: {
-          elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(elo)))}` },
-          seenCount: { integerValue: `${seenCount}` },
-          pickCount: { integerValue: `${pickCount}` },
-          lastRater: { stringValue: raterId },
-        }
+    // 增量寫入：只疊加本場變化量，不覆蓋整份 → 多人同時評分也不會互相蓋掉
+    const RBASE = 'projects/project-hub-410cd/databases/(default)/documents/agricola_ratings';
+    const writes = uniqueIds.map(cardId => {
+      const name  = `${RBASE}/${cardId}`;
+      const dElo  = ratings[cardId].elo       - eloInit[cardId];
+      const dSeen = ratings[cardId].seenCount - seenInit[cardId];
+      const dPick = ratings[cardId].pickCount - pickInit[cardId];
+      if (existingIds.has(cardId)) {
+        const tf = [{ fieldPath: 'elo', increment: { doubleValue: dElo } }];
+        if (dSeen) tf.push({ fieldPath: 'seenCount', increment: { integerValue: `${dSeen}` } });
+        if (dPick) tf.push({ fieldPath: 'pickCount', increment: { integerValue: `${dPick}` } });
+        return {
+          update: { name, fields: { lastRater: { stringValue: raterId } } },
+          updateMask: { fieldPaths: ['lastRater'] },
+          updateTransforms: tf,
+        };
       }
-    }));
+      // 新卡：文件不存在，increment 的 base 會是 0，故直接設定 1200+變化的絕對值
+      return {
+        update: { name, fields: {
+          elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(1200 + dElo)))}` },
+          seenCount: { integerValue: `${dSeen}` },
+          pickCount: { integerValue: `${dPick}` },
+          lastRater: { stringValue: raterId },
+        } }
+      };
+    });
 
     // Per-rater session record
     writes.push({

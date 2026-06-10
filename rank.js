@@ -334,11 +334,13 @@ async function uploadRankingElo() {
   const batchData = await batchRes.json();
 
   const ratings = {};
+  const existingIds = new Set();
   allIds.forEach(id => { ratings[id] = { elo: 1200, seenCount: 0, pickCount: 0, rankSeen: 0 }; });
   batchData.forEach(item => {
     if (item.found) {
       const id = item.found.name.split('/').pop();
       const f  = item.found.fields || {};
+      existingIds.add(id);
       ratings[id] = {
         elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
         seenCount: Number(f.seenCount?.integerValue ?? 0),  // 輪抽展示數，排序模式不動它（保持 pick rate 純淨）
@@ -347,6 +349,22 @@ async function uploadRankingElo() {
       };
     }
   });
+
+  // 評分者權重（從 Firestore settings/rater_weights 載入，預設 1.0；查無時行為與過去完全一致）
+  let raterWeight = 1;
+  try {
+    const wRes = await fetch(`${RANK_FS_BASE}/settings/rater_weights`);
+    if (wRes.ok) {
+      const wf = (await wRes.json()).fields?.weights?.mapValue?.fields?.[raterId];
+      const wv = wf?.doubleValue ?? wf?.integerValue;
+      if (wv != null && Number(wv) > 0) raterWeight = Number(wv);
+    }
+  } catch {}
+  const K_eff = RANK_K_PAIR * raterWeight;
+
+  // 快照初始值，供增量寫入計算淨變化
+  const eloInit = {}, rankSeenInit = {};
+  allIds.forEach(id => { eloInit[id] = ratings[id].elo; rankSeenInit[id] = ratings[id].rankSeen; });
 
   // 記錄變動前的 ELO（四捨五入後，與寫入 Firestore 的整數一致）
   const eloBefore = {};
@@ -368,7 +386,7 @@ async function uploadRankingElo() {
         const wId = ranked[i];  // 名次較高 = 贏家
         const lId = ranked[j];  // 名次較低 = 輸家
         const E_w = 1 / (1 + Math.pow(10, (base[lId] - base[wId]) / 400));
-        const change = RANK_K_PAIR * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
+        const change = K_eff * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
         delta[wId] += change;
         delta[lId] -= change;
       }
@@ -380,19 +398,30 @@ async function uploadRankingElo() {
   applyRanking(occRanked);
   applyRanking(minRanked);
 
-  // Build writes（seenCount/pickCount 原值寫回，避免被清空；rankSeen 為排序展示數）
-  const writes = Object.entries(ratings).map(([cardId, { elo, seenCount, pickCount, rankSeen }]) => ({
-    update: {
-      name: `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${cardId}`,
-      fields: {
-        elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(elo)))}` },
-        seenCount: { integerValue: `${seenCount}` },
-        pickCount: { integerValue: `${pickCount}` },
-        rankSeen:  { integerValue: `${rankSeen}` },
-        lastRater: { stringValue: raterId },
-      }
+  // 增量寫入：只疊加 elo/rankSeen 的本場變化量；seenCount/pickCount 完全不碰（自動保留，不再有覆蓋風險）
+  const RBASE = 'projects/project-hub-410cd/databases/(default)/documents/agricola_ratings';
+  const writes = allIds.map(cardId => {
+    const name  = `${RBASE}/${cardId}`;
+    const dElo  = ratings[cardId].elo      - eloInit[cardId];
+    const dRank = ratings[cardId].rankSeen - rankSeenInit[cardId];
+    if (existingIds.has(cardId)) {
+      const tf = [{ fieldPath: 'elo', increment: { doubleValue: dElo } }];
+      if (dRank) tf.push({ fieldPath: 'rankSeen', increment: { integerValue: `${dRank}` } });
+      return {
+        update: { name, fields: { lastRater: { stringValue: raterId } } },
+        updateMask: { fieldPaths: ['lastRater'] },
+        updateTransforms: tf,
+      };
     }
-  }));
+    // 新卡：文件不存在，直接設定 1200+變化的絕對值
+    return {
+      update: { name, fields: {
+        elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(1200 + dElo)))}` },
+        rankSeen:  { integerValue: `${dRank}` },
+        lastRater: { stringValue: raterId },
+      } }
+    };
+  });
 
   // Session record
   writes.push({
