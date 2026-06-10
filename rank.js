@@ -36,12 +36,7 @@ async function rankInit() {
   await Promise.all([loadRankBanlist(), loadRankDupExclusions()]);
   await loadRankCards();
 
-  const raterId = typeof getRaterId === 'function' ? getRaterId() : null;
-  if (raterId) {
-    const saved = localStorage.getItem(RANK_STORAGE_KEY + '_' + raterId);
-    rankState.roundCount = saved ? parseInt(saved, 10) : 0;
-    updateRankProgress();
-  }
+  loadRankRoundCount();
 }
 
 // Called by auth.js when login state changes
@@ -50,12 +45,7 @@ function onAuthChange() {
   document.getElementById('rankLoginHint').style.display = raterUser ? 'none' : '';
   document.getElementById('startRankBtn').disabled = !raterUser;
 
-  if (raterUser) {
-    const raterId = getRaterId();
-    const saved = localStorage.getItem(RANK_STORAGE_KEY + '_' + raterId);
-    rankState.roundCount = saved ? parseInt(saved, 10) : 0;
-    updateRankProgress();
-  }
+  if (raterUser) loadRankRoundCount();
 }
 
 // ── Load banned cards ─────────────────────────────
@@ -83,6 +73,49 @@ async function loadRankDupExclusions() {
   try {
     rankDupExclusions = (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
   } catch { rankDupExclusions = new Set(); }
+}
+
+// 從 Firestore 撈該評分者真實累積輪數（跨瀏覽器/電腦一致），localStorage 僅作即時快取
+async function loadRankRoundCount() {
+  const raterId = typeof getRaterId === 'function' ? getRaterId() : null;
+  if (!raterId) return;
+
+  // 先用本機快取即時顯示，避免畫面閃爍
+  const cached = localStorage.getItem(RANK_STORAGE_KEY + '_' + raterId);
+  if (cached !== null) {
+    rankState.roundCount = parseInt(cached, 10) || 0;
+    updateRankProgress();
+  }
+
+  // 再用 Firestore 的真實筆數覆蓋（agricola_rank_sessions 每輪一筆）
+  try {
+    const res = await fetch(`${RANK_FS_BASE}:runAggregationQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        structuredAggregationQuery: {
+          structuredQuery: {
+            from: [{ collectionId: 'agricola_rank_sessions' }],
+            where: {
+              fieldFilter: {
+                field: { fieldPath: 'raterId' },
+                op: 'EQUAL',
+                value: { stringValue: raterId }
+              }
+            }
+          },
+          aggregations: [{ count: {}, alias: 'count' }]
+        }
+      })
+    });
+    const data = await res.json();
+    const count = Number(data[0]?.result?.aggregateFields?.count?.integerValue ?? NaN);
+    if (!Number.isNaN(count)) {
+      rankState.roundCount = count;
+      localStorage.setItem(RANK_STORAGE_KEY + '_' + raterId, count);
+      updateRankProgress();
+    }
+  } catch {}
 }
 
 // 與 draft.js / duplicate-utils 一致的複合 key（重複卡可能以此 key 被排除）
