@@ -201,30 +201,6 @@
 .tier-conf-ref       { background: rgba(245, 158, 11, .18);  color: #f59e0b; }
 .tier-conf-converged { background: rgba(34, 197, 94, .18);   color: #22c55e; }
 .tier-conf-solid     { background: rgba(16, 185, 129, .24);  color: #10b981; }
-/* 搶手度熱度條 */
-.tier-heat {
-  position: relative;
-  margin-top: 6px;
-  height: 12px;
-  border-radius: 6px;
-  background: rgba(148, 163, 184, .15);
-  overflow: hidden;
-}
-.tier-heat-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width .3s ease;
-}
-.tier-heat-label {
-  position: absolute;
-  top: 50%;
-  right: 5px;
-  transform: translateY(-50%);
-  font-size: .55rem;
-  font-weight: 700;
-  color: var(--text);
-  text-shadow: 0 0 3px rgba(0, 0, 0, .7);
-}
 
 /* ── Deck filter ── */
 .tier-deck-row {
@@ -392,8 +368,6 @@
   .tier-card-score { font-size: .72rem; }
   .tier-card-seen { font-size: .6rem; }
   .tier-card-conf { font-size: .54rem; padding: 1px 4px; }
-  .tier-heat { height: 10px; margin-top: 5px; }
-  .tier-heat-label { font-size: .5rem; }
 
   /* Ban section */
   .tier-ban-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }

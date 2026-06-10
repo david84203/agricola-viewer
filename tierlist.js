@@ -265,19 +265,14 @@ function renderTierList() {
 
   renderBanSection(container, typeOk);
 
-  // 累計展示 = 輪抽展示 + 排序展示（pick rate 仍只用 seenCount，不受影響）
-  const totalSeen = Object.values(ratingsMap).reduce((s, r) => s + r.seenCount + (r.rankSeen || 0), 0);
   const statsEl = document.getElementById('tierStats');
-  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 累計 ${totalSeen.toLocaleString()} 次展示`;
+  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張`;
   statsEl.textContent = baseStats;
-  // 全站實際局數：從 session log 算（一場輪抽=一份文件，非展示張數）
+  // 全站累計評分場次：從 session log 算（不對外拆分模式，避免一般玩家看到無關雜訊）
   fetchGameCounts().then(({ draft, rank }) => {
     if (draft == null && rank == null) return;
-    const parts = [];
-    if (draft != null) parts.push(`輪抽 ${draft.toLocaleString()} 場`);
-    if (rank != null) parts.push(`快排 ${rank.toLocaleString()} 次`);
     const total = (draft || 0) + (rank || 0);
-    statsEl.textContent = `全站 ${total.toLocaleString()} 局（${parts.join(' · ')}）· ${baseStats}`;
+    statsEl.textContent = `全站累計 ${total.toLocaleString()} 場評分 · ${baseStats}`;
   });
 
   // 重畫後若正在搜尋，維持高亮
@@ -371,15 +366,7 @@ function confidenceLevel(n) {
   if (n >= 30) return { key: 'ref', label: '參考' };
   return { key: 'warm', label: '暖機' };
 }
-// 搶手度顏色：冷藍(冷門) → 火紅(搶手)。隨機基準約 11%(1/9)，45%+ 視為極搶手到頂
-function heatColor(pickRate) {
-  const t = Math.min(pickRate / 45, 1);
-  const hue = 210 - t * 210; // 210°藍 → 0°紅
-  return `hsl(${hue}, 75%, 52%)`;
-}
-
 function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
-  const pickRate = seenCount > 0 ? Math.round(pickCount / seenCount * 100) : 0;
   const eff = seenCount + rankSeen;
   const conf = confidenceLevel(eff);
   const div = document.createElement('div');
@@ -391,11 +378,7 @@ function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
       <div class="tier-card-name">${card['牌名'] || '—'}</div>
       <div class="tier-card-meta">
         <span class="tier-card-score">${Math.round(elo)}</span>
-        <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}（輪抽 ${seenCount}＋快排 ${rankSeen}）">${conf.label}·${eff}</span>
-      </div>
-      <div class="tier-heat" title="搶手度 ${pickRate}%（被選 ${pickCount} / 展示 ${seenCount}）">
-        <div class="tier-heat-fill" style="width:${Math.min(pickRate, 100)}%;background:${heatColor(pickRate)}"></div>
-        <span class="tier-heat-label">${pickRate}%</span>
+        <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}">${conf.label}·${eff}</span>
       </div>
     </div>
   `;
