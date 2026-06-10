@@ -1293,6 +1293,12 @@ body {
   color: var(--text3);
   opacity: .6;
 }
+.donate-thanks-list {
+  font-size: .9rem;
+  color: var(--gold2);
+  line-height: 2;
+  letter-spacing: .04em;
+}
 
 /* ─── Homepage donate CTA ────────────────────────────────────── */
 .home-donate {
