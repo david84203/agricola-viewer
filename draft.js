@@ -981,11 +981,11 @@ async function uploadRatings() {
       }
     });
 
-    // 評分者權重（從 Firestore settings/rater_weights 載入，預設 1.0；查無時行為與過去完全一致）
+    // 評分者權重（從 Firestore settings/calc_params 載入，預設 1.0；查無時行為與過去完全一致）
     const raterId = getRaterId() || 'unknown';
     let raterWeight = 1;
     try {
-      const wRes = await fetch(`${FIRESTORE_BASE}/settings/rater_weights`);
+      const wRes = await fetch(`${FIRESTORE_BASE}/settings/calc_params`);
       if (wRes.ok) {
         const wf = (await wRes.json()).fields?.weights?.mapValue?.fields?.[raterId];
         const wv = wf?.doubleValue ?? wf?.integerValue;
