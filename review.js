@@ -12,6 +12,7 @@ const BGA_DECKS          = ['A', 'B', 'C', 'D', 'E'];
 const BANLIST_CACHE_KEY  = 'agricola_banlist_cache';
 const BANLIST_CACHE_TTL  = 24 * 60 * 60 * 1000;
 const SCORE_ELO_CEILING  = 1300;
+const DRAFT_ROUNDS       = 7;   // 每人永遠選 7 張；handSize 是包牌大小可為 7~10
 
 // 禁卡表（hardcode fallback，Firestore 載入後更新）
 let BANNED_GROUPS = [
@@ -757,7 +758,7 @@ function refreshSessionLoadSelect() {
 async function startSimulation() {
   // 重設所有人的扣牌紀錄
   PLAYERS.forEach(p => {
-    rs.picks[p] = { occ: Array(rs.handSize).fill(null), min: Array(rs.handSize).fill(null) };
+    rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
   });
 
   // 預載圖片
@@ -791,7 +792,7 @@ async function startSimulation() {
 function runAllAiDraft() {
   // 全 AI 瞬間跑完
   for (let type of ['occ', 'min']) {
-    for (let round = 0; round < rs.handSize; round++) {
+    for (let round = 0; round < DRAFT_ROUNDS; round++) {
       for (let p of PLAYERS) {
         const playerIdx = PLAYERS.indexOf(p);
         const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
@@ -893,14 +894,14 @@ function renderActiveDraftScreen() {
   const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
   
   // Header
-  document.getElementById('adRoundLabel').textContent = `${type === 'occ' ? '職業卡' : '次要發展卡'} 第 ${round + 1} / ${rs.handSize} 輪`;
+  document.getElementById('adRoundLabel').textContent = `${type === 'occ' ? '職業卡' : '次要發展卡'} 第 ${round + 1} / ${DRAFT_ROUNDS} 輪`;
   document.getElementById('adTurnName').textContent = getPlayerName(player);
   document.getElementById('adTurnName').className = `ad-turn-name score-color-${player}`;
-  
+
   // Board (該玩家這輪之前選的牌，共 7 格)
   const boardGrid = document.getElementById('adBoardGrid');
   boardGrid.innerHTML = '';
-  for (let r = 0; r < rs.handSize; r++) {
+  for (let r = 0; r < DRAFT_ROUNDS; r++) {
     const slot = document.createElement('div');
     slot.className = 'ad-board-slot';
     const picked = rs.picks[player][type][r];
@@ -1006,7 +1007,7 @@ function renderSlots(player, type) {
   const playerIdx = PLAYERS.indexOf(player);
   grid.innerHTML  = '';
 
-  for (let round = 0; round < rs.handSize; round++) {
+  for (let round = 0; round < DRAFT_ROUNDS; round++) {
     const packKey  = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
     const packName = `${getPlayerName(packKey)}的牌包`;
     const picked   = rs.picks[player][type][round];
@@ -1020,7 +1021,7 @@ function renderSlots(player, type) {
 
     slot.innerHTML = `
       <div class="round-slot-header">
-        <div class="round-slot-round">第 ${round + 1} / ${rs.handSize} 輪</div>
+        <div class="round-slot-round">第 ${round + 1} / ${DRAFT_ROUNDS} 輪</div>
         <div class="round-slot-pack">${packName}</div>
       </div>
       <div class="round-slot-body">
@@ -1063,9 +1064,9 @@ function updateNextBtn() {
   const player   = PLAYERS[rs.currentInputPlayerIdx];
   const total    = countPlayerPicks(player);
   const isLast   = rs.currentInputPlayerIdx >= PLAYERS.length - 1;
-  const allDone  = PLAYERS.every(p => countPlayerPicks(p) === rs.handSize * 2);
+  const allDone  = PLAYERS.every(p => countPlayerPicks(p) === DRAFT_ROUNDS * 2);
   document.getElementById('inputPickCount').innerHTML =
-    `已選 <strong>${total}</strong> / ${rs.handSize * 2} 張`;
+    `已選 <strong>${total}</strong> / ${DRAFT_ROUNDS * 2} 張`;
   const btn = document.getElementById('inputNextBtn');
   btn.disabled = false;
   btn.textContent = isLast ? '查看結果 →' : '下一位玩家 →';
@@ -1089,7 +1090,7 @@ function openSlotPicker(player, type, round, slotEl) {
   const takenIds = getTakenIdsFromPack(packKey, type, player, round);
 
   document.getElementById('slotPickerTitle').textContent =
-    `第 ${round + 1} / ${rs.handSize} 輪 · ${packName}`;
+    `第 ${round + 1} / ${DRAFT_ROUNDS} 輪 · ${packName}`;
   document.getElementById('slotPickerSearch').value = '';
 
   renderPickerCards(packCards, takenIds);
@@ -1122,7 +1123,7 @@ function getTakenIdsFromPack(packKey, type, currentPlayer, currentRound) {
 
   PLAYERS.forEach((otherPlayer, otherIdx) => {
     if (otherPlayer === currentPlayer) return;
-    for (let r = 0; r < rs.handSize; r++) {
+    for (let r = 0; r < DRAFT_ROUNDS; r++) {
       const theirPackKey = type === 'occ' ? occPackKey(otherIdx, r) : minPackKey(otherIdx, r);
       if (theirPackKey !== packKey) continue;
       const theirPick = rs.picks[otherPlayer][type][r];
@@ -1158,22 +1159,17 @@ function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
 
   // 找 playerA 在這包路徑中的位置
   let posA = -1, posB = -1;
-  for (let k = 0; k < rs.handSize; k++) {
+  for (let k = 0; k < DRAFT_ROUNDS; k++) {
     const holderIdx = getHolderOrder(k);
     if (holderIdx === PLAYERS.indexOf(playerA) && posA === -1) posA = k;
     if (holderIdx === PLAYERS.indexOf(playerB) && posB === -1) {
-      // 如果同一個玩家第二次出現（包繞回來），要匹配 round
       if (k === posB) break;
       posB = k;
     }
   }
-  // 更精確：用 round 來確認
-  // playerA 在 roundA 持有這包，playerB 在 roundB 持有這包
-  // 所以直接比較在包路徑中的絕對順序即可
-  // 路徑中的出現次序 = 每 4 輪循環一次，找各自對應的最小 k
   function findPackPos(player, round) {
     const playerIdx = PLAYERS.indexOf(player);
-    for (let k = 0; k < rs.handSize; k++) {
+    for (let k = 0; k < DRAFT_ROUNDS; k++) {
       if (getHolderOrder(k) === playerIdx) {
         // 確認 round 是否對應
         if (type === 'occ') {
@@ -1389,7 +1385,7 @@ async function calculateAllScores() {
 
     // 7 輪職業 + 7 輪次要
     ['occ', 'min'].forEach(type => {
-      for (let round = 0; round < rs.handSize; round++) {
+      for (let round = 0; round < DRAFT_ROUNDS; round++) {
         const picked = rs.picks[p][type][round];
         if (!picked) continue;
 
@@ -1494,7 +1490,7 @@ async function calculateAllScores() {
         <ul class="result-analysis-list">
           ${worst.map(r => `
             <li class="result-analysis-item">
-              <div class="result-analysis-round">${r.phaseLabel} 第 ${r.roundNum} / ${rs.handSize} 輪 · 得 ${r.roundScore} 分</div>
+              <div class="result-analysis-round">${r.phaseLabel} 第 ${r.roundNum} / ${DRAFT_ROUNDS} 輪 · 得 ${r.roundScore} 分</div>
               選了「<strong>${nameOf(r.picked)}</strong>」，
               但「<strong>${nameOf(r.bestId)}</strong>」評分更高（ELO 差約 ${r.gap} 分）
             </li>
@@ -1634,7 +1630,7 @@ function bindGlobalEvents() {
     rs.phase = 'setup';
     rs.currentInputPlayerIdx = 0;
     PLAYERS.forEach(p => {
-      rs.picks[p] = { occ: Array(rs.handSize).fill(null), min: Array(rs.handSize).fill(null) };
+      rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
     });
     showScreen('setupScreen');
   });
