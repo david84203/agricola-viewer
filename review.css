@@ -1203,6 +1203,7 @@
   transition: color var(--transition), border-color var(--transition);
 }
 .session-delete-btn:hover { color: #f87171; border-color: #f87171; }
+.session-hint { font-size: .75rem; color: var(--text3); white-space: nowrap; }
 
 .mode-selection-section {
   background: var(--bg2);
