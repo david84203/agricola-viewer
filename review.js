@@ -49,6 +49,7 @@ let bgaIdMap   = {};  // ourCardId → bgaId, for non-ABCDE BGA cards
 
 const rs = {
   phase: 'setup',  // setup | input | result
+  mode: 1,         // 1=歷史紀錄 2=單人挑戰AI 3=四人單機 4=全AI
   bgaMode: false,
   handSize: 9,
   draftFormat: 'separate', // 'separate' | 'combined'
@@ -512,6 +513,16 @@ function openBGAImportDialog() {
     if (ta) ta.value = '';
     updateBGAPreview(p);
   });
+
+  // 顯示目前輪抽設定
+  const bar = document.getElementById('bgaImportSettingsBar');
+  if (bar) {
+    const fmt   = rs.draftFormat === 'combined' ? '職業次發同時輪抽' : '先職業再次發';
+    const dir   = rs.draftFormat === 'combined' ? '' : `・次發方向：${rs.minDir === 'same' ? '同向' : '反向'}`;
+    const sizeL = `每人 ${rs.handSize}+${rs.handSize} 張`;
+    bar.textContent = `目前設定：${fmt}${dir}　${sizeL}`;
+  }
+
   document.getElementById('bgaImportOverlay').classList.add('active');
 }
 
@@ -568,6 +579,17 @@ function confirmBGAImport() {
   PLAYERS.forEach(p => buildPackPanel(p));
   refreshPackProgressRow();
   updateStartBtn();
+
+  // 暫存匯入資料（整個 session 有效；切換牌數時可還原）
+  try {
+    sessionStorage.setItem('bga_import_backup', JSON.stringify(
+      Object.fromEntries(PLAYERS.map(p => [p, {
+        occs:   rs.packs[p].occs,
+        minors: rs.packs[p].minors,
+      }]))
+    ));
+  } catch {}
+
   closeBGAImportDialog();
 
   if (warnings.length) {
@@ -1383,8 +1405,13 @@ function bindGlobalEvents() {
       document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       rs.handSize = parseInt(btn.dataset.size, 10);
-      // 清空已選牌包，避免超出新上限的舊資料殘留
-      PLAYERS.forEach(p => { rs.packs[p].occs = []; rs.packs[p].minors = []; });
+      // 從 sessionStorage 備份還原，再 trim 到新尺寸（保留 BGA 匯入資料）
+      const _backup = (() => { try { return JSON.parse(sessionStorage.getItem('bga_import_backup')); } catch { return null; } })();
+      PLAYERS.forEach(p => {
+        const src = _backup?.[p];
+        rs.packs[p].occs   = (src?.occs   || rs.packs[p].occs).slice(0, rs.handSize);
+        rs.packs[p].minors = (src?.minors || rs.packs[p].minors).slice(0, rs.handSize);
+      });
       PLAYERS.forEach(p => buildPackPanel(p));
       refreshPackProgressRow();
       updateStartBtn();

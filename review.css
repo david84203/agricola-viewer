@@ -1519,6 +1519,15 @@
   color: var(--text2);
   line-height: 1.75;
 }
+.bga-import-settings-bar {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(200,160,60,.1);
+  border: 1px solid rgba(200,160,60,.25);
+  border-radius: var(--radius-sm);
+  font-size: .8rem;
+  color: var(--gold);
+}
 .bga-import-players {
   display: grid;
   grid-template-columns: 1fr 1fr;
