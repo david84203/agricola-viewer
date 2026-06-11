@@ -112,6 +112,7 @@ async function init() {
   buildSetupScreen();
   bindGlobalEvents();
   refreshSessionLoadSelect();
+  refreshHumanSeatSelect();
   restoreDraftState();
 }
 
@@ -214,6 +215,7 @@ function buildSetupScreen() {
       rs.playerNames[p] = e.target.value.trim() || `玩家${p}`;
       refreshPackTabLabels();
       refreshPackProgressRow();
+      refreshHumanSeatSelect();
       saveDraftState();
     });
   });
@@ -240,6 +242,15 @@ function buildSetupScreen() {
 
 function getPlayerName(p) {
   return rs.playerNames[p] || `玩家${p}`;
+}
+
+/* 座位下拉改用實際玩家名稱（value 仍是座位字母 A/B/C/D） */
+function refreshHumanSeatSelect() {
+  const sel = document.getElementById('humanSeatSelect');
+  if (!sel) return;
+  const cur = sel.value || rs.humanSeat || 'A';
+  sel.innerHTML = PLAYERS.map(p => `<option value="${p}">${getPlayerName(p)}（${p}）</option>`).join('');
+  sel.value = cur;
 }
 
 function buildPackTabs() {
@@ -855,6 +866,7 @@ function applyState(state) {
   PLAYERS.forEach(p => buildPackPanel(p));
   refreshPackTabLabels();
   refreshPackProgressRow();
+  refreshHumanSeatSelect();
   updateStartBtn();
 }
 
@@ -1816,6 +1828,7 @@ function bindGlobalEvents() {
     radio.addEventListener('change', e => {
       rs.mode = parseInt(e.target.value, 10);
       document.getElementById('modeOptions').style.display = rs.mode === 2 ? 'flex' : 'none';
+      if (rs.mode === 2) refreshHumanSeatSelect();
       
       // Update start button text
       const btn = document.getElementById('startInputBtn');
