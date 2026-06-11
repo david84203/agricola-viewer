@@ -983,7 +983,9 @@ function runAllAiDraft() {
 /* ── 動態輪抽引擎 (Active Draft) ────────────────────── */
 function startActiveDraft() {
   rs.phase = 'draft';
-  rs.draftState = { type: 'occ', round: 0, turn: 0 }; // turn: 0=A, 1=B, 2=C, 3=D
+  // 同時輪抽：每輪同時抽職業＋次發；分開輪抽：先 7 輪職業再 7 輪次發
+  const startType = rs.draftFormat === 'combined' ? 'combined' : 'occ';
+  rs.draftState = { type: startType, round: 0, turn: 0 }; // turn: 0=A, 1=B, 2=C, 3=D
   showScreen('activeDraftScreen');
   nextDraftTurn();
 }
@@ -996,16 +998,21 @@ async function nextDraftTurn() {
 
   const { type, round, turn } = rs.draftState;
   const player = PLAYERS[turn];
-  
+
   const isHumanTurn = rs.mode === 3 || (rs.mode === 2 && player === rs.humanSeat);
 
   if (!isHumanTurn) {
     // AI 回合
     const playerIdx = PLAYERS.indexOf(player);
-    const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
-    const card = getAiPick(packKey, type, player, round);
-    rs.picks[player][type][round] = card;
-    
+    if (type === 'combined') {
+      // 同時抽：職業與次發各選一張最高 ELO
+      rs.picks[player].occ[round] = getAiPick(occPackKey(playerIdx, round), 'occ', player, round);
+      rs.picks[player].min[round] = getAiPick(minPackKey(playerIdx, round), 'min', player, round);
+    } else {
+      const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
+      rs.picks[player][type][round] = getAiPick(packKey, type, player, round);
+    }
+
     // 短暫延遲營造思考感
     await new Promise(r => setTimeout(r, 100));
     advanceDraftState();
@@ -1027,13 +1034,10 @@ function advanceDraftState() {
   if (rs.draftState.turn >= 4) {
     rs.draftState.turn = 0;
     rs.draftState.round++;
-    if (rs.draftState.round >= 7) {
+    if (rs.draftState.round >= DRAFT_ROUNDS) {
       rs.draftState.round = 0;
-      if (rs.draftState.type === 'occ') {
-        rs.draftState.type = 'min';
-      } else {
-        rs.draftState.type = 'done';
-      }
+      // occ → min（分開輪抽的第二階段）；min 或 combined 結束後即 done
+      rs.draftState.type = rs.draftState.type === 'occ' ? 'min' : 'done';
     }
   }
 }
@@ -1063,12 +1067,44 @@ function getAiPick(packKey, type, player, round) {
   return bestCards[rndIdx];
 }
 
+/* 建立一張可點選的牌包卡片元素 */
+function makeAdPackCard(card, { selected = false, onClick }) {
+  const special = getCardSpecialInfo(card['卡片ID']);
+  const cEl = document.createElement('div');
+  cEl.className = 'ad-pack-card' + (selected ? ' selected' : '');
+  cEl.innerHTML = `
+    <canvas></canvas>
+    <div class="ad-pack-card-name">${card['牌名'] || '—'}</div>
+    ${special ? `<div class="slot-picker-special-tag ${special.type}">${getBanShortLabel(special)}</div>` : ''}
+  `;
+  cEl.addEventListener('click', onClick);
+  requestAnimationFrame(() => drawCrop(cEl.querySelector('canvas'), card, 0.7));
+  return cEl;
+}
+
+/* 建立一個「已扣下的牌」格子 */
+function makeAdBoardSlot(picked, isCurrent) {
+  const slot = document.createElement('div');
+  slot.className = 'ad-board-slot';
+  if (picked) {
+    slot.classList.add('has-card');
+    slot.innerHTML = `<canvas></canvas><div class="ad-board-card-name">${picked['牌名'] || ''}</div>`;
+    slot.title = picked['牌名'] || '';
+    requestAnimationFrame(() => drawCrop(slot.querySelector('canvas'), picked, 1));
+  } else if (isCurrent) {
+    slot.innerHTML = `<span style="font-size:1.5rem;color:var(--gold);">?</span>`;
+  }
+  return slot;
+}
+
 function renderActiveDraftScreen() {
+  if (rs.draftState.type === 'combined') { renderCombinedDraftScreen(); return; }
+
   const { type, round, turn } = rs.draftState;
   const player = PLAYERS[turn];
   const playerIdx = PLAYERS.indexOf(player);
   const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
-  
+
   // Header
   document.getElementById('adRoundLabel').textContent = `${type === 'occ' ? '職業卡' : '次要發展卡'} 第 ${round + 1} / ${DRAFT_ROUNDS} 輪`;
   document.getElementById('adTurnName').textContent = getPlayerName(player);
@@ -1078,45 +1114,91 @@ function renderActiveDraftScreen() {
   const boardGrid = document.getElementById('adBoardGrid');
   boardGrid.innerHTML = '';
   for (let r = 0; r < DRAFT_ROUNDS; r++) {
-    const slot = document.createElement('div');
-    slot.className = 'ad-board-slot';
     const picked = rs.picks[player][type][r];
-    if (picked) {
-      slot.classList.add('has-card');
-      slot.innerHTML = `<canvas></canvas>`;
-      slot.title = picked['牌名'] || '';
-      requestAnimationFrame(() => drawCrop(slot.querySelector('canvas'), picked, 1));
-    } else {
-      if (r === round) slot.innerHTML = `<span style="font-size:1.5rem;color:var(--gold);">?</span>`; // 當前要選的位子
-    }
-    boardGrid.appendChild(slot);
+    boardGrid.appendChild(makeAdBoardSlot(picked, r === round));
   }
 
   // Pack (傳來的牌包，扣除被前人選走的)
   const packCards = type === 'occ' ? rs.packs[packKey].occs : rs.packs[packKey].minors;
   const takenIds = getTakenIdsFromPack(packKey, type, player, round);
   const available = packCards.filter(c => !takenIds.has(c['卡片ID']));
-  
+
   document.getElementById('adPackTitle').textContent = `來自 ${getPlayerName(packKey)} 的牌包`;
   const packGrid = document.getElementById('adPackGrid');
+  packGrid.style.display = '';
   packGrid.innerHTML = '';
   available.forEach(card => {
-    const special = getCardSpecialInfo(card['卡片ID']);
-    const cEl = document.createElement('div');
-    cEl.className = 'ad-pack-card';
-    cEl.innerHTML = `
-      <canvas></canvas>
-      <div class="ad-pack-card-name">${card['牌名'] || '—'}</div>
-      ${special ? `<div class="slot-picker-special-tag ${special.type}">${getBanShortLabel(special)}</div>` : ''}
-    `;
-    cEl.addEventListener('click', () => {
-      rs.picks[player][type][round] = card;
-      advanceDraftState();
-      nextDraftTurn();
-    });
-    packGrid.appendChild(cEl);
-    requestAnimationFrame(() => drawCrop(cEl.querySelector('canvas'), card, 0.7));
+    packGrid.appendChild(makeAdPackCard(card, {
+      onClick: () => {
+        rs.picks[player][type][round] = card;
+        advanceDraftState();
+        nextDraftTurn();
+      },
+    }));
   });
+}
+
+/* 同時輪抽：同畫面擺出職業包＋次發包，各選一張再按確認換人 */
+function renderCombinedDraftScreen() {
+  const { round, turn } = rs.draftState;
+  const player = PLAYERS[turn];
+  const playerIdx = PLAYERS.indexOf(player);
+
+  document.getElementById('adRoundLabel').textContent = `同時輪抽 第 ${round + 1} / ${DRAFT_ROUNDS} 輪`;
+  document.getElementById('adTurnName').textContent = getPlayerName(player);
+  document.getElementById('adTurnName').className = `ad-turn-name score-color-${player}`;
+
+  // Board：上排職業、下排次發（7+7 在 7 欄 grid 自然成兩列）
+  const boardGrid = document.getElementById('adBoardGrid');
+  boardGrid.innerHTML = '';
+  ['occ', 'min'].forEach(type => {
+    for (let r = 0; r < DRAFT_ROUNDS; r++) {
+      const picked = rs.picks[player][type][r];
+      boardGrid.appendChild(makeAdBoardSlot(picked, r === round && !picked));
+    }
+  });
+
+  // 兩個牌包並列
+  document.getElementById('adPackTitle').textContent = '同時抽：各選一張職業 + 一張次發';
+  const packGrid = document.getElementById('adPackGrid');
+  packGrid.style.display = 'block';   // 改成區塊堆疊，內層各自用 grid
+  packGrid.innerHTML = '';
+
+  const buildSection = (type) => {
+    const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
+    const wrap = document.createElement('div');
+    wrap.className = 'ad-combined-section';
+    const head = document.createElement('div');
+    head.className = 'ad-combined-head';
+    head.textContent = `${type === 'occ' ? '職業包' : '次發包'}（來自 ${getPlayerName(packKey)}）`;
+    const grid = document.createElement('div');
+    grid.className = 'ad-pack-grid';
+
+    const packCards = type === 'occ' ? rs.packs[packKey].occs : rs.packs[packKey].minors;
+    const takenIds  = getTakenIdsFromPack(packKey, type, player, round);
+    const selectedId = rs.picks[player][type][round]?.['卡片ID'];
+    packCards.filter(c => !takenIds.has(c['卡片ID'])).forEach(card => {
+      grid.appendChild(makeAdPackCard(card, {
+        selected: card['卡片ID'] === selectedId,
+        onClick: () => { rs.picks[player][type][round] = card; renderCombinedDraftScreen(); },
+      }));
+    });
+    wrap.appendChild(head);
+    wrap.appendChild(grid);
+    return wrap;
+  };
+
+  packGrid.appendChild(buildSection('occ'));
+  packGrid.appendChild(buildSection('min'));
+
+  // 確認按鈕：兩張都選了才可換人
+  const bothPicked = rs.picks[player].occ[round] && rs.picks[player].min[round];
+  const confirm = document.createElement('button');
+  confirm.className = 'ad-combined-confirm';
+  confirm.disabled = !bothPicked;
+  confirm.textContent = bothPicked ? '✓ 完成本輪，換下一位' : '請各選一張職業與次發';
+  confirm.addEventListener('click', () => { advanceDraftState(); nextDraftTurn(); });
+  packGrid.appendChild(confirm);
 }
 
 function bindActiveDraftEvents() {
