@@ -468,7 +468,10 @@ function findCardByBGAId(bgaId) {
   });
   if (direct) return direct;
   // Check admin-mapped BGA IDs for non-ABCDE cards
-  const ourId = Object.entries(bgaIdMap).find(([, v]) => v === bgaId || normalizeBGAId(v) === norm)?.[0];
+  const ourId = Object.entries(bgaIdMap).find(([, v]) => {
+    const vClean = v.replace('*', '');
+    return vClean === bgaId || normalizeBGAId(vClean) === norm;
+  })?.[0];
   if (!ourId) return null;
   return allCards.find(c => {
     const id = c['卡片ID'] || '';
