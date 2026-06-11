@@ -780,30 +780,36 @@ function refreshSessionLoadSelect() {
 /* ── 自動暫存（牌包＋扣牌＋設定，重整或返回設定都不消失）─── */
 const DRAFT_AUTOSAVE_KEY = 'review_autosave_state';
 
+function buildState() {
+  return {
+    handSize:    rs.handSize,
+    draftFormat: rs.draftFormat,
+    minDir:      rs.minDir,
+    bgaMode:     rs.bgaMode,
+    playerNames: { ...rs.playerNames },
+    packs: Object.fromEntries(PLAYERS.map(p => [p, {
+      occs:   rs.packs[p].occs.map(c => c['卡片ID']),
+      minors: rs.packs[p].minors.map(c => c['卡片ID']),
+    }])),
+    picks: Object.fromEntries(PLAYERS.map(p => [p, {
+      occ: rs.picks[p].occ.map(c => c ? c['卡片ID'] : null),
+      min: rs.picks[p].min.map(c => c ? c['卡片ID'] : null),
+    }])),
+  };
+}
+
 function saveDraftState() {
-  try {
-    const state = {
-      handSize:    rs.handSize,
-      draftFormat: rs.draftFormat,
-      minDir:      rs.minDir,
-      bgaMode:     rs.bgaMode,
-      playerNames: { ...rs.playerNames },
-      packs: Object.fromEntries(PLAYERS.map(p => [p, {
-        occs:   rs.packs[p].occs.map(c => c['卡片ID']),
-        minors: rs.packs[p].minors.map(c => c['卡片ID']),
-      }])),
-      picks: Object.fromEntries(PLAYERS.map(p => [p, {
-        occ: rs.picks[p].occ.map(c => c ? c['卡片ID'] : null),
-        min: rs.picks[p].min.map(c => c ? c['卡片ID'] : null),
-      }])),
-    };
-    localStorage.setItem(DRAFT_AUTOSAVE_KEY, JSON.stringify(state));
-  } catch {}
+  try { localStorage.setItem(DRAFT_AUTOSAVE_KEY, JSON.stringify(buildState())); } catch {}
 }
 
 function restoreDraftState() {
   let state;
   try { state = JSON.parse(localStorage.getItem(DRAFT_AUTOSAVE_KEY)); } catch { return; }
+  if (state) applyState(state);
+}
+
+/* 把一份 state（牌包＋扣牌＋設定）套進畫面，匯入與自動還原共用 */
+function applyState(state) {
   if (!state) return;
   const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || null : null);
 
@@ -847,6 +853,71 @@ function restoreDraftState() {
   refreshPackTabLabels();
   refreshPackProgressRow();
   updateStartBtn();
+}
+
+/* ── 分享文字碼（跨電腦匯出／匯入整局）──────────────── */
+const SHARE_CODE_PREFIX = 'AGRI1:';
+
+// UTF-8 安全的 base64（牌名含中文，需先轉 byte 再編碼）
+function utf8ToB64(str) {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
+}
+function b64ToUtf8(b64) {
+  return new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+}
+
+function encodeShareCode() {
+  return SHARE_CODE_PREFIX + utf8ToB64(JSON.stringify(buildState()));
+}
+
+function decodeShareCode(text) {
+  let raw = (text || '').trim();
+  if (!raw) return null;
+  if (raw.startsWith(SHARE_CODE_PREFIX)) raw = raw.slice(SHARE_CODE_PREFIX.length);
+  try {
+    const state = JSON.parse(b64ToUtf8(raw.trim()));
+    if (state && state.packs && state.picks) return state;
+  } catch {}
+  // 容錯：也接受未編碼的純 JSON
+  try {
+    const state = JSON.parse(raw);
+    if (state && state.packs) return state;
+  } catch {}
+  return null;
+}
+
+function openShareDialog() {
+  const ta = document.getElementById('shareCodeArea');
+  const hasData = PLAYERS.some(p => rs.packs[p].occs.length || rs.packs[p].minors.length);
+  ta.value = hasData ? encodeShareCode() : '';
+  ta.placeholder = hasData ? '' : '目前沒有牌組可匯出。將朋友給的代碼貼這裡，按「匯入」即可。';
+  document.getElementById('shareDialogMsg').textContent = '';
+  document.getElementById('shareOverlay').style.display = 'flex';
+}
+
+function closeShareDialog() {
+  document.getElementById('shareOverlay').style.display = 'none';
+}
+
+async function copyShareCode() {
+  const ta = document.getElementById('shareCodeArea');
+  if (!ta.value.trim()) { document.getElementById('shareDialogMsg').textContent = '沒有可複製的代碼'; return; }
+  try {
+    await navigator.clipboard.writeText(ta.value);
+  } catch {
+    ta.select(); document.execCommand('copy');
+  }
+  document.getElementById('shareDialogMsg').textContent = '✓ 已複製，貼給朋友即可';
+}
+
+function importShareCode() {
+  const ta  = document.getElementById('shareCodeArea');
+  const msg = document.getElementById('shareDialogMsg');
+  const state = decodeShareCode(ta.value);
+  if (!state) { msg.textContent = '✗ 代碼無法辨識，請確認完整複製'; return; }
+  applyState(state);
+  saveDraftState();
+  closeShareDialog();
 }
 
 /* ══════════════════════════════════════════════════
@@ -1698,14 +1769,14 @@ function bindGlobalEvents() {
     document.getElementById(`bgaImportArea${p}`)?.addEventListener('input', () => updateBGAPreview(p));
   });
 
-  document.getElementById('bgaImportAllArea')?.addEventListener('input', e => {
-    const raw = e.target.value.trim();
-    if (!raw) return;
-    if (applyQuickImport(raw)) {
-      e.target.style.borderColor = 'var(--green)';
-    } else {
-      e.target.style.borderColor = raw ? '#f87171' : '';
-    }
+  // 匯出 / 匯入此局
+  document.getElementById('shareOpenBtn')?.addEventListener('click', openShareDialog);
+  document.getElementById('shareCloseBtn')?.addEventListener('click', closeShareDialog);
+  document.getElementById('shareCancelBtn')?.addEventListener('click', closeShareDialog);
+  document.getElementById('shareCopyBtn')?.addEventListener('click', copyShareCode);
+  document.getElementById('shareImportBtn')?.addEventListener('click', importShareCode);
+  document.getElementById('shareOverlay')?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeShareDialog();
   });
 }
 

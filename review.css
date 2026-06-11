@@ -1179,6 +1179,33 @@
 }
 .session-save-btn:hover:not(:disabled) { background: rgba(200,160,60,.12); }
 .session-save-btn:disabled { opacity: .35; cursor: not-allowed; border-color: var(--border); color: var(--text3); }
+.session-share-btn {
+  padding: 7px 18px;
+  background: transparent;
+  border: 1px solid var(--gold1);
+  border-radius: var(--radius-sm);
+  color: var(--gold1);
+  font-size: .84rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+.session-share-btn:hover { background: rgba(200,160,60,.12); }
+.share-code-area {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text1);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: .78rem;
+  line-height: 1.45;
+  resize: vertical;
+  word-break: break-all;
+}
+.share-dialog-msg { min-height: 20px; margin: 8px 2px 2px; font-size: .82rem; color: var(--gold1); }
 .session-load-wrap {
   display: flex;
   align-items: center;

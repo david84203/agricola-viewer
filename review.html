@@ -129,6 +129,7 @@
           </select>
           <button class="session-delete-btn" id="sessionDeleteBtn" style="display:none" title="刪除此筆">🗑</button>
         </div>
+        <button class="session-share-btn" id="shareOpenBtn" title="匯出／匯入給其他電腦">🔗 匯出 / 匯入此局</button>
         <span class="session-hint">僅存於此瀏覽器，清除 Cookie 後消失</span>
       </div>
 
@@ -292,16 +293,9 @@
         <button class="bga-import-close-btn" id="bgaImportClose">✕</button>
       </div>
       <div class="bga-import-steps">
-        <div class="bga-step bga-step-primary">⚡ 推薦：輪抽結束後，在 BGA <strong>遊戲記錄頁</strong>點「記錄書籤」，一次取得所有玩家資料，貼入下方</div>
-        <div class="bga-step">備用：在 BGA 覆盤頁選每位玩家視角，點舊書籤取得單人 JSON，依序貼入下方 A/B/C/D</div>
+        <div class="bga-step bga-step-primary">在 BGA 覆盤頁選每位玩家視角，點書籤取得該玩家 JSON，依序貼入下方 A / B / C / D</div>
       </div>
       <div class="bga-import-settings-bar" id="bgaImportSettingsBar"></div>
-
-      <div class="bga-import-quick">
-        <div class="bga-quick-label">⚡ 一次貼入所有玩家（記錄書籤輸出）</div>
-        <textarea id="bgaImportAllArea" rows="3" placeholder='貼上記錄書籤輸出的 JSON 陣列，系統自動分配至 A/B/C/D…'></textarea>
-      </div>
-      <div class="bga-import-divider">── 或逐人貼入 ──</div>
 
       <div class="bga-import-players">
         <div class="bga-import-pslot">
@@ -328,6 +322,27 @@
       <div class="bga-import-footer">
         <button class="bga-import-confirm-btn" id="bgaImportConfirmBtn">確認匯入</button>
         <button class="bga-import-cancel-btn" id="bgaImportCancelBtn">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 匯出／匯入此局 Dialog -->
+  <div class="bga-import-overlay" id="shareOverlay">
+    <div class="bga-import-dialog">
+      <div class="bga-import-dialog-header">
+        <span>🔗 匯出 / 匯入此局</span>
+        <button class="bga-import-close-btn" id="shareCloseBtn">✕</button>
+      </div>
+      <div class="bga-import-steps">
+        <div class="bga-step bga-step-primary">匯出：按「複製代碼」把這段文字傳給朋友</div>
+        <div class="bga-step">匯入：把朋友給的代碼貼進框內，按「匯入」即可在這台還原整局（含四家初始牌組與扣牌）</div>
+      </div>
+      <textarea id="shareCodeArea" class="share-code-area" rows="5" spellcheck="false" autocomplete="off"></textarea>
+      <div class="share-dialog-msg" id="shareDialogMsg"></div>
+      <div class="bga-import-footer">
+        <button class="bga-import-confirm-btn" id="shareCopyBtn">📋 複製代碼</button>
+        <button class="bga-import-confirm-btn" id="shareImportBtn">📥 匯入</button>
+        <button class="bga-import-cancel-btn" id="shareCancelBtn">關閉</button>
       </div>
     </div>
   </div>
