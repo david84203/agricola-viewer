@@ -2,6 +2,10 @@
    農家樂 覆盤輪抽模擬 — review.css
    ══════════════════════════════════════════════════ */
 
+/* --gold1 全專案被大量使用卻從未定義，導致 var(--gold1) 失效（背景透明/文字看不清）。
+   在此補上定義，一次修好所有誤用。 */
+:root { --gold1: #e8b84b; }
+
 /* ── Layout ───────────────────────────────────────── */
 .review-main {
   max-width: 1200px;
@@ -1492,20 +1496,21 @@
   width: 100%;
   margin-top: 16px;
   padding: 15px;
-  background: var(--gold1);
-  color: #1a1200;
+  background: var(--green);  /* 亮綠＝可送出，跟頁面深色對比明顯 */
+  color: #07140d;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 -2px 18px rgba(0,0,0,.55);
-  transition: opacity var(--transition);
+  transition: background var(--transition), opacity var(--transition);
 }
+.ad-combined-confirm:hover:not(:disabled) { filter: brightness(1.1); }
 .ad-combined-confirm:disabled {
   background: var(--surface2);
   color: var(--text2);
-  border: 1px solid var(--gold1);
+  border: 1px solid var(--border2);
   cursor: not-allowed;
   box-shadow: 0 -2px 18px rgba(0,0,0,.55);
 }
