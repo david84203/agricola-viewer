@@ -32,7 +32,18 @@
     <!-- ══ 畫面一：設定包牌 ══ -->
     <div id="setupScreen" class="review-screen active">
       <div class="review-section-title">設定玩家與牌包</div>
-      <div class="review-section-sub">填入玩家名稱，再為每位玩家的牌包選入 9 張職業牌 + 9 張次要發展牌</div>
+      <div class="review-section-sub">填入玩家名稱，再為每位玩家的牌包選入職業牌與次要發展牌</div>
+
+      <div class="hand-size-wrap">
+        <span class="hand-size-label">每人牌數：</span>
+        <div class="hand-size-select" id="handSizeSelect">
+          <button class="hand-size-btn" data-size="7">7 / 7</button>
+          <button class="hand-size-btn" data-size="8">8 / 8</button>
+          <button class="hand-size-btn selected" data-size="9">9 / 9</button>
+          <button class="hand-size-btn" data-size="10">10 / 10</button>
+        </div>
+        <span class="hand-size-hint">職業 / 次發</span>
+      </div>
 
       <!-- BGA 模式切換 -->
       <div class="bga-mode-bar" id="bgaModeBar">

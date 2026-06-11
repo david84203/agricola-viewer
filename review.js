@@ -46,6 +46,7 @@ let imageCache = {};
 const rs = {
   phase: 'setup',  // setup | input | result
   bgaMode: false,
+  handSize: 9,
 
   playerNames: { A: '玩家A', B: '玩家B', C: '玩家C', D: '玩家D' },
 
@@ -243,7 +244,7 @@ function buildPackPanels() {
         <div class="card-input-group" id="occGroup${p}">
           <div class="card-input-group-title">
             職業牌
-            <span class="card-count-badge" id="occCount${p}">0 / 9</span>
+            <span class="card-count-badge" id="occCount${p}">0 / ${rs.handSize}</span>
           </div>
           <div class="pack-search-wrap">
             <input class="pack-search-input" id="occSearch${p}" type="text"
@@ -258,7 +259,7 @@ function buildPackPanels() {
         <div class="card-input-group" id="minGroup${p}">
           <div class="card-input-group-title">
             次要發展牌
-            <span class="card-count-badge" id="minCount${p}">0 / 9</span>
+            <span class="card-count-badge" id="minCount${p}">0 / ${rs.handSize}</span>
           </div>
           <div class="pack-search-wrap">
             <input class="pack-search-input" id="minSearch${p}" type="text"
@@ -353,7 +354,7 @@ function renderSearchResults(container, cards, player, type) {
 function addCardToPack(player, type, card) {
   const key  = type === 'occ' ? 'occs' : 'minors';
   const list = rs.packs[player][key];
-  if (list.length >= 9) return;
+  if (list.length >= rs.handSize) return;
   if (list.some(c => c['卡片ID'] === card['卡片ID'])) return;
   list.push(card);
   renderPackList(player, type);
@@ -369,7 +370,7 @@ function addCardToPack(player, type, card) {
   clearEl.classList.remove('visible');
   resultsEl.classList.remove('open');
   resultsEl.innerHTML = '';
-  if (list.length < 9) searchEl.focus();
+  if (list.length < rs.handSize) searchEl.focus();
 }
 
 function removeCardFromPack(player, type, cardId) {
@@ -410,12 +411,12 @@ function updatePackCountBadge(player, type) {
   const key   = type === 'occ' ? 'occs' : 'minors';
   const count = rs.packs[player][key].length;
   const el    = document.getElementById(`${type}Count${player}`);
-  el.textContent = `${count} / 9`;
-  el.classList.toggle('full', count === 9);
+  el.textContent = `${count} / ${rs.handSize}`;
+  el.classList.toggle('full', count === rs.handSize);
   // 搜尋欄 disabled
   const searchEl = document.getElementById(`${type}Search${player}`);
-  searchEl.disabled = count >= 9;
-  searchEl.placeholder = count >= 9 ? '已選滿 9 張' : (type === 'occ' ? '搜尋職業牌名稱或 ID…' : '搜尋次要發展牌名稱或 ID…');
+  searchEl.disabled = count >= rs.handSize;
+  searchEl.placeholder = count >= rs.handSize ? `已選滿 ${rs.handSize} 張` : (type === 'occ' ? '搜尋職業牌名稱或 ID…' : '搜尋次要發展牌名稱或 ID…');
 }
 
 function buildPackProgressRow() {
@@ -433,9 +434,9 @@ function refreshPackProgressRow() {
     cell.innerHTML = `
       <div class="pack-progress-label"><span class="player-color-dot dot-${p}"></span>${getPlayerName(p)}的牌包</div>
       <div class="pack-progress-counts">
-        <span class="pack-progress-occ">職業 ${occN}/9</span>
+        <span class="pack-progress-occ">職業 ${occN}/${rs.handSize}</span>
         <span class="pack-progress-sep">·</span>
-        <span class="pack-progress-min">次要 ${minN}/9</span>
+        <span class="pack-progress-min">次要 ${minN}/${rs.handSize}</span>
       </div>
     `;
     row.appendChild(cell);
@@ -443,7 +444,7 @@ function refreshPackProgressRow() {
 }
 
 function isPackFull(player) {
-  return rs.packs[player].occs.length === 9 && rs.packs[player].minors.length === 9;
+  return rs.packs[player].occs.length === rs.handSize && rs.packs[player].minors.length === rs.handSize;
 }
 
 function updateStartBtn() {
@@ -1205,6 +1206,20 @@ function showScreen(id) {
    Global Events
    ══════════════════════════════════════════════════ */
 function bindGlobalEvents() {
+  // Hand size selection
+  document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      rs.handSize = parseInt(btn.dataset.size, 10);
+      // 清空已選牌包，避免超出新上限的舊資料殘留
+      PLAYERS.forEach(p => { rs.packs[p].occs = []; rs.packs[p].minors = []; });
+      PLAYERS.forEach(p => buildPackPanel(p));
+      refreshPackProgressRow();
+      updateStartBtn();
+    });
+  });
+
   // Mode selection
   document.querySelectorAll('input[name="draftMode"]').forEach(radio => {
     radio.addEventListener('change', e => {
