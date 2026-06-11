@@ -1142,14 +1142,12 @@ function getTakenIdsFromPack(packKey, type, currentPlayer, currentRound) {
   const playerIdx = PLAYERS.indexOf(currentPlayer);
 
   PLAYERS.forEach((otherPlayer, otherIdx) => {
-    if (otherPlayer === currentPlayer) return;
     for (let r = 0; r < DRAFT_ROUNDS; r++) {
+      if (otherPlayer === currentPlayer && r === currentRound) continue;
       const theirPackKey = type === 'occ' ? occPackKey(otherIdx, r) : minPackKey(otherIdx, r);
       if (theirPackKey !== packKey) continue;
       const theirPick = rs.picks[otherPlayer][type][r];
       if (!theirPick) continue;
-      // 判斷對方「比這位玩家早」拿到這包
-      // 方法：在這包的循環路徑中，對方的輪次是否在這位玩家之前
       if (isEarlierInPackPath(packKey, type, otherPlayer, r, currentPlayer, currentRound)) {
         takenIds.add(theirPick['卡片ID']);
       }
