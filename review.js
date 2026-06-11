@@ -1117,7 +1117,7 @@ function makeAdBoardSlot(picked, isCurrent) {
     slot.classList.add('has-card');
     slot.innerHTML = `<canvas></canvas><div class="ad-board-card-name">${picked['牌名'] || ''}</div>`;
     slot.title = picked['牌名'] || '';
-    requestAnimationFrame(() => drawCrop(slot.querySelector('canvas'), picked, 1));
+    requestAnimationFrame(() => drawCrop(slot.querySelector('canvas'), picked, 0.55));
   } else if (isCurrent) {
     slot.innerHTML = `<span style="font-size:1.5rem;color:var(--gold);">?</span>`;
   }
