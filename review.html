@@ -61,6 +61,11 @@
         </div>
       </div>
 
+      <div class="bga-import-bar">
+        <a class="bga-bookmarklet-link" id="bgaBookmarkletLink" href="#">🔖 BGA 匯入書籤（拖到書籤列）</a>
+        <button class="bga-import-open-btn" id="bgaImportOpenBtn">📋 從 BGA 快速匯入</button>
+      </div>
+
       <!-- BGA 模式切換 -->
       <div class="bga-mode-bar" id="bgaModeBar">
         <label class="bga-toggle-wrap">
@@ -264,6 +269,47 @@
     </div>
 
   </main>
+
+  <!-- BGA 匯入 Dialog -->
+  <div class="bga-import-overlay" id="bgaImportOverlay">
+    <div class="bga-import-dialog">
+      <div class="bga-import-dialog-header">
+        <span>BGA 快速匯入牌包</span>
+        <button class="bga-import-close-btn" id="bgaImportClose">✕</button>
+      </div>
+      <div class="bga-import-steps">
+        <div class="bga-step">① 將左上角書籤拖到瀏覽器書籤列（或右鍵另存書籤）</div>
+        <div class="bga-step">② 在 BGA 覆盤頁面選每位玩家視角，點書籤，取得 JSON</div>
+        <div class="bga-step">③ 將 JSON 依序貼入下方各格，點確認匯入</div>
+      </div>
+      <div class="bga-import-players">
+        <div class="bga-import-pslot">
+          <div class="bga-import-plabel"><span class="player-color-dot dot-A"></span>玩家 A</div>
+          <textarea id="bgaImportAreaA" placeholder="貼上書籤複製的 JSON…"></textarea>
+          <div class="bga-import-ppreview" id="bgaPreviewA"></div>
+        </div>
+        <div class="bga-import-pslot">
+          <div class="bga-import-plabel"><span class="player-color-dot dot-B"></span>玩家 B</div>
+          <textarea id="bgaImportAreaB" placeholder="貼上書籤複製的 JSON…"></textarea>
+          <div class="bga-import-ppreview" id="bgaPreviewB"></div>
+        </div>
+        <div class="bga-import-pslot">
+          <div class="bga-import-plabel"><span class="player-color-dot dot-C"></span>玩家 C</div>
+          <textarea id="bgaImportAreaC" placeholder="貼上書籤複製的 JSON…"></textarea>
+          <div class="bga-import-ppreview" id="bgaPreviewC"></div>
+        </div>
+        <div class="bga-import-pslot">
+          <div class="bga-import-plabel"><span class="player-color-dot dot-D"></span>玩家 D</div>
+          <textarea id="bgaImportAreaD" placeholder="貼上書籤複製的 JSON…"></textarea>
+          <div class="bga-import-ppreview" id="bgaPreviewD"></div>
+        </div>
+      </div>
+      <div class="bga-import-footer">
+        <button class="bga-import-confirm-btn" id="bgaImportConfirmBtn">確認匯入</button>
+        <button class="bga-import-cancel-btn" id="bgaImportCancelBtn">取消</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 卡牌詳情 Modal（與 draft.html 相同） -->
   <div class="modal-overlay" id="modalOverlay">

@@ -86,6 +86,12 @@ const rs = {
    Init
    ══════════════════════════════════════════════════ */
 async function init() {
+  const bmLink = document.getElementById('bgaBookmarkletLink');
+  if (bmLink) {
+    const bm = `javascript:(()=>{try{const cs=Object.values(gameui._cardStorage).filter(c=>c.pId);if(!cs.length){alert('找不到牌包資料，請在 BGA 農家樂覆盤頁面執行');return;}const pid=cs[0].pId;const pname=Object.values(gameui.gamedatas.players).find(p=>String(p.id)===String(pid))?.name??'玩家';const occ=cs.filter(c=>c.type==='occupation').map(c=>c.numbering);const min=cs.filter(c=>c.type!=='occupation'&&!c.id.startsWith('Major')).map(c=>c.numbering);const out=JSON.stringify({player:pname,occ,min});navigator.clipboard.writeText(out).then(()=>alert('已複製！\\n玩家：'+pname+'\\n職業：'+occ.length+'張\\n次發：'+min.length+'張')).catch(()=>prompt('手動複製：',out));}catch(e){alert('錯誤：'+e.message);}})()`;
+    bmLink.href = bm;
+  }
+
   const [data, dupInfo] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
@@ -428,6 +434,124 @@ function buildPackProgressRow() {
   refreshPackProgressRow();
 }
 
+function buildPackPanel(p) {
+  renderPackList(p, 'occ');
+  renderPackList(p, 'min');
+  updatePackCountBadge(p, 'occ');
+  updatePackCountBadge(p, 'min');
+}
+
+/* ── BGA Import ──────────────────────────────────── */
+function normalizeBGAId(bgaId) {
+  const m = bgaId.match(/^([A-Z]+)(\d+)(\*?)$/);
+  if (!m) return bgaId;
+  return m[1] + m[2].padStart(3, '0') + m[3];
+}
+
+function findCardByBGAId(bgaId) {
+  const norm = normalizeBGAId(bgaId);
+  return allCards.find(c => {
+    const id = c['卡片ID'] || '';
+    return id === norm || id === norm + '*' || id.replace('*', '') === norm;
+  });
+}
+
+function parseBGAImportData(jsonStr) {
+  try {
+    const d = JSON.parse(jsonStr.trim());
+    if (Array.isArray(d.occ) || Array.isArray(d.min)) return d;
+  } catch {}
+  return null;
+}
+
+function updateBGAPreview(player) {
+  const ta      = document.getElementById(`bgaImportArea${player}`);
+  const preview = document.getElementById(`bgaPreview${player}`);
+  if (!ta || !preview) return;
+  const raw = ta.value.trim();
+  if (!raw) { preview.textContent = ''; preview.className = 'bga-import-ppreview'; return; }
+  const data = parseBGAImportData(raw);
+  if (!data) {
+    preview.textContent = '格式錯誤';
+    preview.className = 'bga-import-ppreview bga-preview-err';
+    return;
+  }
+  const occOk = (data.occ || []).filter(id => findCardByBGAId(id)).length;
+  const minOk = (data.min || []).filter(id => findCardByBGAId(id)).length;
+  const name  = data.player ? `${data.player}　` : '';
+  preview.textContent = `${name}職業 ${occOk}/${(data.occ||[]).length}　次發 ${minOk}/${(data.min||[]).length}`;
+  preview.className = 'bga-import-ppreview bga-preview-ok';
+}
+
+function openBGAImportDialog() {
+  PLAYERS.forEach(p => {
+    const ta = document.getElementById(`bgaImportArea${p}`);
+    if (ta) ta.value = '';
+    updateBGAPreview(p);
+  });
+  document.getElementById('bgaImportOverlay').classList.add('active');
+}
+
+function closeBGAImportDialog() {
+  document.getElementById('bgaImportOverlay').classList.remove('active');
+}
+
+function confirmBGAImport() {
+  let maxSize = 0;
+  PLAYERS.forEach(p => {
+    const ta = document.getElementById(`bgaImportArea${p}`);
+    if (!ta?.value.trim()) return;
+    const d = parseBGAImportData(ta.value);
+    if (!d) return;
+    maxSize = Math.max(maxSize, (d.occ||[]).length, (d.min||[]).length);
+  });
+
+  if (maxSize > 0 && [7,8,9,10].includes(maxSize) && maxSize !== rs.handSize) {
+    rs.handSize = maxSize;
+    document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.size) === maxSize);
+    });
+  }
+
+  const warnings = [];
+  PLAYERS.forEach(p => {
+    const ta = document.getElementById(`bgaImportArea${p}`);
+    if (!ta?.value.trim()) return;
+    const d = parseBGAImportData(ta.value);
+    if (!d) return;
+
+    rs.packs[p].occs   = [];
+    rs.packs[p].minors = [];
+    const missed = [];
+
+    (d.occ || []).forEach(id => {
+      const c = findCardByBGAId(id);
+      if (c) rs.packs[p].occs.push(c);
+      else missed.push(id);
+    });
+    (d.min || []).forEach(id => {
+      const c = findCardByBGAId(id);
+      if (c) rs.packs[p].minors.push(c);
+      else missed.push(id);
+    });
+
+    if (d.player) {
+      const el = document.getElementById(`name${p}`);
+      if (el) el.value = d.player;
+    }
+    if (missed.length) warnings.push(`玩家${p}：${missed.join(', ')}`);
+  });
+
+  PLAYERS.forEach(p => buildPackPanel(p));
+  refreshPackProgressRow();
+  updateStartBtn();
+  closeBGAImportDialog();
+
+  if (warnings.length) {
+    alert('匯入完成！以下牌號未找到（可能是新版牌，請手動補選相同效果的舊版牌）：\n\n' + warnings.join('\n'));
+  }
+}
+
 function refreshPackProgressRow() {
   const row = document.getElementById('packProgressRow');
   row.innerHTML = '';
@@ -463,7 +587,7 @@ function updateStartBtn() {
 async function startSimulation() {
   // 重設所有人的扣牌紀錄
   PLAYERS.forEach(p => {
-    rs.picks[p] = { occ: Array(7).fill(null), min: Array(7).fill(null) };
+    rs.picks[p] = { occ: Array(rs.handSize).fill(null), min: Array(rs.handSize).fill(null) };
   });
 
   // 預載圖片
@@ -497,7 +621,7 @@ async function startSimulation() {
 function runAllAiDraft() {
   // 全 AI 瞬間跑完
   for (let type of ['occ', 'min']) {
-    for (let round = 0; round < 7; round++) {
+    for (let round = 0; round < rs.handSize; round++) {
       for (let p of PLAYERS) {
         const playerIdx = PLAYERS.indexOf(p);
         const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
@@ -599,14 +723,14 @@ function renderActiveDraftScreen() {
   const packKey = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
   
   // Header
-  document.getElementById('adRoundLabel').textContent = `${type === 'occ' ? '職業卡' : '次要發展卡'} 第 ${round + 1} / 7 輪`;
+  document.getElementById('adRoundLabel').textContent = `${type === 'occ' ? '職業卡' : '次要發展卡'} 第 ${round + 1} / ${rs.handSize} 輪`;
   document.getElementById('adTurnName').textContent = getPlayerName(player);
   document.getElementById('adTurnName').className = `ad-turn-name score-color-${player}`;
   
   // Board (該玩家這輪之前選的牌，共 7 格)
   const boardGrid = document.getElementById('adBoardGrid');
   boardGrid.innerHTML = '';
-  for (let r = 0; r < 7; r++) {
+  for (let r = 0; r < rs.handSize; r++) {
     const slot = document.createElement('div');
     slot.className = 'ad-board-slot';
     const picked = rs.picks[player][type][r];
@@ -706,7 +830,7 @@ function renderSlots(player, type) {
   const playerIdx = PLAYERS.indexOf(player);
   grid.innerHTML  = '';
 
-  for (let round = 0; round < 7; round++) {
+  for (let round = 0; round < rs.handSize; round++) {
     const packKey  = type === 'occ' ? occPackKey(playerIdx, round) : minPackKey(playerIdx, round);
     const packName = `${getPlayerName(packKey)}的牌包`;
     const picked   = rs.picks[player][type][round];
@@ -720,7 +844,7 @@ function renderSlots(player, type) {
 
     slot.innerHTML = `
       <div class="round-slot-header">
-        <div class="round-slot-round">第 ${round + 1} / 7 輪</div>
+        <div class="round-slot-round">第 ${round + 1} / ${rs.handSize} 輪</div>
         <div class="round-slot-pack">${packName}</div>
       </div>
       <div class="round-slot-body">
@@ -784,7 +908,7 @@ function openSlotPicker(player, type, round, slotEl) {
   const takenIds = getTakenIdsFromPack(packKey, type, player, round);
 
   document.getElementById('slotPickerTitle').textContent =
-    `第 ${round + 1} / 7 輪 · ${packName}`;
+    `第 ${round + 1} / ${rs.handSize} 輪 · ${packName}`;
   document.getElementById('slotPickerSearch').value = '';
 
   renderPickerCards(packCards, takenIds);
@@ -817,7 +941,7 @@ function getTakenIdsFromPack(packKey, type, currentPlayer, currentRound) {
 
   PLAYERS.forEach((otherPlayer, otherIdx) => {
     if (otherPlayer === currentPlayer) return;
-    for (let r = 0; r < 7; r++) {
+    for (let r = 0; r < rs.handSize; r++) {
       const theirPackKey = type === 'occ' ? occPackKey(otherIdx, r) : minPackKey(otherIdx, r);
       if (theirPackKey !== packKey) continue;
       const theirPick = rs.picks[otherPlayer][type][r];
@@ -854,7 +978,7 @@ function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
 
   // 找 playerA 在這包路徑中的位置
   let posA = -1, posB = -1;
-  for (let k = 0; k < 7; k++) {
+  for (let k = 0; k < rs.handSize; k++) {
     const holderIdx = getHolderOrder(k);
     if (holderIdx === PLAYERS.indexOf(playerA) && posA === -1) posA = k;
     if (holderIdx === PLAYERS.indexOf(playerB) && posB === -1) {
@@ -869,7 +993,7 @@ function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
   // 路徑中的出現次序 = 每 4 輪循環一次，找各自對應的最小 k
   function findPackPos(player, round) {
     const playerIdx = PLAYERS.indexOf(player);
-    for (let k = 0; k < 7; k++) {
+    for (let k = 0; k < rs.handSize; k++) {
       if (getHolderOrder(k) === playerIdx) {
         // 確認 round 是否對應
         if (type === 'occ') {
@@ -1080,7 +1204,7 @@ async function calculateAllScores() {
 
     // 7 輪職業 + 7 輪次要
     ['occ', 'min'].forEach(type => {
-      for (let round = 0; round < 7; round++) {
+      for (let round = 0; round < rs.handSize; round++) {
         const picked = rs.picks[p][type][round];
         if (!picked) continue;
 
@@ -1185,7 +1309,7 @@ async function calculateAllScores() {
         <ul class="result-analysis-list">
           ${worst.map(r => `
             <li class="result-analysis-item">
-              <div class="result-analysis-round">${r.phaseLabel} 第 ${r.roundNum} / 7 輪 · 得 ${r.roundScore} 分</div>
+              <div class="result-analysis-round">${r.phaseLabel} 第 ${r.roundNum} / ${rs.handSize} 輪 · 得 ${r.roundScore} 分</div>
               選了「<strong>${nameOf(r.picked)}</strong>」，
               但「<strong>${nameOf(r.bestId)}</strong>」評分更高（ELO 差約 ${r.gap} 分）
             </li>
@@ -1296,7 +1420,7 @@ function bindGlobalEvents() {
     rs.phase = 'setup';
     rs.currentInputPlayerIdx = 0;
     PLAYERS.forEach(p => {
-      rs.picks[p] = { occ: Array(7).fill(null), min: Array(7).fill(null) };
+      rs.picks[p] = { occ: Array(rs.handSize).fill(null), min: Array(rs.handSize).fill(null) };
     });
     showScreen('setupScreen');
   });
@@ -1305,6 +1429,18 @@ function bindGlobalEvents() {
   document.getElementById('modalClose').addEventListener('click', closeModal);
   document.getElementById('modalOverlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
+  });
+
+  // BGA Import
+  document.getElementById('bgaImportOpenBtn').addEventListener('click', openBGAImportDialog);
+  document.getElementById('bgaImportClose').addEventListener('click', closeBGAImportDialog);
+  document.getElementById('bgaImportCancelBtn').addEventListener('click', closeBGAImportDialog);
+  document.getElementById('bgaImportConfirmBtn').addEventListener('click', confirmBGAImport);
+  document.getElementById('bgaImportOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeBGAImportDialog();
+  });
+  PLAYERS.forEach(p => {
+    document.getElementById(`bgaImportArea${p}`)?.addEventListener('input', () => updateBGAPreview(p));
   });
 }
 
