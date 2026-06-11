@@ -977,10 +977,15 @@
   padding: 12px 16px;
   margin-bottom: 20px;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color var(--transition), background var(--transition);
+}
+.bga-mode-bar-main {
+  display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  transition: border-color var(--transition), background var(--transition);
 }
 .bga-mode-bar.active {
   border-color: rgba(91,141,238,.5);
@@ -1443,8 +1448,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 10px 0 16px;
   flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
 }
 .bga-bookmarklet-link {
   display: inline-flex;

@@ -61,26 +61,27 @@
         </div>
       </div>
 
-      <div class="bga-import-bar">
-        <a class="bga-bookmarklet-link" id="bgaBookmarkletLink" href="#">🔖 BGA 匯入書籤（拖到書籤列）</a>
-        <button class="bga-import-open-btn" id="bgaImportOpenBtn">📋 從 BGA 快速匯入</button>
-      </div>
-
-      <!-- BGA 模式切換 -->
+      <!-- BGA 模式切換 + 匯入 -->
       <div class="bga-mode-bar" id="bgaModeBar">
-        <label class="bga-toggle-wrap">
-          <input type="checkbox" id="bgaModeToggle" />
-          <span class="bga-toggle-track"><span class="bga-toggle-thumb"></span></span>
-          <div class="bga-toggle-text">
-            <div class="bga-toggle-title">BGA 模式</div>
-            <div class="bga-toggle-sub">限 A / B / C / D / E 牌組，開放重複卡與禁卡選取（切換時會清空已選包牌）</div>
+        <div class="bga-mode-bar-main">
+          <label class="bga-toggle-wrap">
+            <input type="checkbox" id="bgaModeToggle" />
+            <span class="bga-toggle-track"><span class="bga-toggle-thumb"></span></span>
+            <div class="bga-toggle-text">
+              <div class="bga-toggle-title">BGA 模式</div>
+              <div class="bga-toggle-sub">限 A / B / C / D / E 牌組，開放重複卡與禁卡選取（切換時會清空已選包牌）</div>
+            </div>
+          </label>
+          <div class="bga-preset-hints">
+            <span class="bga-preset-tag ban-strong">禁｜過強 → ELO 1300</span>
+            <span class="bga-preset-tag ban-weak">禁｜過爛 → ELO 850</span>
+            <span class="bga-preset-tag ban-disrupt">禁｜擾亂 → ELO 1200</span>
+            <span class="bga-preset-tag dup">重複卡 → ELO 1150</span>
           </div>
-        </label>
-        <div class="bga-preset-hints">
-          <span class="bga-preset-tag ban-strong">禁｜過強 → ELO 1300</span>
-          <span class="bga-preset-tag ban-weak">禁｜過爛 → ELO 850</span>
-          <span class="bga-preset-tag ban-disrupt">禁｜擾亂 → ELO 1200</span>
-          <span class="bga-preset-tag dup">重複卡 → ELO 1150</span>
+        </div>
+        <div class="bga-import-bar">
+          <a class="bga-bookmarklet-link" id="bgaBookmarkletLink" href="#">🔖 BGA 匯入書籤（拖到書籤列）</a>
+          <button class="bga-import-open-btn" id="bgaImportOpenBtn">📋 從 BGA 快速匯入</button>
         </div>
       </div>
 

@@ -580,6 +580,14 @@ function confirmBGAImport() {
   refreshPackProgressRow();
   updateStartBtn();
 
+  // 自動開啟 BGA 模式
+  if (!rs.bgaMode) {
+    rs.bgaMode = true;
+    const toggle = document.getElementById('bgaModeToggle');
+    if (toggle) toggle.checked = true;
+    document.getElementById('bgaModeBar').classList.add('active');
+  }
+
   // 暫存匯入資料（整個 session 有效；切換牌數時可還原）
   try {
     sessionStorage.setItem('bga_import_backup', JSON.stringify(
