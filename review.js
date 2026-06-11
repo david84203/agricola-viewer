@@ -212,6 +212,7 @@ function buildSetupScreen() {
   document.getElementById('bgaModeToggle').addEventListener('change', e => {
     rs.bgaMode = e.target.checked;
     document.getElementById('bgaModeBar').classList.toggle('active', rs.bgaMode);
+    if (rs.bgaMode) setDraftFormatCombined();
     // 切換模式時清空已選包牌（避免非法卡牌混入）
     PLAYERS.forEach(p => {
       rs.packs[p] = { occs: [], minors: [] };
@@ -580,13 +581,14 @@ function confirmBGAImport() {
   refreshPackProgressRow();
   updateStartBtn();
 
-  // 自動開啟 BGA 模式
+  // 自動開啟 BGA 模式 + 同時輪抽
   if (!rs.bgaMode) {
     rs.bgaMode = true;
     const toggle = document.getElementById('bgaModeToggle');
     if (toggle) toggle.checked = true;
     document.getElementById('bgaModeBar').classList.add('active');
   }
+  setDraftFormatCombined();
 
   // 暫存匯入資料（整個 session 有效；切換牌數時可還原）
   try {
@@ -1381,6 +1383,14 @@ function showScreen(id) {
   document.querySelectorAll('.review-screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setDraftFormatCombined() {
+  rs.draftFormat = 'combined';
+  document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.format === 'combined');
+  });
+  document.getElementById('minDirGroup').style.display = 'none';
 }
 
 /* ══════════════════════════════════════════════════
