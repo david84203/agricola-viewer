@@ -45,6 +45,7 @@ function minPackKey(playerIdx, round) {
 /* ── State ─────────────────────────────────────────*/
 let allCards   = [];
 let imageCache = {};
+let bgaIdMap   = {};  // ourCardId → bgaId, for non-ABCDE BGA cards
 
 const rs = {
   phase: 'setup',  // setup | input | result
@@ -96,12 +97,23 @@ async function init() {
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
     loadBanlist(),
+    loadBgaIdMap(),
   ]);
   allCards = data;
   dupExcludedIds = dupInfo;
   buildBannedIdMap();
   buildSetupScreen();
   bindGlobalEvents();
+}
+
+async function loadBgaIdMap() {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}/settings/bga_id_map`);
+    const doc = await res.json();
+    if (!doc.fields) return;
+    const json = doc.fields.mapJson?.stringValue;
+    if (json) bgaIdMap = JSON.parse(json);
+  } catch {}
 }
 
 async function loadBanlist() {
@@ -450,10 +462,18 @@ function normalizeBGAId(bgaId) {
 
 function findCardByBGAId(bgaId) {
   const norm = normalizeBGAId(bgaId);
-  return allCards.find(c => {
+  const direct = allCards.find(c => {
     const id = c['卡片ID'] || '';
     return id === norm || id === norm + '*' || id.replace('*', '') === norm;
   });
+  if (direct) return direct;
+  // Check admin-mapped BGA IDs for non-ABCDE cards
+  const ourId = Object.entries(bgaIdMap).find(([, v]) => v === bgaId || normalizeBGAId(v) === norm)?.[0];
+  if (!ourId) return null;
+  return allCards.find(c => {
+    const id = c['卡片ID'] || '';
+    return id === ourId || id === ourId + '*' || id.replace('*', '') === ourId;
+  }) || null;
 }
 
 function parseBGAImportData(jsonStr) {

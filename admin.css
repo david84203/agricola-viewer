@@ -314,3 +314,29 @@
   transition: background var(--transition);
 }
 .ban-admin-result-item:hover { background: var(--surface); }
+
+/* ── BGA ID Map ── */
+#bgaAdminChips { flex-direction: column; gap: 0; }
+.bga-id-map-header {
+  display: grid;
+  grid-template-columns: 1fr 120px 28px;
+  gap: 8px;
+  padding: 4px 6px 8px;
+  font-size: .75rem;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.bga-id-map-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 28px;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+.bga-id-map-row:hover { background: var(--bg3); }
+.bga-id-map-label { font-size: .82rem; }
+.bga-id-map-input { font-size: .82rem; padding: 4px 8px; height: 28px; text-transform: uppercase; }
+.ban-admin-result-item:hover { background: var(--surface); }

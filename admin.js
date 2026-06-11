@@ -608,6 +608,25 @@ function renderBanAdminGroups() {
 
 // ── BGA Admin ──────────────────────────────────────
 
+async function loadBgaIdMapFromFirestore() {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_id_map`);
+    const doc = await res.json();
+    if (!doc.fields) return {};
+    const json = doc.fields.mapJson?.stringValue;
+    return json ? JSON.parse(json) : {};
+  } catch { return {}; }
+}
+
+async function saveBgaIdMapToFirestore(map) {
+  const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_id_map?updateMask.fieldPaths=mapJson`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: { mapJson: { stringValue: JSON.stringify(map) } } }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+}
+
 async function loadBgaFromFirestore() {
   try {
     const res = await fetch(`${FIRESTORE_BASE_ADMIN}/settings/bga_cards`);
@@ -672,9 +691,13 @@ async function openBgaAdmin(allCards) {
 
   const status = document.getElementById('bgaAdminStatus');
   status.textContent = '載入中…';
-  const ids = await loadBgaFromFirestore();
+  const [ids, idMap] = await Promise.all([
+    loadBgaFromFirestore(),
+    loadBgaIdMapFromFirestore(),
+  ]);
   if (ids === null) { status.textContent = '載入失敗'; return; }
   window._bgaAdminIds = [...ids];
+  window._bgaAdminIdMap = idMap || {};
   status.textContent = '';
   renderBgaAdminList();
 }
@@ -696,7 +719,7 @@ function injectBgaAdminPanel() {
         <p style="font-size:.8rem;color:var(--text3);margin-bottom:12px;">
           ABCDE 牌組自動屬於 BGA，此處只管理其他牌組中需手動標記的卡牌。
         </p>
-        <div id="bgaAdminChips" class="ban-admin-chips" style="flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+        <div id="bgaAdminChips" class="ban-admin-chips" style="flex-direction:column;gap:0;margin-bottom:14px;"></div>
         <div class="ban-admin-add-row" style="position:relative;">
           <input type="text" class="admin-input" id="bgaAdminSearch" placeholder="搜尋牌名新增…" autocomplete="off" />
           <div class="ban-admin-results" id="bgaAdminResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:10;"></div>
@@ -722,8 +745,20 @@ function injectBgaAdminPanel() {
     btn.disabled = true;
     st.textContent = '儲存中…';
     st.style.color = 'var(--text3)';
+
+    // Collect latest BGA ID map from inputs before saving
+    const currentMap = {};
+    document.querySelectorAll('.bga-id-map-input').forEach(input => {
+      const val = input.value.trim().toUpperCase();
+      if (val) currentMap[input.dataset.id] = val;
+    });
+    window._bgaAdminIdMap = currentMap;
+
     try {
-      await saveBgaToFirestore(window._bgaAdminIds || []);
+      await Promise.all([
+        saveBgaToFirestore(window._bgaAdminIds || []),
+        saveBgaIdMapToFirestore(currentMap),
+      ]);
       if (typeof bgaExtraIds !== 'undefined') {
         bgaExtraIds.clear();
         (window._bgaAdminIds || []).forEach(id => bgaExtraIds.add(id));
@@ -777,21 +812,45 @@ function renderBgaAdminList() {
   const chipsEl = document.getElementById('bgaAdminChips');
   if (!chipsEl) return;
   const ids = window._bgaAdminIds || [];
-  chipsEl.innerHTML = ids.length === 0
-    ? '<span style="color:var(--text3);font-size:.8rem;">尚無手動標記的 BGA 卡牌</span>'
-    : ids.map(id => {
-        const card = (adminBgaAllCards || []).find(c => c['卡片ID'] === id);
-        const label = card ? `${card['牌名']}（${id} · ${card['牌組']}）` : id;
-        return `<span class="ban-admin-chip" data-id="${id}">
-          ${label}
-          <button class="ban-chip-remove" data-id="${id}">✕</button>
-        </span>`;
-      }).join('');
+  const idMap = window._bgaAdminIdMap || {};
 
-  chipsEl.querySelectorAll('.ban-chip-remove').forEach(btn => {
+  if (ids.length === 0) {
+    chipsEl.innerHTML = '<span style="color:var(--text3);font-size:.8rem;">尚無手動標記的 BGA 卡牌</span>';
+    return;
+  }
+
+  chipsEl.innerHTML = `
+    <div class="bga-id-map-header">
+      <span>卡牌</span>
+      <span>BGA ID（如 A72）</span>
+      <span></span>
+    </div>
+    ${ids.map(id => {
+      const card = (adminBgaAllCards || []).find(c => c['卡片ID'] === id);
+      const label = card ? `${card['牌名']}（${id} · ${card['牌組']}）` : id;
+      const bgaVal = idMap[id] || '';
+      return `<div class="bga-id-map-row" data-id="${id}">
+        <span class="bga-id-map-label">${label}</span>
+        <input type="text" class="admin-input bga-id-map-input" data-id="${id}" value="${bgaVal}" placeholder="留空=未知" />
+        <button class="ban-chip-remove bga-id-map-remove" data-id="${id}">✕</button>
+      </div>`;
+    }).join('')}
+  `;
+
+  chipsEl.querySelectorAll('.bga-id-map-remove').forEach(btn => {
     btn.addEventListener('click', () => {
       window._bgaAdminIds = (window._bgaAdminIds || []).filter(x => x !== btn.dataset.id);
+      delete (window._bgaAdminIdMap || {})[btn.dataset.id];
       renderBgaAdminList();
+    });
+  });
+
+  chipsEl.querySelectorAll('.bga-id-map-input').forEach(input => {
+    input.addEventListener('change', () => {
+      window._bgaAdminIdMap = window._bgaAdminIdMap || {};
+      const val = input.value.trim().toUpperCase();
+      if (val) window._bgaAdminIdMap[input.dataset.id] = val;
+      else delete window._bgaAdminIdMap[input.dataset.id];
     });
   });
 }
@@ -802,5 +861,6 @@ window.adminApplyOverrides = applyOverrides;
 window.openCardEditModal   = openCardEditModal;
 window.openBanAdmin        = openBanAdmin;
 window.openBgaAdmin        = openBgaAdmin;
-window.loadBanlistFromFirestore = loadBanlistFromFirestore;
-window.loadBgaFromFirestore     = loadBgaFromFirestore;
+window.loadBanlistFromFirestore  = loadBanlistFromFirestore;
+window.loadBgaFromFirestore      = loadBgaFromFirestore;
+window.loadBgaIdMapFromFirestore = loadBgaIdMapFromFirestore;
