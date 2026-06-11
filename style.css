@@ -748,6 +748,35 @@ body {
   border-color: var(--border2);
 }
 
+.modal-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(210, 50, 50, 0.8);
+  font-size: 2.8rem;
+  cursor: pointer;
+  padding: 20px 16px;
+  line-height: 1;
+  transition: color .15s, transform .15s;
+  z-index: 10;
+  display: none;
+  user-select: none;
+}
+.modal-nav-btn:hover {
+  color: rgba(230, 60, 60, 1);
+  transform: translateY(-50%) scale(1.18);
+}
+.modal-nav-btn:disabled {
+  color: rgba(150, 150, 150, 0.35);
+  cursor: default;
+  transform: translateY(-50%);
+}
+.modal-nav-prev { left: 10px; }
+.modal-nav-next { right: 10px; }
+.modal-overlay.has-nav .modal-nav-btn { display: block; }
+
 .modal-inner {
   display: grid;
   grid-template-columns: 280px 1fr;

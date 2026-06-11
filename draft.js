@@ -127,6 +127,8 @@ let state = {
   currentMinShown: [], // min cards shown this round (combined mode)
 };
 
+let modalNav = { list: [], index: -1 };
+
 // ── Duplicate exclusions ───────────────────────────
 async function loadDupExclusions() {
   try {
@@ -307,11 +309,16 @@ function bindEvents() {
   document.getElementById('restartBtn').addEventListener('click', () => startDraft());
   document.getElementById('changeDecksBtn').addEventListener('click', () => showScreen('setupScreen'));
   document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalNavPrev').addEventListener('click', () => navigateModal(-1));
+  document.getElementById('modalNavNext').addEventListener('click', () => navigateModal(1));
   document.getElementById('modalOverlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
   document.addEventListener('keydown', e => {
+    if (!document.getElementById('modalOverlay').classList.contains('open')) return;
     if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft') navigateModal(-1);
+    if (e.key === 'ArrowRight') navigateModal(1);
   });
 }
 
@@ -429,7 +436,7 @@ function startMinorPhase() {
 }
 
 // ── ELO-weighted sim picks ─────────────────────────
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v2'; // 與 tierlist.js 共用同一份快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v3'; // 與 tierlist.js 共用同一份快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
 const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低輪抽場數
 const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
@@ -597,7 +604,7 @@ function createCombinedCardEl(card, slot) {
   });
   div.querySelector('.draft-card-info-btn').addEventListener('click', e => {
     e.stopPropagation();
-    openModal(card);
+    openModal(card, slot === 'occ' ? state.currentOccShown : state.currentMinShown);
   });
 
   requestAnimationFrame(() => {
@@ -668,7 +675,7 @@ function renderCombinedPickedBar() {
       if (card) {
         div.title = card['牌名'];
         div.innerHTML = '<canvas></canvas>';
-        div.addEventListener('click', () => openModal(card));
+        div.addEventListener('click', () => openModal(card, j === 0 ? state.occPicks : state.minPicks));
         requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card, 0.5));
       } else {
         div.textContent = j === 0 ? '職' : '次';
@@ -785,7 +792,7 @@ function createDraftCardEl(card) {
 
   div.querySelector('.draft-card-info-btn').addEventListener('click', e => {
     e.stopPropagation();
-    openModal(card);
+    openModal(card, state.currentShown);
   });
 
   requestAnimationFrame(() => {
@@ -910,7 +917,7 @@ function renderOccRefBar() {
     div.className = 'picked-thumb occ-ref-thumb';
     div.title = card['牌名'];
     div.innerHTML = '<canvas></canvas>';
-    div.addEventListener('click', () => openModal(card));
+    div.addEventListener('click', () => openModal(card, state.occPicks));
     bar.appendChild(div);
     requestAnimationFrame(() => drawCrop(div.querySelector('canvas'), card, 0.5));
   });
@@ -927,7 +934,7 @@ function renderPickedBar() {
     div.className = 'picked-thumb';
     div.title = card['牌名'];
     div.innerHTML = '<canvas></canvas>';
-    div.addEventListener('click', () => openModal(card));
+    div.addEventListener('click', () => openModal(card, picks));
     bar.appendChild(div);
     requestAnimationFrame(() => {
       drawCrop(div.querySelector('canvas'), card, 0.5);
@@ -1336,7 +1343,7 @@ function renderResultGrid(gridId, cards) {
         <div class="result-card-id">${card['卡片ID'] || ''}</div>
       </div>
     `;
-    div.addEventListener('click', () => openModal(card));
+    div.addEventListener('click', () => openModal(card, cards));
     grid.appendChild(div);
     requestAnimationFrame(() => {
       drawCrop(div.querySelector('canvas'), card);
@@ -1417,7 +1424,7 @@ function drawCrop(canvas, card, topFraction = 1) {
 }
 
 // ── Modal ──────────────────────────────────────────
-function openModal(card) {
+function fillModal(card) {
   const typeName = card.card_type === 'minor' ? '次要發展卡'
                  : card.card_type === 'occupation' ? '職業卡'
                  : '次要發展卡及主要發展卡';
@@ -1448,8 +1455,33 @@ function openModal(card) {
   });
 
   drawCrop(document.getElementById('modalCanvas'), card);
+}
+
+function updateModalNav() {
+  const overlay = document.getElementById('modalOverlay');
+  const hasNav = modalNav.list.length > 1;
+  overlay.classList.toggle('has-nav', hasNav);
+  if (hasNav) {
+    document.getElementById('modalNavPrev').disabled = modalNav.index <= 0;
+    document.getElementById('modalNavNext').disabled = modalNav.index >= modalNav.list.length - 1;
+  }
+}
+
+function openModal(card, contextList = null) {
+  fillModal(card);
+  modalNav.list = contextList || [];
+  modalNav.index = contextList ? contextList.findIndex(c => c['卡片ID'] === card['卡片ID']) : -1;
+  updateModalNav();
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function navigateModal(dir) {
+  const newIdx = modalNav.index + dir;
+  if (newIdx < 0 || newIdx >= modalNav.list.length) return;
+  modalNav.index = newIdx;
+  fillModal(modalNav.list[newIdx]);
+  updateModalNav();
 }
 
 function closeModal() {
