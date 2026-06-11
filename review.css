@@ -445,27 +445,6 @@
 .input-progress-step.active .step-dot { background: var(--gold); }
 .input-progress-step:not(.done):not(.active) .step-dot { background: var(--border2); }
 
-/* ── Input BGA Bookmarklet Bar ───────────────────── */
-.input-bml-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  background: rgba(232,184,75,.05);
-  border: 1px solid rgba(232,184,75,.18);
-  border-radius: var(--radius-sm);
-  padding: 7px 14px;
-  margin-bottom: 10px;
-}
-.input-bml-label {
-  font-size: .78rem;
-  color: var(--text3);
-  white-space: nowrap;
-}
-.input-bml-desc {
-  font-size: .78rem;
-  color: var(--text3);
-}
 
 /* ── Input Phase Header ───────────────────────────── */
 .input-phase-header {
@@ -1542,21 +1521,7 @@
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
-.bga-bookmarklet-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background: #1a1400;
-  border: 1px dashed var(--gold1);
-  border-radius: 6px;
-  color: var(--gold1);
-  font-size: .82rem;
-  text-decoration: none;
-  cursor: grab;
-  transition: background .15s;
-}
-.bga-bookmarklet-link:hover { background: #2e2200; }
+
 .bga-import-open-btn {
   padding: 5px 16px;
   background: transparent;

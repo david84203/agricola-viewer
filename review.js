@@ -96,11 +96,6 @@ async function init() {
     bmLink.href = bm;
   }
 
-  const bmLogLink = document.getElementById('inputBgaBookmarkletLink');
-  if (bmLogLink) {
-    const bm2 = `javascript:(function(){var picks={},order=[];var pat=/([^\\s\\(\\（\\n]{1,25})\\s+選擇\\s+(.+?)\\s*[\\(（](職業|次要發展卡)[\\)）]/g;var src='';['#replaylogs','#game_log','#logs_wrap','#gamelog_wrap','body'].forEach(function(s){if(!src){var el=document.querySelector(s);if(el)src=el.innerText||'';}});var m;while((m=pat.exec(src))!==null){var p=m[1].trim(),c=m[2].trim(),t=m[3];if(!picks[p]){picks[p]={player:p,occ:[],min:[]};order.push(p);}if(t==='職業')picks[p].occ.push(c);else picks[p].min.push(c);}if(!order.length){alert('找不到選牌記錄，請在含有「X 選擇 Y（職業）」的遊戲記錄頁執行');return;}var r=picks[order[0]];var json=JSON.stringify(r);navigator.clipboard?navigator.clipboard.writeText(json).then(function(){alert('已複製！'+r.player+' 職業'+r.occ.length+'張、次要'+r.min.length+'張');}):(prompt('複製：',json));})()`;
-    bmLogLink.href = bm2;
-  }
 
   const [data, dupInfo] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
