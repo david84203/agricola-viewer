@@ -1153,6 +1153,57 @@
 /* ══════════════════════════════════════════════════
    模式選擇區塊
    ══════════════════════════════════════════════════ */
+/* ── Session Save/Load ── */
+.session-save-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+.session-save-btn {
+  padding: 7px 18px;
+  background: transparent;
+  border: 1px solid var(--gold1);
+  border-radius: var(--radius-sm);
+  color: var(--gold1);
+  font-size: .84rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+.session-save-btn:hover:not(:disabled) { background: rgba(200,160,60,.12); }
+.session-save-btn:disabled { opacity: .35; cursor: not-allowed; border-color: var(--border); color: var(--text3); }
+.session-load-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+.session-load-select {
+  flex: 1;
+  padding: 7px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: .84rem;
+  cursor: pointer;
+}
+.session-load-select:focus { outline: none; border-color: var(--gold1); }
+.session-delete-btn {
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text3);
+  font-size: .84rem;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.session-delete-btn:hover { color: #f87171; border-color: #f87171; }
+
 .mode-selection-section {
   background: var(--bg2);
   border: 1px solid var(--border);

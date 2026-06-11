@@ -106,6 +106,7 @@ async function init() {
   buildBannedIdMap();
   buildSetupScreen();
   bindGlobalEvents();
+  refreshSessionLoadSelect();
 }
 
 async function loadBgaIdMap() {
@@ -636,6 +637,114 @@ function isPackFull(player) {
 function updateStartBtn() {
   const allFull = PLAYERS.every(isPackFull);
   document.getElementById('startInputBtn').disabled = !allFull;
+  // 有任何一包有牌就可以儲存
+  const hasAny = PLAYERS.some(p => rs.packs[p].occs.length || rs.packs[p].minors.length);
+  const saveBtn = document.getElementById('sessionSaveBtn');
+  if (saveBtn) saveBtn.disabled = !hasAny;
+}
+
+/* ══════════════════════════════════════════════════
+   儲存 / 載入牌組
+   ══════════════════════════════════════════════════ */
+const SESSION_LS_KEY  = 'review_saved_sessions';
+const SESSION_MAX     = 10;
+
+function getSavedSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSION_LS_KEY)) || []; } catch { return []; }
+}
+
+function saveCurrentSession() {
+  const hasAny = PLAYERS.some(p => rs.packs[p].occs.length || rs.packs[p].minors.length);
+  if (!hasAny) return;
+
+  const d    = new Date();
+  const date = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  const names = PLAYERS.map(p => rs.playerNames[p] || `玩家${p}`).join('+');
+  const label = `${names} ${date}`;
+
+  const session = {
+    id:          Date.now(),
+    label,
+    savedAt:     Date.now(),
+    handSize:    rs.handSize,
+    draftFormat: rs.draftFormat,
+    minDir:      rs.minDir,
+    bgaMode:     rs.bgaMode,
+    playerNames: { ...rs.playerNames },
+    packs: Object.fromEntries(PLAYERS.map(p => [p, {
+      occs:   rs.packs[p].occs.map(c => c['卡片ID']),
+      minors: rs.packs[p].minors.map(c => c['卡片ID']),
+    }])),
+  };
+
+  let sessions = getSavedSessions();
+  sessions.unshift(session);
+  if (sessions.length > SESSION_MAX) sessions = sessions.slice(0, SESSION_MAX);
+  try { localStorage.setItem(SESSION_LS_KEY, JSON.stringify(sessions)); } catch {}
+
+  refreshSessionLoadSelect();
+  const btn = document.getElementById('sessionSaveBtn');
+  if (btn) { btn.textContent = '✓ 已儲存'; setTimeout(() => { btn.textContent = '💾 儲存牌組'; }, 1800); }
+}
+
+function loadSession(id) {
+  const session = getSavedSessions().find(s => s.id === +id);
+  if (!session) return;
+
+  rs.handSize    = session.handSize;
+  rs.draftFormat = session.draftFormat;
+  rs.minDir      = session.minDir;
+  rs.bgaMode     = session.bgaMode || false;
+  rs.playerNames = { ...session.playerNames };
+
+  // 更新 UI 控制元素
+  document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b =>
+    b.classList.toggle('selected', +b.dataset.size === rs.handSize));
+  document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.format === rs.draftFormat));
+  document.getElementById('minDirGroup').style.display = rs.draftFormat === 'combined' ? 'none' : '';
+  document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.dir === rs.minDir));
+
+  const toggle = document.getElementById('bgaModeToggle');
+  if (toggle) toggle.checked = rs.bgaMode;
+  document.getElementById('bgaModeBar').classList.toggle('active', rs.bgaMode);
+
+  PLAYERS.forEach(p => {
+    const el = document.getElementById(`name${p}`);
+    if (el) el.value = rs.playerNames[p] || '';
+    const saved = session.packs[p] || { occs: [], minors: [] };
+    rs.packs[p].occs   = saved.occs.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
+    rs.packs[p].minors = saved.minors.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
+  });
+
+  buildPackTabs();
+  PLAYERS.forEach(p => buildPackPanel(p));
+  refreshPackTabLabels();
+  refreshPackProgressRow();
+  updateStartBtn();
+}
+
+function deleteCurrentSession() {
+  const sel = document.getElementById('sessionLoadSelect');
+  if (!sel?.value) return;
+  if (!confirm('確定刪除此筆紀錄？')) return;
+  const id = +sel.value;
+  let sessions = getSavedSessions().filter(s => s.id !== id);
+  try { localStorage.setItem(SESSION_LS_KEY, JSON.stringify(sessions)); } catch {}
+  refreshSessionLoadSelect();
+}
+
+function refreshSessionLoadSelect() {
+  const sel = document.getElementById('sessionLoadSelect');
+  if (!sel) return;
+  const sessions = getSavedSessions();
+  sel.innerHTML = '<option value="">📂 載入已儲存牌組…</option>' +
+    sessions.map(s => {
+      return `<option value="${s.id}">${s.label}</option>`;
+    }).join('');
+  const del = document.getElementById('sessionDeleteBtn');
+  if (del) del.style.display = 'none';
 }
 
 /* ══════════════════════════════════════════════════
@@ -1469,6 +1578,15 @@ function bindGlobalEvents() {
 
   // 開始按鈕
   document.getElementById('startInputBtn').addEventListener('click', startSimulation);
+
+  // 儲存 / 載入牌組
+  document.getElementById('sessionSaveBtn').addEventListener('click', saveCurrentSession);
+  document.getElementById('sessionLoadSelect').addEventListener('change', e => {
+    const id = e.target.value;
+    document.getElementById('sessionDeleteBtn').style.display = id ? '' : 'none';
+    if (id) loadSession(id);
+  });
+  document.getElementById('sessionDeleteBtn').addEventListener('click', deleteCurrentSession);
 
   // Active Draft 防窺按鈕
   bindActiveDraftEvents();
