@@ -104,6 +104,7 @@ let state = {
   // combined mode: separate occ/minor packs with same pack keys
   occPacks: {}, minPacks: {},
   occRemovedIds: {}, minRemovedIds: {},
+  packSize: 9,
   appliedSimRounds: new Set(),
   eloCache: {},          // { cardId: { elo, seenCount, pickCount, rankSeen } } — loaded at draft start for sim picks
   sTierIds: new Set(),   // Tier S 卡片ID（全卡庫前 8%）— sim picks 對這些卡信心度 100%
@@ -301,6 +302,16 @@ function bindEvents() {
   document.getElementById('presetBGA').addEventListener('click', setBGAChecked);
   document.getElementById('presetAll').addEventListener('click', () => setAllChecked(true));
   document.getElementById('presetNone').addEventListener('click', () => setAllChecked(false));
+  document.querySelectorAll('#packSizeSelect .pack-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#packSizeSelect .pack-size-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.packSize = parseInt(btn.dataset.size, 10);
+      const n = state.packSize;
+      document.getElementById('combinedModeDesc').textContent =
+        `每包各含 ${n} 張職業＋${n} 張次要，每輪各選 1 張，固定向左傳`;
+    });
+  });
   document.getElementById('startDraft').addEventListener('click', startDraft);
   document.getElementById('continueBtn').addEventListener('click', startMinorPhase);
   document.getElementById('confirmBtn').addEventListener('click', confirmPick);
@@ -362,18 +373,20 @@ function buildPacks(cardType) {
     return matchType && state.selectedDecks.includes(c['牌組']);
   });
 
-  if (pool.length < 36) {
+  const minPool = 4 * state.packSize;
+  if (pool.length < minPool) {
     const typeName = cardType === 'occupation' ? '職業卡' : '次要發展卡';
-    alert(`選擇的牌組中${typeName}不足（需至少 36 張，目前 ${pool.length} 張）`);
+    alert(`選擇的牌組中${typeName}不足（需至少 ${minPool} 張，目前 ${pool.length} 張）`);
     return false;
   }
 
+  const n = state.packSize;
   const shuffled = shuffle(pool);
   state.packs = {
-    A: shuffled.slice(0, 9),
-    B: shuffled.slice(9, 18),
-    C: shuffled.slice(18, 27),
-    D: shuffled.slice(27, 36),
+    A: shuffled.slice(0,     n),
+    B: shuffled.slice(n,   2*n),
+    C: shuffled.slice(2*n, 3*n),
+    D: shuffled.slice(3*n, 4*n),
   };
   state.removedIds = {
     A: new Set(), B: new Set(), C: new Set(), D: new Set(),
