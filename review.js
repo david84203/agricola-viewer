@@ -34,9 +34,12 @@ const PLAYER_COLORS = { A: 'dot-A', B: 'dot-B', C: 'dot-C', D: 'dot-D' };
 function occPackKey(playerIdx, round) {
   return PLAYERS[(playerIdx + round) % 4];
 }
-/* 次要發展牌：反向（A→D→C→B→A） */
+/* 次要發展牌：依設定同向或反向 */
 function minPackKey(playerIdx, round) {
-  return PLAYERS[((playerIdx - round) % 4 + 4) % 4];
+  if (rs.draftFormat === 'combined' || rs.minDir === 'same') {
+    return PLAYERS[(playerIdx + round) % 4];          // 同向（同 occ）
+  }
+  return PLAYERS[((playerIdx - round) % 4 + 4) % 4]; // 反向
 }
 
 /* ── State ─────────────────────────────────────────*/
@@ -47,6 +50,8 @@ const rs = {
   phase: 'setup',  // setup | input | result
   bgaMode: false,
   handSize: 9,
+  draftFormat: 'separate', // 'separate' | 'combined'
+  minDir: 'same',          // 'same' | 'reverse'（分開輪抽時有效；同時輪抽固定同向）
 
   playerNames: { A: '玩家A', B: '玩家B', C: '玩家C', D: '玩家D' },
 
@@ -838,14 +843,13 @@ function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
   // 找出 packKey 最初的持有者（round=0 時誰持有這包）
   const packOriginIdx = PLAYERS.indexOf(packKey);
 
-  // 職業：傳遞順序 packOriginIdx, packOriginIdx-1, packOriginIdx-2, ...（向左傳）
-  // 等價於：第 k 個持有者是 (packOriginIdx - k + 4) % 4
-  // 次要：傳遞順序 packOriginIdx, packOriginIdx+1, packOriginIdx+2, ...（向右傳）
-  // 等價於：第 k 個持有者是 (packOriginIdx + k) % 4
+  // 傳遞方向由 rs.draftFormat / rs.minDir 決定
+  // 同向（occ 方向）：第 k 持有者 = (packOriginIdx - k + 8) % 4
+  // 反向：第 k 持有者 = (packOriginIdx + k) % 4
 
   function getHolderOrder(k) {
-    if (type === 'occ') return (packOriginIdx - k + 8) % 4;
-    else                return (packOriginIdx + k) % 4;
+    const useOccDir = type === 'occ' || rs.draftFormat === 'combined' || rs.minDir === 'same';
+    return useOccDir ? (packOriginIdx - k + 8) % 4 : (packOriginIdx + k) % 4;
   }
 
   // 找 playerA 在這包路徑中的位置
@@ -1206,6 +1210,26 @@ function showScreen(id) {
    Global Events
    ══════════════════════════════════════════════════ */
 function bindGlobalEvents() {
+  // Draft format selection (分開 / 同時)
+  document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      rs.draftFormat = btn.dataset.format;
+      // 同時輪抽不需要方向選擇器
+      document.getElementById('minDirGroup').style.display = rs.draftFormat === 'combined' ? 'none' : '';
+    });
+  });
+
+  // Min direction selection (同向 / 反向)
+  document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      rs.minDir = btn.dataset.dir;
+    });
+  });
+
   // Hand size selection
   document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(btn => {
     btn.addEventListener('click', () => {

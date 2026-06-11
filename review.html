@@ -34,15 +34,31 @@
       <div class="review-section-title">設定玩家與牌包</div>
       <div class="review-section-sub">填入玩家名稱，再為每位玩家的牌包選入職業牌與次要發展牌</div>
 
-      <div class="hand-size-wrap">
-        <span class="hand-size-label">每人牌數：</span>
-        <div class="hand-size-select" id="handSizeSelect">
-          <button class="hand-size-btn" data-size="7">7 / 7</button>
-          <button class="hand-size-btn" data-size="8">8 / 8</button>
-          <button class="hand-size-btn selected" data-size="9">9 / 9</button>
-          <button class="hand-size-btn" data-size="10">10 / 10</button>
+      <div class="draft-settings-row">
+        <div class="draft-setting-group">
+          <span class="draft-setting-label">輪抽方式</span>
+          <div class="draft-format-select" id="draftFormatSelect">
+            <button class="draft-fmt-btn selected" data-format="separate">分開輪抽</button>
+            <button class="draft-fmt-btn" data-format="combined">同時輪抽</button>
+          </div>
         </div>
-        <span class="hand-size-hint">職業 / 次發</span>
+        <div class="draft-setting-group" id="minDirGroup">
+          <span class="draft-setting-label">次發傳牌方向</span>
+          <div class="draft-dir-select" id="minDirSelect">
+            <button class="draft-dir-btn selected" data-dir="same">同向</button>
+            <button class="draft-dir-btn" data-dir="reverse">反向</button>
+          </div>
+        </div>
+        <div class="draft-setting-group">
+          <span class="draft-setting-label">每人牌數</span>
+          <div class="hand-size-select" id="handSizeSelect">
+            <button class="hand-size-btn" data-size="7">7 / 7</button>
+            <button class="hand-size-btn" data-size="8">8 / 8</button>
+            <button class="hand-size-btn selected" data-size="9">9 / 9</button>
+            <button class="hand-size-btn" data-size="10">10 / 10</button>
+          </div>
+          <span class="hand-size-hint">職業 / 次發</span>
+        </div>
       </div>
 
       <!-- BGA 模式切換 -->
