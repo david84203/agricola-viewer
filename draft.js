@@ -105,7 +105,8 @@ let state = {
   occPacks: {}, minPacks: {},
   occRemovedIds: {}, minRemovedIds: {},
   appliedSimRounds: new Set(),
-  eloCache: {},          // { cardId: { elo, seenCount } } — loaded at draft start for sim picks
+  eloCache: {},          // { cardId: { elo, seenCount, pickCount, rankSeen } } — loaded at draft start for sim picks
+  sTierIds: new Set(),   // Tier S 卡片ID（全卡庫前 8%）— sim picks 對這些卡信心度 100%
   currentRound: 0,
   occPicks: [],
   minPicks: [],
@@ -397,11 +398,7 @@ function startCombinedPhase() {
   state.selectedOcc = null;
   state.selectedMin = null;
 
-  const allPackIds = [
-    ...Object.values(state.occPacks).flatMap(p => p.map(c => c['卡片ID'])),
-    ...Object.values(state.minPacks).flatMap(p => p.map(c => c['卡片ID'])),
-  ];
-  fetchEloForDraft(allPackIds);
+  fetchEloForDraft();
 
   showScreen('draftScreen');
   renderCombinedRound();
@@ -414,7 +411,7 @@ function startOccupationPhase() {
   state.roundConfig = OCC_ROUNDS;
   state.currentPicks = state.occPicks;
   state.selectedCard = null;
-  fetchEloForDraft(Object.values(state.packs).flatMap(p => p.map(c => c['卡片ID'])));
+  fetchEloForDraft();
   showScreen('draftScreen');
   renderRound();
 }
@@ -426,45 +423,81 @@ function startMinorPhase() {
   state.roundConfig = MIN_ROUNDS;
   state.currentPicks = state.minPicks;
   state.selectedCard = null;
-  fetchEloForDraft(Object.values(state.packs).flatMap(p => p.map(c => c['卡片ID'])));
+  fetchEloForDraft();
   showScreen('draftScreen');
   renderRound();
 }
 
 // ── ELO-weighted sim picks ─────────────────────────
-async function fetchEloForDraft(cardIds) {
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v2'; // 與 tierlist.js 共用同一份快取
+const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
+const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低輪抽場數
+const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
+
+async function fetchEloForDraft() {
   state.eloCache = {};
-  if (cardIds.length === 0) return;
+  state.sTierIds = new Set();
   try {
-    const res = await fetch(`${FIRESTORE_BASE}:batchGet`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        documents: cardIds.map(id =>
-          `projects/project-hub-410cd/databases/(default)/documents/agricola_ratings/${id}`)
-      })
-    });
-    const data = await res.json();
-    data.forEach(item => {
-      if (item.found) {
-        const id = item.found.name.split('/').pop();
-        const f = item.found.fields || {};
-        state.eloCache[id] = {
-          elo: Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
-          seenCount: Number(f.seenCount?.integerValue ?? 0),
-        };
-      }
-    });
+    let map = null;
+    try {
+      const s = JSON.parse(localStorage.getItem(RATINGS_CACHE_KEY));
+      if (s && Date.now() - s.cachedAt < RATINGS_CACHE_TTL) map = s.data;
+    } catch {}
+
+    if (!map) {
+      map = {};
+      let pageToken = null;
+      do {
+        let url = `${FIRESTORE_BASE}/agricola_ratings?pageSize=300`;
+        if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        (data.documents || []).forEach(doc => {
+          const id = doc.name.split('/').pop();
+          const f = doc.fields || {};
+          map[id] = {
+            elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue ?? 1200),
+            seenCount: Number(f.seenCount?.integerValue ?? 0),
+            pickCount: Number(f.pickCount?.integerValue ?? 0),
+            rankSeen:  Number(f.rankSeen?.integerValue  ?? 0),
+          };
+        });
+        pageToken = data.nextPageToken ?? null;
+      } while (pageToken);
+      try { localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
+    }
+
+    state.eloCache = map;
+    state.sTierIds = computeSTierIds(map);
   } catch { /* fail silently — sim picks fall back to uniform random */ }
+}
+
+// 與 tierlist.js 相同的混合分數排名，取非禁卡前 8% 作為 Tier S
+function computeSTierIds(map) {
+  const score = r => {
+    if (!r.seenCount) return r.elo;
+    const pickRate = r.pickCount / r.seenCount;
+    const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
+    const conf = Math.min(r.seenCount / 30, 1);
+    return conf * r.elo + (1 - conf) * prior;
+  };
+  const rated = Object.entries(map)
+    .filter(([id, r]) => r.seenCount >= SIM_MIN_SEEN && !BANNED_IDS.has(id))
+    .sort((a, b) => score(b[1]) - score(a[1]));
+  return new Set(rated.slice(0, Math.ceil(rated.length * SIM_S_TIER_PCT)).map(([id]) => id));
 }
 
 function simPickWeighted(avail, count) {
   if (count <= 0 || avail.length === 0) return [];
   const pool = avail.map(c => {
-    const r = state.eloCache[c['卡片ID']];
-    const confidence = r ? Math.min(r.seenCount / 30, 1) : 0;
+    const id = c['卡片ID'];
+    const r = state.eloCache[id];
+    // Tier S 全信任 ELO；其餘依有效場數（輪抽 seenCount + 快排 rankSeen）建立信心度
+    const effGames = r ? (r.seenCount + (r.rankSeen || 0)) : 0;
+    const confidence = state.sTierIds.has(id) ? 1 : Math.min(effGames / 30, 1);
     const elo = r ? Math.max(r.elo ?? 1200, 100) : 1200;
-    const w = 1200 + (elo - 1200) * confidence;
+    const effElo = 1200 + (elo - 1200) * confidence;
+    const w = Math.pow(10, (effElo - 1200) / 400); // ELO 期望勝率式權重：高 400 分 → 10 倍中籤率
     return { c, w };
   });
   const result = [];
