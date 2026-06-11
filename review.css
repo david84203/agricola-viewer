@@ -445,6 +445,28 @@
 .input-progress-step.active .step-dot { background: var(--gold); }
 .input-progress-step:not(.done):not(.active) .step-dot { background: var(--border2); }
 
+/* ── Input BGA Bookmarklet Bar ───────────────────── */
+.input-bml-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: rgba(232,184,75,.05);
+  border: 1px solid rgba(232,184,75,.18);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  margin-bottom: 10px;
+}
+.input-bml-label {
+  font-size: .78rem;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.input-bml-desc {
+  font-size: .78rem;
+  color: var(--text3);
+}
+
 /* ── Input Phase Header ───────────────────────────── */
 .input-phase-header {
   background: var(--bg2);
