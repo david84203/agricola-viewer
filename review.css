@@ -419,6 +419,10 @@
   position: relative;
 }
 .input-progress-step:last-child { border-right: none; }
+.input-progress-step:hover:not(.active) {
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+}
 .input-progress-step.done {
   color: var(--green);
   background: rgba(76,175,125,.06);

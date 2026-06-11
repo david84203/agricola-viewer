@@ -975,10 +975,16 @@ function renderInputProgress() {
   el.innerHTML = '';
   PLAYERS.forEach((p, i) => {
     const step = document.createElement('div');
-    const isDone   = i < rs.currentInputPlayerIdx;
     const isActive = i === rs.currentInputPlayerIdx;
-    step.className = `input-progress-step${isDone ? ' done' : ''}${isActive ? ' active' : ''}`;
+    const hasPicks = countPlayerPicks(p) > 0;
+    step.className = `input-progress-step${hasPicks && !isActive ? ' done' : ''}${isActive ? ' active' : ''}`;
     step.innerHTML = `<span class="step-dot"></span>${getPlayerName(p)}`;
+    step.style.cursor = 'pointer';
+    step.addEventListener('click', () => {
+      rs.currentInputPlayerIdx = i;
+      renderInputScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
     el.appendChild(step);
   });
 }
@@ -1054,11 +1060,16 @@ function renderSlots(player, type) {
 }
 
 function updateNextBtn() {
-  const player = PLAYERS[rs.currentInputPlayerIdx];
-  const total  = countPlayerPicks(player);
+  const player   = PLAYERS[rs.currentInputPlayerIdx];
+  const total    = countPlayerPicks(player);
+  const isLast   = rs.currentInputPlayerIdx >= PLAYERS.length - 1;
+  const allDone  = PLAYERS.every(p => countPlayerPicks(p) === rs.handSize * 2);
   document.getElementById('inputPickCount').innerHTML =
-    `已選 <strong>${total}</strong> / 14 張`;
-  document.getElementById('inputNextBtn').disabled = total < 14;
+    `已選 <strong>${total}</strong> / ${rs.handSize * 2} 張`;
+  const btn = document.getElementById('inputNextBtn');
+  btn.disabled = false;
+  btn.textContent = isLast ? '查看結果 →' : '下一位玩家 →';
+  if (isLast) btn.disabled = !allDone;
 }
 
 function countPlayerPicks(player) {
