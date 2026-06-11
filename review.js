@@ -685,6 +685,33 @@ function updateStartBtn() {
   const hasAny = PLAYERS.some(p => rs.packs[p].occs.length || rs.packs[p].minors.length);
   const saveBtn = document.getElementById('sessionSaveBtn');
   if (saveBtn) saveBtn.disabled = !hasAny;
+  updateViewResultBtn();
+}
+
+/* 四家扣牌是否都已輸入完整（可直接查看結果） */
+function isGameComplete() {
+  return PLAYERS.every(p =>
+    rs.picks[p].occ.filter(Boolean).length === DRAFT_ROUNDS &&
+    rs.picks[p].min.filter(Boolean).length === DRAFT_ROUNDS);
+}
+
+function updateViewResultBtn() {
+  const btn = document.getElementById('viewResultBtn');
+  if (btn) btn.style.display = isGameComplete() ? 'block' : 'none';
+}
+
+/* 不重新輸入，直接以目前載入的扣牌查看評分結果 */
+async function viewSavedResult() {
+  if (!isGameComplete()) return;
+  document.getElementById('globalLoading').style.display = 'flex';
+  const allIds = PLAYERS.flatMap(p => [
+    ...rs.packs[p].occs.map(c => c['卡片ID']),
+    ...rs.packs[p].minors.map(c => c['卡片ID']),
+  ]);
+  await fetchElo(allIds);
+  preloadAllPackImages();
+  document.getElementById('globalLoading').style.display = 'none';
+  showResult();
 }
 
 /* ══════════════════════════════════════════════════
@@ -1848,6 +1875,7 @@ function bindGlobalEvents() {
 
   // 開始按鈕
   document.getElementById('startInputBtn').addEventListener('click', startSimulation);
+  document.getElementById('viewResultBtn')?.addEventListener('click', viewSavedResult);
 
   // 儲存 / 載入牌組
   document.getElementById('sessionSaveBtn').addEventListener('click', saveCurrentSession);

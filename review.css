@@ -395,6 +395,27 @@
   cursor: not-allowed;
   transform: none;
 }
+.review-view-result-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(76,175,125,.18), rgba(76,175,125,.08));
+  border: 1px solid rgba(76,175,125,.5);
+  border-radius: var(--radius-sm);
+  color: var(--green);
+  font-size: .98rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 12px;
+  text-align: center;
+}
+.review-view-result-btn:hover {
+  background: linear-gradient(135deg, rgba(76,175,125,.28), rgba(76,175,125,.14));
+  border-color: var(--green);
+  transform: translateY(-1px);
+}
 
 /* ══════════════════════════════════════════════════
    畫面二：逐人輸入扣牌
