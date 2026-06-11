@@ -109,6 +109,7 @@ async function init() {
   buildSetupScreen();
   bindGlobalEvents();
   refreshSessionLoadSelect();
+  restoreDraftState();
 }
 
 async function loadBgaIdMap() {
@@ -210,6 +211,7 @@ function buildSetupScreen() {
       rs.playerNames[p] = e.target.value.trim() || `玩家${p}`;
       refreshPackTabLabels();
       refreshPackProgressRow();
+      saveDraftState();
     });
   });
 
@@ -227,6 +229,7 @@ function buildSetupScreen() {
     });
     refreshPackProgressRow();
     updateStartBtn();
+    saveDraftState();
   });
 
 
@@ -400,6 +403,7 @@ function addCardToPack(player, type, card) {
   resultsEl.classList.remove('open');
   resultsEl.innerHTML = '';
   if (list.length < rs.handSize) searchEl.focus();
+  saveDraftState();
 }
 
 function removeCardFromPack(player, type, cardId) {
@@ -409,6 +413,7 @@ function removeCardFromPack(player, type, cardId) {
   updatePackCountBadge(player, type);
   updateStartBtn();
   refreshPackProgressRow();
+  saveDraftState();
 }
 
 function renderPackList(player, type) {
@@ -772,14 +777,88 @@ function refreshSessionLoadSelect() {
   if (del) del.style.display = 'none';
 }
 
+/* ── 自動暫存（牌包＋扣牌＋設定，重整或返回設定都不消失）─── */
+const DRAFT_AUTOSAVE_KEY = 'review_autosave_state';
+
+function saveDraftState() {
+  try {
+    const state = {
+      handSize:    rs.handSize,
+      draftFormat: rs.draftFormat,
+      minDir:      rs.minDir,
+      bgaMode:     rs.bgaMode,
+      playerNames: { ...rs.playerNames },
+      packs: Object.fromEntries(PLAYERS.map(p => [p, {
+        occs:   rs.packs[p].occs.map(c => c['卡片ID']),
+        minors: rs.packs[p].minors.map(c => c['卡片ID']),
+      }])),
+      picks: Object.fromEntries(PLAYERS.map(p => [p, {
+        occ: rs.picks[p].occ.map(c => c ? c['卡片ID'] : null),
+        min: rs.picks[p].min.map(c => c ? c['卡片ID'] : null),
+      }])),
+    };
+    localStorage.setItem(DRAFT_AUTOSAVE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+function restoreDraftState() {
+  let state;
+  try { state = JSON.parse(localStorage.getItem(DRAFT_AUTOSAVE_KEY)); } catch { return; }
+  if (!state) return;
+  const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || null : null);
+
+  if (state.handSize)    rs.handSize    = state.handSize;
+  if (state.draftFormat) rs.draftFormat = state.draftFormat;
+  if (state.minDir)      rs.minDir      = state.minDir;
+  rs.bgaMode = state.bgaMode || false;
+  if (state.playerNames) rs.playerNames = { ...rs.playerNames, ...state.playerNames };
+
+  PLAYERS.forEach(p => {
+    const sp = state.packs?.[p] || { occs: [], minors: [] };
+    rs.packs[p].occs   = (sp.occs   || []).map(byId).filter(Boolean);
+    rs.packs[p].minors = (sp.minors || []).map(byId).filter(Boolean);
+    const pk = state.picks?.[p];
+    if (pk) {
+      rs.picks[p].occ = (pk.occ || []).map(byId);
+      rs.picks[p].min = (pk.min || []).map(byId);
+    }
+  });
+
+  // 同步設定 UI
+  document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b =>
+    b.classList.toggle('selected', +b.dataset.size === rs.handSize));
+  document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.format === rs.draftFormat));
+  const minDirGroup = document.getElementById('minDirGroup');
+  if (minDirGroup) minDirGroup.style.display = rs.draftFormat === 'combined' ? 'none' : '';
+  document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.dir === rs.minDir));
+  const toggle = document.getElementById('bgaModeToggle');
+  if (toggle) toggle.checked = rs.bgaMode;
+  document.getElementById('bgaModeBar')?.classList.toggle('active', rs.bgaMode);
+  PLAYERS.forEach(p => {
+    const el = document.getElementById(`name${p}`);
+    if (el) el.value = rs.playerNames[p] === `玩家${p}` ? '' : (rs.playerNames[p] || '');
+  });
+
+  // 重建牌包面板
+  buildPackTabs();
+  PLAYERS.forEach(p => buildPackPanel(p));
+  refreshPackTabLabels();
+  refreshPackProgressRow();
+  updateStartBtn();
+}
+
 /* ══════════════════════════════════════════════════
    啟動模擬流程 (分流各種模式)
    ══════════════════════════════════════════════════ */
 async function startSimulation() {
-  // 重設所有人的扣牌紀錄
-  PLAYERS.forEach(p => {
-    rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
-  });
+  // 模式 1（歷史輸入）保留先前扣牌以便續編；AI／單機模式則重設
+  if (rs.mode !== 1) {
+    PLAYERS.forEach(p => {
+      rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
+    });
+  }
 
   // 預載圖片
   preloadAllPackImages();
@@ -1067,6 +1146,7 @@ function renderSlots(player, type) {
       rs.picks[player][type][round] = null;
       renderSlots(player, type);
       updateNextBtn();
+      saveDraftState();
     });
 
     grid.appendChild(slot);
@@ -1136,78 +1216,23 @@ function openSlotPicker(player, type, round, slotEl) {
   slotEl.classList.add('open');
 }
 
-/* 計算哪些牌已被「比這位玩家早拿到這包」的其他玩家選走 */
+/* 計算第 currentRound 輪之前，這包牌已被拿走的卡（含玩家自己前一圈拿的）
+   牌包每輪往下傳一位，所以「路徑順位」就等於「輪次 round」：
+   第 r 輪（r < currentRound）持有這包的人選掉的牌，就是已被拿走的。 */
 function getTakenIdsFromPack(packKey, type, currentPlayer, currentRound) {
   const takenIds = new Set();
-  const playerIdx = PLAYERS.indexOf(currentPlayer);
-
-  PLAYERS.forEach((otherPlayer, otherIdx) => {
-    for (let r = 0; r < DRAFT_ROUNDS; r++) {
-      if (otherPlayer === currentPlayer && r === currentRound) continue;
-      const theirPackKey = type === 'occ' ? occPackKey(otherIdx, r) : minPackKey(otherIdx, r);
-      if (theirPackKey !== packKey) continue;
-      const theirPick = rs.picks[otherPlayer][type][r];
-      if (!theirPick) continue;
-      if (isEarlierInPackPath(packKey, type, otherPlayer, r, currentPlayer, currentRound)) {
-        takenIds.add(theirPick['卡片ID']);
-      }
-    }
-  });
-
+  const packIdx  = PLAYERS.indexOf(packKey);
+  // 反向傳遞只在「分開輪抽 + 次發反向」時成立，其餘皆同向
+  const reverseDir = type === 'min' && rs.draftFormat !== 'combined' && rs.minDir === 'reverse';
+  for (let r = 0; r < currentRound; r++) {
+    // 反推第 r 輪誰持有這包
+    const holderIdx = reverseDir
+      ? ((packIdx - r) % 4 + 4) % 4
+      : (packIdx + r) % 4;
+    const pick = rs.picks[PLAYERS[holderIdx]][type][r];
+    if (pick) takenIds.add(pick['卡片ID']);
+  }
   return takenIds;
-}
-
-/* 判斷 (playerA, roundA) 是否比 (playerB, roundB) 更早持有同一個包 */
-function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
-  // 這個包在路徑中的訪問順序：
-  // 職業牌：包 packKey 的初始持有者 = packKey 對應的玩家（P_X 在 R1 持有 X 包）
-  // 次要牌：同上
-  // 之後按傳遞方向依次是下一位玩家
-
-  // 找出 packKey 最初的持有者（round=0 時誰持有這包）
-  const packOriginIdx = PLAYERS.indexOf(packKey);
-
-  // 傳遞方向 A→B→C→D→A：第 k 持有者 = (packOriginIdx + k) % 4
-  // 反向：第 k 持有者 = (packOriginIdx - k + 4k) % 4
-
-  function getHolderOrder(k) {
-    const useOccDir = type === 'occ' || rs.draftFormat === 'combined' || rs.minDir === 'same';
-    return useOccDir ? (packOriginIdx + k) % 4 : ((packOriginIdx - k) % 4 + 4) % 4;
-  }
-
-  // 找 playerA 在這包路徑中的位置
-  let posA = -1, posB = -1;
-  for (let k = 0; k < DRAFT_ROUNDS; k++) {
-    const holderIdx = getHolderOrder(k);
-    if (holderIdx === PLAYERS.indexOf(playerA) && posA === -1) posA = k;
-    if (holderIdx === PLAYERS.indexOf(playerB) && posB === -1) {
-      if (k === posB) break;
-      posB = k;
-    }
-  }
-  function findPackPos(player, round) {
-    const playerIdx = PLAYERS.indexOf(player);
-    for (let k = 0; k < DRAFT_ROUNDS; k++) {
-      if (getHolderOrder(k) === playerIdx) {
-        // 確認 round 是否對應
-        if (type === 'occ') {
-          if (occPackKey(playerIdx, round) === packKey) {
-            // 找到了，這個 k 就是這次的順序
-            return k;
-          }
-        } else {
-          if (minPackKey(playerIdx, round) === packKey) {
-            return k;
-          }
-        }
-      }
-    }
-    return 999;
-  }
-
-  const kA = findPackPos(playerA, roundA);
-  const kB = findPackPos(playerB, roundB);
-  return kA < kB;
 }
 
 function renderPickerCards(cards, takenIds, filter = '') {
@@ -1252,6 +1277,7 @@ function selectCardForSlot(card) {
   closeSlotPicker();
   renderSlots(player, type);
   updateNextBtn();
+  saveDraftState();
 }
 
 function closeSlotPicker() {
@@ -1316,6 +1342,7 @@ function showResult() {
   showScreen('resultScreen');
   buildResultCards();
   calculateAllScores();
+  saveDraftState();
 }
 
 function buildResultCards() {
@@ -1556,6 +1583,7 @@ function bindGlobalEvents() {
       rs.draftFormat = btn.dataset.format;
       // 同時輪抽不需要方向選擇器
       document.getElementById('minDirGroup').style.display = rs.draftFormat === 'combined' ? 'none' : '';
+      saveDraftState();
     });
   });
 
@@ -1565,6 +1593,7 @@ function bindGlobalEvents() {
       document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       rs.minDir = btn.dataset.dir;
+      saveDraftState();
     });
   });
 
@@ -1584,6 +1613,7 @@ function bindGlobalEvents() {
       PLAYERS.forEach(p => buildPackPanel(p));
       refreshPackProgressRow();
       updateStartBtn();
+      saveDraftState();
     });
   });
 
@@ -1643,13 +1673,10 @@ function bindGlobalEvents() {
   // 下一位玩家按鈕
   bindInputNextBtn();
 
-  // 重新輸入
+  // 重新選擇模式（保留牌包與扣牌，方便返回後繼續編輯／換模式）
   document.getElementById('resultRestartBtn').addEventListener('click', () => {
     rs.phase = 'setup';
     rs.currentInputPlayerIdx = 0;
-    PLAYERS.forEach(p => {
-      rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
-    });
     showScreen('setupScreen');
   });
 
