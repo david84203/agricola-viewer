@@ -28,8 +28,8 @@ const PLAYERS = ['A', 'B', 'C', 'D'];
 const PLAYER_COLORS = { A: 'dot-A', B: 'dot-B', C: 'dot-C', D: 'dot-D' };
 
 /* ── 傳包公式 ──────────────────────────────────────
-  職業牌：向左傳（A→B→C→D→A）
-  playerIdx: 0=A, 1=B, 2=C, 3=D；round: 0~6
+  職業牌：向左傳（B的包→A、C的包→B、D的包→C、A的包→D）
+  playerIdx: 0=A, 1=B, 2=C, 3=D；round: 0~handSize-1
 */
 function occPackKey(playerIdx, round) {
   return PLAYERS[(playerIdx + round) % 4];
