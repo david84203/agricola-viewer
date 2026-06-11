@@ -688,21 +688,17 @@ function updateStartBtn() {
   updateViewResultBtn();
 }
 
-/* 四家扣牌是否都已輸入完整（可直接查看結果） */
-function isGameComplete() {
-  return PLAYERS.every(p =>
-    rs.picks[p].occ.filter(Boolean).length === DRAFT_ROUNDS &&
-    rs.picks[p].min.filter(Boolean).length === DRAFT_ROUNDS);
-}
-
+/* 是否存在已保存的歷史紀錄（第一手歷史輸入的那局） */
 function updateViewResultBtn() {
   const btn = document.getElementById('viewResultBtn');
-  if (btn) btn.style.display = isGameComplete() ? 'block' : 'none';
+  if (btn) btn.style.display = getHistoryRecord() ? 'block' : 'none';
 }
 
-/* 不重新輸入，直接以目前載入的扣牌查看評分結果 */
-async function viewSavedResult() {
-  if (!isGameComplete()) return;
+/* 載入獨立保存的歷史紀錄並直接查看評分結果（不受模擬模式覆蓋影響） */
+async function viewHistoryResult() {
+  const rec = getHistoryRecord();
+  if (!rec) return;
+  applyState(rec);   // 把歷史紀錄載回畫面（含四家原始扣牌）
   document.getElementById('globalLoading').style.display = 'flex';
   const allIds = PLAYERS.flatMap(p => [
     ...rs.packs[p].occs.map(c => c['卡片ID']),
@@ -746,6 +742,10 @@ function saveCurrentSession() {
       occs:   rs.packs[p].occs.map(c => c['卡片ID']),
       minors: rs.packs[p].minors.map(c => c['卡片ID']),
     }])),
+    picks: Object.fromEntries(PLAYERS.map(p => [p, {
+      occ: rs.picks[p].occ.map(c => c ? c['卡片ID'] : null),
+      min: rs.picks[p].min.map(c => c ? c['卡片ID'] : null),
+    }])),
   };
 
   let sessions = getSavedSessions();
@@ -755,45 +755,15 @@ function saveCurrentSession() {
 
   refreshSessionLoadSelect();
   const btn = document.getElementById('sessionSaveBtn');
-  if (btn) { btn.textContent = '✓ 已儲存'; setTimeout(() => { btn.textContent = '💾 儲存牌組'; }, 1800); }
+  if (btn) { btn.textContent = '✓ 已儲存'; setTimeout(() => { btn.textContent = '💾 儲存此局'; }, 1800); }
 }
 
 function loadSession(id) {
   const session = getSavedSessions().find(s => s.id === +id);
   if (!session) return;
-
-  rs.handSize    = session.handSize;
-  rs.draftFormat = session.draftFormat;
-  rs.minDir      = session.minDir;
-  rs.bgaMode     = session.bgaMode || false;
-  rs.playerNames = { ...session.playerNames };
-
-  // 更新 UI 控制元素
-  document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b =>
-    b.classList.toggle('selected', +b.dataset.size === rs.handSize));
-  document.querySelectorAll('#draftFormatSelect .draft-fmt-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.format === rs.draftFormat));
-  document.getElementById('minDirGroup').style.display = rs.draftFormat === 'combined' ? 'none' : '';
-  document.querySelectorAll('#minDirSelect .draft-dir-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.dir === rs.minDir));
-
-  const toggle = document.getElementById('bgaModeToggle');
-  if (toggle) toggle.checked = rs.bgaMode;
-  document.getElementById('bgaModeBar').classList.toggle('active', rs.bgaMode);
-
-  PLAYERS.forEach(p => {
-    const el = document.getElementById(`name${p}`);
-    if (el) el.value = rs.playerNames[p] || '';
-    const saved = session.packs[p] || { occs: [], minors: [] };
-    rs.packs[p].occs   = saved.occs.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
-    rs.packs[p].minors = saved.minors.map(id => allCards.find(c => c['卡片ID'] === id)).filter(Boolean);
-  });
-
-  buildPackTabs();
-  PLAYERS.forEach(p => buildPackPanel(p));
-  refreshPackTabLabels();
-  refreshPackProgressRow();
-  updateStartBtn();
+  // session 結構與 applyState 相容（packs/picks 皆為卡片ID）；含扣牌的存檔可直接重看結果
+  applyState(session);
+  saveDraftState();
 }
 
 function deleteCurrentSession() {
@@ -820,6 +790,15 @@ function refreshSessionLoadSelect() {
 
 /* ── 自動暫存（牌包＋扣牌＋設定，重整或返回設定都不消失）─── */
 const DRAFT_AUTOSAVE_KEY = 'review_autosave_state';
+// 歷史紀錄：第一手用「歷史紀錄輸入」完成的那局，獨立保存，模擬模式不會覆蓋
+const HISTORY_RECORD_KEY = 'review_history_record';
+
+function saveHistoryRecord() {
+  try { localStorage.setItem(HISTORY_RECORD_KEY, JSON.stringify(buildState())); } catch {}
+}
+function getHistoryRecord() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_RECORD_KEY)); } catch { return null; }
+}
 
 function buildState() {
   return {
@@ -865,10 +844,8 @@ function applyState(state) {
     rs.packs[p].occs   = (sp.occs   || []).map(byId).filter(Boolean);
     rs.packs[p].minors = (sp.minors || []).map(byId).filter(Boolean);
     const pk = state.picks?.[p];
-    if (pk) {
-      rs.picks[p].occ = (pk.occ || []).map(byId);
-      rs.picks[p].min = (pk.min || []).map(byId);
-    }
+    rs.picks[p].occ = pk ? (pk.occ || []).map(byId) : Array(DRAFT_ROUNDS).fill(null);
+    rs.picks[p].min = pk ? (pk.min || []).map(byId) : Array(DRAFT_ROUNDS).fill(null);
   });
 
   // 同步設定 UI
@@ -1525,6 +1502,7 @@ function bindInputNextBtn() {
   document.getElementById('inputNextBtn').addEventListener('click', () => {
     rs.currentInputPlayerIdx++;
     if (rs.currentInputPlayerIdx >= 4) {
+      saveHistoryRecord();   // 歷史紀錄輸入完成 → 存進獨立槽（模擬模式不會覆蓋）
       showResult();
     } else {
       renderInputScreen();
@@ -1875,7 +1853,7 @@ function bindGlobalEvents() {
 
   // 開始按鈕
   document.getElementById('startInputBtn').addEventListener('click', startSimulation);
-  document.getElementById('viewResultBtn')?.addEventListener('click', viewSavedResult);
+  document.getElementById('viewResultBtn')?.addEventListener('click', viewHistoryResult);
 
   // 儲存 / 載入牌組
   document.getElementById('sessionSaveBtn').addEventListener('click', saveCurrentSession);
@@ -1916,6 +1894,7 @@ function bindGlobalEvents() {
   document.getElementById('resultRestartBtn').addEventListener('click', () => {
     rs.phase = 'setup';
     rs.currentInputPlayerIdx = 0;
+    updateViewResultBtn();
     showScreen('setupScreen');
   });
 
