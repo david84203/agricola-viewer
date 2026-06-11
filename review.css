@@ -1587,11 +1587,46 @@
   cursor: pointer;
   padding: 2px 8px;
 }
-.bga-import-steps { display: flex; flex-direction: column; gap: 2px; }
+.bga-import-steps { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 .bga-step {
   font-size: .82rem;
   color: var(--text2);
   line-height: 1.75;
+}
+.bga-step-primary {
+  color: var(--gold);
+  background: rgba(232,184,75,.06);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+.bga-import-quick {
+  margin-bottom: 6px;
+}
+.bga-quick-label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+.bga-import-quick textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: .82rem;
+  font-family: inherit;
+  color: var(--text);
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color var(--transition);
+}
+.bga-import-quick textarea:focus { outline: none; border-color: var(--gold); }
+.bga-import-divider {
+  text-align: center;
+  font-size: .75rem;
+  color: var(--text3);
+  margin: 10px 0 8px;
 }
 .bga-import-settings-bar {
   margin-top: 8px;

@@ -477,7 +477,10 @@ function findCardByBGAId(bgaId) {
     const vClean = v.replace('*', '');
     return vClean === bgaId || normalizeBGAId(vClean) === norm;
   })?.[0];
-  if (!ourId) return null;
+  if (!ourId) {
+    // 最後嘗試用中文牌名比對（遊戲記錄書籤輸出的是牌名而非 ID）
+    return allCards.find(c => (c['牌名'] || '').trim() === bgaId.trim()) || null;
+  }
   return allCards.find(c => {
     const id = c['卡片ID'] || '';
     return id === ourId || id === ourId + '*' || id.replace('*', '') === ourId;
@@ -509,6 +512,22 @@ function updateBGAPreview(player) {
   const name  = data.player ? `${data.player}　` : '';
   preview.textContent = `${name}職業 ${occOk}/${(data.occ||[]).length}　次發 ${minOk}/${(data.min||[]).length}`;
   preview.className = 'bga-import-ppreview bga-preview-ok';
+}
+
+function applyQuickImport(raw) {
+  let arr;
+  try { arr = JSON.parse(raw.trim()); } catch { return false; }
+  if (!Array.isArray(arr) || arr.length === 0) return false;
+  // 只取前四筆依序對應 A/B/C/D
+  arr.slice(0, PLAYERS.length).forEach((entry, i) => {
+    const p = PLAYERS[i];
+    const ta = document.getElementById(`bgaImportArea${p}`);
+    if (ta) {
+      ta.value = JSON.stringify(entry);
+      updateBGAPreview(p);
+    }
+  });
+  return true;
 }
 
 function openBGAImportDialog() {
@@ -1651,6 +1670,16 @@ function bindGlobalEvents() {
   });
   PLAYERS.forEach(p => {
     document.getElementById(`bgaImportArea${p}`)?.addEventListener('input', () => updateBGAPreview(p));
+  });
+
+  document.getElementById('bgaImportAllArea')?.addEventListener('input', e => {
+    const raw = e.target.value.trim();
+    if (!raw) return;
+    if (applyQuickImport(raw)) {
+      e.target.style.borderColor = 'var(--green)';
+    } else {
+      e.target.style.borderColor = raw ? '#f87171' : '';
+    }
   });
 }
 

@@ -292,11 +292,17 @@
         <button class="bga-import-close-btn" id="bgaImportClose">✕</button>
       </div>
       <div class="bga-import-steps">
-        <div class="bga-step">① 將左上角書籤拖到瀏覽器書籤列（或右鍵另存書籤）</div>
-        <div class="bga-step">② 在 BGA 覆盤頁面選每位玩家視角，點書籤，取得 JSON</div>
-        <div class="bga-step">③ 依<strong>回合順位</strong>貼入：A＝首家、B＝二家、C＝三家、D＝四家</div>
+        <div class="bga-step bga-step-primary">⚡ 推薦：輪抽結束後，在 BGA <strong>遊戲記錄頁</strong>點「記錄書籤」，一次取得所有玩家資料，貼入下方</div>
+        <div class="bga-step">備用：在 BGA 覆盤頁選每位玩家視角，點舊書籤取得單人 JSON，依序貼入下方 A/B/C/D</div>
       </div>
       <div class="bga-import-settings-bar" id="bgaImportSettingsBar"></div>
+
+      <div class="bga-import-quick">
+        <div class="bga-quick-label">⚡ 一次貼入所有玩家（記錄書籤輸出）</div>
+        <textarea id="bgaImportAllArea" rows="3" placeholder='貼上記錄書籤輸出的 JSON 陣列，系統自動分配至 A/B/C/D…'></textarea>
+      </div>
+      <div class="bga-import-divider">── 或逐人貼入 ──</div>
+
       <div class="bga-import-players">
         <div class="bga-import-pslot">
           <div class="bga-import-plabel"><span class="player-color-dot dot-A"></span>玩家 A</div>
