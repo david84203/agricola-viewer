@@ -53,6 +53,8 @@ const rs = {
   phase: 'setup',  // setup | input | result
   mode: 1,         // 1=歷史紀錄 2=單人挑戰AI 3=四人單機 4=全AI
   humanSeat: 'A',  // 單人挑戰AI 時人類座位（預設 A，對應下拉選單第一項）
+  aiStrategy: 'elo', // 'elo'=永遠最高ELO；'mimic'=模仿歷史玩家扣牌
+  historyPicks: null, // 模仿模式用：開始前快照的歷史扣牌
   bgaMode: false,
   handSize: 9,
   draftFormat: 'separate', // 'separate' | 'combined'
@@ -925,8 +927,21 @@ function importShareCode() {
    啟動模擬流程 (分流各種模式)
    ══════════════════════════════════════════════════ */
 async function startSimulation() {
+  // 單人挑戰 AI：先讀取座位與 AI 策略（須在重設扣牌前，才能快照歷史）
+  if (rs.mode === 2) {
+    rs.humanSeat  = document.getElementById('humanSeatSelect')?.value || rs.humanSeat || 'A';
+    rs.aiStrategy = document.getElementById('aiStrategySelect')?.value || 'elo';
+  }
+
   // 模式 1（歷史輸入）保留先前扣牌以便續編；AI／單機模式則重設
   if (rs.mode !== 1) {
+    // 模仿歷史：重設前先快照目前載入的扣牌，供 AI 重現原玩家選法
+    rs.historyPicks = (rs.mode === 2 && rs.aiStrategy === 'mimic')
+      ? Object.fromEntries(PLAYERS.map(p => [p, {
+          occ: rs.picks[p].occ.slice(),
+          min: rs.picks[p].min.slice(),
+        }]))
+      : null;
     PLAYERS.forEach(p => {
       rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
     });
@@ -945,11 +960,6 @@ async function startSimulation() {
   ]);
   await fetchElo(allIds);
   document.getElementById('globalLoading').style.display = 'none';
-
-  // 單人挑戰 AI：確保人類座位有值（即使使用者沒動過下拉選單）
-  if (rs.mode === 2) {
-    rs.humanSeat = document.getElementById('humanSeatSelect')?.value || rs.humanSeat || 'A';
-  }
 
   // 依據模式分流
   if (rs.mode === 1) {
@@ -1046,8 +1056,17 @@ function getAiPick(packKey, type, player, round) {
   const packCards = type === 'occ' ? rs.packs[packKey].occs : rs.packs[packKey].minors;
   const takenIds = getTakenIdsFromPack(packKey, type, player, round);
   const available = packCards.filter(c => !takenIds.has(c['卡片ID']));
-  
+
   if (available.length === 0) return null; // 不應發生
+
+  // 模仿歷史：優先扣下原玩家當時扣的那張；若已被拿走則 fall back 到最高 ELO
+  if (rs.aiStrategy === 'mimic' && player !== rs.humanSeat) {
+    const histId = rs.historyPicks?.[player]?.[type]?.[round]?.['卡片ID'];
+    if (histId) {
+      const match = available.find(c => c['卡片ID'] === histId);
+      if (match) return match;
+    }
+  }
 
   // 找最高 ELO，若有多張相同 ELO，隨機選一張
   let maxElo = -Infinity;
@@ -1076,8 +1095,16 @@ function makeAdPackCard(card, { selected = false, onClick }) {
     <canvas></canvas>
     <div class="ad-pack-card-name">${card['牌名'] || '—'}</div>
     ${special ? `<div class="slot-picker-special-tag ${special.type}">${getBanShortLabel(special)}</div>` : ''}
+    <button class="ad-card-info-btn" title="查看詳情">ℹ</button>
   `;
-  cEl.addEventListener('click', onClick);
+  cEl.addEventListener('click', e => {
+    if (e.target.closest('.ad-card-info-btn')) return;
+    onClick(e);
+  });
+  cEl.querySelector('.ad-card-info-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    openModal(card);
+  });
   requestAnimationFrame(() => drawCrop(cEl.querySelector('canvas'), card, 0.7));
   return cEl;
 }
@@ -1417,10 +1444,18 @@ function renderPickerCards(cards, takenIds, filter = '') {
       <div class="slot-picker-card-name">${card['牌名'] || '—'}</div>
       ${isTaken ? '<div class="slot-picker-taken-label">已被選</div>' : ''}
       ${special && !isTaken ? `<div class="slot-picker-special-tag ${special.type}">${getBanShortLabel(special)}</div>` : ''}
+      <button class="ad-card-info-btn" title="查看詳情">ℹ</button>
     `;
 
+    div.querySelector('.ad-card-info-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(card);
+    });
     if (!isTaken) {
-      div.addEventListener('click', () => selectCardForSlot(card));
+      div.addEventListener('click', e => {
+        if (e.target.closest('.ad-card-info-btn')) return;
+        selectCardForSlot(card);
+      });
     }
 
     grid.appendChild(div);
@@ -1792,6 +1827,10 @@ function bindGlobalEvents() {
   });
   document.getElementById('humanSeatSelect').addEventListener('change', e => {
     rs.humanSeat = e.target.value;
+  });
+  document.getElementById('aiStrategySelect')?.addEventListener('change', e => {
+    rs.aiStrategy = e.target.value;
+    document.getElementById('mimicHint').style.display = e.target.value === 'mimic' ? 'block' : 'none';
   });
 
   // 開始按鈕

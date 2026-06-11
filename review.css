@@ -1301,8 +1301,23 @@
   padding-top: 16px;
   border-top: 1px solid var(--border);
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.mode-option-row {
+  display: flex;
   align-items: center;
   gap: 12px;
+}
+.mode-option-hint {
+  font-size: .82rem;
+  line-height: 1.5;
+  color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
 }
 .mode-option-label {
   font-size: .9rem;
@@ -1488,6 +1503,27 @@
   border: 1px solid var(--border);
   cursor: not-allowed;
 }
+/* 卡片右下角資訊鈕（覆盤輪抽／選牌彈窗共用） */
+.slot-picker-card { position: relative; }
+.ad-card-info-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.5);
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  font-size: .65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  z-index: 2;
+}
+.ad-card-info-btn:hover { background: var(--gold1); color: #1a1200; border-color: var(--gold1); }
 
 /* 換人防窺遮罩 */
 .ad-pass-overlay {

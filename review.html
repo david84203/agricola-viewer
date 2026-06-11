@@ -148,7 +148,7 @@
             <input type="radio" name="draftMode" value="2" />
             <div class="mode-card-content">
               <div class="mode-card-title">🤖 單人挑戰 AI</div>
-              <div class="mode-card-sub">指定一個座位親自扣牌，另外三家 AI 自動選擇最高 ELO 的牌</div>
+              <div class="mode-card-sub">親自扣一個座位，另三家 AI 可選「最高 ELO」或「模仿歷史玩家」</div>
             </div>
           </label>
           <label class="mode-card">
@@ -168,13 +168,25 @@
         </div>
 
         <div class="mode-options" id="modeOptions" style="display:none;">
-          <div class="mode-option-label">選擇你的座位：</div>
-          <select id="humanSeatSelect" class="mode-select">
-            <option value="A">玩家 A</option>
-            <option value="B">玩家 B</option>
-            <option value="C">玩家 C</option>
-            <option value="D">玩家 D</option>
-          </select>
+          <div class="mode-option-row">
+            <div class="mode-option-label">選擇你的座位：</div>
+            <select id="humanSeatSelect" class="mode-select">
+              <option value="A">玩家 A</option>
+              <option value="B">玩家 B</option>
+              <option value="C">玩家 C</option>
+              <option value="D">玩家 D</option>
+            </select>
+          </div>
+          <div class="mode-option-row">
+            <div class="mode-option-label">另外三家 AI 策略：</div>
+            <select id="aiStrategySelect" class="mode-select">
+              <option value="elo">最佳化（永遠選最高 ELO）</option>
+              <option value="mimic">模仿歷史玩法（重現原玩家扣牌）</option>
+            </select>
+          </div>
+          <div class="mode-option-hint" id="mimicHint" style="display:none;">
+            ⚠️ 模仿歷史需先載入一局完整紀錄（匯入代碼／歷史輸入／載入已存牌組）。AI 會優先扣下原玩家當時扣的那張牌；若該牌已被別人拿走，才改扣最高 ELO。
+          </div>
         </div>
       </div>
 
