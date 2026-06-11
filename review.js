@@ -543,6 +543,10 @@ function confirmBGAImport() {
     maxSize = Math.max(maxSize, (d.occ||[]).length, (d.min||[]).length);
   });
 
+  if (maxSize > 10) {
+    alert(`偵測到每人 ${maxSize} 張牌——這看起來是輪抽中途擷取的資料（書籤抓到整個牌池，而非個人選牌）。\n\n請在輪抽全部完成（7/7）後再執行書籤程式，然後重新匯入。`);
+    return;
+  }
   if (maxSize > 0 && [7,8,9,10].includes(maxSize) && maxSize !== rs.handSize) {
     rs.handSize = maxSize;
     document.querySelectorAll('#handSizeSelect .hand-size-btn').forEach(b => {
