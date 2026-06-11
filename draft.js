@@ -497,7 +497,7 @@ function simPickWeighted(avail, count) {
     const confidence = state.sTierIds.has(id) ? 1 : Math.min(effGames / 30, 1);
     const elo = r ? Math.max(r.elo ?? 1200, 100) : 1200;
     const effElo = 1200 + (elo - 1200) * confidence;
-    const w = Math.pow(10, (effElo - 1200) / 400); // ELO 期望勝率式權重：高 400 分 → 10 倍中籤率
+    const w = Math.pow(10, (effElo - 1200) / 250); // 加陡的 ELO 式權重：高 250 分 → 10 倍中籤率（1500分S牌漏網率約6%）
     return { c, w };
   });
   const result = [];
