@@ -28,18 +28,19 @@ const PLAYERS = ['A', 'B', 'C', 'D'];
 const PLAYER_COLORS = { A: 'dot-A', B: 'dot-B', C: 'dot-C', D: 'dot-D' };
 
 /* ── 傳包公式 ──────────────────────────────────────
-  職業牌：向左傳（B的包→A、C的包→B、D的包→C、A的包→D）
+  職業牌：向右傳（A→B→C→D→A）
+  round=0: 拿自己的包；round=1: 拿上家（D給A）的包
   playerIdx: 0=A, 1=B, 2=C, 3=D；round: 0~handSize-1
 */
 function occPackKey(playerIdx, round) {
-  return PLAYERS[(playerIdx + round) % 4];
+  return PLAYERS[((playerIdx - round) % 4 + 4) % 4];
 }
 /* 次要發展牌：依設定同向或反向 */
 function minPackKey(playerIdx, round) {
   if (rs.draftFormat === 'combined' || rs.minDir === 'same') {
-    return PLAYERS[(playerIdx + round) % 4];          // 同向（同 occ）
+    return PLAYERS[((playerIdx - round) % 4 + 4) % 4]; // 同向（同 occ）
   }
-  return PLAYERS[((playerIdx - round) % 4 + 4) % 4]; // 反向
+  return PLAYERS[(playerIdx + round) % 4];             // 反向
 }
 
 /* ── State ─────────────────────────────────────────*/
@@ -1023,13 +1024,12 @@ function isEarlierInPackPath(packKey, type, playerA, roundA, playerB, roundB) {
   // 找出 packKey 最初的持有者（round=0 時誰持有這包）
   const packOriginIdx = PLAYERS.indexOf(packKey);
 
-  // 傳遞方向由 rs.draftFormat / rs.minDir 決定
-  // 同向（occ 方向）：第 k 持有者 = (packOriginIdx - k + 8) % 4
-  // 反向：第 k 持有者 = (packOriginIdx + k) % 4
+  // 傳遞方向 A→B→C→D→A：第 k 持有者 = (packOriginIdx + k) % 4
+  // 反向：第 k 持有者 = (packOriginIdx - k + 4k) % 4
 
   function getHolderOrder(k) {
     const useOccDir = type === 'occ' || rs.draftFormat === 'combined' || rs.minDir === 'same';
-    return useOccDir ? (packOriginIdx - k + 8) % 4 : (packOriginIdx + k) % 4;
+    return useOccDir ? (packOriginIdx + k) % 4 : ((packOriginIdx - k) % 4 + 4) % 4;
   }
 
   // 找 playerA 在這包路徑中的位置
