@@ -52,6 +52,7 @@ let bgaIdMap   = {};  // ourCardId → bgaId, for non-ABCDE BGA cards
 const rs = {
   phase: 'setup',  // setup | input | result
   mode: 1,         // 1=歷史紀錄 2=單人挑戰AI 3=四人單機 4=全AI
+  humanSeat: 'A',  // 單人挑戰AI 時人類座位（預設 A，對應下拉選單第一項）
   bgaMode: false,
   handSize: 9,
   draftFormat: 'separate', // 'separate' | 'combined'
@@ -944,6 +945,11 @@ async function startSimulation() {
   ]);
   await fetchElo(allIds);
   document.getElementById('globalLoading').style.display = 'none';
+
+  // 單人挑戰 AI：確保人類座位有值（即使使用者沒動過下拉選單）
+  if (rs.mode === 2) {
+    rs.humanSeat = document.getElementById('humanSeatSelect')?.value || rs.humanSeat || 'A';
+  }
 
   // 依據模式分流
   if (rs.mode === 1) {
