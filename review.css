@@ -738,6 +738,18 @@
   margin: 0 -20px;
   z-index: 10;
 }
+.input-back-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.input-back-btn:hover { background: var(--bg3); color: var(--text); }
 .input-pick-count {
   font-size: .9rem;
   color: var(--text2);

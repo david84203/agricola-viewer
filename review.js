@@ -573,6 +573,7 @@ function confirmBGAImport() {
     if (d.player) {
       const el = document.getElementById(`name${p}`);
       if (el) el.value = d.player;
+      rs.playerNames[p] = d.player;
     }
     if (missed.length) warnings.push(`玩家${p}：${missed.join(', ')}`);
   });
@@ -1133,6 +1134,11 @@ function bindInputNextBtn() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
+
+  document.getElementById('inputBackBtn').addEventListener('click', () => {
+    rs.currentInputPlayerIdx = 0;
+    showScreen('setupScreen');
+  });
 }
 
 /* ══════════════════════════════════════════════════
@@ -1379,11 +1385,18 @@ async function calculateAllScores() {
 /* ══════════════════════════════════════════════════
    畫面切換
    ══════════════════════════════════════════════════ */
-function showScreen(id) {
+function showScreen(id, pushHistory = true) {
   document.querySelectorAll('.review-screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (pushHistory) history.pushState({ screen: id }, '', '');
 }
+
+window.addEventListener('popstate', e => {
+  const screen = e.state?.screen;
+  // 只處理往 setup 方向的返回；其餘一律回 setupScreen
+  showScreen(screen === 'inputScreen' || screen === 'activeDraftScreen' ? screen : 'setupScreen', false);
+});
 
 function setDraftFormatCombined() {
   rs.draftFormat = 'combined';
