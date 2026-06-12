@@ -420,7 +420,12 @@ function calcHandAvgElo(player) {
     : null;
   const occIds = rs.picks[player].occ.filter(Boolean).map(c => c['卡片ID']);
   const minIds = rs.picks[player].min.filter(Boolean).map(c => c['卡片ID']);
-  return { all: avg([...occIds, ...minIds]), occ: avg(occIds), min: avg(minIds) };
+  // 前4扣：slice 在 filter 前，輪次才不會位移
+  const first4Ids = [
+    ...rs.picks[player].occ.slice(0, 4),
+    ...rs.picks[player].min.slice(0, 4),
+  ].filter(Boolean).map(c => c['卡片ID']);
+  return { all: avg([...occIds, ...minIds]), occ: avg(occIds), min: avg(minIds), first4: avg(first4Ids) };
 }
 
 /* ══════════════════════════════════════════════════
@@ -1826,6 +1831,9 @@ function buildResultCards() {
       <div class="result-avg-elo" id="avgElo${p}">
         <span class="result-avg-elo-label">手牌平均 ELO</span>
         <b>…</b>
+        <span class="result-avg-elo-divider">·</span>
+        <span class="result-avg-elo-label">前4扣</span>
+        <b class="avg-elo-first4">…</b>
       </div>
       <div class="result-hand-section">
         <div class="result-hand-label">職業牌 <span class="hand-avg-elo" id="occAvgElo${p}"></span></div>
@@ -1948,7 +1956,8 @@ async function calculateAllScores() {
 
     // 手牌平均 ELO
     const handAvg = calcHandAvgElo(p);
-    document.querySelector(`#avgElo${p} b`).textContent = handAvg.all ?? '—';
+    document.querySelector(`#avgElo${p} b:first-of-type`).textContent = handAvg.all ?? '—';
+    document.querySelector(`#avgElo${p} .avg-elo-first4`).textContent = handAvg.first4 ?? '—';
     document.getElementById(`occAvgElo${p}`).textContent = handAvg.occ != null ? `· 平均 ${handAvg.occ}` : '';
     document.getElementById(`minAvgElo${p}`).textContent = handAvg.min != null ? `· 平均 ${handAvg.min}` : '';
 

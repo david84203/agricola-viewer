@@ -960,6 +960,15 @@
   color: var(--gold);
   font-weight: 700;
 }
+.result-avg-elo-divider {
+  color: var(--text3);
+  opacity: .5;
+}
+.avg-elo-first4 {
+  font-size: .95rem;
+  color: var(--gold);
+  font-weight: 700;
+}
 .hand-avg-elo {
   font-weight: 500;
   text-transform: none;
