@@ -45,6 +45,14 @@
       </div>
     </section>
 
+    <section class="home-updates" aria-label="重大更新">
+      <div class="home-updates-head">
+        <h2>📢 重大更新</h2>
+        <button class="home-updates-more" id="updatesMoreBtn" style="display:none">顯示更早的更新</button>
+      </div>
+      <div class="home-updates-list" id="updatesList"></div>
+    </section>
+
     <section class="home-tool-grid" aria-label="網站功能">
       <article class="home-tool">
         <h2>卡牌資料庫</h2>
@@ -90,6 +98,7 @@
   </main>
 
   <script src="auth.js"></script>
+  <script src="home-updates.js"></script>
   <script>
     function onAuthChange() {
       const show = typeof isRater === 'function' && isRater();
