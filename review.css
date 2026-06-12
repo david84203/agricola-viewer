@@ -1660,6 +1660,31 @@
   border-top: 1px solid var(--border);
 }
 
+.bga-bookmarklet-link,
+.bga-bookmarklet-link:link,
+.bga-bookmarklet-link:visited {
+  color: var(--gold1);
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 4px 6px;
+  transition: color .15s, background .15s;
+}
+
+.bga-bookmarklet-link:hover {
+  color: var(--gold2);
+  background: rgba(200,160,60,.12);
+}
+
+.bga-bookmarklet-link:focus-visible {
+  outline: 2px solid rgba(240,166,58,.55);
+  outline-offset: 2px;
+}
+
+.bga-bookmarklet-link:active {
+  color: var(--gold2);
+  background: rgba(240,166,58,.18);
+}
+
 .bga-import-open-btn {
   padding: 5px 16px;
   background: transparent;

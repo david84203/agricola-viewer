@@ -92,11 +92,764 @@ const rs = {
 /* ══════════════════════════════════════════════════
    Init
    ══════════════════════════════════════════════════ */
+function makeBookmarklet(fn) {
+  return `javascript:(${fn.toString()})()`;
+}
+
+function bgaCurrentPackBookmarklet() {
+  try {
+    const cs = Object.values(gameui._cardStorage).filter(c => c.pId);
+    if (!cs.length) {
+      alert('找不到牌包資料，請在 BGA 農家樂覆盤頁面執行');
+      return;
+    }
+    const pid = cs[0].pId;
+    const pname = Object.values(gameui.gamedatas.players).find(p => String(p.id) === String(pid))?.name ?? '玩家';
+    const occ = cs.filter(c => c.type === 'occupation').map(c => c.numbering);
+    const min = cs.filter(c => c.type !== 'occupation' && !c.id.startsWith('Major')).map(c => c.numbering);
+    const out = JSON.stringify({ player: pname, occ, min });
+    navigator.clipboard.writeText(out)
+      .then(() => alert('已複製！\n玩家：' + pname + '\n職業：' + occ.length + '張\n次發：' + min.length + '張'))
+      .catch(() => prompt('手動複製：', out));
+  } catch (e) {
+    alert('錯誤：' + e.message);
+  }
+}
+
+function bgaHistoryProbeBookmarklet() {
+  try {
+    const root = typeof gameui !== 'undefined' ? gameui : window.gameui;
+    const out = {
+      tool: 'agricola-bga-history-probe',
+      version: 2,
+      capturedAt: new Date().toISOString(),
+      url: location.href,
+      title: document.title,
+      players: {},
+      currentPack: null,
+      sources: [],
+      candidates: [],
+      draftSelections: [],
+      notes: [
+        '這份資料用來判斷 BGA 歷史頁是否有原始牌號與扣牌順序。',
+        '正式匯入會優先使用 ID 欄位，不會靠畫面上的中文牌名。'
+      ],
+    };
+
+    if (!root) {
+      alert('找不到 gameui，請在 BGA 農家樂遊戲或覆盤頁執行');
+      return;
+    }
+
+    const PICK_RE = /選擇|choose|chooses|chosen|select|selected|draft|pick|職業|次要|minor|occupation|improvement/i;
+    const KEY_RE = /card|cards|card_id|cardid|numbering|occupation|minor|improvement|choice|chosen|draft|pick|args|log|type|notif|history|replay/i;
+    const FIELD_RE = /card|player|type|name|number|numbering|pile|draft|choice|chosen|selected|from|to|hand|id/i;
+    const ID_RE = /^[A-Z]{1,4}\d{1,4}\*?$/;
+    const seen = new WeakSet();
+    const sources = [];
+    const candidates = [];
+
+    const safeKeys = value => {
+      try { return Object.keys(value); } catch { return []; }
+    };
+    const safeEntries = value => {
+      try { return Object.entries(value); } catch { return []; }
+    };
+    const clip = (value, max = 180) => {
+      const s = String(value ?? '');
+      return s.length > max ? s.slice(0, max) + '...' : s;
+    };
+
+    const shallow = (value, depth = 2, seenLocal = new WeakSet()) => {
+      if (value == null || typeof value !== 'object') return value;
+      if (seenLocal.has(value)) return '[Circular]';
+      seenLocal.add(value);
+      if (Array.isArray(value)) return value.slice(0, 6).map(v => shallow(v, depth - 1, seenLocal));
+      if (depth <= 0) return '[Object]';
+      const obj = {};
+      safeKeys(value).slice(0, 24).forEach(k => {
+        let v;
+        try { v = value[k]; } catch { return; }
+        if (typeof v === 'function') return;
+        obj[k] = shallow(v, depth - 1, seenLocal);
+      });
+      return obj;
+    };
+
+    const flattenInteresting = (value, depth = 5, path = '', outMap = {}) => {
+      if (value == null || depth < 0 || Object.keys(outMap).length >= 80) return outMap;
+      if (typeof value !== 'object') {
+        const s = String(value);
+        if (FIELD_RE.test(path) || ID_RE.test(s)) outMap[path || 'value'] = clip(s, 240);
+        return outMap;
+      }
+      const entries = Array.isArray(value)
+        ? value.slice(0, 30).map((v, i) => [i, v])
+        : safeEntries(value).slice(0, 60);
+      entries.forEach(([k, v]) => {
+        const nextPath = path ? `${path}.${k}` : String(k);
+        if (typeof v === 'function') return;
+        if (v == null || typeof v !== 'object') {
+          const s = String(v ?? '');
+          if (FIELD_RE.test(nextPath) || ID_RE.test(s)) outMap[nextPath] = clip(s, 240);
+          return;
+        }
+        if (FIELD_RE.test(nextPath)) outMap[nextPath] = shallow(v, 3);
+        flattenInteresting(v, depth - 1, nextPath, outMap);
+      });
+      return outMap;
+    };
+
+    const collectText = (value, depth = 3, parts = []) => {
+      if (value == null || parts.length > 60 || depth < 0) return parts;
+      if (typeof value === 'string' || typeof value === 'number') {
+        parts.push(String(value));
+        return parts;
+      }
+      if (typeof value !== 'object') return parts;
+      if (Array.isArray(value)) value.slice(0, 20).forEach(v => collectText(v, depth - 1, parts));
+      else safeKeys(value).slice(0, 30).forEach(k => {
+        parts.push(k);
+        try { collectText(value[k], depth - 1, parts); } catch {}
+      });
+      return parts;
+    };
+
+    const collectIds = (value, depth = 4, ids = []) => {
+      if (value == null || ids.length >= 20 || depth < 0) return ids;
+      if (typeof value === 'string') {
+        if (ID_RE.test(value)) ids.push(value);
+        return ids;
+      }
+      if (typeof value !== 'object') return ids;
+      const entries = Array.isArray(value)
+        ? value.slice(0, 30).map((v, i) => [i, v])
+        : safeEntries(value).slice(0, 40);
+      entries.forEach(([k, v]) => {
+        if (typeof v === 'string' && (KEY_RE.test(String(k)) || ID_RE.test(v))) {
+          if (ID_RE.test(v)) ids.push(v);
+        }
+        collectIds(v, depth - 1, ids);
+      });
+      return [...new Set(ids)];
+    };
+
+    const addArraySource = (path, arr) => {
+      if (!Array.isArray(arr) || !arr.length) return;
+      const samples = arr.slice(0, 20);
+      const text = collectText(samples, 3).join(' ');
+      const source = {
+        path,
+        length: arr.length,
+        hasPickWords: PICK_RE.test(text),
+        hasCardKeys: samples.some(item => collectText(item, 2).some(part => KEY_RE.test(part))),
+        idSamples: collectIds(samples, 4).slice(0, 12),
+        sample: shallow(arr[0], 2),
+      };
+      if (source.hasPickWords || source.hasCardKeys || source.idSamples.length) {
+        sources.push(source);
+      }
+
+      arr.slice(0, 800).forEach((item, index) => {
+        if (candidates.length >= 80) return;
+        const itemText = collectText(item, 4).join(' ');
+        const ids = collectIds(item, 5);
+        const likelyPick = PICK_RE.test(itemText);
+        const hasIds = ids.length > 0;
+        if (!likelyPick && !hasIds) return;
+        const type = item?.type ?? item?.name ?? item?.action ?? item?.notif ?? null;
+        const importantFields = flattenInteresting(item, 6);
+        const entry = {
+          source: path,
+          index,
+          uid: item?.uid ?? null,
+          moveId: item?.move_id ?? item?.moveId ?? null,
+          time: item?.time ?? null,
+          channel: item?.channelorig ?? item?.channel ?? null,
+          type,
+          log: clip(item?.log ?? item?.logmsg ?? item?.text ?? item?.message ?? item?.html),
+          args: item?.args ? shallow(item.args, 6) : null,
+          importantFields,
+          ids,
+          sample: shallow(item, 4),
+        };
+        candidates.push({
+          ...entry,
+        });
+        if (/confirmDraftSelection|newDraftPile/i.test(String(type)) || /picks/i.test(String(item?.log || ''))) {
+          out.draftSelections.push(entry);
+        }
+      });
+    };
+
+    const walk = (path, value, depth = 0) => {
+      if (value == null || typeof value !== 'object' || depth > 6 || sources.length >= 80) return;
+      if (seen.has(value)) return;
+      seen.add(value);
+      if (Array.isArray(value)) {
+        addArraySource(path, value);
+        value.slice(0, 8).forEach((v, i) => walk(`${path}[${i}]`, v, depth + 1));
+        return;
+      }
+      safeKeys(value).slice(0, 80).forEach(k => {
+        let child;
+        try { child = value[k]; } catch { return; }
+        if (child == null || typeof child === 'function') return;
+        if (KEY_RE.test(k) || depth < 3 || Array.isArray(child)) walk(`${path}.${k}`, child, depth + 1);
+      });
+    };
+
+    if (root.gamedatas?.players) {
+      Object.values(root.gamedatas.players).forEach(p => {
+        out.players[p.id] = p.name;
+      });
+    }
+
+    if (root._cardStorage) {
+      const cards = Object.values(root._cardStorage).filter(c => c && typeof c === 'object');
+      out.currentPack = {
+        total: cards.length,
+        withPlayer: cards.filter(c => c.pId).length,
+        sample: cards.slice(0, 12).map(c => ({
+          id: c.id,
+          numbering: c.numbering,
+          type: c.type,
+          pId: c.pId,
+          location: c.location,
+        })),
+        playerCards: cards.filter(c => c.pId).map(c => ({
+          id: c.id,
+          numbering: c.numbering,
+          type: c.type,
+          pId: c.pId,
+          location: c.location,
+        })),
+      };
+    }
+
+    [
+      ['gameui', root],
+      ['gameui.gamedatas', root.gamedatas],
+      ['gameui.notifqueue', root.notifqueue],
+      ['gameui.log_history', root.log_history],
+      ['gameui.history', root.history],
+      ['gameui.replay', root.replay],
+    ].forEach(([path, value]) => walk(path, value));
+
+    Object.keys(window).filter(k => /notif|history|replay|log|gamedata|agricola/i.test(k)).slice(0, 40).forEach(k => {
+      try { walk(`window.${k}`, window[k]); } catch {}
+    });
+
+    out.sources = sources
+      .sort((a, b) => Number(b.hasPickWords) - Number(a.hasPickWords) || b.idSamples.length - a.idSamples.length)
+      .slice(0, 40);
+    out.candidates = candidates.slice(0, 80);
+    out.draftSelections = out.draftSelections.slice(0, 80);
+
+    const json = JSON.stringify(out, null, 2);
+    navigator.clipboard.writeText(json)
+      .then(() => alert('已複製 BGA 歷史偵測資料！\n扣牌事件：' + out.draftSelections.length + '\n候選事件：' + out.candidates.length + '\n可疑來源：' + out.sources.length + '\n\n請貼回來給 Codex 分析。'))
+      .catch(() => prompt('手動複製偵測資料：', json));
+  } catch (e) {
+    alert('BGA 歷史偵測失敗：' + e.message);
+  }
+}
+
+async function bgaFourViewProbeBookmarklet() {
+  try {
+    const root = typeof gameui !== 'undefined' ? gameui : window.gameui;
+    if (!root?.gamedatas?.players) {
+      alert('找不到 gameui，請在 BGA 農家樂 replay 歷史頁執行');
+      return;
+    }
+
+    const clip = (value, max = 200) => {
+      const s = String(value ?? '');
+      return s.length > max ? s.slice(0, max) + '...' : s;
+    };
+    const shallowCard = c => {
+      if (!c || typeof c !== 'object') return clip(c, 60);
+      const o = {};
+      Object.keys(c).slice(0, 12).forEach(k => {
+        const v = c[k];
+        if (v == null || typeof v === 'function' || typeof v === 'object') return;
+        o[k] = clip(v, 60);
+      });
+      return o;
+    };
+
+    const handSummary = (gd, pid) => {
+      const player = gd?.players?.[pid];
+      if (!player) return { found: false, reason: 'players 裡沒有這個 id', ids: Object.keys(gd?.players || {}) };
+      const hand = player.hand;
+      if (!hand) return { found: false, reason: '沒有 hand 欄位', playerKeys: Object.keys(player).slice(0, 30) };
+      const cards = Array.isArray(hand) ? hand : Object.values(hand);
+      const occ = [], min = [], other = [];
+      cards.forEach(c => {
+        const type = String(c?.type || '').toLowerCase();
+        const id = c?.numbering || c?.id || c?.card_id || '';
+        if (type.includes('occupation')) occ.push(id);
+        else if (type.includes('major')) other.push(id);
+        else min.push(id);
+      });
+      return {
+        found: true, total: cards.length,
+        occ: occ.length, min: min.length, other: other.length,
+        occIds: occ, minIds: min,
+        sample: shallowCard(cards[0]),
+      };
+    };
+
+    const extractJson = (html, startBrace) => {
+      let depth = 0, inStr = false, esc = false;
+      for (let i = startBrace; i < html.length; i++) {
+        const ch = html[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+        } else if (ch === '"') inStr = true;
+        else if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (!depth) return html.slice(startBrace, i + 1);
+        }
+      }
+      return null;
+    };
+
+    const extractGamedatas = html => {
+      const info = { anchor: null, jsonLength: 0, parseError: null };
+      const anchors = [
+        ['completesetup(', html.indexOf('completesetup(')],
+        ['g_gamedatas =', html.search(/g_gamedatas\s*=\s*\{/)],
+        ['gamedatas =', html.search(/\bgamedatas\s*=\s*\{/)],
+      ];
+      for (const [name, idx] of anchors) {
+        if (idx === -1) continue;
+        const start = html.indexOf('{', idx);
+        if (start === -1) continue;
+        const raw = extractJson(html, start);
+        if (!raw) continue;
+        info.anchor = name;
+        info.jsonLength = raw.length;
+        try { return { info, gd: JSON.parse(raw) }; }
+        catch (e) { info.parseError = clip(e.message); info.head = clip(raw, 200); return { info, gd: null }; }
+      }
+      return { info, gd: null };
+    };
+
+    const url = new URL(location.href);
+    const currentPid = url.searchParams.get('player') || String(root.player_id || '');
+    const players = Object.values(root.gamedatas.players).map(p => ({ id: String(p.id), name: String(p.name || '') }));
+
+    const out = {
+      tool: 'agricola-bga-fourview-probe',
+      version: 1,
+      capturedAt: new Date().toISOString(),
+      url: location.href,
+      currentPlayer: { id: currentPid, hand: handSummary(root.gamedatas, currentPid) },
+      fetches: [],
+      logsPicks: null,
+      notes: ['偵測用：確認同網域 fetch 其他 player= 視角能否抓到完整 10+10 手牌。'],
+    };
+
+    const logs = window.g_gamelogs || root.g_gamelogs || root.gamelogs || [];
+    let confirmEvents = 0;
+    (Array.isArray(logs) ? logs : []).forEach(p => (p.data || []).forEach(e => {
+      if (e?.type === 'confirmDraftSelection') confirmEvents++;
+    }));
+    out.logsPicks = { packets: Array.isArray(logs) ? logs.length : 0, confirmEvents };
+
+    const others = players.filter(p => p.id !== currentPid);
+    for (const target of others) {
+      const u = new URL(location.href);
+      u.searchParams.set('player', target.id);
+      const result = { playerId: target.id, name: target.name, fetchUrl: u.toString() };
+      try {
+        const res = await fetch(u.toString(), { credentials: 'include' });
+        const html = await res.text();
+        result.status = res.status;
+        result.redirectedTo = res.url !== u.toString() ? res.url : null;
+        result.htmlLength = html.length;
+        result.markers = {
+          completesetup: html.includes('completesetup'),
+          gamedatas: /g_gamedatas|gamedatas\s*=/.test(html),
+          handField: html.includes('"hand"'),
+          loginWall: /must be logged|account\/login|請先登入/i.test(html),
+        };
+        const { info, gd } = extractGamedatas(html);
+        result.extract = info;
+        result.hand = gd ? handSummary(gd, target.id) : null;
+        if (!gd && result.markers.handField) {
+          const i = html.indexOf('"hand"');
+          result.handContext = clip(html.slice(Math.max(0, i - 80), i + 300), 400);
+        }
+      } catch (e) {
+        result.error = clip(e.message);
+      }
+      out.fetches.push(result);
+    }
+
+    const summary = out.fetches.map(f => {
+      const h = f.hand;
+      return `${f.name}：` + (h?.found ? `職業 ${h.occ} 張＋次發 ${h.min} 張` : (f.error || '抓不到手牌'));
+    }).join('\n');
+
+    const json = JSON.stringify(out, null, 2);
+    navigator.clipboard.writeText(json)
+      .then(() => alert('四視角偵測完成，結果已複製！\n\n本家（' + currentPid + '）職業 '
+        + (out.currentPlayer.hand.occ ?? '?') + ' 張＋次發 ' + (out.currentPlayer.hand.min ?? '?') + ' 張\n'
+        + summary + '\n\n扣牌事件：' + confirmEvents + ' 筆\n\n請貼回來給 Claude 分析。'))
+      .catch(() => prompt('手動複製偵測資料：', json));
+  } catch (e) {
+    alert('四視角偵測失敗：' + e.message);
+  }
+}
+
+async function bgaFullImportBookmarklet() {
+  try {
+    const root = typeof gameui !== 'undefined' ? gameui : window.gameui;
+    const logs = window.g_gamelogs || root?.g_gamelogs || root?.gamelogs || [];
+    if (!root?.gamedatas?.players || !Array.isArray(logs) || !logs.length) {
+      alert('找不到 BGA replay 資料，請在農家樂 replay 歷史頁執行');
+      return;
+    }
+
+    const slots = ['A', 'B', 'C', 'D'];
+    const normalizeId = id => {
+      const s = String(id || '').trim();
+      const m = s.match(/^([A-Z]+)(\d+)(\*?)$/);
+      return m ? m[1] + m[2].padStart(3, '0') + m[3] : s;
+    };
+    const cleanName = value => {
+      const div = document.createElement('div');
+      div.innerHTML = String(value || '');
+      return (div.textContent || div.innerText || String(value || '')).trim();
+    };
+    const asNum = value => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const playerList = Object.values(root.gamedatas.players).map(p => ({
+      id: String(p.id),
+      name: cleanName(p.name),
+      no: asNum(p.player_no ?? p.no ?? p.player_table_order ?? 0),
+    })).sort((a, b) => a.no - b.no).slice(0, 4);
+    if (playerList.length !== 4) {
+      alert('目前只支援 4 人 BGA 輪抽紀錄');
+      return;
+    }
+    const playerToSlot = Object.fromEntries(playerList.map((p, i) => [p.id, slots[i]]));
+    const playerNames = Object.fromEntries(playerList.map((p, i) => [slots[i], p.name || `玩家${slots[i]}`]));
+
+    const handFromGamedatas = (gd, pid) => {
+      const hand = gd?.players?.[pid]?.hand;
+      if (!hand) return null;
+      const cards = Array.isArray(hand) ? hand : Object.values(hand);
+      const occs = [], minors = [];
+      cards.forEach(c => {
+        const type = String(c?.type || '').toLowerCase();
+        const id = normalizeId(c?.numbering || c?.id);
+        if (!id) return;
+        if (type.includes('occupation')) occs.push(id);
+        else if (!type.includes('major')) minors.push(id);
+      });
+      return { occs, minors };
+    };
+
+    const extractJson = (html, startBrace) => {
+      let depth = 0, inStr = false, esc = false;
+      for (let i = startBrace; i < html.length; i++) {
+        const ch = html[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+        } else if (ch === '"') inStr = true;
+        else if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (!depth) return html.slice(startBrace, i + 1);
+        }
+      }
+      return null;
+    };
+
+    const url = new URL(location.href);
+    const currentPid = url.searchParams.get('player') || String(root.player_id || '');
+    const packs = {};
+    const fetchErrors = [];
+
+    for (const p of playerList) {
+      const slot = playerToSlot[p.id];
+      if (p.id === currentPid) {
+        packs[slot] = handFromGamedatas(root.gamedatas, p.id);
+        if (!packs[slot]) fetchErrors.push(`${p.name}：本頁 gamedatas 沒有手牌`);
+        continue;
+      }
+      const u = new URL(location.href);
+      u.searchParams.set('player', p.id);
+      try {
+        const res = await fetch(u.toString(), { credentials: 'include' });
+        const html = await res.text();
+        const idx = html.indexOf('completesetup(');
+        const start = idx === -1 ? -1 : html.indexOf('{', idx);
+        const raw = start === -1 ? null : extractJson(html, start);
+        const gd = raw ? JSON.parse(raw) : null;
+        packs[slot] = gd ? handFromGamedatas(gd, p.id) : null;
+        if (!packs[slot]) fetchErrors.push(`${p.name}：HTTP ${res.status}，抓不到手牌`);
+      } catch (e) {
+        packs[slot] = null;
+        fetchErrors.push(`${p.name}：${e.message}`);
+      }
+    }
+
+    if (fetchErrors.length) {
+      alert('有玩家視角抓取失敗，請改用「📜 BGA 歷史匯入書籤」（僅扣牌）：\n' + fetchErrors.join('\n'));
+      return;
+    }
+
+    const handSize = Math.max(...slots.flatMap(s => [packs[s].occs.length, packs[s].minors.length]));
+    const packWarnings = [];
+    slots.forEach(s => {
+      if (packs[s].occs.length !== handSize || packs[s].minors.length !== handSize) {
+        packWarnings.push(`${playerNames[s]} 包牌：職業 ${packs[s].occs.length}/${handSize}，次發 ${packs[s].minors.length}/${handSize}`);
+      }
+    });
+
+    const picks = Object.fromEntries(slots.map(s => [s, { occ: [], min: [] }]));
+    const seen = new Set();
+    const packets = logs.slice().sort((a, b) =>
+      asNum(a.move_id) - asNum(b.move_id) ||
+      asNum(a.packet_id) - asNum(b.packet_id) ||
+      asNum(a.time) - asNum(b.time)
+    );
+    packets.forEach(packet => {
+      (packet.data || []).forEach(event => {
+        if (event?.type !== 'confirmDraftSelection') return;
+        const args = event.args || {};
+        const card = args.card || {};
+        const playerId = String(args.player_id || card.pId || '');
+        const slot = playerToSlot[playerId];
+        if (!slot) return;
+        const typeRaw = String(card.type || args.card_type || '').toLowerCase();
+        const type = typeRaw.includes('occupation') || typeRaw.includes('職業') ? 'occ' : 'min';
+        const id = normalizeId(card.numbering || card.id || args.card_id || args.card_name);
+        if (!id) return;
+        const key = `${event.uid || ''}|${playerId}|${type}|${id}|${packet.move_id || ''}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        picks[slot][type].push(id);
+      });
+    });
+
+    const rounds = Math.max(...slots.flatMap(s => [picks[s].occ.length, picks[s].min.length]));
+    const pickWarnings = [];
+    slots.forEach(s => {
+      if (picks[s].occ.length !== rounds || picks[s].min.length !== rounds) {
+        pickWarnings.push(`${playerNames[s]} 扣牌：職業 ${picks[s].occ.length}/${rounds}，次發 ${picks[s].min.length}/${rounds}`);
+      }
+    });
+
+    const packSets = Object.fromEntries(slots.map(s => [s, {
+      occ: new Set(packs[s].occs),
+      min: new Set(packs[s].minors),
+    }]));
+    const countMisses = sign => {
+      let miss = 0;
+      slots.forEach((player, i) => {
+        for (let r = 0; r < rounds; r++) {
+          const packKey = slots[((i - sign * r) % 4 + 4) % 4];
+          const o = picks[player].occ[r];
+          const m = picks[player].min[r];
+          if (o && !packSets[packKey].occ.has(o)) miss++;
+          if (m && !packSets[packKey].min.has(m)) miss++;
+        }
+      });
+      return miss;
+    };
+    const missSame = countMisses(1);
+    const missOpp = countMisses(-1);
+    const rotationNote = missSame === 0 ? null
+      : (missOpp === 0 ? '注意：扣牌與包牌的傳遞方向相反，模擬器顯示的包牌輪轉可能不符'
+        : `注意：有 ${missSame} 張扣牌不在預期包牌中，請檢查匯入結果`);
+
+    const state = {
+      handSize,
+      draftFormat: 'combined',
+      minDir: 'same',
+      bgaMode: true,
+      playerNames,
+      packs,
+      picks,
+      source: {
+        type: 'bga-full',
+        table: new URL(location.href).searchParams.get('table') || '',
+        url: location.href,
+        importedAt: new Date().toISOString(),
+        validation: { missSame, missOpp },
+      },
+    };
+
+    const allWarnings = [...packWarnings, ...pickWarnings, ...(rotationNote ? [rotationNote] : [])];
+    const out = JSON.stringify(state);
+    const message = '已複製 BGA 完整匯入代碼（含四家初始手牌）！\n'
+      + `玩家：${playerList.map(p => p.name).join(' / ')}\n`
+      + `包牌：每人 ${handSize} 職業 + ${handSize} 次發\n`
+      + `扣牌：每人 ${rounds} + ${rounds} 張\n`
+      + (allWarnings.length ? '\n' + allWarnings.join('\n') + '\n' : '')
+      + '\n回農家樂工具頁，點「匯出 / 匯入此局」貼上後按匯入。';
+    navigator.clipboard.writeText(out)
+      .then(() => alert(message))
+      .catch(() => prompt('手動複製這段匯入代碼：', out));
+  } catch (e) {
+    alert('BGA 完整匯入失敗：' + e.message);
+  }
+}
+
+function bgaHistoryImportBookmarklet() {
+  try {
+    const root = typeof gameui !== 'undefined' ? gameui : window.gameui;
+    const logs = window.g_gamelogs || root?.g_gamelogs || root?.gamelogs || [];
+    if (!root || !Array.isArray(logs) || !logs.length) {
+      alert('找不到 BGA 歷史紀錄資料，請在農家樂 replay 歷史頁執行');
+      return;
+    }
+
+    const slots = ['A', 'B', 'C', 'D'];
+    const normalizeId = id => {
+      const s = String(id || '').trim();
+      const m = s.match(/^([A-Z]+)(\d+)(\*?)$/);
+      return m ? m[1] + m[2].padStart(3, '0') + m[3] : s;
+    };
+    const cleanName = value => {
+      const div = document.createElement('div');
+      div.innerHTML = String(value || '');
+      return (div.textContent || div.innerText || String(value || '')).trim();
+    };
+    const asNum = value => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const playersRaw = root.gamedatas?.players || {};
+    const playerList = Object.values(playersRaw).map(p => ({
+      id: String(p.id),
+      name: cleanName(p.name),
+      no: asNum(p.player_no ?? p.no ?? p.player_table_order ?? 0),
+    })).sort((a, b) => a.no - b.no).slice(0, 4);
+    if (playerList.length !== 4) {
+      alert('目前只支援 4 人 BGA 輪抽紀錄');
+      return;
+    }
+    const playerToSlot = Object.fromEntries(playerList.map((p, i) => [p.id, slots[i]]));
+    const playerNames = Object.fromEntries(playerList.map((p, i) => [slots[i], p.name || `玩家${slots[i]}`]));
+
+    const packets = logs.slice().sort((a, b) =>
+      asNum(a.move_id) - asNum(b.move_id) ||
+      asNum(a.packet_id) - asNum(b.packet_id) ||
+      asNum(a.time) - asNum(b.time)
+    );
+
+    const picks = Object.fromEntries(slots.map(p => [p, { occ: [], min: [] }]));
+    const seen = new Set();
+
+    packets.forEach(packet => {
+      (packet.data || []).forEach(event => {
+        if (event?.type !== 'confirmDraftSelection') return;
+        const args = event.args || {};
+        const card = args.card || {};
+        const playerId = String(args.player_id || card.pId || '');
+        const slot = playerToSlot[playerId];
+        if (!slot) return;
+        const typeRaw = String(card.type || args.card_type || '').toLowerCase();
+        const type = typeRaw.includes('occupation') || typeRaw.includes('職業') ? 'occ' : 'min';
+        const id = normalizeId(card.numbering || card.id || args.card_id || args.card_name);
+        if (!id) return;
+        const key = `${event.uid || ''}|${playerId}|${type}|${id}|${packet.move_id || ''}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        picks[slot][type].push(id);
+      });
+    });
+
+    const handSize = Math.max(...slots.flatMap(p => [picks[p].occ.length, picks[p].min.length]));
+    if (!handSize || handSize > 10) {
+      alert('沒有找到完整的輪抽扣牌紀錄，請先把 BGA replay 拉到輪抽結束附近再執行');
+      return;
+    }
+
+    const warnings = [];
+    slots.forEach(p => {
+      if (picks[p].occ.length !== handSize || picks[p].min.length !== handSize) {
+        warnings.push(`${playerNames[p]}：職業 ${picks[p].occ.length}/${handSize}，次發 ${picks[p].min.length}/${handSize}`);
+      }
+    });
+
+    const packKeyFor = (playerIdx, round) => slots[((playerIdx - round) % 4 + 4) % 4];
+    const packs = Object.fromEntries(slots.map(p => [p, { occs: [], minors: [] }]));
+    slots.forEach((player, playerIdx) => {
+      for (let round = 0; round < handSize; round++) {
+        const packKey = packKeyFor(playerIdx, round);
+        const occ = picks[player].occ[round];
+        const min = picks[player].min[round];
+        if (occ) packs[packKey].occs.push(occ);
+        if (min) packs[packKey].minors.push(min);
+      }
+    });
+
+    const state = {
+      handSize,
+      draftFormat: 'combined',
+      minDir: 'same',
+      bgaMode: true,
+      playerNames,
+      packs,
+      picks,
+      source: {
+        type: 'bga-history',
+        table: new URL(location.href).searchParams.get('table') || '',
+        url: location.href,
+        importedAt: new Date().toISOString(),
+      },
+    };
+
+    const out = JSON.stringify(state);
+    const message = '已複製 BGA 歷史匯入代碼！\n'
+      + `玩家：${playerList.map(p => p.name).join(' / ')}\n`
+      + `每人：${handSize} 張職業 + ${handSize} 張次發\n`
+      + (warnings.length ? '\n注意：偵測到張數不一致，請確認 replay 已跑到輪抽結束：\n' + warnings.join('\n') + '\n' : '')
+      + '\n回農家樂工具頁，點「匯出 / 匯入此局」貼上後按匯入。';
+    navigator.clipboard.writeText(out)
+      .then(() => alert(message))
+      .catch(() => prompt('手動複製這段匯入代碼：', out));
+  } catch (e) {
+    alert('BGA 歷史匯入失敗：' + e.message);
+  }
+}
+
 async function init() {
   const bmLink = document.getElementById('bgaBookmarkletLink');
   if (bmLink) {
-    const bm = `javascript:(()=>{try{const cs=Object.values(gameui._cardStorage).filter(c=>c.pId);if(!cs.length){alert('找不到牌包資料，請在 BGA 農家樂覆盤頁面執行');return;}const pid=cs[0].pId;const pname=Object.values(gameui.gamedatas.players).find(p=>String(p.id)===String(pid))?.name??'玩家';const occ=cs.filter(c=>c.type==='occupation').map(c=>c.numbering);const min=cs.filter(c=>c.type!=='occupation'&&!c.id.startsWith('Major')).map(c=>c.numbering);const out=JSON.stringify({player:pname,occ,min});navigator.clipboard.writeText(out).then(()=>alert('已複製！\\n玩家：'+pname+'\\n職業：'+occ.length+'張\\n次發：'+min.length+'張')).catch(()=>prompt('手動複製：',out));}catch(e){alert('錯誤：'+e.message);}})()`;
-    bmLink.href = bm;
+    bmLink.href = makeBookmarklet(bgaCurrentPackBookmarklet);
+  }
+  const historyImportLink = document.getElementById('bgaHistoryImportLink');
+  if (historyImportLink) {
+    historyImportLink.href = makeBookmarklet(bgaHistoryImportBookmarklet);
+  }
+  const historyProbeLink = document.getElementById('bgaHistoryProbeLink');
+  if (historyProbeLink) {
+    historyProbeLink.href = makeBookmarklet(bgaHistoryProbeBookmarklet);
+  }
+  const fourViewProbeLink = document.getElementById('bgaFourViewProbeLink');
+  if (fourViewProbeLink) {
+    fourViewProbeLink.href = makeBookmarklet(bgaFourViewProbeBookmarklet);
+  }
+  const fullImportLink = document.getElementById('bgaFullImportLink');
+  if (fullImportLink) {
+    fullImportLink.href = makeBookmarklet(bgaFullImportBookmarklet);
   }
 
 
@@ -492,10 +1245,10 @@ function findCardByBGAId(bgaId) {
     return id === norm || id === norm + '*' || id.replace('*', '') === norm;
   });
   if (direct) return direct;
-  // Check admin-mapped BGA IDs for non-ABCDE cards
+  // Check admin-mapped BGA IDs for non-ABCDE cards（星號兩側都要正規化比對）
   const ourId = Object.entries(bgaIdMap).find(([, v]) => {
-    const vClean = v.replace('*', '');
-    return vClean === bgaId || normalizeBGAId(vClean) === norm;
+    const vNorm = normalizeBGAId(String(v).trim().toUpperCase());
+    return vNorm === norm || vNorm.replace('*', '') === norm.replace('*', '');
   })?.[0];
   if (!ourId) {
     // 最後嘗試用中文牌名比對（遊戲記錄書籤輸出的是牌名而非 ID）
@@ -831,7 +1584,7 @@ function restoreDraftState() {
 /* 把一份 state（牌包＋扣牌＋設定）套進畫面，匯入與自動還原共用 */
 function applyState(state) {
   if (!state) return;
-  const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || null : null);
+  const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || findCardByBGAId(String(id)) || null : null);
 
   if (state.handSize)    rs.handSize    = state.handSize;
   if (state.draftFormat) rs.draftFormat = state.draftFormat;
@@ -905,6 +1658,39 @@ function decodeShareCode(text) {
   return null;
 }
 
+function getStateCardIds(state) {
+  const ids = [];
+  PLAYERS.forEach(p => {
+    ids.push(...(state.packs?.[p]?.occs || []));
+    ids.push(...(state.packs?.[p]?.minors || []));
+    ids.push(...(state.picks?.[p]?.occ || []).filter(Boolean));
+    ids.push(...(state.picks?.[p]?.min || []).filter(Boolean));
+  });
+  return [...new Set(ids)];
+}
+
+function findMissingStateCardIds(state) {
+  return getStateCardIds(state).filter(id => {
+    if (!id) return false;
+    if (allCards.find(c => c['卡片ID'] === id)) return false;
+    return !findCardByBGAId(String(id));
+  });
+}
+
+function shouldPreserveCurrentPacksForHistoryImport(state) {
+  if (state?.source?.type !== 'bga-history') return false;
+  const incomingSize = state.handSize || DRAFT_ROUNDS;
+  const currentHasFullerPacks = PLAYERS.every(p =>
+    rs.packs[p].occs.length > incomingSize &&
+    rs.packs[p].minors.length > incomingSize
+  );
+  const incomingHasPicks = PLAYERS.every(p =>
+    (state.picks?.[p]?.occ || []).filter(Boolean).length === DRAFT_ROUNDS &&
+    (state.picks?.[p]?.min || []).filter(Boolean).length === DRAFT_ROUNDS
+  );
+  return currentHasFullerPacks && incomingHasPicks;
+}
+
 function openShareDialog() {
   const ta = document.getElementById('shareCodeArea');
   const hasData = PLAYERS.some(p => rs.packs[p].occs.length || rs.packs[p].minors.length);
@@ -934,9 +1720,37 @@ function importShareCode() {
   const msg = document.getElementById('shareDialogMsg');
   const state = decodeShareCode(ta.value);
   if (!state) { msg.textContent = '✗ 代碼無法辨識，請確認完整複製'; return; }
-  applyState(state);
+  const missing = findMissingStateCardIds(state);
+  const preserveCurrentPacks = shouldPreserveCurrentPacksForHistoryImport(state);
+  const stateToApply = preserveCurrentPacks
+    ? {
+        ...state,
+        handSize: rs.handSize,
+        packs: Object.fromEntries(PLAYERS.map(p => [p, {
+          occs: rs.packs[p].occs.map(c => c['卡片ID']),
+          minors: rs.packs[p].minors.map(c => c['卡片ID']),
+        }])),
+      }
+    : state;
+  applyState(stateToApply);
   saveDraftState();
+  // 如果 picks 已齊全（e.g. BGA 歷史匯入），存為歷史紀錄讓「查看結果」按鈕出現
+  const picksComplete = PLAYERS.every(p =>
+    rs.picks[p].occ.filter(Boolean).length === DRAFT_ROUNDS &&
+    rs.picks[p].min.filter(Boolean).length === DRAFT_ROUNDS
+  );
+  if (picksComplete) {
+    saveHistoryRecord();
+    updateViewResultBtn();
+  }
   closeShareDialog();
+  if (preserveCurrentPacks) {
+    alert('已匯入 BGA 歷史扣牌紀錄，並保留目前完整的 10+10 初始手牌。');
+    return;
+  }
+  if (missing.length) {
+    alert(`匯入完成，但以下 BGA 牌號目前在資料庫找不到，已暫時略過：\n\n${missing.join(', ')}\n\n可以到 BGA 管理補對照，或把缺牌資料補進 cards.json。`);
+  }
 }
 
 /* ══════════════════════════════════════════════════
