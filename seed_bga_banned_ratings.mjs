@@ -79,18 +79,18 @@ async function main() {
     updateMask: { fieldPaths: ['elo'] },
   }));
 
-  const res = await fetch(`${BASE}:batchWrite`, {
+  const res = await fetch(`${BASE}:commit`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({ writes }),
   });
   if (!res.ok) {
     const txt = await res.text();
-    throw new Error(`batchWrite failed ${res.status}: ${txt}`);
+    throw new Error(`commit failed ${res.status}: ${txt}`);
   }
   const result = await res.json();
   const statuses = result.writeResults ?? [];
-  console.log(`batchWrite 回應：${statuses.length} 筆`);
+  console.log(`commit 回應：${statuses.length} 筆`);
 
   console.log('\n=== 驗證 ===');
   let ok = 0;
