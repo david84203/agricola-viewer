@@ -1627,6 +1627,34 @@ function applyState(state) {
   updateStartBtn();
 }
 
+/* ── 清除重製 ─────────────────────────────────────────── */
+function resetAll() {
+  if (!confirm('確定要清除所有牌包與扣牌，回到空白狀態嗎？')) return;
+  PLAYERS.forEach(p => {
+    rs.packs[p].occs   = [];
+    rs.packs[p].minors = [];
+    rs.picks[p].occ    = Array(DRAFT_ROUNDS).fill(null);
+    rs.picks[p].min    = Array(DRAFT_ROUNDS).fill(null);
+    rs.playerNames[p]  = `玩家${p}`;
+  });
+  rs.bgaMode = false;
+  try { localStorage.removeItem(DRAFT_AUTOSAVE_KEY); } catch {}
+  try { localStorage.removeItem(HISTORY_RECORD_KEY); } catch {}
+  const toggle = document.getElementById('bgaModeToggle');
+  if (toggle) toggle.checked = false;
+  document.getElementById('bgaModeBar')?.classList.remove('active');
+  PLAYERS.forEach(p => {
+    const el = document.getElementById(`name${p}`);
+    if (el) el.value = '';
+  });
+  buildPackTabs();
+  PLAYERS.forEach(p => buildPackPanel(p));
+  refreshPackTabLabels();
+  refreshPackProgressRow();
+  refreshHumanSeatSelect();
+  updateStartBtn();
+}
+
 /* ── 分享文字碼（跨電腦匯出／匯入整局）──────────────── */
 const SHARE_CODE_PREFIX = 'AGRI1:';
 
@@ -2732,6 +2760,7 @@ function bindGlobalEvents() {
 
   // 匯出 / 匯入此局
   document.getElementById('shareOpenBtn')?.addEventListener('click', openShareDialog);
+  document.getElementById('resetAllBtn')?.addEventListener('click', resetAll);
   document.getElementById('shareCloseBtn')?.addEventListener('click', closeShareDialog);
   document.getElementById('shareCancelBtn')?.addEventListener('click', closeShareDialog);
   document.getElementById('shareCopyBtn')?.addEventListener('click', copyShareCode);
