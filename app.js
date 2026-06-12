@@ -17,6 +17,11 @@ const CROP = {
 let allCards = [];
 let filteredCards = [];
 let imageCache = {};
+
+const LATEST_COUNT = 18;
+let latestCards = [];
+let latestKeySet = new Set();
+let allElsBuilt = false;
 let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
 let dupCardToPair = new Map();   // cardId → { pair, canonId }
 let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
@@ -33,6 +38,9 @@ async function loadCards() {
   ]);
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
+
+  latestCards = allCards.slice(-LATEST_COUNT).reverse();
+  latestKeySet = new Set(latestCards.map(getCardKey));
 
   const dupInfo = await DuplicateCards.loadDuplicateInfo(allCards, dupPairs);
   dupNonCanonical = dupInfo.nonCanonicalKeys;
@@ -83,7 +91,7 @@ function populateDeckFilter() {
 
 // ── Filters ────────────────────────────────────────
 let activeType = 'all';
-let activeDeck = 'all';
+let activeDeck = 'latest';
 let searchQuery = '';
 let excludeBanned = false;
 let excludeDups = false;
@@ -287,7 +295,9 @@ function applyFilters() {
     // exclude non-canonical duplicates toggle
     if (excludeDups && dupNonCanonical.has(getCardKey(c))) return false;
     // deck filter
-    if (activeDeck !== 'all') {
+    if (activeDeck === 'latest') {
+      if (!latestKeySet.has(getCardKey(c))) return false;
+    } else if (activeDeck !== 'all') {
       if (activeDeck === 'BGA') {
         if (!BGA_DECKS.includes(c['牌組']) && !bgaExtraIds.has(c['卡片ID'])) return false;
       } else {
@@ -301,6 +311,12 @@ function applyFilters() {
     }
     return true;
   });
+
+  // 最新模式預設排序：新→舊
+  if (activeDeck === 'latest' && activeSort === 'default') {
+    const order = new Map(latestCards.map((c, i) => [getCardKey(c), i]));
+    filteredCards.sort((a, b) => order.get(getCardKey(a)) - order.get(getCardKey(b)));
+  }
 
   // 牌力排序（選了才生效；未上榜的牌固定排到最後）
   if (activeSort !== 'default') {
@@ -316,28 +332,48 @@ function applyFilters() {
 
   renderGrid();
   document.getElementById('resultsInfo').textContent =
-    filteredCards.length === allCards.length
-      ? `共 ${allCards.length} 張卡牌`
-      : `顯示 ${filteredCards.length} / ${allCards.length} 張`;
+    activeDeck === 'latest'
+      ? `最新加入的 ${filteredCards.length} 張卡牌（共 ${allCards.length} 張）`
+      : filteredCards.length === allCards.length
+        ? `共 ${allCards.length} 張卡牌`
+        : `顯示 ${filteredCards.length} / ${allCards.length} 張`;
 }
 
 // ── Render Grid ────────────────────────────────────
-function renderGrid() {
-  const grid = document.getElementById('cardGrid');
 
-  // First call: create all card elements once
-  if (cardElMap.size === 0) {
-    allCards.forEach((card, idx) => {
-      // Remove stale DOM element if this ID was already processed (duplicate guard)
-      const cardKey = getCardKey(card);
-      if (cardElMap.has(cardKey)) {
-        cardElMap.get(cardKey).el.remove();
-      }
-      const el = createCardEl(card, idx);
-      cardElMap.set(cardKey, { el, card });
+// 「最新」模式只建最新 N 張的元素；其他模式第一次進入時補建全部（一次性）
+function ensureCardEls() {
+  const grid = document.getElementById('cardGrid');
+  if (allElsBuilt) return;
+
+  if (activeDeck === 'latest') {
+    latestCards.forEach(card => {
+      const key = getCardKey(card);
+      if (cardElMap.has(key)) return;
+      const el = createCardEl(card, allCards.indexOf(card));
+      cardElMap.set(key, { el, card });
       grid.appendChild(el);
     });
+    return;
   }
+
+  const frag = document.createDocumentFragment();
+  allCards.forEach((card, idx) => {
+    const key = getCardKey(card);
+    let entry = cardElMap.get(key);
+    if (!entry) {
+      entry = { el: createCardEl(card, idx), card };
+      cardElMap.set(key, entry);
+    }
+    frag.appendChild(entry.el);
+  });
+  grid.appendChild(frag);
+  allElsBuilt = true;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('cardGrid');
+  ensureCardEls();
 
   // Toggle visibility only
   const filteredSet = new Set(filteredCards.map(c => getCardKey(c)));
@@ -354,8 +390,8 @@ function renderGrid() {
     if (show) count++;
   });
 
-  // 牌力排序時重排 DOM；切回預設時還原原始順序
-  if (activeSort !== 'default') {
+  // 牌力排序或最新模式時重排 DOM；切回全部預設時還原原始順序
+  if (activeSort !== 'default' || activeDeck === 'latest') {
     const frag = document.createDocumentFragment();
     filteredCards.forEach(c => {
       const entry = cardElMap.get(getCardKey(c));
@@ -755,6 +791,10 @@ searchInput.addEventListener('input', () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     searchQuery = searchInput.value.trim();
+    if (searchQuery && activeDeck === 'latest') {
+      activeDeck = 'all';
+      document.getElementById('deckSelect').value = 'all';
+    }
     applyFilters();
   }, 250);
 });
