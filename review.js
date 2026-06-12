@@ -1849,6 +1849,10 @@ function buildResultCards() {
       </div>
     `;
     grid.appendChild(card);
+    const header = card.querySelector('.result-player-header');
+    header.classList.add('ph-clickable');
+    header.title = '點擊查看手牌大圖';
+    header.addEventListener('click', () => openPlayerHand(p));
     renderHandThumbs(p, 'occ');
     renderHandThumbs(p, 'min');
   });
@@ -2133,8 +2137,10 @@ function bindGlobalEvents() {
   document.getElementById('pickerBackdrop').addEventListener('click', closeSlotPicker);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
+      const modalWasOpen = document.getElementById('modalOverlay').classList.contains('open');
       closeSlotPicker();
       closeModal();
+      if (!modalWasOpen) closePlayerHand();
     }
   });
 
@@ -2164,6 +2170,12 @@ function bindGlobalEvents() {
   document.getElementById('modalClose').addEventListener('click', closeModal);
   document.getElementById('modalOverlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
+  });
+
+  // 玩家手牌大圖
+  document.getElementById('playerHandClose').addEventListener('click', closePlayerHand);
+  document.getElementById('playerHandOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closePlayerHand();
   });
 
   // BGA Import（快速匯入 dialog 已移除，改由 shareDialog import 模式處理）
@@ -2245,6 +2257,54 @@ function drawCrop(canvas, card, topFraction = 1) {
   }
 }
 
+/* ── 玩家手牌大圖 ─────────────────────────────────── */
+function openPlayerHand(p) {
+  document.getElementById('playerHandTitle').textContent =
+    `${getPlayerName(p)}（位置 ${p}）的手牌`;
+  const body = document.getElementById('playerHandBody');
+  body.innerHTML = '';
+
+  [['occ', '職業牌'], ['min', '次要發展牌']].forEach(([type, label]) => {
+    const cards = rs.picks[p][type].filter(Boolean);
+    if (!cards.length) return;
+    const section = document.createElement('div');
+    section.className = 'ph-section';
+    section.innerHTML = `<div class="ph-section-label">${label}（${cards.length} 張）</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'ph-grid';
+
+    cards.forEach(card => {
+      const special = getCardSpecialInfo(card['卡片ID']);
+      const item = document.createElement('div');
+      item.className = 'ph-card';
+      item.innerHTML = `
+        <div class="ph-thumb">
+          <canvas></canvas>
+          ${special ? `<div class="hand-special-badge ${special.type}">${getBanShortLabel(special)}</div>` : ''}
+        </div>
+        <div class="ph-name">${card['牌名'] || '—'}</div>
+        <div class="ph-elo">ELO ${Math.round(getAdjElo(card['卡片ID']))}</div>
+      `;
+      item.addEventListener('click', () => openModal(card));
+      grid.appendChild(item);
+      requestAnimationFrame(() => drawCrop(item.querySelector('canvas'), card, 1));
+    });
+
+    section.appendChild(grid);
+    body.appendChild(section);
+  });
+
+  document.getElementById('playerHandOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerHand() {
+  document.getElementById('playerHandOverlay').classList.remove('open');
+  if (!document.getElementById('modalOverlay').classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+
 /* ══════════════════════════════════════════════════
    Modal（與 draft.js 相同邏輯）
    ══════════════════════════════════════════════════ */
@@ -2282,7 +2342,8 @@ function openModal(card) {
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  const handOpen = document.getElementById('playerHandOverlay').classList.contains('open');
+  if (!handOpen) document.body.style.overflow = '';
 }
 
 /* ══════════════════════════════════════════════════
