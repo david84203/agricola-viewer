@@ -436,7 +436,7 @@ function startMinorPhase() {
 }
 
 // ── ELO-weighted sim picks ─────────────────────────
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v3'; // 與 tierlist.js 共用同一份快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v4'; // v4：ELO 公式修正＋全體收斂後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
 const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低輪抽場數
 const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
@@ -989,7 +989,7 @@ async function uploadRatings() {
   statusEl.className = 'upload-status uploading';
 
   try {
-    const K_PAIR = 8; // ELO K-factor per pairwise match（從 16 調降，避免低樣本卡在尚未輸過的情況下被結構性不對稱機制衝到異常高分）
+    const K_PAIR = 8; // ELO K-factor per pairwise match（從 16 調降；扣分公式已修正為標準零和）
 
     // Collect all unique card IDs in this draft
     const uniqueIds = [...new Set(state.shownLog.flatMap(r => [r.picked, ...r.opponents]))];
@@ -1052,7 +1052,7 @@ async function uploadRatings() {
         const R_o = ratings[oppId].elo;
         const E_p = 1 / (1 + Math.pow(10, (R_o - R_p) / 400));
         deltas[picked]  = (deltas[picked]  || 0) + K_eff * (1 - E_p);
-        deltas[oppId]   = (deltas[oppId]   || 0) + K_eff * (0 - E_p);
+        deltas[oppId]   = (deltas[oppId]   || 0) + K_eff * (E_p - 1);   // 標準零和：輸家扣 K×(1−E_p)
       });
 
       Object.entries(deltas).forEach(([id, d]) => { ratings[id].elo += d; });

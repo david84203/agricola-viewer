@@ -6,7 +6,7 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v3'; // v3：C099 花園設計師 ID 修正後刷新快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v4'; // v4：ELO 公式修正＋全體收斂後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 
