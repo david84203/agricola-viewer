@@ -2009,3 +2009,20 @@
 /* 玩家標題區可點擊的提示 */
 .ph-clickable { cursor: pointer; }
 .ph-clickable:hover .result-player-name { color: var(--gold); }
+.ph-open-btn {
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: .68rem;
+  font-weight: 600;
+  color: var(--gold);
+  background: none;
+  border: 1px solid var(--gold);
+  border-radius: 100px;
+  cursor: pointer;
+  opacity: .75;
+  transition: opacity .15s, background .15s;
+}
+.ph-open-btn:hover {
+  opacity: 1;
+  background: rgba(240, 192, 96, .12);
+}

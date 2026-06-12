@@ -1816,7 +1816,7 @@ function buildResultCards() {
         <div class="result-rank-badge" id="rankBadge${p}">…</div>
         <div class="result-player-info">
           <div class="result-player-name">${getPlayerName(p)}</div>
-          <div class="result-player-seat">位置 ${p}</div>
+          <div class="result-player-seat">位置 ${p} <button class="ph-open-btn" type="button">🔍 手牌大圖</button></div>
         </div>
         <div class="result-score-wrap">
           <div class="result-score-num score-color-${p}" id="scoreNum${p}">—</div>
@@ -1853,6 +1853,10 @@ function buildResultCards() {
     header.classList.add('ph-clickable');
     header.title = '點擊查看手牌大圖';
     header.addEventListener('click', () => openPlayerHand(p));
+    card.querySelector('.ph-open-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      openPlayerHand(p);
+    });
     renderHandThumbs(p, 'occ');
     renderHandThumbs(p, 'min');
   });
