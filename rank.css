@@ -13,6 +13,21 @@
   margin-bottom: 16px;
 }
 
+/* 評分者告知文字：BGA 禁卡進評分池 */
+.rank-pool-notice {
+  font-size: .8rem;
+  color: var(--text3);
+  border: 1px solid rgba(240, 166, 58, .3);
+  border-radius: var(--radius-sm);
+  background: rgba(240, 166, 58, .06);
+  padding: 8px 14px;
+  margin: -8px 0 16px;
+  line-height: 1.55;
+}
+@media (max-width: 800px) {
+  .rank-pool-notice { font-size: .75rem; padding: 6px 10px; }
+}
+
 .rank-status-bar {
   display: flex;
   align-items: center;

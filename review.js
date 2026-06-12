@@ -11,7 +11,7 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub
 const BGA_DECKS          = ['A', 'B', 'C', 'D', 'E'];
 const BANLIST_CACHE_KEY  = 'agricola_banlist_cache';
 const BANLIST_CACHE_TTL  = 24 * 60 * 60 * 1000;
-const SCORE_ELO_CEILING  = 1300;
+const SCORE_ELO_CEILING  = 1700;
 const DRAFT_ROUNDS       = 7;   // 每人永遠選 7 張；handSize 是包牌大小可為 7~10
 
 // 禁卡表（hardcode fallback，Firestore 載入後更新）
@@ -404,10 +404,26 @@ function getBanShortLabel(special) {
   return map[special.label] || '禁卡';
 }
 
-/* 取得 ELO 用於評分：禁卡/重複卡一律用預設，不套信心度收斂 */
+/* 取得 ELO 用於評分：
+   BGA 牌組禁卡（A~E 牌組）且 eloCache 有資料 → 套信心度過渡到真實分，prior 用 eloPreset
+   其餘禁卡/重複卡 → 維持預設分
+   一般卡 → 套 seenCount 信心度 */
 function getAdjElo(cardId) {
   const special = getCardSpecialInfo(cardId);
-  if (special) return special.eloPreset;
+  if (special) {
+    if (special.type === 'ban') {
+      const card = allCards.find(c => c['卡片ID'] === cardId);
+      if (card && BGA_DECKS.includes(card['牌組'])) {
+        const cached = rs.eloCache[cardId];
+        if (cached) {
+          const eff  = cached.rankSeen ?? 0;
+          const conf = Math.min(eff / 30, 1);
+          return Math.min(conf * cached.elo + (1 - conf) * special.eloPreset, SCORE_ELO_CEILING);
+        }
+      }
+    }
+    return special.eloPreset;
+  }
   const r    = rs.eloCache[cardId] || { elo: 1200, seenCount: 0 };
   const conf = Math.min(r.seenCount / 30, 1);
   return Math.min(conf * r.elo + (1 - conf) * 1200, SCORE_ELO_CEILING);
@@ -1787,6 +1803,7 @@ async function fetchElo(cardIds) {
         rs.eloCache[id] = {
           elo:       Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
           seenCount: Number(f.seenCount?.integerValue ?? 0),
+          rankSeen:  Number(f.rankSeen?.integerValue  ?? 0),
         };
       }
     });
@@ -1985,7 +2002,15 @@ async function calculateAllScores() {
     ];
     const presetEloItems = allPickedIds
       .map(id => ({ id, special: getCardSpecialInfo(id) }))
-      .filter(x => x.special !== null);
+      .filter(x => {
+        if (!x.special) return false;
+        // BGA 牌組禁卡已進評分系統（eloCache 有文件）→ 不再列入「使用預設」清單
+        if (x.special.type === 'ban') {
+          const card = allCards.find(c => c['卡片ID'] === x.id);
+          if (card && BGA_DECKS.includes(card['牌組']) && rs.eloCache[x.id]) return false;
+        }
+        return true;
+      });
 
     const presetHtml = presetEloItems.length
       ? `<div class="result-preset-elo-section">

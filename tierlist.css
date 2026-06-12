@@ -201,6 +201,17 @@
 .tier-conf-ref       { background: rgba(245, 158, 11, .18);  color: #f59e0b; }
 .tier-conf-converged { background: rgba(34, 197, 94, .18);   color: #22c55e; }
 .tier-conf-solid     { background: rgba(16, 185, 129, .24);  color: #10b981; }
+/* BGA 牌組禁卡標籤（只在 Tier List 標示，排序卡片刻意不標以避免錨定偏差） */
+.tier-card-ban {
+  font-size: .58rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+  line-height: 1.5;
+  white-space: nowrap;
+  background: rgba(224, 92, 92, .25);
+  color: var(--red);
+}
 
 /* ── Deck filter ── */
 .tier-deck-row {

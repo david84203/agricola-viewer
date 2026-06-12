@@ -6,7 +6,7 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v4'; // v4：ELO 公式修正＋全體收斂後刷新快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 
@@ -192,9 +192,11 @@ function renderTierList() {
     return true;
   };
 
-  const eligible = allCards.filter(c =>
-    !BANNED_IDS.has(c['卡片ID']) && activeDecks.has(c['牌組']) && typeOk(c)
-  );
+  const eligible = allCards.filter(c => {
+    if (!activeDecks.has(c['牌組']) || !typeOk(c)) return false;
+    if (BANNED_IDS.has(c['卡片ID'])) return BGA_DECKS.includes(c['牌組']); // BGA 牌組禁卡放行，需真實評分
+    return true;
+  });
 
   const rated = [], unrated = [];
   eligible.forEach(card => {
@@ -369,6 +371,7 @@ function confidenceLevel(n) {
 function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
   const eff = seenCount + rankSeen;
   const conf = confidenceLevel(eff);
+  const isBanned = BANNED_IDS.has(card['卡片ID']);
   const div = document.createElement('div');
   div.className = 'tier-card';
   div.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
@@ -378,6 +381,7 @@ function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
       <div class="tier-card-name">${card['牌名'] || '—'}</div>
       <div class="tier-card-meta">
         <span class="tier-card-score">${Math.round(elo)}</span>
+        ${isBanned ? '<span class="tier-card-ban">禁</span>' : ''}
         <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}">${conf.label}·${eff}</span>
       </div>
     </div>

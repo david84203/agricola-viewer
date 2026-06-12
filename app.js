@@ -100,7 +100,7 @@ let excludeDups = false;
 // 預設不顯示、不抓資料；使用者選「牌力排序」才懶載入。
 // 快取與 tierlist 共用同一把 key，零額外 Firestore 成本。
 const RATINGS_FS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v4'; // v4：ELO 公式修正＋全體收斂後刷新快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
 const RATING_MIN_SEEN = 5;
 const RATING_TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];

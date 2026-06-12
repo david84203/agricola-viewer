@@ -436,7 +436,7 @@ function startMinorPhase() {
 }
 
 // ── ELO-weighted sim picks ─────────────────────────
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v4'; // v4：ELO 公式修正＋全體收斂後刷新快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
 const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低輪抽場數
 const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
@@ -1272,8 +1272,8 @@ async function calculateScore() {
     });
 
     // 樣本數不足的卡牌，原始 ELO 容易被結構性機制衝出異常值，往基準值收斂以避免污染最佳/最差判斷
-    // 另夾一道天花板：樣本充足卡牌目前實測最高約 1288，超過 1300 多半是尚未自然修正的幽靈高分
-    const SCORE_ELO_CEILING = 1300;
+    // 天花板保留作保險絲；S 卡均衡點預期 1600~1700，以 1700 為上限
+    const SCORE_ELO_CEILING = 1700;
     const eloMap = {};
     uniqueIds.forEach(id => {
       const { elo, seenCount } = ratingMap[id];

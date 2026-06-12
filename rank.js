@@ -6,13 +6,18 @@ const RANK_IMG_BASE      = './images/';
 const RANK_FS_BASE       = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 const RANK_CARDS_PER_ROUND = 7;
 const RANK_TARGET        = 100;
-const RANK_K_PAIR        = 8;
 const RANK_STORAGE_KEY   = 'agricola_rank_count';
+
+const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
+
+const RANK_RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新
+const RANK_RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 
 let rankAllCards  = [];
 let rankImageCache = {};
 let rankBannedIds = new Set();
 let rankDupExclusions = new Set();
+let rankRatingsMap = null; // null = 未載入；載入後為 map（失敗維持 null → 退回純隨機）
 
 let rankState = {
   roundCount: 0,
@@ -128,15 +133,27 @@ async function loadRankCards() {
   try {
     const res = await fetch('./cards.json');
     const data = await res.json();
+    const BGA_BANNED_IDS = ['A127','B010*','A010','B021','A048','C031','A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','A100','A132','B147','C058','B052','B018','C093','C130','C003*','B022'];
     rankAllCards = data.filter(c => {
       const id = c['卡片ID'];
       if (!id) return false;
-      if (rankBannedIds.has(id)) return false;
+      // 禁卡照常排除，但 BGA 牌組（A~E）的禁卡放行——它們出現在 BGA 覆盤對局，需要真實評分
+      if (rankBannedIds.has(id) && !BGA_DECKS.includes(c['牌組'])) return false;
       // 重複卡：純 ID 與複合 key 都要比對，跟輪抽一致
       if (rankDupExclusions.has(id)) return false;
       if (rankDupExclusions.has(rankGetCardKey(c))) return false;
       return c.card_type === 'occupation' || c.card_type === 'minor' || c.card_type === 'both';
     });
+    // 報告 BGA 禁卡中被重複卡機制排除的清單（它們由正本代表評分，不需處理）
+    const bgaBannedExcluded = BGA_BANNED_IDS.filter(id =>
+      rankDupExclusions.has(id) ||
+      data.filter(c => c['卡片ID'] === id).some(c => rankDupExclusions.has(rankGetCardKey(c)))
+    );
+    if (bgaBannedExcluded.length) {
+      console.log('[rank] BGA 禁卡中被重複卡排除（由正本代表）:', bgaBannedExcluded);
+    } else {
+      console.log('[rank] BGA 禁卡與重複卡無交集，26 張全數可進池');
+    }
   } catch {}
 }
 
@@ -160,8 +177,118 @@ function rankShuffle(arr) {
   return a;
 }
 
+// ── Ladder K：rankSeen 越少 K 越大，隨場數自動退火 ───
+function rankCardK(rankSeen) {
+  if (rankSeen < 10) return 24;
+  if (rankSeen < 30) return 16;
+  return 8;
+}
+
+// ── 全量評分快取（供加權抽卡使用） ────────────────────
+async function fetchRankRatings() {
+  try {
+    const cached = (() => {
+      try {
+        const s = JSON.parse(localStorage.getItem(RANK_RATINGS_CACHE_KEY));
+        return s && Date.now() - s.cachedAt < RANK_RATINGS_CACHE_TTL ? s.data : null;
+      } catch { return null; }
+    })();
+    if (cached) { rankRatingsMap = cached; return; }
+
+    const map = {};
+    let pageToken = null;
+    do {
+      let url = `${RANK_FS_BASE}/agricola_ratings?pageSize=300`;
+      if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      (data.documents || []).forEach(doc => {
+        const id = doc.name.split('/').pop();
+        const f  = doc.fields || {};
+        map[id] = {
+          elo:       Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
+          seenCount: Number(f.seenCount?.integerValue ?? 0),
+          rankSeen:  Number(f.rankSeen?.integerValue  ?? 0),
+        };
+      });
+      pageToken = data.nextPageToken ?? null;
+    } while (pageToken);
+
+    rankRatingsMap = map;
+    try { localStorage.setItem(RANK_RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
+  } catch {
+    // 保持 null → rankBuildPack 退回純隨機
+  }
+}
+
+// ── 加權不放回抽樣（反比 eff） ──────────────────────
+// eff = seenCount + rankSeen（抽卡公平性看歷史總曝光）
+function rankWeightedDrawOne(pool, used) {
+  const candidates = pool.filter(c => !used.has(c['卡片ID']));
+  if (!candidates.length) return null;
+  const weights = candidates.map(c => {
+    const r = rankRatingsMap?.[c['卡片ID']];
+    const eff = (r?.seenCount ?? 0) + (r?.rankSeen ?? 0);
+    return 1 / (1 + eff);
+  });
+  const total = weights.reduce((a, b) => a + b, 0);
+  let rand = Math.random() * total;
+  for (let i = 0; i < candidates.length; i++) {
+    rand -= weights[i];
+    if (rand <= 0 || i === candidates.length - 1) return candidates[i];
+  }
+  return candidates[candidates.length - 1];
+}
+
+// ── 加權組包（3少場數＋1高分＋1低分＋2隨機） ─────────
+// 載入失敗（rankRatingsMap===null）退回純隨機，確保頁面不掛
+function rankBuildPack(pool) {
+  if (rankRatingsMap === null) return rankShuffle(pool).slice(0, RANK_CARDS_PER_ROUND);
+
+  const used = new Set();
+  const pack = [];
+
+  // 1. 3 張場數少（加權抽樣，eff 越小機率越高）
+  for (let i = 0; i < 3; i++) {
+    const c = rankWeightedDrawOne(pool, used);
+    if (c) { pack.push(c); used.add(c['卡片ID']); }
+  }
+
+  // 2. 1 張高分（剩餘卡 elo 前 10% 均勻隨機）
+  const rem1 = pool.filter(c => !used.has(c['卡片ID']));
+  if (rem1.length) {
+    const byDesc = [...rem1].sort((a, b) =>
+      (rankRatingsMap[b['卡片ID']]?.elo ?? 1200) - (rankRatingsMap[a['卡片ID']]?.elo ?? 1200));
+    const top = byDesc.slice(0, Math.max(1, Math.ceil(byDesc.length * 0.1)));
+    const pick = top[Math.floor(Math.random() * top.length)];
+    pack.push(pick); used.add(pick['卡片ID']);
+  }
+
+  // 3. 1 張低分（剩餘卡 elo 後 10% 均勻隨機）
+  const rem2 = pool.filter(c => !used.has(c['卡片ID']));
+  if (rem2.length) {
+    const byAsc = [...rem2].sort((a, b) =>
+      (rankRatingsMap[a['卡片ID']]?.elo ?? 1200) - (rankRatingsMap[b['卡片ID']]?.elo ?? 1200));
+    const bot = byAsc.slice(0, Math.max(1, Math.ceil(byAsc.length * 0.1)));
+    const pick = bot[Math.floor(Math.random() * bot.length)];
+    pack.push(pick); used.add(pick['卡片ID']);
+  }
+
+  // 4. 補足至 7 張（均勻隨機）
+  rankShuffle(pool.filter(c => !used.has(c['卡片ID'])))
+    .slice(0, RANK_CARDS_PER_ROUND - pack.length)
+    .forEach(c => pack.push(c));
+
+  return rankShuffle(pack);
+}
+
 // ── Start round ───────────────────────────────────
 async function startRankRound() {
+  // 第一輪才嘗試載入評分資料（供加權抽卡），失敗退回純隨機
+  if (rankRatingsMap === null) {
+    try { await fetchRankRatings(); } catch {}
+  }
+
   // 'both'（烤爐/廚房等）實為次要發展卡，只歸入次要牌庫，避免跑到職業排，也避免同一張同時出現在兩排
   const occPool = rankAllCards.filter(c => c.card_type === 'occupation');
   const minPool = rankAllCards.filter(c => c.card_type === 'minor' || c.card_type === 'both');
@@ -171,8 +298,8 @@ async function startRankRound() {
     return;
   }
 
-  rankState.occCards    = rankShuffle(occPool).slice(0, RANK_CARDS_PER_ROUND);
-  rankState.minCards    = rankShuffle(minPool).slice(0, RANK_CARDS_PER_ROUND);
+  rankState.occCards = rankBuildPack(occPool);
+  rankState.minCards = rankBuildPack(minPool);
   rankState.occRankings = [];
   rankState.minRankings = [];
 
@@ -360,7 +487,6 @@ async function uploadRankingElo() {
       if (wv != null && Number(wv) > 0) raterWeight = Number(wv);
     }
   } catch {}
-  const K_eff = RANK_K_PAIR * raterWeight;
 
   // 快照初始值，供增量寫入計算淨變化
   const eloInit = {}, rankSeenInit = {};
@@ -381,12 +507,15 @@ async function uploadRankingElo() {
     ranked.forEach(id => { base[id] = ratings[id].elo; delta[id] = 0; });
 
     // 名次高者為贏家，與每張名次較低的牌比一場（C(7,2)=21 組）
+    // 配對 K 取兩卡平均：保持零和精確（各用各的 K 會破壞零和引入漂移）
+    // K 以本輪開始前的快照（rankSeenInit）計算，避免 rankSeen++ 後用到更新後的場數
     for (let i = 0; i < ranked.length; i++) {
       for (let j = i + 1; j < ranked.length; j++) {
         const wId = ranked[i];  // 名次較高 = 贏家
         const lId = ranked[j];  // 名次較低 = 輸家
+        const kPair = (rankCardK(rankSeenInit[wId]) + rankCardK(rankSeenInit[lId])) / 2 * raterWeight;
         const E_w = 1 / (1 + Math.pow(10, (base[lId] - base[wId]) / 400));
-        const change = K_eff * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
+        const change = kPair * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
         delta[wId] += change;
         delta[lId] -= change;
       }

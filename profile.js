@@ -183,8 +183,8 @@ function computeAnalytics(sessions, cards, ratingsMap, tierMap) {
 
   const eloOf = id => ratingsMap[id]?.elo ?? 1000;
   // 樣本數不足的卡牌，原始 ELO 容易被結構性機制衝出異常值，算分時往基準值收斂以避免污染最佳/最差判斷
-  // 另夾一道天花板：樣本充足卡牌目前實測最高約 1288，超過 1300 多半是尚未自然修正的幽靈高分
-  const SCORE_ELO_CEILING = 1300;
+  // 天花板保留作保險絲；S 卡均衡點預期 1600~1700，以 1700 為上限
+  const SCORE_ELO_CEILING = 1700;
   const eloForScore = id => {
     const r = ratingsMap[id];
     if (!r) return 1200;
