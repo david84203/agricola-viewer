@@ -413,6 +413,16 @@ function getAdjElo(cardId) {
   return Math.min(conf * r.elo + (1 - conf) * 1200, SCORE_ELO_CEILING);
 }
 
+/* 計算玩家手牌平均 ELO（用 getAdjElo，與評分演算法同一套基準） */
+function calcHandAvgElo(player) {
+  const avg = ids => ids.length
+    ? Math.round(ids.reduce((s, id) => s + getAdjElo(id), 0) / ids.length)
+    : null;
+  const occIds = rs.picks[player].occ.filter(Boolean).map(c => c['卡片ID']);
+  const minIds = rs.picks[player].min.filter(Boolean).map(c => c['卡片ID']);
+  return { all: avg([...occIds, ...minIds]), occ: avg(occIds), min: avg(minIds) };
+}
+
 /* ══════════════════════════════════════════════════
    畫面一：設定包牌
    ══════════════════════════════════════════════════ */
@@ -1813,12 +1823,16 @@ function buildResultCards() {
           <div class="result-score-bar-fill fill-${p}" id="scoreFill${p}" style="width:0%"></div>
         </div>
       </div>
+      <div class="result-avg-elo" id="avgElo${p}">
+        <span class="result-avg-elo-label">手牌平均 ELO</span>
+        <b>…</b>
+      </div>
       <div class="result-hand-section">
-        <div class="result-hand-label">職業牌</div>
+        <div class="result-hand-label">職業牌 <span class="hand-avg-elo" id="occAvgElo${p}"></span></div>
         <div class="result-hand-thumbs" id="occHand${p}"></div>
       </div>
       <div class="result-hand-section">
-        <div class="result-hand-label">次要發展牌</div>
+        <div class="result-hand-label">次要發展牌 <span class="hand-avg-elo" id="minAvgElo${p}"></span></div>
         <div class="result-hand-thumbs" id="minHand${p}"></div>
       </div>
       <div class="result-analysis-section">
@@ -1931,6 +1945,12 @@ async function calculateAllScores() {
     setTimeout(() => {
       document.getElementById(`scoreFill${p}`).style.width = `${total}%`;
     }, 50);
+
+    // 手牌平均 ELO
+    const handAvg = calcHandAvgElo(p);
+    document.querySelector(`#avgElo${p} b`).textContent = handAvg.all ?? '—';
+    document.getElementById(`occAvgElo${p}`).textContent = handAvg.occ != null ? `· 平均 ${handAvg.occ}` : '';
+    document.getElementById(`minAvgElo${p}`).textContent = handAvg.min != null ? `· 平均 ${handAvg.min}` : '';
 
     // 分析：最差的最多 3 輪
     const worst = roundDetails

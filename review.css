@@ -945,6 +945,29 @@
 .fill-C { background: linear-gradient(90deg, #c07a1a, #f0c060); }
 .fill-D { background: linear-gradient(90deg, #b03535, #f08080); }
 
+/* Hand average ELO */
+.result-avg-elo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: .72rem;
+  color: var(--text3);
+}
+.result-avg-elo b {
+  font-size: .95rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+.hand-avg-elo {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text3);
+  opacity: .85;
+}
+
 /* Hand cards */
 .result-hand-section {
   padding: 10px 16px;
