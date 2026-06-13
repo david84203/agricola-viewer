@@ -5,6 +5,7 @@
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
+const CROP_REF = { width: 2040, height: 2807 };
 const LS_KEY = 'agricola_dups';
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 const FS_DUP_DOC = `${FIRESTORE_BASE}/agricola_dup_state/main`;
@@ -362,20 +363,22 @@ function drawCrop(canvas, card) {
   const cols = card.grid_cols || (isComposite ? 10 : GRID_COLS);
   const rows = card.grid_rows || (isComposite ? 3 : GRID_ROWS);
   const noOffset = isComposite || isOdeck || isTTS;
-  const oL = card.crop_left   !== undefined ? card.crop_left   : (noOffset ? 0 : CROP.offsetLeft);
-  const oR = card.crop_right  !== undefined ? card.crop_right  : (noOffset ? 0 : CROP.offsetRight);
-  const oT = card.crop_top    !== undefined ? card.crop_top    : (noOffset ? 0 : CROP.offsetTop);
-  const oB = card.crop_bottom !== undefined ? card.crop_bottom : (noOffset ? 0 : CROP.offsetBottom);
 
   const draw = (img) => {
+    const scaleCropX = (value) => value === 0 ? 0 : value * img.naturalWidth / CROP_REF.width;
+    const scaleCropY = (value) => value === 0 ? 0 : value * img.naturalHeight / CROP_REF.height;
+    const oL = scaleCropX(card.crop_left   !== undefined ? card.crop_left   : (noOffset ? 0 : CROP.offsetLeft));
+    const oR = scaleCropX(card.crop_right  !== undefined ? card.crop_right  : (noOffset ? 0 : CROP.offsetRight));
+    const oT = scaleCropY(card.crop_top    !== undefined ? card.crop_top    : (noOffset ? 0 : CROP.offsetTop));
+    const oB = scaleCropY(card.crop_bottom !== undefined ? card.crop_bottom : (noOffset ? 0 : CROP.offsetBottom));
     let sx, sy, cellW, cellH;
     if (src.startsWith('Zm')) {
       const cols_x = [16, 388, 760];
       const rows_y = [30, 651, 1274];
-      cellW = 342;
-      cellH = 558;
-      sx = cols_x[card.grid_col || 0];
-      sy = rows_y[card.grid_row || 0];
+      cellW = scaleCropX(342);
+      cellH = scaleCropY(558);
+      sx = scaleCropX(cols_x[card.grid_col || 0]);
+      sy = scaleCropY(rows_y[card.grid_row || 0]);
     } else {
       cellW = (img.naturalWidth  - oL - oR) / cols;
       cellH = (img.naturalHeight - oT - oB) / rows;

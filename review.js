@@ -6,6 +6,7 @@ const IMG_BASE   = './images/';
 const GRID_COLS  = 3;
 const GRID_ROWS  = 3;
 const CROP_DEF   = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
+const CROP_REF   = { width: 2040, height: 2807 };
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
 const BGA_DECKS          = ['A', 'B', 'C', 'D', 'E'];
@@ -2252,10 +2253,12 @@ function drawCrop(canvas, card, topFraction = 1) {
     else if (isNLtmpl)                   base = { l: 182, t: 114, r: 166, b: 101 };
     else                                 base = { l: CROP_DEF.offsetLeft, t: CROP_DEF.offsetTop, r: CROP_DEF.offsetRight, b: CROP_DEF.offsetBottom };
 
-    const oL = card.crop_left   !== undefined ? card.crop_left   : base.l;
-    const oR = card.crop_right  !== undefined ? card.crop_right  : base.r;
-    const oT = card.crop_top    !== undefined ? card.crop_top    : base.t;
-    const oB = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
+    const scaleCropX = (value) => value === 0 ? 0 : value * img.naturalWidth / CROP_REF.width;
+    const scaleCropY = (value) => value === 0 ? 0 : value * img.naturalHeight / CROP_REF.height;
+    const oL = scaleCropX(card.crop_left   !== undefined ? card.crop_left   : base.l);
+    const oR = scaleCropX(card.crop_right  !== undefined ? card.crop_right  : base.r);
+    const oT = scaleCropY(card.crop_top    !== undefined ? card.crop_top    : base.t);
+    const oB = scaleCropY(card.crop_bottom !== undefined ? card.crop_bottom : base.b);
 
     const usableW = img.naturalWidth  - oL - oR;
     const usableH = img.naturalHeight - oT - oB;

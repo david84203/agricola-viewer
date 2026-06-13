@@ -7,6 +7,7 @@ const RANK_FS_BASE       = 'https://firestore.googleapis.com/v1/projects/project
 const RANK_CARDS_PER_ROUND = 7;
 const RANK_TARGET        = 100;
 const RANK_STORAGE_KEY   = 'agricola_rank_count';
+const RANK_CROP_REF      = { width: 2040, height: 2807 };
 
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 
@@ -613,18 +614,21 @@ function rankDrawCrop(canvas, card) {
     else if (isNLtmpl)                   base = { l: 182, t: 114, r: 166, b: 101 };
     else                                 base = CROP_BASE;
 
+    const scaleCropX = (value) => value === 0 ? 0 : value * img.naturalWidth / RANK_CROP_REF.width;
+    const scaleCropY = (value) => value === 0 ? 0 : value * img.naturalHeight / RANK_CROP_REF.height;
+
     let sx, sy, cellW, cellH;
     if (src.startsWith('Zm')) {
       const cols_x = [16, 388, 760];
       const rows_y = [30, 651, 1274];
-      cellW = 342; cellH = 558;
-      sx = cols_x[card.grid_col || 0];
-      sy = rows_y[card.grid_row || 0];
+      cellW = scaleCropX(342); cellH = scaleCropY(558);
+      sx = scaleCropX(cols_x[card.grid_col || 0]);
+      sy = scaleCropY(rows_y[card.grid_row || 0]);
     } else {
-      const oL = card.crop_left   !== undefined ? card.crop_left   : base.l;
-      const oR = card.crop_right  !== undefined ? card.crop_right  : base.r;
-      const oT = card.crop_top    !== undefined ? card.crop_top    : base.t;
-      const oB = card.crop_bottom !== undefined ? card.crop_bottom : base.b;
+      const oL = scaleCropX(card.crop_left   !== undefined ? card.crop_left   : base.l);
+      const oR = scaleCropX(card.crop_right  !== undefined ? card.crop_right  : base.r);
+      const oT = scaleCropY(card.crop_top    !== undefined ? card.crop_top    : base.t);
+      const oB = scaleCropY(card.crop_bottom !== undefined ? card.crop_bottom : base.b);
       cellW = (img.naturalWidth  - oL - oR) / cols;
       cellH = (img.naturalHeight - oT - oB) / rows;
       sx = oL + (card.grid_col || 0) * cellW;
