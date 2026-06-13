@@ -631,14 +631,13 @@
   },
   {
     "id": "n061",
-    "label": "建築專家",
+    "label": "建築專家／建築專家2版",
     "cards": [
-      "A163",
       "WM018",
       "11823-4"
     ],
     "defaultCanonical": "11823-4",
-    "type": "name"
+    "type": "replacement"
   },
   {
     "id": "n062",
