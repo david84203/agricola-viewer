@@ -2309,5 +2309,25 @@
     ],
     "defaultCanonical": "8818-5|2版牌更新O4.jpg|7",
     "type": "replacement"
+  },
+  {
+    "id": "n231",
+    "label": "黑莓農夫／黑莓農夫2版",
+    "cards": [
+      "6598-5a",
+      "E108|E103.jpg|5"
+    ],
+    "defaultCanonical": "E108|E103.jpg|5",
+    "type": "replacement"
+  },
+  {
+    "id": "n232",
+    "label": "改良者／改良者2版",
+    "cards": [
+      "4724-9a",
+      "4724-9|G8o57.jpg|5"
+    ],
+    "defaultCanonical": "4724-9|G8o57.jpg|5",
+    "type": "replacement"
   }
 ]
