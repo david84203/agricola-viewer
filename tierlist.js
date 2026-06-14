@@ -213,11 +213,13 @@ function renderTierList() {
   document.getElementById('tierEmpty').style.display = 'none';
 
   rated.sort((a, b) => {
-    const score = ({ elo, seenCount, pickCount }) => {
-      if (!seenCount) return elo;
-      const pickRate = pickCount / seenCount;
-      const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
-      const conf = Math.min(seenCount / 30, 1);
+    // 信心依歷史有效場數（輪抽 seenCount + 快排 rankSeen），現有 ELO 由兩者共同養成
+    const score = ({ elo, seenCount, pickCount, rankSeen }) => {
+      const eff = seenCount + rankSeen;
+      const conf = Math.min(eff / 30, 1);
+      if (conf >= 1) return elo;                          // 場數夠多→完全信任 ELO
+      const pickRate = seenCount ? pickCount / seenCount : 0.11; // 場數不足時用輪抽選取率當保險
+      const prior = 1200 + (pickRate - 0.11) * 450;       // 0.11 ≈ 1/9（9張包隨機基準）
       return conf * elo + (1 - conf) * prior;
     };
     return score(b) - score(a);
@@ -362,7 +364,8 @@ async function fetchGameCounts() {
 }
 
 // ── Card elements ──────────────────────────────────
-// 信心等級：依有效場數（輪抽 seenCount + 快排 rankSeen）分級
+// 信心等級：依有效場數（歷史輪抽 seenCount + 快排 rankSeen）分級
+// 現有 ELO 是兩者共同養成，故合計；往後僅快排會再推動 ELO
 // 門檻參考收斂經驗：<30 暖機、30~49 有參考性、50+ 收斂（理想 80~100）
 function confidenceLevel(n) {
   if (n >= 80) return { key: 'solid', label: '穩固' };
@@ -371,7 +374,7 @@ function confidenceLevel(n) {
   return { key: 'warm', label: '暖機' };
 }
 function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
-  const eff = seenCount + rankSeen;
+  const eff = seenCount + rankSeen;  // 現有 ELO 由歷史輪抽+快排共同養成，信心算兩者合計
   const conf = confidenceLevel(eff);
   const isBanned = BANNED_IDS.has(card['卡片ID']);
   const div = document.createElement('div');
