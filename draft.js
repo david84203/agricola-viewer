@@ -239,6 +239,7 @@ async function init() {
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
     loadBanlist(),
+    window.CardImages?.load?.() || Promise.resolve(),
   ]);
   allCards = cardsData.filter(c =>
     !dupExcluded.has(c['卡片ID']) &&
@@ -1361,8 +1362,15 @@ function showScreen(id) {
 
 // ── Canvas Crop ────────────────────────────────────
 // topFraction: 1 = full card, 0.5 = top half only
-function drawCrop(canvas, card, topFraction = 1) {
+function drawCrop(canvas, card, topFraction = 1, forceSheet = false) {
   if (!canvas || !card || !card.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, topFraction, () => drawCrop(canvas, card, topFraction, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {

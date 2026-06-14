@@ -36,6 +36,7 @@ async function loadCards() {
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
+    window.CardImages?.load?.() || Promise.resolve(),
   ]);
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
@@ -490,7 +491,15 @@ function createCardEl(card, idx) {
 // ── Canvas Crop ────────────────────────────────────
 // Each source image is a 3×3 grid of cards (sometimes fewer in last row).
 // We draw the specific cell onto a canvas so it's natively responsive.
-function drawCrop(canvas, card) {
+function drawCrop(canvas, card, forceSheet = false) {
+  if (!canvas || !card) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, 1, () => drawCrop(canvas, card, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {

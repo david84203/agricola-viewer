@@ -319,6 +319,7 @@ async function init() {
     loadDupExclusions(),
     loadBanlist(),
     loadBgaIdMap(),
+    window.CardImages?.load?.() || Promise.resolve(),
   ]);
   allCards = data;
   dupExcludedIds = dupInfo;
@@ -2232,8 +2233,15 @@ function bindGlobalEvents() {
 /* ══════════════════════════════════════════════════
    Canvas Crop（與 draft.js 相同邏輯）
    ══════════════════════════════════════════════════ */
-function drawCrop(canvas, card, topFraction = 1) {
+function drawCrop(canvas, card, topFraction = 1, forceSheet = false) {
   if (!canvas || !card || !card.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, topFraction, () => drawCrop(canvas, card, topFraction, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
 
   const draw = (img) => {

@@ -132,6 +132,7 @@ function rankGetCardKey(card) {
 // ── Load cards ────────────────────────────────────
 async function loadRankCards() {
   try {
+    await (window.CardImages?.load?.() || Promise.resolve());
     const res = await fetch('./cards.json');
     const data = await res.json();
     const BGA_BANNED_IDS = ['A127','B010*','A010','B021','A048','C031','A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','A100','A132','B147','C058','B052','B018','C093','C130','C003*','B022'];
@@ -591,8 +592,15 @@ async function uploadRankingElo() {
 }
 
 // ── Card image crop (mirrors draft.js drawCrop) ───
-function rankDrawCrop(canvas, card) {
+function rankDrawCrop(canvas, card, forceSheet = false) {
   if (!canvas || !card || !card.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, 1, () => rankDrawCrop(canvas, card, true));
+      return;
+    }
+  }
   const key = RANK_IMG_BASE + card.source_image;
 
   const GRID_COLS = 3, GRID_ROWS = 3;

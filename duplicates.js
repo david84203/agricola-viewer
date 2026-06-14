@@ -27,6 +27,7 @@ async function init() {
   const [cards, pairs] = await Promise.all([
     fetch('./cards.json?v=20260608').then(r => r.json()),
     fetch('./duplicates.json').then(r => r.json()),
+    window.CardImages?.load?.() || Promise.resolve(),
   ]);
   allCards = cards;
   basePairs = pairs;
@@ -350,8 +351,15 @@ function closeCompareModal() {
 }
 
 // ── Canvas ─────────────────────────────────────────
-function drawCrop(canvas, card) {
+function drawCrop(canvas, card, forceSheet = false) {
   if (!canvas || !card?.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, 1, () => drawCrop(canvas, card, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
   const src = card.source_image;
   const isComposite = src.includes('部分.jpg') || src.includes('舊版');

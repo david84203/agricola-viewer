@@ -41,8 +41,15 @@ function getTier(rankPct) {
 }
 
 // ── Canvas Crop (from draft.js) ────────────────────
-function drawCrop(canvas, card, topFraction = 1) {
+function drawCrop(canvas, card, topFraction = 1, forceSheet = false) {
   if (!canvas || !card || !card.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, topFraction, () => drawCrop(canvas, card, topFraction, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
   const draw = img => {
     const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
@@ -1052,6 +1059,7 @@ async function init() {
       fetchSessions(raterId),
       fetch('./cards.json').then(r => r.json()),
       fetchAllRatings(),
+      window.CardImages?.load?.() || Promise.resolve(),
     ]);
 
     setLoading('計算分析數據…');

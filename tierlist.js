@@ -117,6 +117,7 @@ async function init() {
       loadDupExclusions(),
       loadBanlist(),
       loadBgaIds(),
+      window.CardImages?.load?.() || Promise.resolve(),
     ]);
     allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
@@ -470,8 +471,15 @@ function drawPendingCanvases(container) {
   });
 }
 
-function drawCrop(canvas, card) {
+function drawCrop(canvas, card, forceSheet = false) {
   if (!canvas || !card?.source_image) return;
+  if (!forceSheet) {
+    const singleCardPath = window.CardImages?.getPath?.(card);
+    if (singleCardPath) {
+      window.CardImages.draw(canvas, singleCardPath, 1, () => drawCrop(canvas, card, true));
+      return;
+    }
+  }
   const key = IMG_BASE + card.source_image;
   const isComposite = card.source_image.includes('部分.jpg') || card.source_image.includes('舊版');
   const src = card.source_image;
