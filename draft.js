@@ -1034,16 +1034,30 @@ async function uploadRatings() {
         if (wv != null && Number(wv) > 0) raterWeight = Number(wv);
       }
     } catch {}
-    // 快照初始值，供增量寫入計算淨變化（解決多人同時評分互相覆蓋）
-    const seenInit = {}, pickInit = {};
-    uniqueIds.forEach(id => { seenInit[id] = ratings[id].seenCount; pickInit[id] = ratings[id].pickCount; });
+    const K_eff = K_PAIR * raterWeight;
 
-    // 輪抽只累加曝光/選取數，不再動 ELO（單牌強度交由快排評定，訊號較純）
-    // ELO 改由快排（rank.js）獨佔，避免輪抽的情境性選擇污染單牌強度
+    // 快照初始值，供增量寫入計算淨變化（解決多人同時評分互相覆蓋）
+    const eloInit = {}, seenInit = {}, pickInit = {};
+    uniqueIds.forEach(id => { eloInit[id] = ratings[id].elo; seenInit[id] = ratings[id].seenCount; pickInit[id] = ratings[id].pickCount; });
+
+    // Compute ELO updates round by round (sequential, using pre-round ratings per round)
     state.shownLog.forEach(({ picked, opponents }) => {
       ratings[picked].seenCount++;
       ratings[picked].pickCount++;
       opponents.forEach(id => { ratings[id].seenCount++; });
+
+      if (opponents.length === 0) return;
+      const R_p = ratings[picked].elo;
+      const deltas = {};
+
+      opponents.forEach(oppId => {
+        const R_o = ratings[oppId].elo;
+        const E_p = 1 / (1 + Math.pow(10, (R_o - R_p) / 400));
+        deltas[picked]  = (deltas[picked]  || 0) + K_eff * (1 - E_p);
+        deltas[oppId]   = (deltas[oppId]   || 0) + K_eff * (E_p - 1);   // 標準零和：輸家扣 K×(1−E_p)
+      });
+
+      Object.entries(deltas).forEach(([id, d]) => { ratings[id].elo += d; });
     });
 
     const totalMatches = state.shownLog.reduce((s, r) => s + r.opponents.length, 0);
@@ -1052,11 +1066,11 @@ async function uploadRatings() {
     const RBASE = 'projects/project-hub-410cd/databases/(default)/documents/agricola_ratings';
     const writes = uniqueIds.map(cardId => {
       const name  = `${RBASE}/${cardId}`;
+      const dElo  = ratings[cardId].elo       - eloInit[cardId];
       const dSeen = ratings[cardId].seenCount - seenInit[cardId];
       const dPick = ratings[cardId].pickCount - pickInit[cardId];
       if (existingIds.has(cardId)) {
-        // 輪抽不再寫 elo：既有 ELO 完全不動，只疊加曝光/選取數
-        const tf = [];
+        const tf = [{ fieldPath: 'elo', increment: { doubleValue: dElo } }];
         if (dSeen) tf.push({ fieldPath: 'seenCount', increment: { integerValue: `${dSeen}` } });
         if (dPick) tf.push({ fieldPath: 'pickCount', increment: { integerValue: `${dPick}` } });
         return {
@@ -1065,10 +1079,10 @@ async function uploadRatings() {
           updateTransforms: tf,
         };
       }
-      // 新卡：文件不存在，給 ELO 基準 1200（待快排評定），只記錄曝光/選取數
+      // 新卡：文件不存在，increment 的 base 會是 0，故直接設定 1200+變化的絕對值
       return {
         update: { name, fields: {
-          elo:       { integerValue: '1200' },
+          elo:       { integerValue: `${Math.min(2000, Math.max(500, Math.round(1200 + dElo)))}` },
           seenCount: { integerValue: `${dSeen}` },
           pickCount: { integerValue: `${dPick}` },
           lastRater: { stringValue: raterId },
