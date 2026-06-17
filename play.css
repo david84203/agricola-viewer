@@ -2029,6 +2029,57 @@ body.draft-active .hand-dock {
   padding: 16px;
 }
 
+.score-modal {
+  width: min(720px, calc(100vw - 28px));
+  max-height: calc(100vh - 44px);
+  overflow: auto;
+  padding: 16px;
+}
+
+.score-body { margin: 14px 0; }
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.score-table th,
+.score-table td {
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(82, 53, 27, .22);
+}
+
+.score-table th:first-child,
+.score-table td:first-child {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.score-table thead th {
+  font-weight: 700;
+  border-bottom: 2px solid rgba(82, 53, 27, .4);
+}
+
+.score-pts { font-weight: 700; }
+.score-val { margin-left: 4px; font-size: 12px; opacity: .6; }
+
+.score-table input {
+  width: 54px;
+  padding: 3px 5px;
+  border: 1px solid rgba(82, 53, 27, .4);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .75);
+  text-align: center;
+}
+
+.score-total td {
+  font-weight: 800;
+  font-size: 16px;
+  border-top: 2px solid rgba(82, 53, 27, .4);
+}
+
 .harvest-body {
   display: grid;
   gap: 10px;

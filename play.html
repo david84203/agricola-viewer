@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="play.css?v=20260618-bake-harvest-renovate-1" />
+  <link rel="stylesheet" href="play.css?v=20260618-scoreboard-1" />
 </head>
 <body>
   <header class="game-topbar">
@@ -26,6 +26,7 @@
       <button class="ghost-btn" id="undoBtn" type="button">返回一步</button>
       <button class="primary-btn" id="replenishBtn" type="button">補料</button>
       <button class="ghost-btn" id="returnHomeBtn" type="button">返家</button>
+      <button class="ghost-btn" id="scoreBtn" type="button">結算分數</button>
     </div>
   </header>
 
@@ -206,6 +207,22 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="scoreModal" hidden>
+    <div class="score-modal" role="dialog" aria-modal="true" aria-labelledby="scoreModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="phase-label">分數估算</span>
+          <h2 id="scoreModalTitle">結算分數</h2>
+        </div>
+        <button class="icon-btn" id="closeScoreModal" type="button" aria-label="關閉">X</button>
+      </div>
+      <div class="score-body" id="scoreBody"></div>
+      <div class="modal-actions">
+        <span class="player-meta">依標準計分表估算；卡片/額外加分請手動填。隨時可開來參考。</span>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="cardInfoModal" hidden>
     <div class="card-info-modal" role="dialog" aria-modal="true" aria-labelledby="cardInfoTitle">
       <div class="modal-head">
@@ -219,6 +236,6 @@
     </div>
   </div>
 
-  <script src="play.js?v=20260618-bake-harvest-renovate-1"></script>
+  <script src="play.js?v=20260618-scoreboard-1"></script>
 </body>
 </html>

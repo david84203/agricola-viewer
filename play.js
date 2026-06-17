@@ -509,6 +509,8 @@ const els = {
   confirmActionBtn: document.getElementById('confirmActionBtn'),
   harvestModal: document.getElementById('harvestModal'),
   harvestBody: document.getElementById('harvestBody'),
+  scoreModal: document.getElementById('scoreModal'),
+  scoreBody: document.getElementById('scoreBody'),
 };
 
 function currentPlayer() {
@@ -2619,6 +2621,119 @@ function removeAnimalsFromFarm(player, type, count) {
   return count - remaining;
 }
 
+const SCORE_TABLE = {
+  field: [2, 3, 4, 5],
+  pasture: [1, 2, 3, 4],
+  grain: [1, 4, 6, 8],
+  vegetable: [1, 2, 3, 4],
+  sheep: [1, 4, 6, 8],
+  boar: [1, 3, 5, 7],
+  cattle: [1, 3, 5, 7],
+};
+
+function tieredScore(value, mins) {
+  if (value >= mins[3]) return 4;
+  if (value >= mins[2]) return 3;
+  if (value >= mins[1]) return 2;
+  if (value >= mins[0]) return 1;
+  return -1;
+}
+
+function cropTotal(player, type) {
+  let total = player.resources[type] || 0;
+  player.farm.forEach((cell) => {
+    if (cell.crop?.type === type) total += cell.crop.count;
+  });
+  return total;
+}
+
+function countPastureAreas(player) {
+  const groups = new Set();
+  let singles = 0;
+  player.farm.forEach((cell) => {
+    if (cell.terrain !== 'pasture') return;
+    if (cell.pastureGroup) groups.add(cell.pastureGroup);
+    else singles += 1;
+  });
+  return groups.size + singles;
+}
+
+function computeScore(player) {
+  const rows = [];
+  const fields = player.farm.filter((c) => c.terrain === 'field').length;
+  const pastures = countPastureAreas(player);
+  const grain = cropTotal(player, 'grain');
+  const veg = cropTotal(player, 'vegetable');
+  const empty = player.farm.filter((c) => c.terrain === 'empty' && !c.stable).length;
+  const stables = player.farm.filter((c) => c.stable).length;
+  const clayRooms = player.farm.filter((c) => c.terrain === 'room' && c.roomType === 'clay').length;
+  const stoneRooms = player.farm.filter((c) => c.terrain === 'room' && c.roomType === 'stone').length;
+  const begging = player.beggingCards || 0;
+  const bonus = Number(state.scoreBonus?.[player.id]) || 0;
+
+  rows.push({ label: '農田', value: fields, score: tieredScore(fields, SCORE_TABLE.field) });
+  rows.push({ label: '牧場', value: pastures, score: tieredScore(pastures, SCORE_TABLE.pasture) });
+  rows.push({ label: '麥', value: grain, score: tieredScore(grain, SCORE_TABLE.grain) });
+  rows.push({ label: '蔬菜', value: veg, score: tieredScore(veg, SCORE_TABLE.vegetable) });
+  rows.push({ label: '羊', value: player.animals.sheep || 0, score: tieredScore(player.animals.sheep || 0, SCORE_TABLE.sheep) });
+  rows.push({ label: '野豬', value: player.animals.boar || 0, score: tieredScore(player.animals.boar || 0, SCORE_TABLE.boar) });
+  rows.push({ label: '牛', value: player.animals.cattle || 0, score: tieredScore(player.animals.cattle || 0, SCORE_TABLE.cattle) });
+  rows.push({ label: '未使用空格', value: empty, score: -empty });
+  rows.push({ label: '馬廄', value: stables, score: stables });
+  rows.push({ label: '磚屋房間', value: clayRooms, score: clayRooms });
+  rows.push({ label: '石屋房間', value: stoneRooms, score: stoneRooms * 2 });
+  rows.push({ label: '家庭成員', value: player.workers.total, score: player.workers.total * 3 });
+  rows.push({ label: '乞討卡', value: begging, score: begging * -3 });
+  rows.push({ label: '卡片/額外加分', value: bonus, score: bonus, bonus: true });
+
+  const total = rows.reduce((sum, row) => sum + row.score, 0);
+  return { rows, total };
+}
+
+function openScoreboard() {
+  els.scoreModal.hidden = false;
+  renderScoreboard();
+}
+
+function closeScoreboard() {
+  els.scoreModal.hidden = true;
+}
+
+function renderScoreboard() {
+  const players = state.playerOrder.map((id) => state.players[id]);
+  const scores = players.map((player) => computeScore(player));
+  const labels = scores[0].rows.map((row) => row.label);
+  const head = `<tr><th>項目</th>${players.map((p) => `<th>${COLOR_LABELS[p.color]}</th>`).join('')}</tr>`;
+  const body = labels.map((label, rowIndex) => {
+    const cells = players.map((player, playerIndex) => {
+      const row = scores[playerIndex].rows[rowIndex];
+      if (row.bonus) {
+        return `<td><input type="number" data-score-bonus="${player.id}" value="${row.value}" /></td>`;
+      }
+      const sign = row.score > 0 ? '+' : '';
+      return `<td><span class="score-pts">${sign}${row.score}</span><span class="score-val">(${row.value})</span></td>`;
+    }).join('');
+    return `<tr><td>${label}</td>${cells}</tr>`;
+  }).join('');
+  const totalRow = `<tr class="score-total"><td>總分</td>${players.map((p, i) => `<td data-score-total="${p.id}">${scores[i].total}</td>`).join('')}</tr>`;
+  els.scoreBody.innerHTML = `<table class="score-table"><thead>${head}</thead><tbody>${body}${totalRow}</tbody></table>`;
+
+  els.scoreBody.querySelectorAll('[data-score-bonus]').forEach((input) => {
+    input.addEventListener('input', () => {
+      if (!state.scoreBonus) state.scoreBonus = {};
+      state.scoreBonus[input.dataset.scoreBonus] = Number(input.value) || 0;
+      updateScoreTotals();
+    });
+  });
+}
+
+function updateScoreTotals() {
+  state.playerOrder.forEach((id) => {
+    const cell = els.scoreBody.querySelector(`[data-score-total="${id}"]`);
+    if (cell) cell.textContent = computeScore(state.players[id]).total;
+  });
+}
+
 function harvestFields(player) {
   player.farm.forEach((cell) => {
     if (!cell.crop || cell.crop.count <= 0) return;
@@ -2663,6 +2778,7 @@ function finishRound() {
   if (state.round >= 14) {
     state.phaseId = 'GAME_END';
     addLog('第 14 回合收成後，遊戲結束。');
+    openScoreboard();
     return;
   }
 
@@ -2846,6 +2962,11 @@ document.getElementById('doneNotesBtn').addEventListener('click', closeNotes);
 document.getElementById('closeHandModal').addEventListener('click', closeHand);
 document.getElementById('skipCardActionBtn').addEventListener('click', skipPendingCardAction);
 document.getElementById('confirmHarvestBtn').addEventListener('click', finishHarvestFeeding);
+document.getElementById('scoreBtn').addEventListener('click', openScoreboard);
+document.getElementById('closeScoreModal').addEventListener('click', closeScoreboard);
+els.scoreModal.addEventListener('click', (event) => {
+  if (event.target === els.scoreModal) closeScoreboard();
+});
 document.getElementById('closeMajorModal').addEventListener('click', closeMajorModal);
 document.getElementById('closeCardInfoModal').addEventListener('click', closeCardInfo);
 els.confirmActionBtn.addEventListener('click', confirmAction);
