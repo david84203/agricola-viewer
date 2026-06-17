@@ -736,6 +736,10 @@ function openMajorModal() {
 
 function closeMajorModal() {
   els.majorModal.hidden = true;
+  const pending = state.pendingCardAction;
+  if (pending && pending.workerPlaced && pending.type === 'major') {
+    completeCardAction(pending.actionId, `${COLOR_LABELS[currentPlayer().color]} 未加打主要發展卡，行動結束。`);
+  }
 }
 
 function renderMajorModal() {
@@ -827,7 +831,12 @@ function renderFarmSelectionBar() {
 }
 
 function cancelPendingFarmSelection() {
+  const pending = state.pendingFarmAction;
   state.pendingFarmAction = null;
+  if (pending?.workerPlaced) {
+    addLog(`${COLOR_LABELS[currentPlayer().color]} 未加建柵欄，行動結束。`);
+    advanceTurn();
+  }
   render();
 }
 
@@ -850,6 +859,16 @@ function confirmPendingFarmSelection() {
   if (pending.mode === 'pasture') {
     if (!Object.keys(pending.pastureGroups || {}).length) {
       addLog('請至少選擇 1 格圈地。');
+      render();
+      return;
+    }
+    if (pending.workerPlaced) {
+      if (!applyPastureBuild(currentPlayer(), pending.pastureGroups)) {
+        render();
+        return;
+      }
+      state.pendingFarmAction = null;
+      advanceTurn();
       render();
       return;
     }
@@ -1398,7 +1417,10 @@ function skipPendingCardAction() {
 function closeHand() {
   els.handModal.hidden = true;
   const pending = state.pendingCardAction;
-  if (pending && pending.type !== 'major') {
+  if (!pending) return;
+  if (pending.workerPlaced) {
+    completeCardAction(pending.actionId, `${COLOR_LABELS[currentPlayer().color]} 未加打發展卡，行動結束。`);
+  } else if (pending.type !== 'major') {
     state.pendingCardAction = null;
     render();
   }
@@ -1542,7 +1564,7 @@ function openActionModal(actionId) {
     state.selectedBuildRooms = 1;
     state.selectedBuildStables = 0;
   }
-  if (space.id === 'major_minor_improvement') {
+  if (space.id === 'major_minor_improvement' || space.id === 'renovation_major_minor') {
     state.selectedImprovementSource = 'minor';
   }
   if (space.cardAction === 'occupation') {
@@ -1565,10 +1587,10 @@ function openActionModal(actionId) {
     } else {
       extra.push(`翻修會把全部 ${roomCount(player)} 間房子升級為${RESOURCE_LABELS[next]}屋，支付 ${formatCostForLog(renovationCost(player))}。`);
     }
-    if (space.id === 'renovation_major_minor') extra.push('翻修後可再手動從手牌打 1 張發展卡（第一版手動）。');
-    if (space.id === 'renovation_fences') extra.push('翻修後若要建柵欄，請另用「建造柵欄」格（第一版手動）。');
+    if (space.id === 'renovation_major_minor') extra.push('翻修後可加打 1 張發展卡（依上方來源選擇），或略過。');
+    if (space.id === 'renovation_fences') extra.push('翻修後可加建柵欄，或略過。');
   }
-  if (space.id === 'family_growth_minor') extra.push('需要有空房，確認後增加 1 位家庭成員。');
+  if (space.id === 'family_growth_minor') extra.push('需要有空房，確認後增加 1 位家庭成員，並可加打 1 張次要發展卡（或略過）。');
   if (space.id === 'family_growth_without_room') extra.push('不需要空房，確認後增加 1 位家庭成員。');
   if (space.cardAction === 'occupation') extra.push('確認後請從手牌選 1 張職業卡打出。首張預設免費、第 2 張起預設 1 食物，可自行修改。');
   if (space.id === 'starting_player') extra.push('確認後你會成為起始玩家，並可從手牌打 1 張次要發展卡（可按「不打牌，直接派人」略過）。');
@@ -1583,7 +1605,7 @@ function openActionModal(actionId) {
       <div class="token-row">${[...tokenRows, ...gainRows].join('') || '沒有自動資源，僅記錄行動。'}</div>
     </div>
     ${space.farmAction === 'build' ? buildOptionsHtmlV2(player) : ''}
-    ${space.id === 'major_minor_improvement' ? improvementSourceHtml() : ''}
+    ${space.id === 'major_minor_improvement' || space.id === 'renovation_major_minor' ? improvementSourceHtml() : ''}
     ${space.cardAction === 'occupation' ? `
       <div class="modal-summary">
         <label class="occupation-food-field">打出此職業支付食物：
@@ -1841,6 +1863,44 @@ function pastureFenceSegments(pastureGroups) {
   return [...segmentMap.values()];
 }
 
+function applyPastureBuild(player, pastureGroups) {
+  const selectedIndexes = Object.keys(pastureGroups).map(Number);
+  const fenceSegments = pastureFenceSegments(pastureGroups);
+  const fenceCost = fenceSegments.length;
+  if (!selectedIndexes.length) {
+    addLog('建造柵欄失敗：請至少選擇 1 格圈地。');
+    return false;
+  }
+  if (selectedIndexes.some((index) => player.farm[index]?.terrain !== 'empty')) {
+    addLog('建造柵欄失敗：圈地範圍只能選未使用地。');
+    return false;
+  }
+  if (player.fences < fenceCost) {
+    addLog(`${COLOR_LABELS[player.color]} 柵欄數量不足，需要 ${fenceCost} 根柵欄。`);
+    return false;
+  }
+  if (!hasResources(player, { wood: fenceCost })) {
+    addLog(`${COLOR_LABELS[player.color]} 木頭不足，需要 ${fenceCost} 木。`);
+    return false;
+  }
+  payResources(player, { wood: fenceCost });
+  player.fences -= fenceCost;
+  selectedIndexes.forEach((index) => {
+    const cell = player.farm[index];
+    cell.terrain = 'pasture';
+    cell.pastureGroup = `${player.id}-${pastureGroups[index]}`;
+    cell.fences = { top: false, right: false, bottom: false, left: false };
+  });
+  fenceSegments.forEach((segment) => {
+    player.farm[segment.index].fences[segment.side] = true;
+    if (segment.neighbor !== null) {
+      player.farm[segment.neighbor].fences[segment.opposite] = true;
+    }
+  });
+  addLog(`${COLOR_LABELS[player.color]} 建立 ${new Set(Object.values(pastureGroups)).size} 個圈地，使用 ${fenceCost} 根柵欄與 ${fenceCost} 木。`);
+  return true;
+}
+
 function currentRoomType(player) {
   return player.farm.find((cell) => cell.terrain === 'room')?.roomType || 'wood';
 }
@@ -2086,7 +2146,17 @@ function confirmAction() {
     return;
   }
 
-  finalizeAction(actionId);
+  const comboBonus = comboBonusFor(space);
+  finalizeAction(actionId, comboBonus ? { comboBonus } : {});
+}
+
+function comboBonusFor(space) {
+  if (space.id === 'family_growth_minor') return { kind: 'card', cardType: 'minor' };
+  if (space.id === 'renovation_major_minor') {
+    return { kind: 'card', cardType: state.selectedImprovementSource === 'major' ? 'major' : 'minor' };
+  }
+  if (space.id === 'renovation_fences') return { kind: 'fence' };
+  return null;
 }
 
 function finalizeAction(actionId, options = {}) {
@@ -2188,45 +2258,10 @@ function finalizeAction(actionId, options = {}) {
 
   if (space.farmAction === 'pasture') {
     if (options.pastureGroups) {
-      const pastureGroups = options.pastureGroups;
-      const selectedIndexes = Object.keys(pastureGroups).map(Number);
-      const fenceSegments = pastureFenceSegments(pastureGroups);
-      const fenceCost = fenceSegments.length;
-      if (!selectedIndexes.length) {
-        addLog('建造柵欄失敗：請至少選擇 1 格圈地。');
+      if (!applyPastureBuild(player, options.pastureGroups)) {
         render();
         return;
       }
-      if (selectedIndexes.some((index) => player.farm[index]?.terrain !== 'empty')) {
-        addLog('建造柵欄失敗：圈地範圍只能選未使用地。');
-        render();
-        return;
-      }
-      if (player.fences < fenceCost) {
-        addLog(`${COLOR_LABELS[player.color]} 柵欄數量不足，需要 ${fenceCost} 根柵欄。`);
-        render();
-        return;
-      }
-      if (!hasResources(player, { wood: fenceCost })) {
-        addLog(`${COLOR_LABELS[player.color]} 木頭不足，需要 ${fenceCost} 木。`);
-        render();
-        return;
-      }
-      payResources(player, { wood: fenceCost });
-      player.fences -= fenceCost;
-      selectedIndexes.forEach((index) => {
-        const cell = player.farm[index];
-        cell.terrain = 'pasture';
-        cell.pastureGroup = `${player.id}-${pastureGroups[index]}`;
-        cell.fences = { top: false, right: false, bottom: false, left: false };
-      });
-      fenceSegments.forEach((segment) => {
-        player.farm[segment.index].fences[segment.side] = true;
-        if (segment.neighbor !== null) {
-          player.farm[segment.neighbor].fences[segment.opposite] = true;
-        }
-      });
-      addLog(`${COLOR_LABELS[player.color]} 建立 ${new Set(Object.values(pastureGroups)).size} 個圈地，使用 ${fenceCost} 根柵欄與 ${fenceCost} 木。`);
     } else {
     const cell = player.farm[options.farmIndex];
     if (!cell || cell.terrain !== 'empty') {
@@ -2325,8 +2360,38 @@ function finalizeAction(actionId, options = {}) {
 
   addLog(`${COLOR_LABELS[player.color]} 派人到「${space.name}」${formatGainForLog(appliedGains)}`);
   closeActionModal();
+  if (options.comboBonus) {
+    startComboBonus(space, player, options.comboBonus);
+    render();
+    return;
+  }
   advanceTurn();
   render();
+}
+
+function startComboBonus(space, player, bonus) {
+  if (bonus.kind === 'card') {
+    state.pendingCardAction = { actionId: space.id, playerId: player.id, type: bonus.cardType, workerPlaced: true };
+    if (bonus.cardType === 'major') {
+      openMajorModal();
+    } else {
+      state.handFilter = 'minor';
+      openHand();
+    }
+    addLog(`${COLOR_LABELS[player.color]} 可加打 1 張${bonus.cardType === 'major' ? '主要' : '次要'}發展卡，或略過直接結束。`);
+    return;
+  }
+  if (bonus.kind === 'fence') {
+    state.pendingFarmAction = {
+      actionId: space.id,
+      mode: 'pasture',
+      playerId: player.id,
+      currentPastureGroup: 1,
+      pastureGroups: {},
+      workerPlaced: true,
+    };
+    addLog(`${COLOR_LABELS[player.color]} 翻修完成，可加建柵欄（選好後按確認圈地），或按取消略過。`);
+  }
 }
 
 function mergeResourceMaps(...maps) {
@@ -2828,15 +2893,18 @@ function randomizeSeats() {
 function completeCardAction(actionId, message) {
   const space = state.actionSpaces[actionId];
   const player = currentPlayer();
-  if (!space || space.occupiedBy || player.workers.available <= 0) {
+  const alreadyPlaced = state.pendingCardAction?.workerPlaced;
+  if (!alreadyPlaced && (!space || space.occupiedBy || player.workers.available <= 0)) {
     state.pendingCardAction = null;
     render();
     return;
   }
-  player.workers.available -= 1;
-  space.occupiedBy = player.id;
-  if (space.id === 'starting_player') {
-    state.nextStartPlayerId = player.id;
+  if (!alreadyPlaced) {
+    player.workers.available -= 1;
+    space.occupiedBy = player.id;
+    if (space.id === 'starting_player') {
+      state.nextStartPlayerId = player.id;
+    }
   }
   state.pendingCardAction = null;
   addLog(message);
@@ -2868,7 +2936,7 @@ function playMajorImprovement(majorId) {
   payResources(player, cost);
   state.majorImprovements[majorId].available = false;
   player.played.push({ ...card, instanceId: `${player.id}-played-${card.id}-${Date.now()}` });
-  closeMajorModal();
+  els.majorModal.hidden = true;
   completeCardAction(pending.actionId, `${COLOR_LABELS[player.color]} 支付 ${formatCostForLog(cost)}，打出主要發展卡「${card.name}」。`);
 }
 
