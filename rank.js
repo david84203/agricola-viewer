@@ -20,6 +20,13 @@ let rankBannedIds = new Set();
 let rankDupExclusions = new Set();
 let rankRatingsMap = null; // null = 未載入；載入後為 map（失敗維持 null → 退回純隨機）
 
+// ── Tier S 集訓模式（?mode=elite）：牌池只放目前 S＋A前半段（頂端約 16.5%）──
+let rankEliteMode = false;
+let rankEliteOcc = null;  // Set of card IDs
+let rankEliteMin = null;
+const ELITE_TOP_PCT = 0.165; // S(8%) + A 前半(~8.5%)
+const ELITE_K_SCALE = 0.6;   // 集訓模式：K 值縮小，避免同級對打單場暴衝（A 被砸進 B）
+
 let rankState = {
   roundCount: 0,
   occCards: [],      // 9 occupation cards shown this round
@@ -42,7 +49,63 @@ async function rankInit() {
   await Promise.all([loadRankBanlist(), loadRankDupExclusions()]);
   await loadRankCards();
 
+  // 集訓模式：URL 帶 ?mode=elite 才啟用，正常快排完全不受影響
+  if (new URLSearchParams(location.search).get('mode') === 'elite') {
+    await setupEliteMode();
+  }
+
   loadRankRoundCount();
+}
+
+// ── 集訓模式：算出目前 S＋A前半段 的卡，限縮牌池 ──
+async function setupEliteMode() {
+  try {
+    const map = {};
+    let pageToken = null;
+    do {
+      let url = `${RANK_FS_BASE}/agricola_ratings?pageSize=300`;
+      if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+      const data = await fetch(url).then(r => r.json());
+      (data.documents || []).forEach(doc => {
+        const id = doc.name.split('/').pop();
+        const f = doc.fields || {};
+        const g = (k, v) => Number(f[k]?.integerValue ?? f[k]?.doubleValue ?? v);
+        map[id] = { elo: g('elo', 1200), seen: g('seenCount', 0), pick: g('pickCount', 0), rank: g('rankSeen', 0) };
+      });
+      pageToken = data.nextPageToken ?? null;
+    } while (pageToken);
+
+    // 與 tierlist 相同的評分函式
+    const score = r => {
+      const eff = r.seen + r.rank;
+      const conf = Math.min(eff / 30, 1);
+      if (conf >= 1) return r.elo;
+      const pr = r.seen ? r.pick / r.seen : 0.11;
+      return conf * r.elo + (1 - conf) * (1200 + (pr - 0.11) * 450);
+    };
+    const topSet = pool => {
+      const rated = pool
+        .filter(c => map[c['卡片ID']] && map[c['卡片ID']].seen >= 5)
+        .map(c => ({ id: c['卡片ID'], s: score(map[c['卡片ID']]) }))
+        .sort((a, b) => b.s - a.s);
+      const cut = Math.max(RANK_CARDS_PER_ROUND, Math.ceil(rated.length * ELITE_TOP_PCT));
+      return new Set(rated.slice(0, cut).map(r => r.id));
+    };
+    rankEliteOcc = topSet(rankAllCards.filter(c => c.card_type === 'occupation'));
+    rankEliteMin = topSet(rankAllCards.filter(c => c.card_type === 'minor' || c.card_type === 'both'));
+    rankEliteMode = true;
+    showEliteBanner(rankEliteOcc.size, rankEliteMin.size);
+  } catch (e) {
+    console.warn('[elite] 設定失敗，退回一般模式', e);
+  }
+}
+
+function showEliteBanner(occN, minN) {
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:sticky;top:0;z-index:50;background:linear-gradient(90deg,#b8860b,#f5c542);color:#1a1205;'
+    + 'font-weight:700;text-align:center;padding:8px 12px;font-size:14px';
+  bar.textContent = `🔥 Tier S 集訓模式 — 牌池只剩頂端強卡（職業 ${occN}・次發 ${minN} 張），低出場優先冒出`;
+  document.body.prepend(bar);
 }
 
 // Called by auth.js when login state changes
@@ -292,8 +355,14 @@ async function startRankRound() {
   }
 
   // 'both'（烤爐/廚房等）實為次要發展卡，只歸入次要牌庫，避免跑到職業排，也避免同一張同時出現在兩排
-  const occPool = rankAllCards.filter(c => c.card_type === 'occupation');
-  const minPool = rankAllCards.filter(c => c.card_type === 'minor' || c.card_type === 'both');
+  let occPool = rankAllCards.filter(c => c.card_type === 'occupation');
+  let minPool = rankAllCards.filter(c => c.card_type === 'minor' || c.card_type === 'both');
+
+  // 集訓模式：牌池限縮成目前 S＋A前半段
+  if (rankEliteMode) {
+    if (rankEliteOcc) occPool = occPool.filter(c => rankEliteOcc.has(c['卡片ID']));
+    if (rankEliteMin) minPool = minPool.filter(c => rankEliteMin.has(c['卡片ID']));
+  }
 
   if (occPool.length < RANK_CARDS_PER_ROUND || minPool.length < RANK_CARDS_PER_ROUND) {
     alert('牌庫不足，無法開始');
@@ -515,7 +584,11 @@ async function uploadRankingElo() {
       for (let j = i + 1; j < ranked.length; j++) {
         const wId = ranked[i];  // 名次較高 = 贏家
         const lId = ranked[j];  // 名次較低 = 輸家
-        const kPair = (rankCardK(rankSeenInit[wId]) + rankCardK(rankSeenInit[lId])) / 2 * raterWeight;
+        // 集訓模式：只算「爆冷」——低分牌被排到高分牌前面才動分；
+        // 排序與現有 ELO 一致（預期內）則兩邊不動，避免池底好牌被單向壓垮
+        if (rankEliteMode && base[wId] >= base[lId]) continue;
+        const kPair = (rankCardK(rankSeenInit[wId]) + rankCardK(rankSeenInit[lId])) / 2 * raterWeight
+          * (rankEliteMode ? ELITE_K_SCALE : 1); // 集訓模式縮小幅度
         const E_w = 1 / (1 + Math.pow(10, (base[lId] - base[wId]) / 400));
         const change = kPair * (1 - E_w); // 標準 ELO：贏家加多少，輸家就扣多少（零和）
         delta[wId] += change;
