@@ -973,18 +973,15 @@ function showResult() {
   showScreen('resultScreen');
   renderResultGrid('occResultGrid', state.occPicks);
   renderResultGrid('minResultGrid', state.minPicks);
-  // 評分者與玩家輪抽都只記個人場次（excludeFromElo），ELO 一律改由「快速牌力排序」產生
-  if (state.raterMode) uploadPlayerSession('rater');
+  // 評分者輪抽計入 ELO＋選取率；一般玩家只記個人場次、不影響榜單
+  if (state.raterMode) uploadRatings();
   else if (state.playerMode) uploadPlayerSession('player');
   calculateScore();
 }
 
-// ⚠ 已停用：輪抽不再產生 ELO（牌力評分一律改由「快速牌力排序」rank.js 提供）。
-// 此函式保留僅供參考，已無任何呼叫處；防呆 early-return 確保即使被誤呼叫也不會寫入 agricola_ratings。
+// 輪抽 ELO 計分（僅評分者）：picked 對每張對手各打一場，K=8×評分者權重，標準零和、增量寫入。
+// 同步更新 seenCount/pickCount（選取率）並寫個人場次。一般玩家走 uploadPlayerSession（不計 ELO）。
 async function uploadRatings() {
-  console.warn('uploadRatings 已停用：輪抽不再灌 ELO，請使用快速牌力排序');
-  return;
-  /* eslint-disable no-unreachable */
   const statusEl = document.getElementById('uploadStatus');
   statusEl.style.display = 'flex';
   statusEl.textContent = '評分資料上傳中…';
@@ -1096,6 +1093,7 @@ async function uploadRatings() {
         name: `projects/project-hub-410cd/databases/(default)/documents/agricola_sessions/${raterId}_${Date.now()}`,
         fields: {
           raterId:      { stringValue: raterId },
+          role:         { stringValue: 'rater' },
           timestamp:    { stringValue: new Date().toISOString() },
           draftMode:    { stringValue: state.draftMode },
           totalRounds:  { integerValue: `${state.shownLog.length}` },

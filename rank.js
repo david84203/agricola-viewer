@@ -313,33 +313,13 @@ function rankBuildPack(pool) {
   const used = new Set();
   const pack = [];
 
-  // 1. 3 張場數少（加權抽樣，eff 越小機率越高）
+  // 1. 3 張場數少（加權抽樣，eff 越小機率越高）— 保底樣本，確保冷門卡有被比到
   for (let i = 0; i < 3; i++) {
     const c = rankWeightedDrawOne(pool, used);
     if (c) { pack.push(c); used.add(c['卡片ID']); }
   }
 
-  // 2. 1 張高分（剩餘卡 elo 前 10% 均勻隨機）
-  const rem1 = pool.filter(c => !used.has(c['卡片ID']));
-  if (rem1.length) {
-    const byDesc = [...rem1].sort((a, b) =>
-      (rankRatingsMap[b['卡片ID']]?.elo ?? 1200) - (rankRatingsMap[a['卡片ID']]?.elo ?? 1200));
-    const top = byDesc.slice(0, Math.max(1, Math.ceil(byDesc.length * 0.1)));
-    const pick = top[Math.floor(Math.random() * top.length)];
-    pack.push(pick); used.add(pick['卡片ID']);
-  }
-
-  // 3. 1 張低分（剩餘卡 elo 後 10% 均勻隨機）
-  const rem2 = pool.filter(c => !used.has(c['卡片ID']));
-  if (rem2.length) {
-    const byAsc = [...rem2].sort((a, b) =>
-      (rankRatingsMap[a['卡片ID']]?.elo ?? 1200) - (rankRatingsMap[b['卡片ID']]?.elo ?? 1200));
-    const bot = byAsc.slice(0, Math.max(1, Math.ceil(byAsc.length * 0.1)));
-    const pick = bot[Math.floor(Math.random() * bot.length)];
-    pack.push(pick); used.add(pick['卡片ID']);
-  }
-
-  // 4. 補足至 7 張（均勻隨機）
+  // 2. 其餘補滿至 7 張：純隨機（不再刻意挑高分/低分離群樣本）
   rankShuffle(pool.filter(c => !used.has(c['卡片ID'])))
     .slice(0, RANK_CARDS_PER_ROUND - pack.length)
     .forEach(c => pack.push(c));
