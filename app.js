@@ -785,6 +785,11 @@ if (sortSelect) {
     activeSort = e.target.value;
     const grid = document.getElementById('cardGrid');
     if (activeSort !== 'default') {
+      // 牌力排序跨整個資料庫才有意義，自動切換到「全部」牌組
+      if (activeDeck !== 'all') {
+        activeDeck = 'all';
+        document.getElementById('deckSelect').value = 'all';
+      }
       sortSelect.disabled = true;
       try { await ensureRatings(); }
       catch (err) { console.error('載入牌力資料失敗', err); }
