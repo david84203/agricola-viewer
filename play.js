@@ -11,12 +11,28 @@ const RESOURCE_LABELS = {
   cattle: '牛',
 };
 
-const RESOURCE_ORDER = ['wood', 'clay', 'reed', 'stone', 'grain', 'vegetable', 'food'];
+const RESOURCE_ORDER = ['wood', 'clay', 'reed', 'stone', 'food', 'grain', 'vegetable'];
 const ANIMAL_ORDER = ['sheep', 'boar', 'cattle'];
 const FARM_COLUMNS = 5;
 const FARM_CELL_LEFTS = [3.7, 22.0, 40.3, 58.6, 76.9];
 const FARM_CELL_TOPS = [19.7, 44.8, 69.9];
 const FARM_CELL_SIZE = 15;
+const FARM_ROWS = 3;
+const FARM_GRID_ASPECT = 3488 / 2475;
+const FARM_CELL_H = FARM_CELL_SIZE * FARM_GRID_ASPECT; // 格子高度（佔格線總高的 %）
+// 柵欄「邊」的座標：對齊「兩格之間縫隙的正中央」。cb=0..5、rb=0..3
+const FARM_COL_PITCH = FARM_CELL_LEFTS[1] - FARM_CELL_LEFTS[0];
+const FARM_ROW_PITCH = FARM_CELL_TOPS[1] - FARM_CELL_TOPS[0];
+const FARM_HALF_GAP_X = (FARM_COL_PITCH - FARM_CELL_SIZE) / 2;
+const FARM_HALF_GAP_Y = (FARM_ROW_PITCH - FARM_CELL_H) / 2;
+const FARM_COL_BOUNDS = [
+  ...FARM_CELL_LEFTS.map((l) => l - FARM_HALF_GAP_X),
+  FARM_CELL_LEFTS[FARM_COLUMNS - 1] + FARM_CELL_SIZE + FARM_HALF_GAP_X,
+];
+const FARM_ROW_BOUNDS = [
+  ...FARM_CELL_TOPS.map((t) => t - FARM_HALF_GAP_Y),
+  FARM_CELL_TOPS[FARM_ROWS - 1] + FARM_CELL_H + FARM_HALF_GAP_Y,
+];
 const RESOURCE_ICON_PATHS = {
   wood: 'images/online-table/wood.png',
   clay: 'images/online-table/clay.png',
@@ -165,7 +181,7 @@ const actionSpaceDefs = [
   { id: 'starting_player', name: '起始玩家', shortName: '起始玩家', boardText: '打 1 張次要發展卡', kind: '起始玩家 + 次要發展卡', cardAction: 'minor', board: { panel: 'left', col: 3, row: 2 } },
 
   { id: 'traveling_players', name: '賣藝', boardText: '1 食物', kind: '累積格', accumulate: { food: 1 }, board: { panel: 'left', col: 1, row: 5, rowSpan: 2 } },
-  { id: 'occupation_1', name: '打 1 張職業卡', shortName: '打 1 張職業', boardText: '付出食物後打出職業', kind: '出牌', cardAction: 'occupation', board: { panel: 'left', col: 2, row: 5, rowSpan: 2 } },
+  { id: 'occupation_1', name: '打 1 張職業卡', shortName: '打 1 張職業', boardText: '前兩張各 1 食物；之後 2 食物', kind: '出牌', cardAction: 'occupation', board: { panel: 'left', col: 2, row: 5, rowSpan: 2 } },
   { id: 'grain_seeds', name: '拿 1 份麥子', shortName: '拿 1 份麥子', boardText: '置入個人供應區', kind: '立即格', gain: { grain: 1 }, board: { panel: 'left', col: 3, row: 3 } },
 
   { id: 'plow_1_field_left', name: '犁 1 塊農田', shortName: '犁田', boardText: '新增 1 塊農田', kind: '農場操作', farmAction: 'field', board: { panel: 'left', col: 3, row: 4 } },
@@ -244,6 +260,8 @@ const state = {
   handFilter: 'all',
   cardLibraryLoaded: false,
   spectatorMode: false,
+  debugMode: false,
+  roundStartResolved: false,
   chatMessages: [],
   notePlayerId: initialPlayers[0].id,
   playerNotes: loadPlayerNotes(),
@@ -268,6 +286,7 @@ const state = {
         fences: 15,
         stables: 4,
         beggingCards: 0,
+        fenceEdges: {},
         farm: createInitialFarm(player.id),
         hand: sampleHand.map((card, index) => ({ ...card, instanceId: `${player.id}-${card.id}-${index}` })),
         played: [],
@@ -509,6 +528,8 @@ const els = {
   confirmActionBtn: document.getElementById('confirmActionBtn'),
   harvestModal: document.getElementById('harvestModal'),
   harvestBody: document.getElementById('harvestBody'),
+  roundStartModal: document.getElementById('roundStartModal'),
+  roundStartBody: document.getElementById('roundStartBody'),
   scoreModal: document.getElementById('scoreModal'),
   scoreBody: document.getElementById('scoreBody'),
 };
@@ -534,8 +555,16 @@ function resourceIconHtml(type, className = 'resource-icon') {
   return `<img class="${className}" src="${escapeHtml(iconPath)}" alt="${escapeHtml(RESOURCE_LABELS[type] || type)}" loading="lazy" />`;
 }
 
-function resourcePill(type, value) {
-  return `<span class="resource-pill res-${type}" aria-label="${escapeHtml(RESOURCE_LABELS[type] || type)} ${value}"><span>${value}</span>${resourceIconHtml(type)}</span>`;
+function resourcePill(type, value, editPlayerId = null) {
+  const label = `${escapeHtml(RESOURCE_LABELS[type] || type)} ${value}`;
+  if (!editPlayerId) {
+    return `<span class="resource-pill res-${type}" aria-label="${label}"><span>${value}</span>${resourceIconHtml(type)}</span>`;
+  }
+  return `<span class="resource-pill res-${type} editable" aria-label="${label}">`
+    + `<button class="pill-step" type="button" data-res-adjust="-1" data-res-type="${type}" data-res-player="${editPlayerId}" aria-label="減少${escapeHtml(RESOURCE_LABELS[type] || type)}">−</button>`
+    + `<span>${value}</span>${resourceIconHtml(type)}`
+    + `<button class="pill-step" type="button" data-res-adjust="1" data-res-type="${type}" data-res-player="${editPlayerId}" aria-label="增加${escapeHtml(RESOURCE_LABELS[type] || type)}">＋</button>`
+    + `</span>`;
 }
 
 function compactResourcePill(type, value) {
@@ -561,10 +590,10 @@ function actionSeasonLabel(enabledRound) {
   return '第六季';
 }
 
-function formatResources(resources, animals = {}) {
+function formatResources(resources, animals = {}, editPlayerId = null) {
   return [
-    ...RESOURCE_ORDER.map((type) => resourcePill(type, resources[type] || 0)),
-    ...ANIMAL_ORDER.map((type) => resourcePill(type, animals[type] || 0)),
+    ...RESOURCE_ORDER.map((type) => resourcePill(type, resources[type] || 0, editPlayerId)),
+    ...ANIMAL_ORDER.map((type) => resourcePill(type, animals[type] || 0, editPlayerId)),
   ].join('');
 }
 
@@ -616,6 +645,7 @@ function render() {
   renderDraft();
   if (!els.notesModal.hidden) renderNotesModal();
   if (!els.majorModal.hidden) renderMajorModal();
+  maybeOpenRoundStartModal();
 }
 
 function turnBannerHtml(player) {
@@ -792,20 +822,36 @@ function renderFarmSelectionBar() {
       </div>
     `;
   } else if (pending.mode === 'pasture') {
-    const selectedCount = Object.keys(pending.pastureGroups || {}).length;
-    const fenceCount = pastureFenceSegments(pending.pastureGroups || {}).length;
-    const groupIds = [...new Set(Object.values(pending.pastureGroups || {}))].sort((a, b) => a - b);
-    const visibleGroupIds = [...new Set([1, 2, 3, 4, pending.currentPastureGroup || 1, ...groupIds])].sort((a, b) => a - b);
-    const nextGroup = Math.max(1, ...groupIds, pending.currentPastureGroup || 1) + 1;
+    const newCount = Object.keys(pending.newEdges || {}).filter((k) => pending.newEdges[k]).length;
+    const groupCount = enclosureGroups(currentPlayer()).length;
     els.farmSelectionBar.innerHTML = `
       <div class="selection-summary">
-        <strong>選擇圈地範圍</strong>
-        <span>${selectedCount} 格 ・ ${groupIds.length || 1} 個圈地 ・ 需要 ${fenceCount} 根柵欄/木頭</span>
+        <strong>點格線放柵欄</strong>
+        <span>本次新增 ${newCount} 根柵欄 = ${newCount} 木 ・ 目前 ${groupCount} 個圈地</span>
       </div>
       <div class="selection-actions">
-        ${visibleGroupIds.map((groupId) => `<button class="ghost-btn ${pending.currentPastureGroup === groupId ? 'active' : ''}" type="button" data-pasture-group="${groupId}">第 ${groupId} 圈地</button>`).join('')}
-        <button class="ghost-btn" type="button" data-pasture-group="${nextGroup}">新增圈地</button>
-        <button class="primary-btn" type="button" data-farm-selection-confirm>確認圈地</button>
+        <button class="primary-btn" type="button" data-farm-selection-confirm ${newCount <= 0 ? 'disabled' : ''}>確認柵欄</button>
+        <button class="ghost-btn" type="button" data-farm-selection-cancel>取消</button>
+      </div>
+    `;
+  } else if (pending.mode === 'sow') {
+    const cells = pending.sowCells || {};
+    const fieldCount = Object.keys(cells).length;
+    const usedGrain = Object.values(cells).filter((type) => type === 'grain').length;
+    const usedVeg = Object.values(cells).filter((type) => type === 'vegetable').length;
+    const cropButtons = [['grain', '麥子'], ['vegetable', '蔬菜']]
+      .map(([type, name]) => {
+        const owned = currentPlayer().resources[type] || 0;
+        return `<button class="ghost-btn ${pending.currentSowCrop === type ? 'active' : ''}" type="button" data-sow-crop-pick="${type}" ${owned <= 0 ? 'disabled' : ''}>${name}（有 ${owned}）</button>`;
+      }).join('');
+    els.farmSelectionBar.innerHTML = `
+      <div class="selection-summary">
+        <strong>選擇要播種的田</strong>
+        <span>${fieldCount} 塊田 ・ 用 ${usedGrain} 麥 ${usedVeg} 菜</span>
+      </div>
+      <div class="selection-actions">
+        ${cropButtons}
+        <button class="primary-btn" type="button" data-farm-selection-confirm>確認播種</button>
         <button class="ghost-btn" type="button" data-farm-selection-cancel>取消</button>
       </div>
     `;
@@ -814,15 +860,15 @@ function renderFarmSelectionBar() {
     return;
   }
 
-  els.farmSelectionBar.querySelectorAll('[data-build-placement]').forEach((button) => {
+  els.farmSelectionBar.querySelectorAll('[data-sow-crop-pick]').forEach((button) => {
     button.addEventListener('click', () => {
-      state.pendingFarmAction.placementKind = button.dataset.buildPlacement;
+      state.pendingFarmAction.currentSowCrop = button.dataset.sowCropPick;
       render();
     });
   });
-  els.farmSelectionBar.querySelectorAll('[data-pasture-group]').forEach((button) => {
+  els.farmSelectionBar.querySelectorAll('[data-build-placement]').forEach((button) => {
     button.addEventListener('click', () => {
-      state.pendingFarmAction.currentPastureGroup = Number(button.dataset.pastureGroup);
+      state.pendingFarmAction.placementKind = button.dataset.buildPlacement;
       render();
     });
   });
@@ -857,13 +903,14 @@ function confirmPendingFarmSelection() {
     return;
   }
   if (pending.mode === 'pasture') {
-    if (!Object.keys(pending.pastureGroups || {}).length) {
-      addLog('請至少選擇 1 格圈地。');
+    const newKeys = Object.keys(pending.newEdges || {}).filter((k) => pending.newEdges[k]);
+    if (!newKeys.length) {
+      addLog('請至少放 1 根柵欄，或按取消。');
       render();
       return;
     }
     if (pending.workerPlaced) {
-      if (!applyPastureBuild(currentPlayer(), pending.pastureGroups)) {
+      if (!commitFences(currentPlayer(), pending.newEdges)) {
         render();
         return;
       }
@@ -874,7 +921,19 @@ function confirmPendingFarmSelection() {
     }
     state.pendingFarmAction = null;
     state.viewedFarmPlayerId = pending.playerId;
-    finalizeAction(pending.actionId, { pastureGroups: pending.pastureGroups });
+    finalizeAction(pending.actionId, { fenceEdges: pending.newEdges });
+  }
+  if (pending.mode === 'sow') {
+    const cells = pending.sowCells || {};
+    const bakeGrain = Math.max(0, pending.bakeGrain || 0);
+    if (!Object.keys(cells).length && bakeGrain <= 0) {
+      addLog('請至少選擇 1 塊田播種，或取消。');
+      render();
+      return;
+    }
+    state.pendingFarmAction = null;
+    state.viewedFarmPlayerId = pending.playerId;
+    finalizeAction(pending.actionId, { sowCells: cells, bakeGrain, bakeFood: pending.bakeFood });
   }
 }
 
@@ -926,8 +985,8 @@ function renderFarm(player) {
     return `
       <button class="farm-cell ${cell.terrain}${selectable ? ' selectable' : ''}${selectionClass}" type="button" data-farm-index="${cell.index}" style="${farmCellPositionStyle(cell.index)}">
         ${coverHtml}
-        ${farmFenceHtml(cell)}
         <span class="cell-label">${label}</span>
+        ${farmDraftBadgeHtml(cell)}
         ${stableHtml}
         ${cropHtml}
         ${animalHtml}
@@ -935,16 +994,85 @@ function renderFarm(player) {
     `;
   }).join('');
 
+  els.farmGrid.insertAdjacentHTML('beforeend', farmFenceBarsHtml(player));
+  const pending = state.pendingFarmAction;
+  if (pending && pending.mode === 'pasture' && pending.playerId === player.id) {
+    els.farmGrid.insertAdjacentHTML('beforeend', fenceEdgeOverlayHtml(player));
+  }
+
+  els.farmGrid.style.setProperty('--fence-color', `var(--${player.color})`);
   els.farmGrid.querySelectorAll('[data-farm-index]').forEach((button) => {
     button.addEventListener('click', () => chooseFarmCell(Number(button.dataset.farmIndex)));
   });
+  els.farmGrid.querySelectorAll('[data-fence-edge]').forEach((button) => {
+    button.addEventListener('click', () => {
+      toggleFenceEdge(player, button.dataset.fenceEdge);
+      render();
+    });
+  });
 }
 
-function farmFenceHtml(cell) {
-  return FENCE_SIDES
-    .filter((side) => cell.fences?.[side])
-    .map((side) => `<span class="farm-fence fence-${side}"></span>`)
-    .join('');
+// 已蓋好＋預覽的柵欄，畫在格縫中心的覆蓋層上
+function farmFenceBarsHtml(player) {
+  const pending = state.pendingFarmAction;
+  const preview = (pending && pending.mode === 'pasture' && pending.playerId === player.id) ? (pending.newEdges || {}) : {};
+  const bars = [];
+  for (let r = 0; r < FARM_ROWS; r++) {
+    for (let cb = 0; cb <= FARM_COLUMNS; cb++) {
+      const key = `v:${r}:${cb}`;
+      const committed = hasFence(player, key);
+      const prev = !committed && preview[key];
+      if (!committed && !prev) continue;
+      const top = FARM_ROW_BOUNDS[r];
+      const h = FARM_ROW_BOUNDS[r + 1] - top;
+      bars.push(`<span class="farm-fence fence-bar-v${prev ? ' fence-preview' : ''}" style="left:${FARM_COL_BOUNDS[cb]}%;top:${top}%;height:${h}%;"></span>`);
+    }
+  }
+  for (let rb = 0; rb <= FARM_ROWS; rb++) {
+    for (let c = 0; c < FARM_COLUMNS; c++) {
+      const key = `h:${rb}:${c}`;
+      const committed = hasFence(player, key);
+      const prev = !committed && preview[key];
+      if (!committed && !prev) continue;
+      const left = FARM_COL_BOUNDS[c];
+      const w = FARM_COL_BOUNDS[c + 1] - left;
+      bars.push(`<span class="farm-fence fence-bar-h${prev ? ' fence-preview' : ''}" style="top:${FARM_ROW_BOUNDS[rb]}%;left:${left}%;width:${w}%;"></span>`);
+    }
+  }
+  return `<div class="farm-fence-layer">${bars.join('')}</div>`;
+}
+
+function fenceEdgeOverlayHtml(player) {
+  const buttons = [];
+  for (let r = 0; r < FARM_ROWS; r++) {
+    for (let cb = 0; cb <= FARM_COLUMNS; cb++) {
+      const key = `v:${r}:${cb}`;
+      const committed = hasFence(player, key) ? ' committed' : '';
+      const top = FARM_ROW_BOUNDS[r];
+      const h = FARM_ROW_BOUNDS[r + 1] - top;
+      buttons.push(`<button class="fence-edge fence-edge-v${committed}" type="button" data-fence-edge="${key}" style="left:${FARM_COL_BOUNDS[cb]}%;top:${top}%;height:${h}%;" aria-label="放／取消柵欄"></button>`);
+    }
+  }
+  for (let rb = 0; rb <= FARM_ROWS; rb++) {
+    for (let c = 0; c < FARM_COLUMNS; c++) {
+      const key = `h:${rb}:${c}`;
+      const committed = hasFence(player, key) ? ' committed' : '';
+      const left = FARM_COL_BOUNDS[c];
+      const w = FARM_COL_BOUNDS[c + 1] - left;
+      buttons.push(`<button class="fence-edge fence-edge-h${committed}" type="button" data-fence-edge="${key}" style="top:${FARM_ROW_BOUNDS[rb]}%;left:${left}%;width:${w}%;" aria-label="放／取消柵欄"></button>`);
+    }
+  }
+  return `<div class="fence-edge-layer">${buttons.join('')}</div>`;
+}
+
+function farmDraftBadgeHtml(cell) {
+  const pending = state.pendingFarmAction;
+  if (!pending || pending.playerId !== viewedFarmPlayer().id) return '';
+  if (pending.mode === 'sow') {
+    const crop = pending.sowCells?.[cell.index];
+    if (crop) return `<span class="sow-draft-badge res-${crop}"><span>${plantedCropCount(crop)}</span>${resourceIconHtml(crop, 'resource-icon farm-token-icon')}</span>`;
+  }
+  return '';
 }
 
 function farmSelectionClass(cell) {
@@ -954,8 +1082,8 @@ function farmSelectionClass(cell) {
     if (pending.selectedRooms?.includes(cell.index)) return ' selected-room';
     if (pending.selectedStables?.includes(cell.index)) return ' selected-stable';
   }
-  if (pending.mode === 'pasture' && pending.pastureGroups?.[cell.index]) {
-    return ` selected-pasture pasture-draft-${pending.pastureGroups[cell.index]}`;
+  if (pending.mode === 'sow' && pending.sowCells?.[cell.index]) {
+    return ' selected-sow';
   }
   return '';
 }
@@ -970,11 +1098,70 @@ function renderPlayers() {
           <span class="player-name">${formatPlayer(player)}</span>
           <span class="player-meta">${player.workers.available}/${player.workers.total} 人</span>
         </div>
-        <div class="resource-strip">${formatResources(player.resources, player.animals)}</div>
+        <div class="resource-strip${state.debugMode ? ' debug' : ''}">${formatResources(player.resources, player.animals, state.debugMode ? player.id : null)}</div>
         <div class="player-meta">柵欄 ${player.fences}/15 ・ 馬廄 ${player.stables}/4 ・ 乞討 ${player.beggingCards} ・ 已出牌 ${player.played.length}</div>
       </article>
     `;
   }).join('');
+
+  els.playerList.querySelectorAll('[data-res-adjust]').forEach((button) => {
+    button.addEventListener('click', () => {
+      adjustDebugResource(button.dataset.resPlayer, button.dataset.resType, Number(button.dataset.resAdjust));
+    });
+  });
+}
+
+function applyResourceDelta(playerId, type, delta) {
+  const player = state.players[playerId];
+  if (!player) return;
+  if (ANIMAL_ORDER.includes(type)) {
+    // 動物要真的進/出農莊格，才能測試圈地與容量
+    if (delta > 0) addAnimalsToFarm(player, type, delta);
+    else removeAnimalsFromFarm(player, type, -delta);
+    syncPlayerAnimals(player);
+  } else {
+    player.resources[type] = Math.max(0, (player.resources[type] || 0) + delta);
+  }
+}
+
+function adjustDebugResource(playerId, type, delta) {
+  if (!state.debugMode) return;
+  applyResourceDelta(playerId, type, delta);
+  render();
+}
+
+// 測試用：挑一個可直接結算（純拿資源／累積格）的空行動格
+function pickAutoActionSpace() {
+  const candidates = actionSpaceDefs.filter((def) => {
+    const space = state.actionSpaces[def.id];
+    const enabled = !space.enabledRound || state.round >= space.enabledRound;
+    if (!enabled || space.occupiedBy) return false;
+    if (def.cardAction || def.farmAction) return false;
+    if (def.id === 'family_growth_minor' || def.id === 'family_growth_without_room') return false;
+    return true;
+  });
+  if (!candidates.length) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+// 測試用：把目前非紅色玩家的工人，隨機派到簡單行動格，直到輪回紅色或卡住
+function autoPlaceNonRed() {
+  if (state.spectatorMode || state.draft.active) return;
+  let guard = 0;
+  while (guard++ < 60) {
+    if (state.phaseId !== 'WORK_PHASE') break;
+    const player = currentPlayer();
+    if (player.color === 'red') break;
+    if (player.workers.available <= 0) break;
+    const def = pickAutoActionSpace();
+    if (!def) {
+      addLog(`${COLOR_LABELS[player.color]} 沒有可自動結算的簡單行動格，請手動操作。`);
+      break;
+    }
+    finalizeAction(def.id, {});
+    if (!state.actionSpaces[def.id].occupiedBy) break; // 結算失敗，避免無限迴圈
+  }
+  render();
 }
 
 function renderHand(player) {
@@ -1512,6 +1699,12 @@ function renderControlState() {
   document.getElementById('replenishBtn').disabled = state.spectatorMode || state.draft.active;
   document.getElementById('returnHomeBtn').disabled = state.spectatorMode;
   document.getElementById('clearLogBtn').disabled = state.spectatorMode;
+  const debugBtn = document.getElementById('debugToggleBtn');
+  debugBtn.textContent = state.debugMode ? '測試模式：開' : '測試模式：關';
+  debugBtn.classList.toggle('active', state.debugMode);
+  debugBtn.setAttribute('aria-pressed', String(state.debugMode));
+  document.getElementById('autoPlaceBtn').disabled = state.spectatorMode || state.draft.active
+    || state.phaseId !== 'WORK_PHASE' || currentPlayer().color === 'red';
   els.chatModeLabel.textContent = state.spectatorMode ? '旁觀者發言' : '玩家發言';
 }
 
@@ -1569,7 +1762,11 @@ function openActionModal(actionId) {
   }
   if (space.cardAction === 'occupation') {
     const playedOcc = player.played.filter((card) => card.type === 'occupation').length;
-    state.selectedOccupationFood = playedOcc === 0 ? 0 : 1;
+    // occupation_1（臨時工左邊）：前兩張各 1 食物，之後每張 2 食物
+    // occupation_2（臨時工上面）：第一張免費，之後每張 1 食物
+    state.selectedOccupationFood = space.id === 'occupation_1'
+      ? (playedOcc < 2 ? 1 : 2)
+      : (playedOcc === 0 ? 0 : 1);
   }
   if (space.farmAction === 'sow') {
     state.selectedBakeGrain = 0;
@@ -1578,8 +1775,8 @@ function openActionModal(actionId) {
   const extra = [];
   if (space.farmAction === 'field') extra.push('確認後請在農場選擇 1 格未使用地，放置 1 片田地。');
   if (space.farmAction === 'build') extra.push('可以擴建 1 間房舍，或支付 2 木建造 1 間馬廄。');
-  if (space.farmAction === 'pasture') extra.push('MVP 先以單格圈地處理：選擇 1 格未使用地，支付 4 木與 4 根柵欄，容量 2 隻同種動物。');
-  if (space.farmAction === 'sow') extra.push('可只播種、只烤麵包、或兩者都做。播種需選空田；烤麵包請依你的烤爐自行填「花幾麥換幾食物」。');
+  if (space.farmAction === 'pasture') extra.push('確認後在農場格線上點要放柵欄的「邊」（再點一次取消，已蓋好的不能拆）。被完全圍起來的空格會自動變圈地。要切幾個圈就放對應的隔牆，下方即時顯示新增幾根＝幾木，滿意再按「確認柵欄」。每根柵欄付 1 木。');
+  if (space.farmAction === 'sow') extra.push('確認後可連續點多塊空田播種（下方可切換麥子／蔬菜），選好按「確認播種」。也可只烤麵包：請依你的烤爐自行填「花幾麥換幾食物」。');
   if (space.farmAction === 'renovate') {
     const next = renovationTarget(player);
     if (!next) {
@@ -1592,7 +1789,7 @@ function openActionModal(actionId) {
   }
   if (space.id === 'family_growth_minor') extra.push('需要有空房，確認後增加 1 位家庭成員，並可加打 1 張次要發展卡（或略過）。');
   if (space.id === 'family_growth_without_room') extra.push('不需要空房，確認後增加 1 位家庭成員。');
-  if (space.cardAction === 'occupation') extra.push('確認後請從手牌選 1 張職業卡打出。首張預設免費、第 2 張起預設 1 食物，可自行修改。');
+  if (space.cardAction === 'occupation') extra.push(`確認後請從手牌選 1 張職業卡打出。${space.id === 'occupation_1' ? '前兩張各預設 1 食物、第 3 張起預設 2 食物' : '首張預設免費、第 2 張起預設 1 食物'}，可自行修改。`);
   if (space.id === 'starting_player') extra.push('確認後你會成為起始玩家，並可從手牌打 1 張次要發展卡（可按「不打牌，直接派人」略過）。');
   if (space.id === 'major_minor_improvement') extra.push('確認後依上方選擇，從供應區或手牌打出 1 張發展卡。');
 
@@ -1690,8 +1887,8 @@ function canSelectFarmCell(player, cell) {
   if (!state.pendingFarmAction || state.pendingFarmAction.playerId !== player.id) return false;
   if (state.pendingFarmAction.mode === 'field') return cell.terrain === 'empty';
   if (state.pendingFarmAction.mode === 'build') return canSelectBuildCell(player, cell);
-  if (state.pendingFarmAction.mode === 'pasture') return cell.terrain === 'empty' || Boolean(state.pendingFarmAction.pastureGroups?.[cell.index]);
-  if (state.pendingFarmAction.mode === 'sow') return cell.terrain === 'field' && !cell.crop;
+  // 圈地模式不靠點格子，改點格線上的「邊」
+  if (state.pendingFarmAction.mode === 'sow') return (cell.terrain === 'field' && !cell.crop) || Boolean(state.pendingFarmAction.sowCells?.[cell.index]);
   return false;
 }
 
@@ -1711,8 +1908,8 @@ function chooseFarmCell(index) {
     return;
   }
 
-  if (state.pendingFarmAction.mode === 'pasture') {
-    togglePastureSelection(index);
+  if (state.pendingFarmAction.mode === 'sow') {
+    toggleSowSelection(player, index);
     render();
     return;
   }
@@ -1788,16 +1985,153 @@ function toggleBuildSelection(player, index) {
   }
 }
 
-function togglePastureSelection(index) {
+// 一格的四條邊各對應一個唯一 key（共用邊兩格指向同一 key）
+function cellEdges(index) {
+  const r = Math.floor(index / FARM_COLUMNS);
+  const c = index % FARM_COLUMNS;
+  return {
+    top: `h:${r}:${c}`,
+    bottom: `h:${r + 1}:${c}`,
+    left: `v:${r}:${c}`,
+    right: `v:${r}:${c + 1}`,
+  };
+}
+
+function hasFence(player, key) {
+  return Boolean(player.fenceEdges?.[key]);
+}
+
+// 放柵欄模式下點一條邊：切換「本次新增」；已蓋好的舊柵欄不可拆
+function toggleFenceEdge(player, key) {
   const pending = state.pendingFarmAction;
   if (!pending || pending.mode !== 'pasture') return;
-  const groups = pending.pastureGroups || {};
-  if (groups[index]) {
-    delete groups[index];
-  } else {
-    groups[index] = pending.currentPastureGroup || 1;
+  if (hasFence(player, key)) {
+    addLog('這道柵欄已經蓋好了，不能拆。');
+    return;
   }
-  pending.pastureGroups = { ...groups };
+  const edges = pending.newEdges || {};
+  if (edges[key]) delete edges[key];
+  else edges[key] = true;
+  pending.newEdges = { ...edges };
+}
+
+// 淹水填充：從農場外灌水，遇柵欄擋住；流不到的格子＝被圍住
+function enclosedCellSet(player, extraEdges = null) {
+  const fenced = (key) => hasFence(player, key) || Boolean(extraEdges?.[key]);
+  const N = FARM_COLUMNS * FARM_ROWS;
+  const reachable = new Set();
+  const stack = [];
+  const seed = (i) => { if (!reachable.has(i)) { reachable.add(i); stack.push(i); } };
+  for (let i = 0; i < N; i++) {
+    const r = Math.floor(i / FARM_COLUMNS);
+    const c = i % FARM_COLUMNS;
+    const e = cellEdges(i);
+    if ((r === 0 && !fenced(e.top)) || (r === FARM_ROWS - 1 && !fenced(e.bottom))
+      || (c === 0 && !fenced(e.left)) || (c === FARM_COLUMNS - 1 && !fenced(e.right))) {
+      seed(i);
+    }
+  }
+  while (stack.length) {
+    const i = stack.pop();
+    const r = Math.floor(i / FARM_COLUMNS);
+    const c = i % FARM_COLUMNS;
+    const e = cellEdges(i);
+    if (r > 0 && !fenced(e.top)) seed(i - FARM_COLUMNS);
+    if (r < FARM_ROWS - 1 && !fenced(e.bottom)) seed(i + FARM_COLUMNS);
+    if (c > 0 && !fenced(e.left)) seed(i - 1);
+    if (c < FARM_COLUMNS - 1 && !fenced(e.right)) seed(i + 1);
+  }
+  const enclosed = new Set();
+  for (let i = 0; i < N; i++) if (!reachable.has(i)) enclosed.add(i);
+  return enclosed;
+}
+
+// 把封閉格依「彼此間沒有柵欄相連」分群，每群＝一個圈地
+function enclosureGroups(player) {
+  const enclosed = enclosedCellSet(player);
+  const seen = new Set();
+  const groups = [];
+  enclosed.forEach((start) => {
+    if (seen.has(start)) return;
+    const group = [];
+    const stack = [start];
+    seen.add(start);
+    while (stack.length) {
+      const i = stack.pop();
+      group.push(i);
+      const r = Math.floor(i / FARM_COLUMNS);
+      const c = i % FARM_COLUMNS;
+      const e = cellEdges(i);
+      const step = (idx, key) => {
+        if (idx < 0 || hasFence(player, key)) return;
+        if (enclosed.has(idx) && !seen.has(idx)) { seen.add(idx); stack.push(idx); }
+      };
+      step(r > 0 ? i - FARM_COLUMNS : -1, e.top);
+      step(r < FARM_ROWS - 1 ? i + FARM_COLUMNS : -1, e.bottom);
+      step(c > 0 ? i - 1 : -1, e.left);
+      step(c < FARM_COLUMNS - 1 ? i + 1 : -1, e.right);
+    }
+    groups.push(group);
+  });
+  return groups;
+}
+
+// 容量公式（參考 e2crawfo）：格數 × 2^(馬廄數+1)
+function enclosureCapacity(player, group) {
+  const stableCount = group.filter((i) => player.farm[i].stable).length;
+  return group.length * Math.pow(2, stableCount + 1);
+}
+
+// 確認放柵欄：扣木頭與柵欄、寫入 fenceEdges、把新被圍住的空格變圈地
+function commitFences(player, newEdges) {
+  const keys = Object.keys(newEdges || {}).filter((k) => newEdges[k] && !hasFence(player, k));
+  const cost = keys.length;
+  if (cost <= 0) {
+    addLog('沒有新增任何柵欄。');
+    return false;
+  }
+  if (player.fences < cost) {
+    addLog(`${COLOR_LABELS[player.color]} 柵欄庫存不足，需要 ${cost} 根。`);
+    return false;
+  }
+  if (!hasResources(player, { wood: cost })) {
+    addLog(`${COLOR_LABELS[player.color]} 木頭不足，需要 ${cost} 木。`);
+    return false;
+  }
+  payResources(player, { wood: cost });
+  player.fences -= cost;
+  keys.forEach((k) => { player.fenceEdges[k] = true; });
+  let newlyEnclosed = 0;
+  enclosedCellSet(player).forEach((i) => {
+    const cell = player.farm[i];
+    if (cell.terrain === 'empty') { cell.terrain = 'pasture'; newlyEnclosed += 1; }
+  });
+  const groupCount = enclosureGroups(player).length;
+  addLog(`${COLOR_LABELS[player.color]} 蓋了 ${cost} 根柵欄（${cost} 木），目前共 ${groupCount} 個圈地。`);
+  return true;
+}
+
+function toggleSowSelection(player, index) {
+  const pending = state.pendingFarmAction;
+  if (!pending || pending.mode !== 'sow') return;
+  const cells = pending.sowCells || {};
+  if (cells[index]) {
+    delete cells[index];
+    pending.sowCells = { ...cells };
+    return;
+  }
+  const crop = pending.currentSowCrop;
+  if (!crop) {
+    addLog('請先在下方選擇要播的作物。');
+    return;
+  }
+  const alreadyUsed = Object.values(cells).filter((type) => type === crop).length;
+  if ((player.resources[crop] || 0) <= alreadyUsed) {
+    addLog(`${COLOR_LABELS[player.color]} 的${RESOURCE_LABELS[crop]}不夠播這麼多田。`);
+    return;
+  }
+  cells[index] = crop;
+  pending.sowCells = { ...cells };
 }
 
 function buildPlanCost(player, roomCount, stableCount) {
@@ -1827,78 +2161,6 @@ function canBuildRoomPlan(player, roomIndexes) {
     });
   }
   return remaining.size === 0;
-}
-
-function neighborIndexForSide(index, side) {
-  const row = Math.floor(index / FARM_COLUMNS);
-  const col = index % FARM_COLUMNS;
-  if (side === 'top') return row > 0 ? index - FARM_COLUMNS : null;
-  if (side === 'bottom') return row < 2 ? index + FARM_COLUMNS : null;
-  if (side === 'left') return col > 0 ? index - 1 : null;
-  if (side === 'right') return col < FARM_COLUMNS - 1 ? index + 1 : null;
-  return null;
-}
-
-function pastureFenceSegments(pastureGroups) {
-  const selected = new Set(Object.keys(pastureGroups).map(Number));
-  const segmentMap = new Map();
-  selected.forEach((index) => {
-    FENCE_SIDES.forEach((side) => {
-      const neighbor = neighborIndexForSide(index, side);
-      const sameGroup = neighbor !== null && selected.has(neighbor) && pastureGroups[neighbor] === pastureGroups[index];
-      if (sameGroup) return;
-      const sharedDifferentGroup = neighbor !== null && selected.has(neighbor);
-      if (sharedDifferentGroup && index > neighbor) return;
-      const key = sharedDifferentGroup
-        ? `${Math.min(index, neighbor)}-${Math.max(index, neighbor)}`
-        : `${index}-${side}`;
-      segmentMap.set(key, {
-        index,
-        side,
-        neighbor: sharedDifferentGroup ? neighbor : null,
-        opposite: FENCE_OPPOSITE[side],
-      });
-    });
-  });
-  return [...segmentMap.values()];
-}
-
-function applyPastureBuild(player, pastureGroups) {
-  const selectedIndexes = Object.keys(pastureGroups).map(Number);
-  const fenceSegments = pastureFenceSegments(pastureGroups);
-  const fenceCost = fenceSegments.length;
-  if (!selectedIndexes.length) {
-    addLog('建造柵欄失敗：請至少選擇 1 格圈地。');
-    return false;
-  }
-  if (selectedIndexes.some((index) => player.farm[index]?.terrain !== 'empty')) {
-    addLog('建造柵欄失敗：圈地範圍只能選未使用地。');
-    return false;
-  }
-  if (player.fences < fenceCost) {
-    addLog(`${COLOR_LABELS[player.color]} 柵欄數量不足，需要 ${fenceCost} 根柵欄。`);
-    return false;
-  }
-  if (!hasResources(player, { wood: fenceCost })) {
-    addLog(`${COLOR_LABELS[player.color]} 木頭不足，需要 ${fenceCost} 木。`);
-    return false;
-  }
-  payResources(player, { wood: fenceCost });
-  player.fences -= fenceCost;
-  selectedIndexes.forEach((index) => {
-    const cell = player.farm[index];
-    cell.terrain = 'pasture';
-    cell.pastureGroup = `${player.id}-${pastureGroups[index]}`;
-    cell.fences = { top: false, right: false, bottom: false, left: false };
-  });
-  fenceSegments.forEach((segment) => {
-    player.farm[segment.index].fences[segment.side] = true;
-    if (segment.neighbor !== null) {
-      player.farm[segment.neighbor].fences[segment.opposite] = true;
-    }
-  });
-  addLog(`${COLOR_LABELS[player.color]} 建立 ${new Set(Object.values(pastureGroups)).size} 個圈地，使用 ${fenceCost} 根柵欄與 ${fenceCost} 木。`);
-  return true;
 }
 
 function currentRoomType(player) {
@@ -2134,12 +2396,13 @@ function confirmAction() {
       state.pendingFarmAction.selectedStables = [];
     }
     if (selectionMode === 'pasture') {
-      state.pendingFarmAction.currentPastureGroup = 1;
-      state.pendingFarmAction.pastureGroups = {};
+      state.pendingFarmAction.newEdges = {};
     }
     if (selectionMode === 'sow') {
       state.pendingFarmAction.bakeGrain = Math.max(0, state.selectedBakeGrain || 0);
       state.pendingFarmAction.bakeFood = Math.max(0, state.selectedBakeFood || 0);
+      state.pendingFarmAction.sowCells = {};
+      state.pendingFarmAction.currentSowCrop = state.selectedSowCrop;
     }
     closeActionModal();
     render();
@@ -2257,51 +2520,33 @@ function finalizeAction(actionId, options = {}) {
   }
 
   if (space.farmAction === 'pasture') {
-    if (options.pastureGroups) {
-      if (!applyPastureBuild(player, options.pastureGroups)) {
+    if (!commitFences(player, options.fenceEdges || {})) {
+      render();
+      return;
+    }
+  }
+
+  if (space.farmAction === 'sow' && options.sowCells) {
+    const entries = Object.entries(options.sowCells);
+    const need = {};
+    for (const [, cropType] of entries) need[cropType] = (need[cropType] || 0) + 1;
+    for (const [cropType, count] of Object.entries(need)) {
+      if ((player.resources[cropType] || 0) < count) {
+        addLog(`${COLOR_LABELS[player.color]} 的${RESOURCE_LABELS[cropType]}不足，無法播這些田。`);
         render();
         return;
       }
-    } else {
-    const cell = player.farm[options.farmIndex];
-    if (!cell || cell.terrain !== 'empty') {
-      addLog('建造柵欄失敗：MVP 版請選擇未使用地建立單格圈地。');
-      render();
-      return;
     }
-    if (player.fences < SINGLE_PASTURE_FENCES) {
-      addLog(`${COLOR_LABELS[player.color]} 柵欄數量不足，無法建立單格圈地。`);
-      render();
-      return;
+    const planted = {};
+    for (const [idx, cropType] of entries) {
+      const cell = player.farm[Number(idx)];
+      if (!cell || cell.terrain !== 'field' || cell.crop) continue;
+      player.resources[cropType] -= 1;
+      cell.crop = { type: cropType, count: plantedCropCount(cropType) };
+      planted[cropType] = (planted[cropType] || 0) + 1;
     }
-    if (!hasResources(player, SINGLE_PASTURE_COST)) {
-      addLog(`${COLOR_LABELS[player.color]} 資源不足，無法建造柵欄。`);
-      render();
-      return;
-    }
-    payResources(player, SINGLE_PASTURE_COST);
-    player.fences -= SINGLE_PASTURE_FENCES;
-    cell.terrain = 'pasture';
-    addLog(`${COLOR_LABELS[player.color]} 支付 ${formatCostForLog(SINGLE_PASTURE_COST)}與 ${SINGLE_PASTURE_FENCES} 根柵欄，建立 1 格圈地。`);
-  }
-  }
-
-  if (space.farmAction === 'sow' && options.farmIndex != null) {
-    const cell = player.farm[options.farmIndex];
-    const cropType = options.cropType;
-    if (!cell || cell.terrain !== 'field' || cell.crop) {
-      addLog('播種失敗：請選擇空的農田。');
-      render();
-      return;
-    }
-    if (!cropType || (player.resources[cropType] || 0) <= 0) {
-      addLog(`${COLOR_LABELS[player.color]} 沒有可播種的作物。`);
-      render();
-      return;
-    }
-    player.resources[cropType] -= 1;
-    cell.crop = { type: cropType, count: plantedCropCount(cropType) };
-    addLog(`${COLOR_LABELS[player.color]} 播種 1 份${RESOURCE_LABELS[cropType]}，田上放置 ${cell.crop.count} 份。`);
+    const summary = Object.entries(planted).map(([type, n]) => `${n} 塊${RESOURCE_LABELS[type]}田`).join('、');
+    if (summary) addLog(`${COLOR_LABELS[player.color]} 播種：${summary}。`);
   }
 
   if (space.farmAction === 'sow' && (options.bakeGrain || 0) > 0) {
@@ -2386,11 +2631,10 @@ function startComboBonus(space, player, bonus) {
       actionId: space.id,
       mode: 'pasture',
       playerId: player.id,
-      currentPastureGroup: 1,
-      pastureGroups: {},
+      newEdges: {},
       workerPlaced: true,
     };
-    addLog(`${COLOR_LABELS[player.color]} 翻修完成，可加建柵欄（選好後按確認圈地），或按取消略過。`);
+    addLog(`${COLOR_LABELS[player.color]} 翻修完成，可加放柵欄（點格線、按確認柵欄），或按取消略過。`);
   }
 }
 
@@ -2451,8 +2695,25 @@ function animalCellCapacity(player, cell, type) {
 
 function addAnimalsToFarm(player, type, count) {
   let remaining = count;
-  player.farm.forEach((cell) => {
+  // 1. 圈地：以「整個圈地」為單位算容量（格數 × 2^(馬廄數+1)）
+  enclosureGroups(player).forEach((group) => {
     if (remaining <= 0) return;
+    const cells = group.map((i) => player.farm[i]).filter((c) => c.terrain === 'pasture');
+    if (!cells.length) return;
+    const existingType = cells.map(cellAnimalType).find(Boolean);
+    if (existingType && existingType !== type) return;
+    const stableCount = cells.filter((c) => c.stable).length;
+    const capacity = cells.length * Math.pow(2, stableCount + 1);
+    const used = cells.reduce((t, c) => t + cellAnimalCount(c), 0);
+    const free = Math.max(0, capacity - used);
+    if (free <= 0) return;
+    const placed = Math.min(remaining, free);
+    cells[0].animals[type] = (cells[0].animals[type] || 0) + placed;
+    remaining -= placed;
+  });
+  // 2. 沒被圍進圈地的單獨馬廄（容量 1）與房屋寵物
+  player.farm.forEach((cell) => {
+    if (remaining <= 0 || cell.terrain === 'pasture') return;
     const capacity = animalCellCapacity(player, cell, type);
     const used = cellAnimalCount(cell);
     const free = Math.max(0, capacity - used);
@@ -2566,6 +2827,60 @@ function advanceTurn() {
     state.phaseId = 'WORK_PHASE_END';
     addLog('WORK_PHASE_END：所有家庭成員都已派出。');
   }
+}
+
+// 回合開始效果視窗（通用自由操作）：自動在每回合開始、補料之前跳出
+function maybeOpenRoundStartModal() {
+  if (state.draft.active) return;
+  if (state.phaseId !== 'ROUND_START') return;
+  if (state.roundStartResolved) return;
+  if (!els.roundStartModal.hidden) return;
+  openRoundStartModal();
+}
+
+function openRoundStartModal() {
+  els.roundStartModal.hidden = false;
+  renderRoundStartModalBody();
+}
+
+function roundStartCards(player) {
+  return player.played.filter((card) => (card.text || '').includes('回合開始'));
+}
+
+function renderRoundStartModalBody() {
+  els.roundStartModal.querySelector('#roundStartTitle').textContent = `第 ${state.round} 回合開始效果`;
+  els.roundStartBody.innerHTML = state.playerOrder.map((id) => {
+    const player = state.players[id];
+    const houseType = currentRoomType(player);
+    const cards = roundStartCards(player);
+    const cardsHtml = cards.length
+      ? cards.map((card) => `<li><strong>${escapeHtml(card.name)}</strong>：${escapeHtml(card.text)}</li>`).join('')
+      : '<li class="harvest-ok">（無回合開始效果卡）</li>';
+    return `
+      <div class="harvest-row">
+        <div class="harvest-row-head">
+          <strong>${COLOR_LABELS[player.color]} ${escapeHtml(player.name)}</strong>
+          <span>住屋：${RESOURCE_LABELS[houseType] || houseType}屋</span>
+        </div>
+        <ul class="round-start-cards">${cardsHtml}</ul>
+        <div class="resource-strip debug">${formatResources(player.resources, player.animals, player.id)}</div>
+      </div>
+    `;
+  }).join('');
+
+  els.roundStartBody.querySelectorAll('[data-res-adjust]').forEach((button) => {
+    button.addEventListener('click', () => {
+      applyResourceDelta(button.dataset.resPlayer, button.dataset.resType, Number(button.dataset.resAdjust));
+      renderRoundStartModalBody();
+    });
+  });
+}
+
+function finishRoundStart() {
+  state.roundStartResolved = true;
+  els.roundStartModal.hidden = true;
+  addLog(`第 ${state.round} 回合開始效果處理完畢，可以補料。`);
+  render();
 }
 
 function startHarvest() {
@@ -2713,14 +3028,9 @@ function cropTotal(player, type) {
 }
 
 function countPastureAreas(player) {
-  const groups = new Set();
-  let singles = 0;
-  player.farm.forEach((cell) => {
-    if (cell.terrain !== 'pasture') return;
-    if (cell.pastureGroup) groups.add(cell.pastureGroup);
-    else singles += 1;
-  });
-  return groups.size + singles;
+  // 圈地數 = 被柵欄完全圍起來、含至少一格圈地的封閉區數量
+  return enclosureGroups(player).filter((group) =>
+    group.some((i) => player.farm[i].terrain === 'pasture')).length;
 }
 
 function computeScore(player) {
@@ -2737,7 +3047,7 @@ function computeScore(player) {
   const bonus = Number(state.scoreBonus?.[player.id]) || 0;
 
   rows.push({ label: '農田', value: fields, score: tieredScore(fields, SCORE_TABLE.field) });
-  rows.push({ label: '牧場', value: pastures, score: tieredScore(pastures, SCORE_TABLE.pasture) });
+  rows.push({ label: '圈地', value: pastures, score: tieredScore(pastures, SCORE_TABLE.pasture) });
   rows.push({ label: '麥', value: grain, score: tieredScore(grain, SCORE_TABLE.grain) });
   rows.push({ label: '蔬菜', value: veg, score: tieredScore(veg, SCORE_TABLE.vegetable) });
   rows.push({ label: '羊', value: player.animals.sheep || 0, score: tieredScore(player.animals.sheep || 0, SCORE_TABLE.sheep) });
@@ -2851,6 +3161,7 @@ function finishRound() {
   applyStartPlayerForNextRound();
   state.phaseId = 'ROUND_START';
   state.started = false;
+  state.roundStartResolved = false;
   state.currentPlayerIndex = 0;
   addLog(`進入第 ${state.round} 回合。`);
 }
@@ -3012,6 +3323,12 @@ document.getElementById('spectatorToggleBtn').addEventListener('click', () => {
   addLog(state.spectatorMode ? '已切換為旁觀者模式。' : '已切換為玩家操作模式。');
   render();
 });
+document.getElementById('debugToggleBtn').addEventListener('click', () => {
+  state.debugMode = !state.debugMode;
+  addLog(state.debugMode ? '已開啟測試模式：可自由增減各玩家資源。' : '已關閉測試模式。');
+  render();
+});
+document.getElementById('autoPlaceBtn').addEventListener('click', autoPlaceNonRed);
 document.getElementById('openNotesBtn').addEventListener('click', () => openNotes());
 document.getElementById('clearLogBtn').addEventListener('click', () => {
   if (rejectSpectatorAction('清空紀錄')) return;
@@ -3030,6 +3347,7 @@ document.getElementById('doneNotesBtn').addEventListener('click', closeNotes);
 document.getElementById('closeHandModal').addEventListener('click', closeHand);
 document.getElementById('skipCardActionBtn').addEventListener('click', skipPendingCardAction);
 document.getElementById('confirmHarvestBtn').addEventListener('click', finishHarvestFeeding);
+document.getElementById('roundStartDoneBtn').addEventListener('click', finishRoundStart);
 document.getElementById('scoreBtn').addEventListener('click', openScoreboard);
 document.getElementById('closeScoreModal').addEventListener('click', closeScoreboard);
 els.scoreModal.addEventListener('click', (event) => {

@@ -20,6 +20,8 @@
     <div class="top-actions">
       <button class="ghost-btn" id="randomSeatsBtn" type="button">隨機座位</button>
       <button class="ghost-btn" id="spectatorToggleBtn" type="button" aria-pressed="false">旁觀者：關</button>
+      <button class="ghost-btn" id="debugToggleBtn" type="button" aria-pressed="false">測試模式：關</button>
+      <button class="ghost-btn" id="autoPlaceBtn" type="button">隨機派子（非紅）</button>
       <button class="ghost-btn" id="openNotesBtn" type="button">備忘錄</button>
       <button class="ghost-btn" id="openMajorBtn" type="button">查看剩餘主發</button>
       <button class="ghost-btn" id="openHandBtn" type="button">手牌</button>
@@ -203,6 +205,22 @@
       <div class="modal-actions">
         <span class="player-meta">成人各吃 2 食物、新生兒吃 1。可先在下方把麥/菜/動物換成食物，食物不足會自動換成乞討卡。</span>
         <button class="primary-btn" id="confirmHarvestBtn" type="button">確認餵食並繼續收成</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="roundStartModal" hidden>
+    <div class="harvest-modal" role="dialog" aria-modal="true" aria-labelledby="roundStartTitle">
+      <div class="modal-head">
+        <div>
+          <span class="phase-label">回合開始</span>
+          <h2 id="roundStartTitle">回合開始效果</h2>
+        </div>
+      </div>
+      <div class="harvest-body" id="roundStartBody"></div>
+      <div class="modal-actions">
+        <span class="player-meta">依順位手動發動各自的「回合開始」卡效（多需住石屋、付食物）。用 −／＋ 自行調整資源與動物來套用效果，完成後開始補料。</span>
+        <button class="primary-btn" id="roundStartDoneBtn" type="button">完成回合開始，開始補料</button>
       </div>
     </div>
   </div>
