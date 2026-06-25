@@ -15,3 +15,25 @@ diff.txt
 export_for_notebooklm.js
 agricola_all_cards.md
 .agents/
+
+# 本機稽核 / 暫存 / 備份產物，不進版本庫
+.playwright-mcp/
+scratch/
+notes/
+__pycache__/
+
+_*.py
+_*.txt
+_*.json
+_*.mjs
+notesdump_*.py
+notesprobe*.py
+apply_tag4.js
+gen_tag4_*.js
+cat*_outside.txt
+cat*_inset.txt
+cards.json.bak*
+cards.json.upstairs-WIP-*
+channels.backup_*.json
+channels.json.bak
+farm-assets-check.png
