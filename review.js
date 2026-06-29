@@ -883,6 +883,11 @@ function loadSession(id) {
   // session 結構與 applyState 相容（packs/picks 皆為卡片ID）；含扣牌的存檔可直接重看結果
   applyState(session);
   saveDraftState();
+  // 若載入的是一局完整對局，更新「原始紀錄」，讓模仿歷史以這局為藍本（與匯入行為一致）
+  const complete = PLAYERS.every(p =>
+    rs.picks[p].occ.filter(Boolean).length === DRAFT_ROUNDS &&
+    rs.picks[p].min.filter(Boolean).length === DRAFT_ROUNDS);
+  if (complete) saveHistoryRecord();
 }
 
 function deleteCurrentSession() {
@@ -1217,13 +1222,24 @@ async function startSimulation() {
 
   // 模式 1（歷史輸入）保留先前扣牌以便續編；AI／單機模式則重設
   if (rs.mode !== 1) {
-    // 模仿歷史：重設前先快照目前載入的扣牌，供 AI 重現原玩家選法
-    rs.historyPicks = (rs.mode === 2 && rs.aiStrategy === 'mimic')
-      ? Object.fromEntries(PLAYERS.map(p => [p, {
-          occ: rs.picks[p].occ.slice(),
-          min: rs.picks[p].min.slice(),
-        }]))
-      : null;
+    // 模仿歷史：藍本一律取「最初匯入/輸入的那局」鎖死的原始紀錄，
+    // 避免被先前的單人挑戰扣牌覆蓋（換座位重玩時其他三家才會重現原局）。
+    // 若沒有獨立原始紀錄，才退而用目前工作區的扣牌。
+    if (rs.mode === 2 && rs.aiStrategy === 'mimic') {
+      const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || findCardByBGAId(String(id)) || null : null);
+      const src = getHistoryRecord()?.picks;
+      rs.historyPicks = src
+        ? Object.fromEntries(PLAYERS.map(p => [p, {
+            occ: (src[p]?.occ || []).map(byId),
+            min: (src[p]?.min || []).map(byId),
+          }]))
+        : Object.fromEntries(PLAYERS.map(p => [p, {
+            occ: rs.picks[p].occ.slice(),
+            min: rs.picks[p].min.slice(),
+          }]));
+    } else {
+      rs.historyPicks = null;
+    }
     PLAYERS.forEach(p => {
       rs.picks[p] = { occ: Array(DRAFT_ROUNDS).fill(null), min: Array(DRAFT_ROUNDS).fill(null) };
     });
