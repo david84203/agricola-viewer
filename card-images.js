@@ -1,5 +1,5 @@
 (function () {
-  const MANIFEST_URL = './card-images.json?v=20260614';
+  const MANIFEST_URL = './card-images.json?v=20260702-g8o66';
   const DECKS = new Set([
     'A', 'B', 'BI', 'C', 'Cz', 'D', 'E', 'FL', 'FR', 'G', 'G4', 'G5',
     'G5+', 'G6', 'G7', 'G8', 'G9', 'HH', 'I', 'K', 'L', 'NL', 'O', 'OX',

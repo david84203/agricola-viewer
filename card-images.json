@@ -1,5 +1,5 @@
 {
-  "version": "20260614-single-card-images-webp-q84",
+  "version": "20260702-g8o66",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -266,6 +266,7 @@
     "10940": "images/cards/G8/10940.webp",
     "10944": "images/cards/G8/10944.webp",
     "10963": "images/cards/G8/10963.webp",
+    "11105": "images/cards/G8/11105.webp",
     "11107": "images/cards/G8/11107.webp",
     "11113": "images/cards/G8/11113.webp",
     "11116": "images/cards/G8/11116.webp",
@@ -277,6 +278,7 @@
     "11170": "images/cards/G8/11170.webp",
     "11190": "images/cards/G8/11190.webp",
     "11214": "images/cards/G8/11214.webp",
+    "11218": "images/cards/G8/11218.webp",
     "11221": "images/cards/G8/11221.webp",
     "11238": "images/cards/G8/11238.webp",
     "11247": "images/cards/G8/11247.webp",
@@ -399,6 +401,7 @@
     "12136": "images/cards/S/12136.webp",
     "12137": "images/cards/S/12137.webp",
     "12138": "images/cards/S/12138.webp",
+    "12140": "images/cards/G8/12140.webp",
     "12157": "images/cards/G8/12157.webp",
     "12158": "images/cards/S/12158.webp",
     "12160": "images/cards/S/12160.webp",
@@ -3811,7 +3814,13 @@
     "E025": "images/cards/E/E025.webp",
     "E058": "images/cards/E/E058.webp",
     "E060": "images/cards/E/E060.webp",
-    "E149": "images/cards/E/E149.webp"
+    "E149": "images/cards/E/E149.webp",
+    "11692-6": "images/cards/G8/11692-6.webp",
+    "7092-3": "images/cards/G8/7092-3.webp",
+    "7244-2": "images/cards/G8/7244-2.webp",
+    "9118-3": "images/cards/G8/9118-3.webp",
+    "10829-2": "images/cards/G8/10829-2.webp",
+    "11414-4": "images/cards/G8/11414-4.webp"
   },
   "byDeckId": {
     "A/A001": "images/cards/A/A001.webp",
@@ -7627,6 +7636,15 @@
     "E/E025": "images/cards/E/E025.webp",
     "E/E058": "images/cards/E/E058.webp",
     "E/E060": "images/cards/E/E060.webp",
-    "E/E149": "images/cards/E/E149.webp"
+    "E/E149": "images/cards/E/E149.webp",
+    "G8/11692-6": "images/cards/G8/11692-6.webp",
+    "G8/7092-3": "images/cards/G8/7092-3.webp",
+    "G8/7244-2": "images/cards/G8/7244-2.webp",
+    "G8/11105": "images/cards/G8/11105.webp",
+    "G8/9118-3": "images/cards/G8/9118-3.webp",
+    "G8/10829-2": "images/cards/G8/10829-2.webp",
+    "G8/11218": "images/cards/G8/11218.webp",
+    "G8/11414-4": "images/cards/G8/11414-4.webp",
+    "G8/12140": "images/cards/G8/12140.webp"
   }
 }
