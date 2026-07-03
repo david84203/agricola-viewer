@@ -1,5 +1,5 @@
 {
-  "version": "20260702-g8o66",
+  "version": "20260703-s12o1",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -459,6 +459,14 @@
     "12400": "images/cards/G8/12400.webp",
     "12409": "images/cards/G8/12409.webp",
     "12456": "images/cards/QQ/12456.webp",
+    "12568": "images/cards/S12/12568.webp",
+    "12569": "images/cards/S12/12569.webp",
+    "12570": "images/cards/S12/12570.webp",
+    "12571": "images/cards/S12/12571.webp",
+    "12573": "images/cards/S12/12573.webp",
+    "12575": "images/cards/S12/12575.webp",
+    "12576": "images/cards/S12/12576.webp",
+    "12577": "images/cards/S12/12577.webp",
     "A001": "images/cards/A/A001.webp",
     "A002": "images/cards/A/A002.webp",
     "A003": "images/cards/A/A003.webp",
@@ -3820,7 +3828,8 @@
     "7244-2": "images/cards/G8/7244-2.webp",
     "9118-3": "images/cards/G8/9118-3.webp",
     "10829-2": "images/cards/G8/10829-2.webp",
-    "11414-4": "images/cards/G8/11414-4.webp"
+    "11414-4": "images/cards/G8/11414-4.webp",
+    "12578-2": "images/cards/S12/12578-2.webp"
   },
   "byDeckId": {
     "A/A001": "images/cards/A/A001.webp",
@@ -7645,6 +7654,15 @@
     "G8/10829-2": "images/cards/G8/10829-2.webp",
     "G8/11218": "images/cards/G8/11218.webp",
     "G8/11414-4": "images/cards/G8/11414-4.webp",
-    "G8/12140": "images/cards/G8/12140.webp"
+    "G8/12140": "images/cards/G8/12140.webp",
+    "S12/12571": "images/cards/S12/12571.webp",
+    "S12/12573": "images/cards/S12/12573.webp",
+    "S12/12575": "images/cards/S12/12575.webp",
+    "S12/12577": "images/cards/S12/12577.webp",
+    "S12/12568": "images/cards/S12/12568.webp",
+    "S12/12576": "images/cards/S12/12576.webp",
+    "S12/12569": "images/cards/S12/12569.webp",
+    "S12/12570": "images/cards/S12/12570.webp",
+    "S12/12578-2": "images/cards/S12/12578-2.webp"
   }
 }
