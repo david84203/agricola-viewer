@@ -1,5 +1,5 @@
 {
-  "version": "20260703-s12o1",
+  "version": "20260703-s12m1",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -459,6 +459,15 @@
     "12400": "images/cards/G8/12400.webp",
     "12409": "images/cards/G8/12409.webp",
     "12456": "images/cards/QQ/12456.webp",
+    "12555": "images/cards/S12/12555.webp",
+    "12556": "images/cards/S12/12556.webp",
+    "12557": "images/cards/S12/12557.webp",
+    "12558": "images/cards/S12/12558.webp",
+    "12559": "images/cards/S12/12559.webp",
+    "12562": "images/cards/S12/12562.webp",
+    "12564": "images/cards/S12/12564.webp",
+    "12565": "images/cards/S12/12565.webp",
+    "12566": "images/cards/S12/12566.webp",
     "12568": "images/cards/S12/12568.webp",
     "12569": "images/cards/S12/12569.webp",
     "12570": "images/cards/S12/12570.webp",
@@ -7663,6 +7672,15 @@
     "S12/12576": "images/cards/S12/12576.webp",
     "S12/12569": "images/cards/S12/12569.webp",
     "S12/12570": "images/cards/S12/12570.webp",
-    "S12/12578-2": "images/cards/S12/12578-2.webp"
+    "S12/12578-2": "images/cards/S12/12578-2.webp",
+    "S12/12555": "images/cards/S12/12555.webp",
+    "S12/12566": "images/cards/S12/12566.webp",
+    "S12/12559": "images/cards/S12/12559.webp",
+    "S12/12558": "images/cards/S12/12558.webp",
+    "S12/12557": "images/cards/S12/12557.webp",
+    "S12/12556": "images/cards/S12/12556.webp",
+    "S12/12565": "images/cards/S12/12565.webp",
+    "S12/12564": "images/cards/S12/12564.webp",
+    "S12/12562": "images/cards/S12/12562.webp"
   }
 }
