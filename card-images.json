@@ -1,5 +1,5 @@
 {
-  "version": "20260703-s12o2m2",
+  "version": "20260703-s13o1",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -481,6 +481,12 @@
     "12575": "images/cards/S12/12575.webp",
     "12576": "images/cards/S12/12576.webp",
     "12577": "images/cards/S12/12577.webp",
+    "12714": "images/cards/S13/12714.webp",
+    "12716": "images/cards/S13/12716.webp",
+    "12722": "images/cards/S13/12722.webp",
+    "12723": "images/cards/S13/12723.webp",
+    "12724": "images/cards/S13/12724.webp",
+    "12725": "images/cards/S13/12725.webp",
     "A001": "images/cards/A/A001.webp",
     "A002": "images/cards/A/A002.webp",
     "A003": "images/cards/A/A003.webp",
@@ -3844,7 +3850,10 @@
     "10829-2": "images/cards/G8/10829-2.webp",
     "11414-4": "images/cards/G8/11414-4.webp",
     "12578-2": "images/cards/S12/12578-2.webp",
-    "12572-2": "images/cards/S12/12572-2.webp"
+    "12572-2": "images/cards/S12/12572-2.webp",
+    "12717-2": "images/cards/S13/12717-2.webp",
+    "12721-2": "images/cards/S13/12721-2.webp",
+    "12718-2": "images/cards/S13/12718-2.webp"
   },
   "byDeckId": {
     "A/A001": "images/cards/A/A001.webp",
@@ -7693,6 +7702,15 @@
     "S12/12567": "images/cards/S12/12567.webp",
     "S12/12563": "images/cards/S12/12563.webp",
     "S12/12560": "images/cards/S12/12560.webp",
-    "S12/12561": "images/cards/S12/12561.webp"
+    "S12/12561": "images/cards/S12/12561.webp",
+    "S13/12717-2": "images/cards/S13/12717-2.webp",
+    "S13/12716": "images/cards/S13/12716.webp",
+    "S13/12721-2": "images/cards/S13/12721-2.webp",
+    "S13/12723": "images/cards/S13/12723.webp",
+    "S13/12714": "images/cards/S13/12714.webp",
+    "S13/12718-2": "images/cards/S13/12718-2.webp",
+    "S13/12722": "images/cards/S13/12722.webp",
+    "S13/12725": "images/cards/S13/12725.webp",
+    "S13/12724": "images/cards/S13/12724.webp"
   }
 }

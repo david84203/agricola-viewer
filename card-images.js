@@ -1,9 +1,9 @@
 (function () {
-  const MANIFEST_URL = './card-images.json?v=20260703-s12o2m2';
+  const MANIFEST_URL = './card-images.json?v=20260703-s13o1';
   const DECKS = new Set([
     'A', 'B', 'BI', 'C', 'Cz', 'D', 'E', 'FL', 'FR', 'G', 'G4', 'G5',
     'G5+', 'G6', 'G7', 'G8', 'G9', 'HH', 'I', 'K', 'L', 'NL', 'O', 'OX',
-    'PI', 'QQ', 'S', 'S12', 'WA', 'WM', 'Z', 'AY'
+    'PI', 'QQ', 'S', 'S12', 'S13', 'WA', 'WM', 'Z', 'AY'
   ]);
 
   let manifest = { byId: {}, byDeckId: {} };
