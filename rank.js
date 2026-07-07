@@ -724,19 +724,11 @@ function rankDrawCrop(canvas, card, forceSheet = false) {
 function openRankModal(card) {
   document.getElementById('rankModalTitle').textContent = card['牌名'] || '—';
   document.getElementById('rankModalId').textContent = card['卡片ID'] || '';
+  CardModal.renderTypeBadge(document.getElementById('rankModalBadge'), card);
   document.getElementById('rankModalDesc').textContent = card['說明'] || card['效果'] || '';
 
   const fieldsEl = document.getElementById('rankModalFields');
-  fieldsEl.innerHTML = '';
-  const showFields = ['費用', '勝利點數', '人數限制'];
-  showFields.forEach(key => {
-    if (card[key]) {
-      const row = document.createElement('div');
-      row.className = 'modal-field-row';
-      row.innerHTML = `<span class="modal-field-label">${key}</span><span class="modal-field-value">${card[key]}</span>`;
-      fieldsEl.appendChild(row);
-    }
-  });
+  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
 
   const canvas = document.getElementById('rankModalCanvas');
   rankDrawCrop(canvas, card);

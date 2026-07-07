@@ -2365,31 +2365,13 @@ function closePlayerHand() {
    Modal（與 draft.js 相同邏輯）
    ══════════════════════════════════════════════════ */
 function openModal(card) {
-  const typeName = card.card_type === 'minor' ? '次要發展卡'
-                 : card.card_type === 'occupation' ? '職業卡'
-                 : '次要發展卡及主要發展卡';
   document.getElementById('modalTitle').textContent = card['牌名'] || '—';
   document.getElementById('modalId').textContent    = card['卡片ID'] || '';
-  document.getElementById('modalBadge').className   = `modal-badge badge-${card.card_type}`;
-  document.getElementById('modalBadge').textContent = typeName;
+  CardModal.renderTypeBadge(document.getElementById('modalBadge'), card);
   document.getElementById('modalDesc').textContent  = card['說明'] || '—';
 
   const fieldsEl  = document.getElementById('modalFields');
-  fieldsEl.innerHTML = '';
-  const fieldDefs = card.card_type === 'occupation'
-    ? [['需求人數', card['需求人數']], ['紅利分數', card['紅利分數']], ['牌組', card['牌組']]]
-    : [['先決條件', card['先決條件']], ['費用', card['費用']], ['是否傳遞', card['是否傳遞']],
-       ['勝利點數', card['勝利點數'], 'vp'], ['紅利分數', card['紅利分數'], 'bonus'], ['牌組', card['牌組']]];
-
-  fieldDefs.forEach(([label, value, hi]) => {
-    if (!value) return;
-    const cls = hi === 'vp' && value !== '無' ? 'highlight-vp'
-              : hi === 'bonus' && value === '有' ? 'highlight-bonus' : '';
-    const row = document.createElement('div');
-    row.className = 'field-row';
-    row.innerHTML = `<div class="field-label">${label}</div><div class="field-value ${cls}">${value}</div>`;
-    fieldsEl.appendChild(row);
-  });
+  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
 
   drawCrop(document.getElementById('modalCanvas'), card);
   document.getElementById('modalOverlay').classList.add('open');

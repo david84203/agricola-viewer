@@ -636,7 +636,6 @@ function closeDupCompare() {
 // ── Modal ──────────────────────────────────────────
 function openModal(card) {
   const overlay = document.getElementById('modalOverlay');
-  const typeBadgeClass = `badge-${card.card_type}`;
 
   document.getElementById('modalTitle').textContent = card['牌名'] || '—';
   document.getElementById('modalId').textContent = card['卡片ID'] || '';
@@ -645,32 +644,12 @@ function openModal(card) {
   const bgaBadge = document.getElementById('modalBgaBadge');
   if (bgaBadge) bgaBadge.style.display = isCardBga(card) ? '' : 'none';
   const badgeEl = document.getElementById('modalBadge');
-  badgeEl.className = `modal-badge ${typeBadgeClass}`;
-  if (card.card_type === 'both') {
-    badgeEl.innerHTML = '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
-  } else {
-    badgeEl.textContent = card.card_type === 'minor' ? '次要發展卡' : '職業卡';
-  }
+  CardModal.renderTypeBadge(badgeEl, card);
   document.getElementById('modalDesc').textContent = card['說明'] || '—';
 
   // Fields
   const fieldsEl = document.getElementById('modalFields');
-  fieldsEl.innerHTML = '';
-
-  const fieldDefs = card.card_type === 'occupation'
-    ? [
-        ['需求人數', card['人數'] || card['需求人數']],
-        ['紅利分數', card['紅利分數']],
-        ['牌組', card['牌組']],
-      ]
-    : [
-        ['先決條件', card['先決條件']],
-        ['費用', card['費用']],
-        ['是否傳遞', card['是否傳遞']],
-        ['勝利點數', card['勝利點數'], 'vp'],
-        ['紅利分數', card['紅利分數'], 'bonus'],
-        ['牌組', card['牌組']],
-      ];
+  const fieldDefs = CardModal.fieldDefs(card);
 
   const replacedCardsText = getReplacedCardsText(card);
   if (replacedCardsText) fieldDefs.push(['取代卡牌', replacedCardsText, 'replace']);
@@ -686,21 +665,7 @@ function openModal(card) {
       fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
     }
   }
-
-  fieldDefs.forEach(([label, value, highlight]) => {
-    if (!value) return;
-    const row = document.createElement('div');
-    row.className = 'field-row';
-    const cls = highlight === 'vp' && value !== '無' ? (String(value).startsWith('-') ? 'highlight-vp-neg' : 'highlight-vp')
-              : highlight === 'bonus' && value === '有' ? 'highlight-bonus'
-              : highlight === 'replace' ? 'highlight-replace'
-              : '';
-    row.innerHTML = `
-      <div class="field-label">${label}</div>
-      <div class="field-value ${cls}">${value}</div>
-    `;
-    fieldsEl.appendChild(row);
-  });
+  CardModal.renderFields(fieldsEl, fieldDefs);
 
   // Draw modal canvas
   const modalCanvas = document.getElementById('modalCanvas');
