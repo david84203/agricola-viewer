@@ -2,7 +2,9 @@
    農家樂 Agricola Card Viewer — app.js
    ══════════════════════════════════════════════════ */
 
-const IMG_BASE = './images/';
+// 卡圖檔 CDN 單一開關（sprite sheet 用）：圖已搬 Cloudflare。回滾＝設 localStorage hv-card-cdn 指回 './'。
+const CARD_IMG_CDN = localStorage.getItem('hv-card-cdn') || 'https://agricola-cards.pages.dev/';
+const IMG_BASE = CARD_IMG_CDN + 'images/';
 const GRID_COLS = 3;
 const GRID_ROWS = 3;
 

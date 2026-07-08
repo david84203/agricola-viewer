@@ -1,4 +1,7 @@
 (function () {
+  // 卡圖檔 CDN：圖已搬到 Cloudflare Pages（免費、流量無上限）。
+  // 這是卡圖網址的單一開關——回滾只要設 localStorage hv-card-cdn 指回 viewer 自己（如 './'）即可。
+  const CARD_IMG_CDN = localStorage.getItem('hv-card-cdn') || 'https://agricola-cards.pages.dev/';
   const MANIFEST_URL = './card-images.json?v=20260705-missing7';
   const DECKS = new Set([
     'A', 'B', 'BI', 'C', 'Cz', 'D', 'E', 'FL', 'FR', 'G', 'G4', 'G5',
@@ -61,7 +64,8 @@
     const id = sanitizeId(getCardId(card));
     if (!id) return '';
     const deck = sanitizePart(getCardDeck(card));
-    return (deck && manifest.byDeckId?.[`${deck}/${id}`]) || manifest.byId?.[id] || '';
+    const rel = (deck && manifest.byDeckId?.[`${deck}/${id}`]) || manifest.byId?.[id] || '';
+    return rel ? CARD_IMG_CDN + rel : '';
   }
 
   function draw(canvas, imagePath, topFraction = 1, onError) {
