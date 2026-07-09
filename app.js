@@ -39,6 +39,8 @@ async function loadCards() {
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
     window.CardImages?.load?.() || Promise.resolve(),
+    (typeof isImplStatusViewer === 'function' && isImplStatusViewer() && typeof ensureImplStatus === 'function')
+      ? ensureImplStatus() : Promise.resolve(null),
   ]);
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
@@ -58,6 +60,7 @@ async function loadCards() {
   bgaExtraIds = new Set(bgaData || []);
 
   populateDeckFilter();
+  if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
   document.getElementById('totalCount').textContent = allCards.length;
   const _bannedKeys = new Set(allCards.filter(c => BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))).map(getCardKey));
   const _excluded = new Set([..._bannedKeys, ...dupNonCanonical]);
@@ -99,6 +102,7 @@ let activeDeck = 'latest';
 let searchQuery = '';
 let excludeBanned = false;
 let excludeDups = false;
+let activeImplStatus = 'all'; // 卡牌實作狀態篩選（白名單專用，見 impl-status.js）
 
 // ── 牌力評分（ELO / Tier）─────────────────────────
 // 預設不顯示、不抓資料；使用者選「牌力排序」才懶載入。
@@ -298,6 +302,10 @@ function applyFilters() {
     if (excludeBanned && BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))) return false;
     // exclude non-canonical duplicates toggle
     if (excludeDups && dupNonCanonical.has(getCardKey(c))) return false;
+    // impl status filter（白名單專用；非白名單一律忽略此篩選）
+    if (activeImplStatus !== 'all' && typeof isImplStatusViewer === 'function' && isImplStatusViewer()) {
+      if (String(getImplStatus(c['卡片ID'])) !== activeImplStatus) return false;
+    }
     // deck filter
     if (activeDeck === 'latest') {
       if (!latestKeySet.has(getCardKey(c))) return false;
@@ -474,6 +482,8 @@ function createCardEl(card, idx) {
       ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
     </div>
   `;
+
+  if (typeof renderImplStatusBadge === 'function') renderImplStatusBadge(card, div);
 
   div.addEventListener('click', () => {
     if (dupNonCanonical.has(getCardKey(card))) openDupCompare(card);
@@ -685,6 +695,9 @@ function openModal(card) {
   editBtn.style.display = (typeof isAdmin === 'function' && isAdmin()) ? '' : 'none';
   editBtn.onclick = () => openCardEditModal(card, allCards);
 
+  // 卡牌功能實作狀態編輯（白名單專用，DOM 層級不渲染非白名單）
+  if (typeof renderImplStatusEditor === 'function') renderImplStatusEditor(card);
+
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -698,6 +711,19 @@ function onAuthChange() {
   if (bgaAdminBtn) bgaAdminBtn.style.display = admin ? '' : 'none';
   const editBtn = document.getElementById('modalAdminEditBtn');
   if (editBtn) editBtn.style.display = admin ? '' : 'none';
+
+  // 卡牌功能實作狀態：篩選器與徽章跟著登入狀態顯示/隱藏
+  if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
+  const viewer = typeof isImplStatusViewer === 'function' && isImplStatusViewer();
+  const implEditor = document.getElementById('implStatusEditor');
+  if (implEditor && !viewer) implEditor.remove();
+  if (viewer && typeof ensureImplStatus === 'function') {
+    ensureImplStatus().then(() => { if (typeof refreshAllImplStatusBadges === 'function') refreshAllImplStatusBadges(); });
+  } else {
+    implStatusMap = null; // 登出/切換身份後清掉記憶體中的快取，縱深防禦
+    if (typeof refreshAllImplStatusBadges === 'function') refreshAllImplStatusBadges();
+    if (typeof applyFilters === 'function') applyFilters();
+  }
 }
 
 function closeModal() {

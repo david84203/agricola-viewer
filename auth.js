@@ -51,6 +51,12 @@ function getRaterId(){ const a = getAuth(); return a?.displayId || a?.id || null
 function isRater()   { const r = getRole(); return r === 'rater' || r === 'admin'; }
 function isAdmin()   { return getRole() === 'admin'; }
 function isPlayer()  { return getRole() === 'player'; }
+// 卡牌「功能實作狀態」私有 tag 白名單：只有小路(GM)與YOYO可見可改
+function isImplStatusViewer() {
+  if (isAdmin()) return true;
+  const id = getAuth()?.id;
+  return typeof id === 'string' && id.trim().toLowerCase() === 'yoyo';
+}
 // 玩家／評分者／管理員都會累積個人輪抽紀錄，可查看個人分析
 function hasProfileAccess() { const r = getRole(); return r === 'rater' || r === 'admin' || r === 'player'; }
 
