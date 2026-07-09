@@ -29,19 +29,22 @@ let dupNonCanonical = new Set(); // IDs of non-canonical duplicate cards
 let dupCardToPair = new Map();   // cardId → { pair, canonId }
 let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 let bgaExtraIds = new Set();     // manually marked BGA card IDs
+let effectsById = new Map();     // 卡片ID → 結構化卡效（effects.json，載入失敗則靜默降級為空）
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const [base, overrides, banGroups, dupPairs, bgaData] = await Promise.all([
+  const [base, overrides, banGroups, dupPairs, bgaData, effectsData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
+    fetch('./effects.json').then(r => r.json()).catch(() => []),
     window.CardImages?.load?.() || Promise.resolve(),
     (typeof isImplStatusViewer === 'function' && isImplStatusViewer() && typeof ensureImplStatus === 'function')
       ? ensureImplStatus() : Promise.resolve(null),
   ]);
+  effectsById = new Map((effectsData || []).map(e => [e.cardId, e]));
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
 
@@ -678,6 +681,16 @@ function openModal(card) {
     }
   }
   CardModal.renderFields(fieldsEl, fieldDefs);
+
+  // 結構化卡效（純顯示；沒有編碼的卡完全不顯示）
+  const effRec = effectsById.get(card['卡片ID']);
+  const effBadge = document.getElementById('modalEffectsBadge');
+  const effWrap = document.getElementById('modalEffectsWrap');
+  if (effBadge) effBadge.style.display = effRec ? '' : 'none';
+  if (effWrap) {
+    effWrap.style.display = effRec ? '' : 'none';
+    if (effRec) CardModal.renderEffects(document.getElementById('modalEffectsBody'), effRec);
+  }
 
   // Draw modal canvas
   const modalCanvas = document.getElementById('modalCanvas');

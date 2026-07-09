@@ -929,6 +929,46 @@ body {
   padding: 14px 16px;
 }
 
+.modal-effects-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #5a7a4f;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: .02em;
+}
+.modal-effects-wrap { margin-top: 6px; }
+.modal-effects-body {
+  font-size: .82rem;
+  color: var(--text2);
+  line-height: 1.6;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.effects-section-title {
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 8px;
+}
+.effects-section-title:first-child { margin-top: 0; }
+.effects-meta-line {
+  font-size: .78rem;
+  color: var(--text3);
+}
+.effects-op-line {
+  font-family: 'Courier New', monospace;
+  font-size: .76rem;
+  color: var(--text2);
+  padding-left: 10px;
+  word-break: break-all;
+}
+
 /* ─── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
