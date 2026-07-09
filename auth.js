@@ -11,6 +11,7 @@ const UGG_LINE_URL = 'https://lin.ee/TLqRqdc';
 const FIRESTORE_DOCS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 const FIRESTORE_AUTH = `${FIRESTORE_DOCS_BASE}/settings/auth`;
 const FIRESTORE_PLAYERS = `${FIRESTORE_DOCS_BASE}/agricola_players`;
+const MIN_PIN_LEN = 4; // 新設定的 PIN 最低長度（登入時不檢查，避免擋到舊帳號）
 
 // ── State ──────────────────────────────────────────
 function getAuth() {
@@ -98,74 +99,157 @@ async function isUsedAsRaterId(id) {
   }
 }
 
-// ── Login ──────────────────────────────────────────
-async function login(id, pin) {
-  const trimmedId = id.trim();
-  if (!trimmedId) return { ok: false, error: '請輸入 ID' };
-
-  if (trimmedId.toLowerCase() === 'bay' || trimmedId.toLowerCase() === 'chris') {
-    return { ok: false, error: '此 ID 已被限制，若要使用請改由「玩家登入」註冊一般帳號' };
-  }
-
-  if (await isRegisteredPlayerId(trimmedId)) {
-    return { ok: false, error: `「${trimmedId}」已是一般玩家帳號，你登入錯入口囉，請改用「玩家登入」` };
-  }
-
-  const settings = await fetchAuthSettings();
-
-  if (pin !== settings.raterPin) return { ok: false, error: 'PIN 錯誤，請重試' };
-
-  const role      = id.trim() === settings.adminId ? 'admin' : 'rater';
-  const displayId = role === 'admin' && settings.adminName ? settings.adminName : id.trim();
-  localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id: id.trim(), role, displayId }));
-  return { ok: true, role, id: id.trim() };
-}
-
-// ── Player login (self-service ID + PIN, first login = register) ──
+// ── 帳號基礎工具（統一存在 agricola_players/{id}）─────
 async function hashPin(pin) {
   const data = new TextEncoder().encode(pin);
   const buf  = await crypto.subtle.digest('SHA-256', data);
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+function validatePin(pin) {
+  return typeof pin === 'string' && pin.trim().length >= MIN_PIN_LEN;
+}
+
+// 讀取帳號文件。回傳 { exists, pinHash, role } 或 { exists:false }（error:true 表示網路錯）
+async function fetchAccount(id) {
+  try {
+    const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}`);
+    if (res.status === 200) {
+      const d = await res.json();
+      return { exists: true, pinHash: d.fields?.pinHash?.stringValue, role: d.fields?.role?.stringValue || null };
+    }
+    if (res.status === 404) return { exists: false };
+    return { exists: false, error: true };
+  } catch {
+    return { exists: false, error: true };
+  }
+}
+
+// 建立新帳號（role 傳 null = 一般玩家；'rater' = 評分者）。回傳是否成功。
+async function createAccount(id, pin, role) {
+  const fields = {
+    pinHash:   { stringValue: await hashPin(pin) },
+    createdAt: { stringValue: new Date().toISOString() },
+  };
+  if (role) fields.role = { stringValue: role };
+  const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
+  });
+  return res.ok;
+}
+
+// 只更新 pinHash（用 updateMask 才不會把 role/createdAt 洗掉）
+async function patchPinHash(id, newPin) {
+  const url = `${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}?updateMask.fieldPaths=pinHash`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: { pinHash: { stringValue: await hashPin(newPin) } } }),
+  });
+  return res.ok;
+}
+
+// 寫入登入狀態並回傳結果（role: admin 由 settings.adminId 判定，優先於文件裡的 role）
+function persistLogin(id, docRole, settings) {
+  const role = (settings && id === settings.adminId) ? 'admin' : (docRole || 'player');
+  const displayId = (role === 'admin' && settings && settings.adminName) ? settings.adminName : id;
+  localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id, role, displayId }));
+  return { ok: true, role, id };
+}
+
+// ── 統一登入（只登入、不自動建帳號；供評分者入口與線上大廳使用）──
+// 回傳：{ok:true,role,id} / {ok:false,error} / {needMigrate:true,id,code}（舊評分者用共用碼首次登入）
+async function loginAccount(id, pin) {
+  const trimmedId = id.trim();
+  if (!trimmedId) return { ok: false, error: '請輸入 ID' };
+  if (!pin)        return { ok: false, error: '請輸入 PIN' };
+
+  const settings = await fetchAuthSettings();
+  const acc = await fetchAccount(trimmedId);
+  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
+
+  if (acc.exists) {
+    if (acc.pinHash !== await hashPin(pin)) {
+      return { ok: false, error: 'PIN 錯誤，請重試（忘記請聯絡管理員重設）' };
+    }
+    return persistLogin(trimmedId, acc.role, settings);
+  }
+
+  // 尚無個人帳號 → 若輸入的是共用通關密碼，視為舊評分者首次登入，帶去設定新 PIN
+  if (settings.raterPin && pin === settings.raterPin) {
+    return { needMigrate: true, id: trimmedId, code: pin };
+  }
+  return {
+    ok: false,
+    unregistered: true,
+    error: '查無此帳號或 PIN 錯誤。若你是評分者但還沒設定新密碼，請用「ID＋原本的通關密碼」登入一次，系統會帶你設定新密碼。',
+  };
+}
+
+// ── 評分者授權／舊帳號遷移：用共用碼換一組個人 PIN ──
+async function setRaterPin(id, code, newPin) {
+  const trimmedId = id.trim();
+  if (!trimmedId) return { ok: false, error: '請輸入 ID' };
+  const settings = await fetchAuthSettings();
+  if (!settings.raterPin || code !== settings.raterPin) return { ok: false, error: '授權碼錯誤' };
+  if (!validatePin(newPin)) return { ok: false, error: `新 PIN 至少 ${MIN_PIN_LEN} 碼` };
+  if (newPin === settings.raterPin) return { ok: false, error: '新 PIN 不能跟原本的通關密碼一樣' };
+
+  const acc = await fetchAccount(trimmedId);
+  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
+  if (acc.exists) return { ok: false, error: '此 ID 已有帳號，請直接用個人 PIN 登入' };
+
+  const isAdmin = trimmedId === settings.adminId;
+  const created = await createAccount(trimmedId, newPin, isAdmin ? null : 'rater');
+  if (!created) return { ok: false, error: '設定失敗，請重試' };
+  return persistLogin(trimmedId, isAdmin ? null : 'rater', settings);
+}
+
+// ── 玩家登入／自助註冊（首次登入即建立帳號）──
 async function loginPlayer(id, pin) {
   const trimmedId = id.trim();
   if (!trimmedId) return { ok: false, error: '請輸入 ID' };
   if (!pin)        return { ok: false, error: '請輸入 PIN' };
 
-  const pinHash = await hashPin(pin);
-  const docUrl  = `${FIRESTORE_PLAYERS}/${encodeURIComponent(trimmedId)}`;
+  const settings = await fetchAuthSettings();
+  const acc = await fetchAccount(trimmedId);
+  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
 
-  const res = await fetch(docUrl);
-
-  if (res.status === 404) {
-    if (await isUsedAsRaterId(trimmedId)) {
-      return { ok: false, error: `「${trimmedId}」已是評分者身份，你登入錯入口囉，請改用「評分者登入」（或換一個 ID 註冊玩家帳號）` };
-    }
-
-    // ID 尚未被使用 → 直接以此 ID + PIN 建立新帳號
-    const createRes = await fetch(docUrl, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fields: {
-          pinHash:   { stringValue: pinHash },
-          createdAt: { stringValue: new Date().toISOString() },
-        }
-      })
-    });
-    if (!createRes.ok) return { ok: false, error: '建立帳號失敗，請重試' };
-  } else if (res.ok) {
-    const doc = await res.json();
-    if (doc.fields?.pinHash?.stringValue !== pinHash) {
+  if (acc.exists) {
+    if (acc.pinHash !== await hashPin(pin)) {
       return { ok: false, error: 'PIN 錯誤，請重試（ID 已被使用，若忘記 PIN 請聯絡管理員重設）' };
     }
-  } else {
-    return { ok: false, error: '網路錯誤，請重試' };
+    return persistLogin(trimmedId, acc.role, settings);
   }
 
-  localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id: trimmedId, role: 'player', displayId: trimmedId }));
-  return { ok: true, role: 'player', id: trimmedId };
+  // 尚未被使用 → 自助建立玩家帳號
+  if (!validatePin(pin)) return { ok: false, error: `PIN 至少 ${MIN_PIN_LEN} 碼，請重新設定` };
+  if (settings.adminId && trimmedId === settings.adminId) {
+    return { ok: false, error: '此 ID 為保留帳號，無法用玩家登入建立' };
+  }
+  if (await isUsedAsRaterId(trimmedId)) {
+    return { ok: false, error: `「${trimmedId}」已是評分者身份，請改用「評分者登入」設定密碼（或換一個 ID）` };
+  }
+  const created = await createAccount(trimmedId, pin, null);
+  if (!created) return { ok: false, error: '建立帳號失敗，請重試' };
+  return persistLogin(trimmedId, null, settings);
+}
+
+// ── 自助修改 PIN（需驗證原 PIN）──
+async function changePin(id, oldPin, newPin) {
+  const trimmedId = id.trim();
+  if (!trimmedId) return { ok: false, error: '缺少帳號' };
+  const acc = await fetchAccount(trimmedId);
+  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
+  if (!acc.exists) return { ok: false, error: '找不到帳號' };
+  if (acc.pinHash !== await hashPin(oldPin)) return { ok: false, error: '原 PIN 錯誤' };
+  if (!validatePin(newPin)) return { ok: false, error: `新 PIN 至少 ${MIN_PIN_LEN} 碼` };
+  const settings = await fetchAuthSettings().catch(() => ({}));
+  if (settings.raterPin && newPin === settings.raterPin) return { ok: false, error: '新 PIN 不能跟原本的通關密碼一樣' };
+  const ok = await patchPinHash(trimmedId, newPin);
+  return ok ? { ok: true } : { ok: false, error: '更新失敗，請重試' };
 }
 
 // ── Mount UI ───────────────────────────────────────
@@ -198,8 +282,10 @@ function refreshAuthBar() {
     wrap.innerHTML = `
       <span class="auth-user">${roleLabel}｜${auth.id}</span>
       ${adminLink}
+      <button class="auth-changepin-btn" id="authChangePinBtn">修改 PIN</button>
       <button class="auth-logout-btn" id="authLogoutBtn">登出</button>
     `;
+    wrap.querySelector('#authChangePinBtn').addEventListener('click', openChangePinModal);
     wrap.querySelector('#authLogoutBtn').addEventListener('click', () => {
       clearAuth();
       refreshAuthBar();
@@ -273,6 +359,7 @@ function injectLoginModal() {
   modal.innerHTML = `
     <div class="auth-modal">
       <div class="auth-modal-title">評分者登入</div>
+      <p class="player-auth-hint">第一次登入請用「原本的通關密碼」，系統會請你設定一組專屬新 PIN；之後就用新 PIN 登入。</p>
       <div class="auth-field">
         <label>你的 ID（暱稱）</label>
         <input type="text" id="authIdInput" class="auth-input" placeholder="輸入你的名字" autocomplete="off" maxlength="20" />
@@ -309,11 +396,14 @@ async function doLogin() {
   err.textContent = '';
 
   try {
-    const result = await login(id, pin);
+    const result = await loginAccount(id, pin);
     if (result.ok) {
       closeLoginModal();
       refreshAuthBar();
       if (shouldShowLineInvite()) openLineInviteModal();
+    } else if (result.needMigrate) {
+      closeLoginModal();
+      openMigrateModal(result.id, result.code);
     } else {
       err.textContent = result.error;
     }
@@ -334,7 +424,7 @@ function injectPlayerLoginModal() {
   modal.innerHTML = `
     <div class="auth-modal">
       <div class="auth-modal-title">玩家登入</div>
-      <p class="player-auth-hint">第一次登入會自動用此 ID＋PIN 建立帳號，之後請固定用同一組登入。請自行記住，遺失需請管理員協助重設。</p>
+      <p class="player-auth-hint">第一次登入會自動用此 ID＋PIN 建立帳號（PIN 至少 ${MIN_PIN_LEN} 碼），之後請固定用同一組登入。請自行記住，遺失需請管理員協助重設。</p>
       <div class="auth-field">
         <label>你的 ID（暱稱）</label>
         <input type="text" id="playerAuthIdInput" class="auth-input" placeholder="設定一個好記的 ID" autocomplete="off" maxlength="20" />
@@ -388,6 +478,9 @@ async function doPlayerLogin() {
       closePlayerLoginModal();
       refreshAuthBar();
       if (shouldShowLineInvite()) openLineInviteModal();
+    } else if (result.needMigrate) {
+      closePlayerLoginModal();
+      openMigrateModal(result.id, result.code);
     } else {
       err.textContent = result.error;
     }
@@ -399,10 +492,161 @@ async function doPlayerLogin() {
   btn.textContent = '登入／建立帳號';
 }
 
+// ── 遷移／授權設定新 PIN Modal ─────────────────────
+function injectMigrateModal() {
+  const modal = document.createElement('div');
+  modal.id = 'migrateModal';
+  modal.className = 'auth-modal-overlay';
+  modal.style.display = 'none';
+  modal.innerHTML = `
+    <div class="auth-modal">
+      <div class="auth-modal-title">設定你的專屬 PIN</div>
+      <p class="player-auth-hint">偵測到你是評分者。為了保護你的戰績與資料，請設定一組只有你知道的新 PIN（至少 ${MIN_PIN_LEN} 碼），之後就用「ID＋新 PIN」登入。</p>
+      <div class="auth-field">
+        <label>ID</label>
+        <input type="text" id="migrateIdInput" class="auth-input" disabled />
+      </div>
+      <div class="auth-field">
+        <label>新 PIN（至少 ${MIN_PIN_LEN} 碼）</label>
+        <input type="password" id="migratePinInput" class="auth-input" placeholder="設定新 PIN" autocomplete="off" />
+      </div>
+      <div class="auth-field">
+        <label>再輸入一次</label>
+        <input type="password" id="migratePin2Input" class="auth-input" placeholder="再輸入一次" autocomplete="off" />
+      </div>
+      <div class="auth-error" id="migrateError"></div>
+      <div class="auth-modal-footer">
+        <button class="auth-btn-cancel" id="migrateCancel">取消</button>
+        <button class="auth-btn-submit" id="migrateSubmit">完成升級</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('migrateCancel').addEventListener('click', closeMigrateModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeMigrateModal(); });
+  document.getElementById('migrateSubmit').addEventListener('click', doMigrate);
+  document.getElementById('migratePin2Input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMigrate();
+  });
+}
+
+let _migrateCode = '';
+function openMigrateModal(id, code) {
+  if (!document.getElementById('migrateModal')) injectMigrateModal();
+  _migrateCode = code || '';
+  document.getElementById('migrateIdInput').value = id;
+  document.getElementById('migratePinInput').value = '';
+  document.getElementById('migratePin2Input').value = '';
+  document.getElementById('migrateError').textContent = '';
+  document.getElementById('migrateModal').style.display = 'flex';
+  document.getElementById('migratePinInput').focus();
+}
+function closeMigrateModal() {
+  const m = document.getElementById('migrateModal');
+  if (m) m.style.display = 'none';
+}
+async function doMigrate() {
+  const id   = document.getElementById('migrateIdInput').value.trim();
+  const pin  = document.getElementById('migratePinInput').value;
+  const pin2 = document.getElementById('migratePin2Input').value;
+  const btn  = document.getElementById('migrateSubmit');
+  const err  = document.getElementById('migrateError');
+  if (pin !== pin2) { err.textContent = '兩次輸入不一致'; return; }
+  btn.disabled = true; btn.textContent = '處理中…'; err.textContent = '';
+  try {
+    const result = await setRaterPin(id, _migrateCode, pin);
+    if (result.ok) {
+      closeMigrateModal();
+      refreshAuthBar();
+      if (shouldShowLineInvite()) openLineInviteModal();
+    } else {
+      err.textContent = result.error;
+    }
+  } catch (e) {
+    err.textContent = '網路錯誤，請重試';
+  }
+  btn.disabled = false; btn.textContent = '完成升級';
+}
+
+// ── 修改 PIN Modal ────────────────────────────────
+function injectChangePinModal() {
+  const modal = document.createElement('div');
+  modal.id = 'changePinModal';
+  modal.className = 'auth-modal-overlay';
+  modal.style.display = 'none';
+  modal.innerHTML = `
+    <div class="auth-modal">
+      <div class="auth-modal-title">修改 PIN</div>
+      <div class="auth-field">
+        <label>原 PIN</label>
+        <input type="password" id="cpOldInput" class="auth-input" placeholder="輸入原本的 PIN" autocomplete="off" />
+      </div>
+      <div class="auth-field">
+        <label>新 PIN（至少 ${MIN_PIN_LEN} 碼）</label>
+        <input type="password" id="cpNewInput" class="auth-input" placeholder="設定新 PIN" autocomplete="off" />
+      </div>
+      <div class="auth-field">
+        <label>再輸入一次</label>
+        <input type="password" id="cpNew2Input" class="auth-input" placeholder="再輸入一次" autocomplete="off" />
+      </div>
+      <div class="auth-error" id="cpError"></div>
+      <div class="auth-modal-footer">
+        <button class="auth-btn-cancel" id="cpCancel">取消</button>
+        <button class="auth-btn-submit" id="cpSubmit">確認修改</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('cpCancel').addEventListener('click', closeChangePinModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeChangePinModal(); });
+  document.getElementById('cpSubmit').addEventListener('click', doChangePin);
+  document.getElementById('cpNew2Input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doChangePin();
+  });
+}
+function openChangePinModal() {
+  if (!document.getElementById('changePinModal')) injectChangePinModal();
+  document.getElementById('cpOldInput').value = '';
+  document.getElementById('cpNewInput').value = '';
+  document.getElementById('cpNew2Input').value = '';
+  document.getElementById('cpError').textContent = '';
+  document.getElementById('changePinModal').style.display = 'flex';
+  document.getElementById('cpOldInput').focus();
+}
+function closeChangePinModal() {
+  const m = document.getElementById('changePinModal');
+  if (m) m.style.display = 'none';
+}
+async function doChangePin() {
+  const auth = getAuth();
+  if (!auth) { closeChangePinModal(); return; }
+  const oldPin = document.getElementById('cpOldInput').value;
+  const newPin = document.getElementById('cpNewInput').value;
+  const new2   = document.getElementById('cpNew2Input').value;
+  const btn = document.getElementById('cpSubmit');
+  const err = document.getElementById('cpError');
+  if (newPin !== new2) { err.textContent = '兩次輸入不一致'; return; }
+  btn.disabled = true; btn.textContent = '處理中…'; err.textContent = '';
+  try {
+    const result = await changePin(auth.id, oldPin, newPin);
+    if (result.ok) {
+      closeChangePinModal();
+      alert('PIN 已更新，下次請用新 PIN 登入。');
+    } else {
+      err.textContent = result.error;
+    }
+  } catch (e) {
+    err.textContent = '網路錯誤，請重試';
+  }
+  btn.disabled = false; btn.textContent = '確認修改';
+}
+
 // ── Auto-init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   injectLoginModal();
   injectPlayerLoginModal();
+  injectMigrateModal();
+  injectChangePinModal();
   const mount = document.getElementById('authBarMount') || document.querySelector('.brand-right');
   if (mount) mountAuthBar(mount);
 });

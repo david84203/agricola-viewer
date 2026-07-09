@@ -27,7 +27,7 @@
   font-weight: 500;
   white-space: nowrap;
 }
-.auth-logout-btn {
+.auth-logout-btn, .auth-changepin-btn {
   background: none;
   border: 1px solid var(--border);
   border-radius: 100px;
@@ -41,6 +41,10 @@
 .auth-logout-btn:hover {
   border-color: #f87171;
   color: #f87171;
+}
+.auth-changepin-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 .auth-admin-link {
   font-size: .8rem;
