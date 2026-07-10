@@ -329,6 +329,7 @@ async function init() {
   refreshSessionLoadSelect();
   refreshHumanSeatSelect();
   restoreDraftState();
+  importFromUrlHash(); // 放在 restore 之後：URL 帶碼優先於上次自動存檔
 }
 
 async function loadBgaIdMap() {
@@ -959,7 +960,8 @@ function restoreDraftState() {
 /* 把一份 state（牌包＋扣牌＋設定）套進畫面，匯入與自動還原共用 */
 function applyState(state) {
   if (!state) return;
-  const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || findCardByBGAId(String(id)) || null : null);
+  // 線上對戰的卡 ID 已去掉 * 字尾，比對時多一層「去星號」fallback
+  const byId = id => (id ? allCards.find(c => c['卡片ID'] === id) || allCards.find(c => String(c['卡片ID']).replace(/\*+$/, '') === id) || findCardByBGAId(String(id)) || null : null);
 
   if (state.handSize)    rs.handSize    = state.handSize;
   if (state.draftFormat) rs.draftFormat = state.draftFormat;
@@ -1103,6 +1105,7 @@ function findMissingStateCardIds(state) {
   return getStateCardIds(state).filter(id => {
     if (!id) return false;
     if (allCards.find(c => c['卡片ID'] === id)) return false;
+    if (allCards.find(c => String(c['卡片ID']).replace(/\*+$/, '') === id)) return false;
     return !findCardByBGAId(String(id));
   });
 }
@@ -1172,11 +1175,8 @@ async function copyShareCode() {
   document.getElementById('shareDialogMsg').textContent = '✓ 已複製，貼給朋友即可';
 }
 
-function importShareCode() {
-  const ta  = document.getElementById('shareCodeArea');
-  const msg = document.getElementById('shareDialogMsg');
-  const state = decodeShareCode(ta.value);
-  if (!state) { msg.textContent = '✗ 代碼無法辨識，請確認完整複製'; return; }
+/* 匯入 state 的共用核心（對話框貼碼與 URL 帶碼共用） */
+function applyImportedShareState(state) {
   const missing = findMissingStateCardIds(state);
   const preserveCurrentPacks = shouldPreserveCurrentPacksForHistoryImport(state);
   const stateToApply = preserveCurrentPacks
@@ -1200,6 +1200,29 @@ function importShareCode() {
     saveHistoryRecord();
     updateViewResultBtn();
   }
+  return { missing, preserveCurrentPacks };
+}
+
+/* URL 帶碼一鍵匯入：review.html#import=AGRI1:...（線上對戰結算頁的「覆盤輪抽」按鈕由此進） */
+function importFromUrlHash() {
+  const m = location.hash.match(/^#import=(.+)/);
+  if (!m) return;
+  let code = m[1];
+  try { code = decodeURIComponent(code); } catch {}
+  const state = decodeShareCode(code);
+  // 匯入後清掉冗長 hash：重新整理不會重複匯入、網址也乾淨
+  history.replaceState(null, '', location.pathname + location.search);
+  if (!state) { alert('連結中的覆盤代碼無法辨識，請改用「📥 匯入」貼上分享碼'); return; }
+  const { missing } = applyImportedShareState(state);
+  if (missing.length) alert(`匯入完成，${missing.length} 張找不到對照，已標示在牌包空缺處`);
+}
+
+function importShareCode() {
+  const ta  = document.getElementById('shareCodeArea');
+  const msg = document.getElementById('shareDialogMsg');
+  const state = decodeShareCode(ta.value);
+  if (!state) { msg.textContent = '✗ 代碼無法辨識，請確認完整複製'; return; }
+  const { missing, preserveCurrentPacks } = applyImportedShareState(state);
   closeShareDialog();
   if (preserveCurrentPacks) {
     alert('已匯入 BGA 歷史扣牌紀錄，並保留目前完整的 10+10 初始手牌。');
