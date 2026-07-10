@@ -1,5 +1,5 @@
 {
-  "version": "20260705-missing7",
+  "version": "20260711-b163-priest",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -864,6 +864,7 @@
     "B160": "images/cards/B/B160.webp",
     "B161": "images/cards/B/B161.webp",
     "B162": "images/cards/B/B162.webp",
+    "B163": "images/cards/B/B163.webp",
     "B164": "images/cards/B/B164.webp",
     "B165": "images/cards/B/B165.webp",
     "B166": "images/cards/B/B166.webp",
@@ -4248,6 +4249,7 @@
     "B/B160": "images/cards/B/B160.webp",
     "B/B161": "images/cards/B/B161.webp",
     "B/B162": "images/cards/B/B162.webp",
+    "B/B163": "images/cards/B/B163.webp",
     "B/B164": "images/cards/B/B164.webp",
     "B/B165": "images/cards/B/B165.webp",
     "B/B166": "images/cards/B/B166.webp",
