@@ -938,6 +938,16 @@ body {
   border-radius: 100px;
   letter-spacing: .02em;
 }
+.modal-online-impl-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #2f9e44;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: .02em;
+  cursor: help;
+}
 .modal-effects-wrap { margin-top: 6px; }
 .modal-effects-body {
   font-size: .82rem;

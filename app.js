@@ -30,21 +30,25 @@ let dupCardToPair = new Map();   // cardId → { pair, canonId }
 let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 let bgaExtraIds = new Set();     // manually marked BGA card IDs
 let effectsById = new Map();     // 卡片ID → 結構化卡效（effects.json，載入失敗則靜默降級為空）
+let onlineImplMap = new Map();    // 卡片ID → 線上實作機制中文（online-implemented.json；GM/YOYO 專用徽章）
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const [base, overrides, banGroups, dupPairs, bgaData, effectsData] = await Promise.all([
+  const implViewer = typeof isImplStatusViewer === 'function' && isImplStatusViewer();
+  const [base, overrides, banGroups, dupPairs, bgaData, effectsData, onlineImplData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
     fetch('./effects.json').then(r => r.json()).catch(() => []),
+    // 線上已實作清單：僅 GM/YOYO 需要，非白名單不抓（比照 impl-status 的私有原則）
+    implViewer ? fetch('./online-implemented.json').then(r => r.json()).catch(() => null) : Promise.resolve(null),
     window.CardImages?.load?.() || Promise.resolve(),
-    (typeof isImplStatusViewer === 'function' && isImplStatusViewer() && typeof ensureImplStatus === 'function')
-      ? ensureImplStatus() : Promise.resolve(null),
+    (implViewer && typeof ensureImplStatus === 'function') ? ensureImplStatus() : Promise.resolve(null),
   ]);
   effectsById = new Map((effectsData || []).map(e => [e.cardId, e]));
+  onlineImplMap = new Map(onlineImplData && onlineImplData.cards ? Object.entries(onlineImplData.cards) : []);
 
   allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
 
@@ -690,6 +694,16 @@ function openModal(card) {
   if (effWrap) {
     effWrap.style.display = effRec ? '' : 'none';
     if (effRec) CardModal.renderEffects(document.getElementById('modalEffectsBody'), effRec);
+  }
+
+  // 線上已實作徽章（GM/YOYO 專用；自動取自 online-implemented.json，反映 play.js 真實實作）
+  const onlineBadge = document.getElementById('modalOnlineImplBadge');
+  if (onlineBadge) {
+    // online-implemented.json 的 key 是 play.js 的 cleanCardId（無星號），cards.json 的 ID 帶尾綴 *，比對前先去星號
+    const mech = (typeof isImplStatusViewer === 'function' && isImplStatusViewer())
+      ? onlineImplMap.get(String(card['卡片ID']).replace(/\*$/, '')) : null;
+    onlineBadge.style.display = mech ? '' : 'none';
+    if (mech) onlineBadge.title = `線上機制：${mech}`;
   }
 
   // Draw modal canvas
