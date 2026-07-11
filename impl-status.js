@@ -142,6 +142,7 @@ function renderImplStatusFilterControl() {
     <label for="implStatusSelect">功能狀態</label>
     <select id="implStatusSelect">
       <option value="all">全部</option>
+      <option value="online">✅ 線上已實作（自動）</option>
       <option value="1">1 部分完成</option>
       <option value="2">2 完成</option>
       <option value="3">3 未做</option>
@@ -151,7 +152,9 @@ function renderImplStatusFilterControl() {
   filterBar.appendChild(wrap);
 
   document.getElementById('implStatusSelect').addEventListener('change', e => {
-    window.activeImplStatus = e.target.value;
+    // 注意：要寫 app.js 頂層的 let activeImplStatus（共用全域作用域）；
+    // 之前寫成 window.activeImplStatus 是另一個變數，applyFilters 讀不到，篩選完全沒作用。
+    activeImplStatus = e.target.value;
     if (typeof applyFilters === 'function') applyFilters();
   });
 }

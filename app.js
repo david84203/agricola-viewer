@@ -311,7 +311,10 @@ function applyFilters() {
     if (excludeDups && dupNonCanonical.has(getCardKey(c))) return false;
     // impl status filter（白名單專用；非白名單一律忽略此篩選）
     if (activeImplStatus !== 'all' && typeof isImplStatusViewer === 'function' && isImplStatusViewer()) {
-      if (String(getImplStatus(c['卡片ID'])) !== activeImplStatus) return false;
+      if (activeImplStatus === 'online') {
+        // 線上已實作＝online-implemented.json 白名單（play.js 自動真相）；ID 帶星號要先去掉
+        if (!onlineImplMap.has(String(c['卡片ID']).replace(/\*$/, ''))) return false;
+      } else if (String(getImplStatus(c['卡片ID'])) !== activeImplStatus) return false;
     }
     // deck filter
     if (activeDeck === 'latest') {
