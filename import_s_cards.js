@@ -96,7 +96,24 @@ for (const card of allCards) {
 // Update cards.json
 const cardsJsonPath = path.join(__dirname, 'cards.json');
 const existing = JSON.parse(fs.readFileSync(cardsJsonPath, 'utf8'));
-const filtered = existing.filter(c => !c['牌組'] || !/^S(?:\d+)?$/.test(String(c['牌組'])));
+// 只替換這支匯入程式實際管理的 S1～S11 合圖資料。
+// 不能依「牌組」整批刪除：冰釣漁夫雖屬 S，圖片卻寄居在 G8o31；
+// S12、S13 在網站內也統一顯示為 S，但不屬於本批匯入範圍。
+const managedSourceImages = new Set(
+  Object.values(deckImages).flat().map(([imgName]) => imgName)
+);
+const removed = existing.filter(c => managedSourceImages.has(c.source_image));
+const incomingIds = new Set(allCards.map(c => c['卡片ID']));
+const missingAfterRebuild = removed.filter(c => !incomingIds.has(c['卡片ID']));
+
+if (missingAfterRebuild.length > 0) {
+  const details = missingAfterRebuild
+    .map(c => `${c['卡片ID']} ${c['牌名']} (${c.source_image})`)
+    .join('\n');
+  throw new Error(`匯入將刪除但未補回以下卡片：\n${details}`);
+}
+
+const filtered = existing.filter(c => !managedSourceImages.has(c.source_image));
 const final = [...filtered, ...allCards];
 fs.writeFileSync(cardsJsonPath, JSON.stringify(final, null, 2), 'utf8');
-console.log(`\n移除舊 S 系列 ${existing.length - filtered.length} 筆，新增 ${allCards.length} 筆，總計 ${final.length} 筆`);
+console.log(`\n替換 S1～S11 合圖資料 ${removed.length} 筆，新增 ${allCards.length} 筆，總計 ${final.length} 筆`);

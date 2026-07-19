@@ -159,7 +159,7 @@ const imageGroups = [
   ['G8m62.jpg', [
     ['11003-3','農民的聚餐','次要發展卡','無','1木/1磚','是','無','無','G8','當你打出此卡，若你的家庭成員已佔據「犁1塊農田」或「播種和/或烤麵包」行動格，你取得3份食物或1份蔬菜。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。'],
     ['10718-3','被壓抑的羊群','次要發展卡','無','1羊+1磚','否','無','有','G8','遊戲結束計分時，你每有1個圈地飼養的羊數量到達該圈地的容量上限(至少可以飼養1隻羊)，你獲得1分紅利分數。'],
-    [null,'披薩烤爐','次要發展卡','退還1個烤爐','2木+1磚+2石','否',2,'有','G8','每當你執行「烤麵包」行動，你可以使用此卡：1麥轉換為4份食物。遊戲結束計分時，你每有3份食物，你獲得1分紅利分數。'],
+    ['9029-3','披薩烤爐','次要發展卡及主要發展卡','退還1個烤爐','2木+1磚+2石','否',2,'有','G8','每當你執行「烤麵包」行動，你可以使用此卡將1份麥+1份蔬菜轉換為8份食物一次。遊戲結束計分時，你每有3份食物，你獲得1分紅利分數。',['烤麵包']],
     ['11781-5','香菜根','次要發展卡','無','無','是','無','無','G8','當你打出此卡，你立即取得1份蔬菜、1份食物和1張乞討卡。在你打出此卡後，將其傳給你左手邊的玩家，加入他的手牌中。'],
     ['12469-7','披薩食譜','次要發展卡','無','無','是','無','無','G8','若你有磚造烤爐或石造烤爐，當你執行「烤麵包」行動時，你可以改為將恰好1份麥子和1份蔬菜轉換為7份食物。'],
     ['9010-2','犁田稅','次要發展卡','恰好2名家庭成員','1食物','否','無','有','G8','打出此卡時，將4個標記放在此卡上。每回合結束時，若你有在當回合犁至少1塊農田，從此卡上移除1個標記。遊戲結束計分時，此卡上每1個標記讓你獲得1分紅利分數。'],
@@ -217,12 +217,10 @@ let updated = 0, added = 0, skipped = 0;
 
 imageGroups.forEach(([imgName, cardList]) => {
   cardList.forEach((row, pos) => {
-    const [id, name, type, prereq, cost, pass, vp, bonus, deck, desc] = row;
+    const [id, name, type, prereq, cost, pass, vp, bonus, deck, desc, symbols] = row;
 
     if (!id) {
-      console.log(`SKIP (no ID): ${name} in ${imgName}`);
-      skipped++;
-      return;
+      throw new Error(`缺少卡片 ID：${name} (${imgName}[${pos}])`);
     }
 
     const vpVal = toVP(vp);
@@ -241,10 +239,12 @@ imageGroups.forEach(([imgName, cardList]) => {
       existing['紅利分數'] = bonusVal;
       existing['牌組'] = toStr(deck);
       existing['說明'] = toStr(desc);
+      existing.card_type = String(type).includes('主要發展卡') ? 'both' : 'minor';
       existing['source_image'] = imgName;
       existing['position'] = pos;
       existing['grid_col'] = gridCol;
       existing['grid_row'] = gridRow;
+      if (symbols?.length) existing['符號'] = symbols;
       updated++;
       console.log(`updated: ${name} (${id}) → ${imgName}[${pos}]`);
     } else {
@@ -259,11 +259,12 @@ imageGroups.forEach(([imgName, cardList]) => {
         牌組: toStr(deck),
         卡片ID: id,
         說明: toStr(desc),
-        card_type: 'minor',
+        card_type: String(type).includes('主要發展卡') ? 'both' : 'minor',
         source_image: imgName,
         position: pos,
         grid_col: gridCol,
         grid_row: gridRow,
+        ...(symbols?.length ? { 符號: symbols } : {}),
       });
       added++;
       console.log(`added: ${name} (${id}) → ${imgName}[${pos}]`);
