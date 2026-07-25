@@ -6,6 +6,7 @@ check_missing.js
 fix_C_cards.js
 fix_bonus.js
 fix_duplicates.js
+fix_fee_names.js
 fix_wording.js
 update_A_cards.js
 update_old_cards.js
@@ -25,7 +26,11 @@ __pycache__/
 _*.py
 _*.txt
 _*.json
+_*.md
 _*.mjs
+dead_files_full.txt
+referenced_files_full.txt
+missing_refs.txt
 notesdump_*.py
 notesprobe*.py
 apply_tag4.js
