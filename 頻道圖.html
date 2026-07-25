@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>農家樂 頻道地圖</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#1f2733; --sub:#6b7785; --line:#e6e9ef;
+    --act:#2f6fed; --actbg:#eaf1ff; --state:#1ca672; --statebg:#e6f7f0;
+    --bind:#8a5cf6; --bindbg:#f1ebff; --eff:#e08a17; --effbg:#fdf2df;
+    --cause:#e8633a; --react:#2f80c4;
+    --res:#1ca672; --resbg:#e6f7f0; --cnt:#c2557a; --cntbg:#fdeaf1;
+    --other:#7a8494; --otherbg:#eef0f4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+  h1{font-size:24px;margin:0 0 4px}
+  .muted{color:var(--sub);font-size:14px}
+  .stat{display:flex;gap:24px;margin:14px 0 6px;flex-wrap:wrap}
+  .stat b{font-size:22px}
+  section{margin-top:30px}
+  h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+
+  /* 概念卡 */
+  .concepts{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:14px}
+  .concept{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .concept h3{margin:0 0 8px;font-size:14px}
+  .concept p{margin:0;font-size:13px;color:var(--sub);line-height:1.6}
+  .pill{display:inline-block;padding:1px 7px;border-radius:6px;font-size:12px;font-weight:600}
+  .pc{background:#fdeae3;color:var(--cause)} .pr{background:#e6f0fa;color:var(--react)}
+  .plug{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:var(--sub);flex-wrap:wrap}
+  .node{padding:3px 9px;border-radius:8px;font-size:12px;font-weight:600;white-space:nowrap}
+  .ncause{background:var(--cause);color:#fff} .nreact{background:var(--react);color:#fff}
+  .arrow{color:#aab2bd;font-weight:700}
+
+  /* 生命線 */
+  .lifeline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:16px}
+  .ll-act{background:var(--actbg);color:var(--act);border:1px solid #cfe0ff}
+  .ll-state{background:var(--statebg);color:var(--state);border:1px solid #c4ecdb}
+  .ll-node{padding:6px 12px;border-radius:9px;font-size:13px;font-weight:600}
+  .ll-arrow{color:#aab2bd;font-size:13px}
+
+  /* 頻道格 */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));gap:12px}
+  .ch{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;
+    cursor:pointer;transition:.12s;position:relative}
+  .ch:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,30,50,.08)}
+  .ch .nm{font-weight:700;font-size:15px;margin-bottom:2px}
+  .ch .ct{font-size:12px;color:var(--sub)}
+  .bar{display:flex;height:7px;border-radius:5px;overflow:hidden;margin:9px 0 7px;background:#eef0f4}
+  .bar>span{flex:0 0 auto;display:block}
+  .flav{display:flex;gap:10px;font-size:11px;color:var(--sub)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:-1px}
+  .dG{background:#566;} .dA{background:#fff;border:1.5px solid #99a}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--sub);margin:4px 0 14px;flex-wrap:wrap}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+  /* 抽屜 */
+  .drawer{position:fixed;top:0;right:0;width:430px;max-width:92vw;height:100%;background:#fff;
+    box-shadow:-8px 0 30px rgba(20,30,50,.16);transform:translateX(100%);transition:.22s;z-index:9;
+    display:flex;flex-direction:column}
+  .drawer.open{transform:none}
+  .dhead{padding:18px 20px;border-bottom:1px solid var(--line)}
+  .dhead .nm{font-size:19px;font-weight:800}
+  .dhead .x{position:absolute;top:16px;right:18px;cursor:pointer;font-size:22px;color:var(--sub);border:none;background:none}
+  .dbody{overflow:auto;padding:8px 10px 30px}
+  .row{padding:9px 11px;border-radius:9px}
+  .row:nth-child(odd){background:#fafbfc}
+  .row .rn{font-weight:600;font-size:14px}
+  .row .rt{font-size:12px;color:var(--sub);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap}
+  .t{padding:1px 7px;border-radius:6px;font-size:11px;font-weight:600}
+  .tc{background:#fdeae3;color:var(--cause)} .tr{background:#e6f0fa;color:var(--react)}
+  .tb{background:var(--bindbg);color:var(--bind)}
+  .tg{background:#eef1f4;color:#566} .ta{background:#fff;border:1px solid #ccd;color:#778}
+  .scrim{position:fixed;inset:0;background:rgba(20,25,35,.28);opacity:0;pointer-events:none;transition:.2s;z-index:8}
+  .scrim.open{opacity:1;pointer-events:auto}
+  @media(max-width:680px){.concepts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>農家樂 頻道地圖 🧭</h1>
+  <div class="muted">卡牌 combo 串接系統 — 點任一頻道看裡面的卡。資料來自 <code>channels.json</code>。</div>
+  <div class="stat">
+    <div><b id="sCards">–</b><div class="muted">張卡有頻道</div></div>
+    <div><b id="sChan">–</b><div class="muted">個頻道</div></div>
+    <div><b id="sEntry">–</b><div class="muted">條頻道標記</div></div>
+  </div>
+
+  <section>
+    <h2>怎麼讀這張圖</h2>
+    <div class="concepts">
+      <div class="concept">
+        <h3>① 頻道＝combo 的插頭與插座</h3>
+        <p>每張卡碰到的「動作」就是它的頻道。引擎靠頻道把卡自動串起來。</p>
+        <div class="plug"><span class="node ncause">情聖 生小孩</span><span class="arrow">→ 觸發 →</span><span class="node nreact">教母 給菜</span></div>
+      </div>
+      <div class="concept">
+        <h3>② <span class="pill pc">cause</span> 我來做　<span class="pill pr">react</span> 你做我反應</h3>
+        <p><b>cause</b>＝這張卡讓你做那個動作（插頭，製造事件）。<br>
+        <b>react</b>＝每當那個動作發生，它跳出來反應（插座，聽事件）。</p>
+      </div>
+      <div class="concept">
+        <h3>③ 行動格 vs 行動</h3>
+        <p><span class="dot dG"></span><b>行動格</b>＝指名棋盤那個格（站格子才算）。<br>
+        <span class="dot dA"></span><b>行動</b>＝做這件事就算（含卡片直送）。<br>
+        行動格 ⊃ 行動：站格子一定也做了動作。</p>
+      </div>
+      <div class="concept">
+        <h3>④ 資源頻道用另一組詞</h3>
+        <p><b>get</b> 產出／<b>pay</b> 花掉／<b>react</b> 監聽你取得它／<b>read</b> 只看你持有多少。<br>
+        再配 <b>src</b>：<b>供應</b>＝卡直接從場外拿；<b>場格</b>＝從棋盤格取得（會觸發別人的 react）；<b>任意</b>／<b>繁殖</b> 為 react 專用。</p>
+        <div class="plug"><span class="node" style="background:#1ca672;color:#fff">get·場格</span><span class="arrow">↔ 配對 ↔</span><span class="node nreact">react·場格</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="tag" style="background:var(--statebg);color:var(--state)">狀態</span>田地生命線（對立狀態串成鏈）</h2>
+    <div class="lifeline" id="lifeline">
+      <span class="ll-node ll-act">犁田</span><span class="ll-arrow">→</span>
+      <span class="ll-node ll-state">空田</span><span class="ll-arrow">→ 播種 →</span>
+      <span class="ll-node ll-state">已播種田</span><span class="ll-arrow">→ 收割 →</span>
+      <span class="ll-node ll-act">作物</span>
+      <span style="margin-left:14px;color:var(--bind);font-size:13px">　封田＝把田從生命線移除</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>所有頻道</h2>
+    <div class="legend" id="legend"></div>
+    <div id="groups"></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="dhead">
+    <button class="x" id="closeX">×</button>
+    <div class="nm" id="dName">–</div>
+    <div class="muted" id="dMeta"></div>
+  </div>
+  <div class="dbody" id="dBody"></div>
+</aside>
+
+<script>
+/* 分組表只決定「顯示順序與配色」，不決定「誰能出現」。
+   沒列到的頻道一律落到「其他（未分類）」——新開的頻道會自己冒出來，不會被靜靜丟掉。 */
+const GROUP_DEFS = [
+  {key:"動作",   color:"var(--act)",   bg:"var(--actbg)",
+   names:["犁田","播種","收割","烤麵包","圈柵欄","蓋馬廄","擴建房舍","翻修房舍","打職業","打發展","增加家庭成員","額外行動"]},
+  {key:"資源",   color:"var(--res)",   bg:"var(--resbg)",
+   names:["木頭","蘆葦","石頭","磚頭","羊","野豬","牛","動物","麥子","蔬菜","作物"]},
+  {key:"狀態",   color:"var(--state)", bg:"var(--statebg)",
+   names:["空田","已播種田","封田","房舍材質","馬廄","圈地","居住空間"]},
+  {key:"計數",   color:"var(--cnt)",   bg:"var(--cntbg)",
+   names:["家庭人數","房間數","職業數","發展數","手牌","尚未打出職業卡","尚未打出發展卡"]},
+  {key:"格綁定", color:"var(--bind)",  bg:"var(--bindbg)", match:n=>n.startsWith("格綁定")},
+  {key:"效果",   color:"var(--eff)",   bg:"var(--effbg)",  match:n=>n.startsWith("效果:")},
+];
+const OTHER_GROUP = {key:"其他（未分類）", color:"var(--other)", bg:"var(--otherbg)"};
+
+const NOTE = {
+  "額外行動":"食客已併入（臨時多一次派遣）",
+  "增加家庭成員":"永久工人（含旁門生人）",
+  "空田":"狀態·與播種相反", "已播種田":"狀態", "封田":"狀態·永久鎖死",
+  "動物":"母層·羊/野豬/牛擇一", "作物":"母層·麥/菜擇一",
+};
+
+const ROLE_COLOR = {
+  cause:"var(--cause)", react:"var(--react)", bind:"var(--bind)",
+  get:"var(--res)", pay:"var(--eff)", read:"var(--sub)",
+};
+const ROLE_ORDER = ["cause","get","pay","react","read","bind"];
+const OTHER_ROLE_COLOR = "#9aa4b2";
+const FLAV_ORDER = ["行動格","行動","供應","場格","任意","繁殖","pay"];
+
+let CH = {};       // ch -> {cards:[{cid,nm,tags}], roles:{role:n}, flav:{on或src:n}}
+let CARDS = {};
+
+function add(ch, cid, nm, role, flav){
+  const o = CH[ch] || (CH[ch] = {cards:[], roles:{}, flav:{}, byId:{}});
+  let card = o.byId[cid];
+  if(!card){ card = {cid, nm, tags:[]}; o.byId[cid] = card; o.cards.push(card); }
+  card.tags.push({role, flav});
+  o.roles[role] = (o.roles[role]||0) + 1;
+  if(flav) o.flav[flav] = (o.flav[flav]||0) + 1;
+}
+
+// 依名稱決定所屬群組
+function groupOf(name){
+  for(const g of GROUP_DEFS){
+    if(g.match ? g.match(name) : g.names.includes(name)) return g;
+  }
+  return OTHER_GROUP;
+}
+function roleColor(r){ return ROLE_COLOR[r] || OTHER_ROLE_COLOR; }
+// 依 ROLE_ORDER 排前面，其餘（木/石/容量…這類頻道專屬詞）照數量接在後面
+function sortedRoles(roles){
+  return Object.keys(roles).sort((a,b)=>{
+    const ia = ROLE_ORDER.indexOf(a), ib = ROLE_ORDER.indexOf(b);
+    if(ia >= 0 && ib >= 0) return ia - ib;
+    if(ia >= 0) return -1;
+    if(ib >= 0) return 1;
+    return roles[b] - roles[a];
+  });
+}
+function sortedFlav(flav){
+  return Object.keys(flav).sort((a,b)=>{
+    const ia = FLAV_ORDER.indexOf(a), ib = FLAV_ORDER.indexOf(b);
+    if(ia >= 0 && ib >= 0) return ia - ib;
+    if(ia >= 0) return -1;
+    if(ib >= 0) return 1;
+    return flav[b] - flav[a];
+  });
+}
+
+function render(){
+  let entries = 0;
+  for(const cid in window._chan){
+    const rec = window._chan[cid];
+    (rec.channels||[]).forEach(e=>{
+      entries++;
+      const flav = e.on || e.src || null;
+      const roles = (e.role||[]).length ? e.role : ["—"];
+      roles.forEach(r=> add(e.ch, cid, rec.牌名, r, flav));
+    });
+    (rec.effects||[]).forEach(x=> add("效果:"+x, cid, rec.牌名, "—", null));
+  }
+
+  document.getElementById("sCards").textContent = Object.keys(window._chan).length.toLocaleString();
+  document.getElementById("sChan").textContent  = Object.keys(CH).length.toLocaleString();
+  document.getElementById("sEntry").textContent = entries.toLocaleString();
+
+  // 圖例：通用 role 逐一列；頻道專屬詞（提供/免空/圈內/容量…）數量多又同色，併成一條
+  const allRoles = Object.keys(CH).reduce((acc,n)=>{
+    for(const r in CH[n].roles) acc[r] = (acc[r]||0) + CH[n].roles[r];
+    return acc;
+  }, {});
+  const common = ROLE_ORDER.filter(r=> allRoles[r]);
+  const special = Object.keys(allRoles).filter(r=> r!=="—" && !ROLE_ORDER.includes(r));
+  document.getElementById("legend").innerHTML =
+    common.map(r=>`<span><i style="background:${roleColor(r)}"></i>${r}</span>`).join("")
+    + (special.length ? `<span><i style="background:${OTHER_ROLE_COLOR}"></i>頻道專屬詞（${special.length} 種：${special.slice(0,4).join("／")}…）</span>` : "")
+    + `<span><span class="dot dG"></span>行動格</span><span><span class="dot dA"></span>行動</span>`;
+
+  // 把所有頻道分進群組（分組表沒列到的自動進「其他」）
+  const buckets = new Map();
+  [...GROUP_DEFS, OTHER_GROUP].forEach(g=> buckets.set(g, []));
+  Object.keys(CH).forEach(name=> buckets.get(groupOf(name)).push(name));
+
+  const host = document.getElementById("groups");
+  buckets.forEach((names, g)=>{
+    if(!names.length) return;
+    // 分組表有列名字的照表順序，其餘（含「其他」）照卡數多到少
+    names.sort((a,b)=>{
+      if(g.names){
+        const ia = g.names.indexOf(a), ib = g.names.indexOf(b);
+        if(ia >= 0 && ib >= 0) return ia - ib;
+      }
+      return CH[b].cards.length - CH[a].cards.length;
+    });
+    const sec = document.createElement("div");
+    sec.style.marginBottom = "22px";
+    sec.innerHTML = `<h2><span class="tag" style="background:${g.bg};color:${g.color}">${g.key}</span>
+      <span class="muted" style="font-size:12px;font-weight:400">${names.length} 個</span></h2>`;
+    const grid = document.createElement("div"); grid.className = "grid";
+    names.forEach(name=>{
+      const o = CH[name];
+      const rs = sortedRoles(o.roles);
+      const tot = rs.reduce((s,r)=> s + o.roles[r], 0) || 1;
+      const bar = rs.map(r=>`<span style="width:${o.roles[r]/tot*100}%;background:${roleColor(r)}"></span>`).join("");
+      const roleTxt = rs.filter(r=>r!=="—").map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—";
+      const fs = sortedFlav(o.flav);
+      const flav = fs.length ? `<div class="flav">${fs.map(f=>{
+        const dot = f==="行動格" ? '<span class="dot dG"></span>' : f==="行動" ? '<span class="dot dA"></span>' : "";
+        return `<span>${dot}${o.flav[f]} ${f}</span>`;
+      }).join("")}</div>` : "";
+      const note = NOTE[name] ? `<div class="ct" style="margin-top:4px">${NOTE[name]}</div>` : "";
+      const el = document.createElement("div"); el.className = "ch";
+      el.innerHTML = `<div class="nm">${name.replace("格綁定:","🔗 ").replace("效果:","✨ ")}</div>
+        <div class="ct">${o.cards.length} 張卡　·　${roleTxt}</div>
+        <div class="bar">${bar}</div>
+        ${flav}${note}`;
+      el.onclick = ()=> openDrawer(name);
+      grid.appendChild(el);
+    });
+    sec.appendChild(grid); host.appendChild(sec);
+  });
+}
+
+function openDrawer(name){
+  const o = CH[name];
+  const rs = sortedRoles(o.roles).filter(r=>r!=="—");
+  document.getElementById("dName").textContent = name.replace("格綁定:","🔗 ").replace("效果:","✨ ");
+  document.getElementById("dMeta").textContent =
+    `${o.cards.length} 張　·　` + (rs.map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—");
+  const body = document.getElementById("dBody"); body.innerHTML = "";
+  o.cards.sort((a,b)=> a.nm.localeCompare(b.nm,"zh-Hant"));
+  o.cards.forEach(c=>{
+    const tags = c.tags.map(t=>{
+      const rt = t.role==="—" ? "" :
+        `<span class="t" style="background:${roleColor(t.role)}22;color:${roleColor(t.role)}">${t.role}</span>`;
+      const ft = t.flav ? `<span class="t ${t.flav==="行動"?"ta":"tg"}">${t.flav}</span>` : "";
+      return rt + ft;
+    }).join(" ");
+    const desc = (CARDS[c.cid]||"").slice(0,70);
+    const row = document.createElement("div"); row.className = "row";
+    row.innerHTML = `<div class="rn">${c.nm} <span class="muted" style="font-weight:400;font-size:11px">${c.cid}</span></div>
+      <div class="rt">${tags}</div>
+      <div class="muted" style="font-size:11.5px;margin-top:4px;line-height:1.5">${desc}…</div>`;
+    body.appendChild(row);
+  });
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("scrim").classList.add("open");
+}
+function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("scrim").classList.remove("open"); }
+document.getElementById("closeX").onclick=closeDrawer;
+document.getElementById("scrim").onclick=closeDrawer;
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeDrawer(); });
+
+Promise.all([
+  fetch("channels.json").then(r=>r.json()),
+  fetch("cards.json").then(r=>r.json()).catch(()=>[])
+]).then(([chan, cards])=>{
+  window._chan = chan;
+  const arr = Array.isArray(cards)?cards:(cards.cards||[]);
+  arr.forEach(c=> CARDS[c.卡片ID]=c.說明||"");
+  render();
+}).catch(e=>{ document.getElementById("groups").innerHTML="<p class='muted'>讀不到 channels.json／cards.json。請用 <code>npx serve</code> 在 agricola-viewer 目錄開此頁（port 3333），不要直接雙擊檔案。</p>"; });
+</script>
+</body>
+</html>
