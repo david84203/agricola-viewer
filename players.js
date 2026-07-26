@@ -289,7 +289,7 @@ function noticeTemplate(id) {
   return `Hi ${id}，\n`
     + `你的輪抽模擬場次已經破 ${KEY_THRESHOLD} 場了，這在所有玩家裡非常少見 👏\n\n`
     + `有個東西想私下給你，方便的話來找我聊聊：\n`
-    + `（← 這行改成你的 IG／LINE／FB）\n\n`
+    + `LINE 官方帳號 @160qiryn\n\n`
     + `—— 站長`;
 }
 
