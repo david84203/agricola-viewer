@@ -5,12 +5,15 @@
 
 const FIRESTORE_BASE_PLAYERS = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
-let playersData = []; // [{ id, createdAt, count, lastActive }]
+// 專屬通道門檻：累積輪抽場次達此數即列入邀請名單（僅後台可見，公開頁面不提示）
+const KEY_THRESHOLD = 100;
+
+let playersData = []; // [{ id, createdAt, count, lastActive, keyInvited, keyInvitedAt }]
 let currentSort = 'count';
 let playersLoaded = false;
 let resetPinTargetId = null;
 
-const PLAYERS_CACHE_KEY = 'agricola_players_cache';
+const PLAYERS_CACHE_KEY = 'agricola_players_cache_v2'; // v2：新增 keyInvited 欄位，舊快取自動失效
 const PLAYERS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // ── Cache ──────────────────────────────────────────
@@ -42,8 +45,10 @@ async function fetchPlayerAccounts() {
     const data = await res.json();
     (data.documents || []).forEach(doc => {
       players.push({
-        id:        doc.name.split('/').pop(),
-        createdAt: doc.fields?.createdAt?.stringValue || '',
+        id:           doc.name.split('/').pop(),
+        createdAt:    doc.fields?.createdAt?.stringValue || '',
+        keyInvited:   doc.fields?.keyInvited?.booleanValue === true,
+        keyInvitedAt: doc.fields?.keyInvitedAt?.stringValue || '',
       });
     });
     pageToken = data.nextPageToken || null;
@@ -121,6 +126,12 @@ function sortPlayers(arr, by) {
   return [...arr].sort((a, b) => {
     if (by === 'lastActive') return b.lastActive.localeCompare(a.lastActive);
     if (by === 'createdAt')  return b.createdAt.localeCompare(a.createdAt);
+    if (by === 'key') {
+      // 待邀請 → 已邀請 → 未達標，各組內再依場次由多到少
+      const rank = p => (p.count >= KEY_THRESHOLD ? (p.keyInvited ? 1 : 0) : 2);
+      const d = rank(a) - rank(b);
+      if (d !== 0) return d;
+    }
     return b.count - a.count;
   });
 }
@@ -134,6 +145,18 @@ function formatDate(iso) {
   });
 }
 
+// ── 專屬通道欄 ─────────────────────────────────────
+function keyCellHtml(p) {
+  if (p.count < KEY_THRESHOLD) {
+    return `<span class="key-progress">${p.count}/${KEY_THRESHOLD}</span>`;
+  }
+  const state = p.keyInvited
+    ? `<span class="key-done">✓ 已邀請 <span class="key-when">${formatDate(p.keyInvitedAt)}</span></span>`
+    : `<span class="key-ready">🔑 待邀請</span>`;
+  const btn = `<button class="sort-btn key-invite-btn" data-id="${p.id}">${p.keyInvited ? '取消標記' : '標記已邀請'}</button>`;
+  return `<div class="key-cell">${state}${btn}</div>`;
+}
+
 function renderTable() {
   const tbody = document.getElementById('playersTableBody');
   tbody.innerHTML = '';
@@ -143,6 +166,7 @@ function renderTable() {
     tr.innerHTML = `
       <td class="rater-name">${p.id}</td>
       <td class="rater-count">${p.count}</td>
+      <td>${keyCellHtml(p)}</td>
       <td class="rater-date">${formatDate(p.lastActive)}</td>
       <td class="rater-date">${formatDate(p.createdAt)}</td>
       <td><a href="profile.html?rater=${encodeURIComponent(p.id)}" class="rater-link-btn">查看分析 →</a></td>
@@ -154,12 +178,53 @@ function renderTable() {
   tbody.querySelectorAll('.reset-pin-btn').forEach(btn => {
     btn.addEventListener('click', () => openResetPinModal(btn.dataset.id));
   });
+  tbody.querySelectorAll('.key-invite-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleKeyInvited(btn.dataset.id, btn));
+  });
 }
 
 function renderSummary() {
-  const total = playersData.reduce((s, p) => s + p.count, 0);
+  const total   = playersData.reduce((s, p) => s + p.count, 0);
+  const reached = playersData.filter(p => p.count >= KEY_THRESHOLD);
+  const pending = reached.filter(p => !p.keyInvited).length;
   document.getElementById('playersSummary').textContent =
-    `共 ${playersData.length} 位玩家　總場次 ${total}`;
+    `共 ${playersData.length} 位玩家　總場次 ${total}　｜　達 ${KEY_THRESHOLD} 場 ${reached.length} 位（待邀請 ${pending} 位）`;
+}
+
+// ── 標記／取消「已邀請」──────────────────────────
+async function toggleKeyInvited(id, btn) {
+  const p = playersData.find(x => x.id === id);
+  if (!p) return;
+
+  const next   = !p.keyInvited;
+  const nextAt = next ? new Date().toISOString() : '';
+  const oldTxt = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '處理中…';
+
+  try {
+    const url = `${FIRESTORE_BASE_PLAYERS}/agricola_players/${encodeURIComponent(id)}`
+      + `?updateMask.fieldPaths=keyInvited&updateMask.fieldPaths=keyInvitedAt`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: {
+        keyInvited:   { booleanValue: next },
+        keyInvitedAt: { stringValue: nextAt },
+      }}),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    p.keyInvited   = next;
+    p.keyInvitedAt = nextAt;
+    setCachedPlayers(playersData);
+    renderSummary();
+    renderTable();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = oldTxt;
+    alert(`標記失敗：${e.message}`);
+  }
 }
 
 // ── Reset PIN Modal ────────────────────────────────
