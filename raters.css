@@ -145,7 +145,24 @@
   font-size: .82rem;
 }
 
-.key-invite-btn {
+.key-invite-btn,
+.key-notice-btn {
   font-size: .78rem;
   padding: 3px 9px;
+}
+
+/* ── 留言 Modal ─────────────────────────────────── */
+.notice-modal { max-width: 480px; }
+
+.notice-textarea {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  line-height: 1.7;
+  font-family: inherit;
+}
+
+.notice-warn {
+  color: #e8b84b;
+  font-weight: 600;
 }

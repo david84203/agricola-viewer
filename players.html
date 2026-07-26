@@ -97,6 +97,28 @@
     </div>
   </div>
 
+  <!-- 站內通知 Modal -->
+  <div id="noticeModal" class="auth-modal-overlay" style="display:none">
+    <div class="auth-modal notice-modal">
+      <div class="auth-modal-title">留言給玩家</div>
+      <p class="player-auth-hint">
+        對象：<strong id="noticeTargetId"></strong><br/>
+        這則訊息會在對方下次登入網站時跳出來，看過後自動標記已讀。<br/>
+        <span class="notice-warn">⚠ 不要寫網址或密碼</span>——這個資料表任何人都讀得到。
+        只留「來找我」和你的聯絡方式，實際的連結與密碼私下給。
+      </p>
+      <div class="auth-field">
+        <label>訊息內容</label>
+        <textarea id="noticeInput" class="auth-input notice-textarea" rows="8"></textarea>
+      </div>
+      <div class="auth-error" id="noticeError"></div>
+      <div class="auth-modal-footer">
+        <button class="auth-btn-cancel" id="noticeCancel">取消</button>
+        <button class="auth-btn-submit" id="noticeSubmit">送出留言</button>
+      </div>
+    </div>
+  </div>
+
   <script src="auth.js"></script>
   <script src="players.js"></script>
 
