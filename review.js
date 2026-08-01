@@ -1859,7 +1859,28 @@ function showResult() {
   showScreen('resultScreen');
   buildResultCards();
   calculateAllScores();
+  showAccuracyNote();
   saveDraftState();
+}
+
+/* 線上對戰實測：扣牌分名次與真實名次的命中率。
+   資料由 draft_accuracy.mjs 定期重算後寫進 Firestore，抓不到就不顯示。 */
+async function showAccuracyNote() {
+  const el = document.getElementById('resultAccuracyNote');
+  if (!el) return;
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}/agricola_stats/draft_accuracy`);
+    if (!res.ok) return;
+    const f = (await res.json()).fields;
+    const games = Number(f?.games?.integerValue ?? 0);
+    if (!games) return;
+    const pct = v => `${Math.round(Number(v) * 100)}%`;
+    el.innerHTML = `📈 這套評分準不準？拿 <b>${games}</b> 局線上實戰對過答案：`
+      + `兩兩名次順序猜對 <b>${pct(f.pairwiseAgreement?.doubleValue)}</b>`
+      + `（亂猜 50%）、冠軍猜中 <b>${pct(f.top1HitRate?.doubleValue)}</b>（亂猜 25%）、`
+      + `四名全中 <b>${pct(f.exactMatchRate?.doubleValue)}</b>（亂猜 4%）。`;
+    el.hidden = false;
+  } catch { /* 靜默：純加分資訊，抓不到就當沒這行 */ }
 }
 
 function buildResultCards() {

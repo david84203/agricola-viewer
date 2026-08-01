@@ -42,3 +42,7 @@ cards.json.upstairs-WIP-*
 channels.backup_*.json
 channels.json.bak
 farm-assets-check.png
+
+# 扣牌分驗證的產出（每天排程重算，不進版）
+draft_accuracy.json
+draft_accuracy.md

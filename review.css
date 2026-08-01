@@ -848,6 +848,18 @@
   font-weight: 700;
   color: var(--gold2);
 }
+/* 實測命中率小字（資料來自 Firestore agricola_stats/draft_accuracy） */
+.result-accuracy-note {
+  margin: -12px 0 20px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text2, #9aa0a6);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+}
+.result-accuracy-note b { color: var(--gold2); }
 .result-restart-btn {
   padding: 8px 20px;
   background: var(--surface2);
