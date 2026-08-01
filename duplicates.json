@@ -2328,5 +2328,25 @@
     ],
     "defaultCanonical": "4724-9|G8o57.jpg|5",
     "type": "replacement"
+  },
+  {
+    "id": "n233",
+    "label": "規劃專家（舊版／9770-10a 改版）",
+    "cards": [
+      "9770-10a",
+      "9770-10"
+    ],
+    "defaultCanonical": "9770-10",
+    "type": "replacement"
+  },
+  {
+    "id": "n234",
+    "label": "修補匠2版（WA057／WA057b 加食物版）",
+    "cards": [
+      "WA057",
+      "WA057b"
+    ],
+    "defaultCanonical": "WA057b",
+    "type": "replacement"
   }
 ]
