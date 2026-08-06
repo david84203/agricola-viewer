@@ -328,7 +328,9 @@ function applyFilters() {
     }
     // search
     if (q) {
-      const haystack = [c['牌名'], c['卡片ID'], c['說明'], c['先決條件'], c['費用']].join(' ').toLowerCase();
+      // 「人數」要一起搜：職業卡的 1+/3+/4+ 原本擠在先決條件欄，2026-08-06 清到人數欄後
+      // 若不加進來，打「3+」就搜不到那批職業卡了。
+      const haystack = [c['牌名'], c['卡片ID'], c['說明'], c['先決條件'], c['費用'], c['人數']].join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
