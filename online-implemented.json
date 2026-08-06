@@ -1,9 +1,9 @@
 {
   "_note": "由 agricola-online/gen_online_implemented.cjs 自動產生，勿手改。id → 線上實作機制。",
-  "generatedAt": "2026-08-06T12:28:09.445Z",
-  "count": 2425,
+  "generatedAt": "2026-08-06T12:36:16.939Z",
+  "count": 2426,
   "_excludedNote": "excluded＝已實作但被禁卡/重複卡排除、實際永遠抽不到的卡；effectiveCount＝count 扣掉它們。",
-  "effectiveCount": 2369,
+  "effectiveCount": 2370,
   "excluded": {
     "6174": "重複卡（被取代）",
     "2466-2": "重複卡（被取代）",
@@ -2393,6 +2393,7 @@
     "C071": "繁殖2種以上送播種行動",
     "5036-4": "依繁殖新生數自動給分（冠軍哺育師 G4 版 ID）",
     "6463-7": "繁殖≥2隻可付1食犁1塊田（applyBreedCards 硬寫）",
+    "E090": "繁殖≥2隻可付1食犁1塊田（applyBreedCards 硬寫；任何繁殖方式都算，看隻數不看種類）",
     "11101-3": "收成繁殖到牛→之後 2 回合行動格各 1 食物（applyBreedCards 硬寫）",
     "8295-3": "餵養階段後可退2隻同種動物換整套資源（applyAfterFeedCards 硬寫）",
     "A049": "補貨時蘆葦格非空自動得食",
