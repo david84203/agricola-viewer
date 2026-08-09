@@ -2,7 +2,7 @@
   // 卡圖檔 CDN：圖已搬到 Cloudflare Pages（免費、流量無上限）。
   // 這是卡圖網址的單一開關——回滾只要設 localStorage hv-card-cdn 指回 viewer 自己（如 './'）即可。
   const CARD_IMG_CDN = localStorage.getItem('hv-card-cdn') || 'https://agricola-cards.pages.dev/';
-  const MANIFEST_URL = './card-images.json?v=20260705-missing7';
+  const MANIFEST_URL = './card-images.json?v=20260809-a063';
   const DECKS = new Set([
     'A', 'B', 'BI', 'C', 'Cz', 'D', 'E', 'FL', 'FR', 'G', 'G4', 'G5',
     'G5+', 'G6', 'G7', 'G8', 'G9', 'HH', 'I', 'K', 'L', 'NL', 'O', 'OX',
