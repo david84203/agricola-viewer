@@ -21409,7 +21409,7 @@
         "timing": "after",
         "optional": false,
         "condition": {
-          "dynamic": "is_harvest_round"
+          "dynamic": "round in [5,8,10,12,14]"
         },
         "effects": [
           {
@@ -21423,7 +21423,7 @@
     "modifiers": [],
     "scoringRule": null,
     "confidence": "high",
-    "notes": "固定2VP在meta。「緊接著有收成階段的回合」=本回合結束即收成的回合(is_harvest_round)。該回合中每次執行烤麵包動作都額外+3食。",
+    "notes": "固定2VP在meta。原卡文翻譯錯誤；正確時機是收成回合之後的R5/R8/R10/R12/R14。該回合中每次執行烤麵包動作都額外+3食。",
     "matchedName": "荷式風車"
   },
   {
