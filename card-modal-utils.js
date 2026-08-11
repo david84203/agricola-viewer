@@ -20,7 +20,8 @@
     if (card.card_type === 'occupation') {
       return [
         ['需求人數', card['人數'] || card['需求人數']],
-        ['紅利分數', card['紅利分數']],
+        ['紅利分數', card['紅利分數'], 'bonus'],
+        ['負分標記', card['負分標記'], 'minus'],
         ['牌組', card['牌組']],
       ];
     }
@@ -31,6 +32,7 @@
       ['是否傳遞', card['是否傳遞']],
       ['勝利點數', card['勝利點數'], 'vp'],
       ['紅利分數', card['紅利分數'], 'bonus'],
+      ['負分標記', card['負分標記'], 'minus'],
       ['牌組', card['牌組']],
     ];
   }
@@ -40,6 +42,7 @@
       return String(value).startsWith('-') ? 'highlight-vp-neg' : 'highlight-vp';
     }
     if (highlight === 'bonus' && value === '有') return 'highlight-bonus';
+    if (highlight === 'minus' && value === '有') return 'highlight-minus';
     if (highlight === 'replace') return 'highlight-replace';
     return '';
   }

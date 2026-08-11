@@ -655,6 +655,7 @@ body {
 .tag-vp     { background: rgba(221,204,28,.18);  color: #DDCC1C; }
 .tag-vp-neg { background: rgba(136,136,136,.15); color: #888; }
 .tag-bonus { background: rgba(232,184,75,.15);  color: var(--gold2); }
+.tag-minus { background: rgba(224,92,92,.15);   color: var(--red); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
 /* 卡牌功能實作狀態徽章（GM／YOYO 專用私有 tag，見 impl-status.js） */
@@ -908,6 +909,7 @@ body {
 .field-value.highlight-vp      { color: #DDCC1C; }
 .field-value.highlight-vp-neg  { color: #888; }
 .field-value.highlight-bonus { color: var(--gold); }
+.field-value.highlight-minus { color: var(--red); }
 .field-value.highlight-pass  { color: var(--green); }
 .field-value.highlight-replace { color: #9fc0ff; }
 

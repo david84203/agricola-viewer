@@ -29,6 +29,7 @@ function toCard(r){
   if(isOcc){ c.遊玩人數=r.遊玩人數; c.紅利分數=r.紅利分數; }
   else { c.類型='次要發展卡'; c.先決條件=r.先決條件||'無'; c.費用=r.費用||'無';
     c.是否傳遞=r.是否傳遞; c.勝利點數=r.勝利點數||'無'; c.紅利分數=r.紅利分數; }
+  if(r.負分標記) c.負分標記=r.負分標記; // 只在 md 有填時才寫入，缺欄位不覆蓋既有值
   return c;
 }
 const files=fs.readdirSync('.').filter(f=>/^cards_.*\.md$/.test(f));

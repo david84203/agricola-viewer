@@ -114,6 +114,17 @@ const COLUMNS = [
     },
   },
   {
+    key: 'minus',
+    label: '負分標記',
+    className: 'col-minus',
+    defaultOn: true,
+    render: c => {
+      const v = c['負分標記'];
+      if (!v || v === '無') return '<span class="val-no">無</span>';
+      return `<span class="val-minus">${v}</span>`;
+    },
+  },
+  {
     key: 'deck',
     label: '牌組',
     className: 'col-deck',

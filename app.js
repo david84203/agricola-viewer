@@ -467,12 +467,14 @@ function createCardEl(card, idx) {
   // Tags
   const vp = card['勝利點數'] && card['勝利點數'] !== '無';
   const bonus = card['紅利分數'] === '有';
+  const minus = card['負分標記'] === '有';
   const pass = card['是否傳遞'] === '是';
   const tagsHtml = [
     bga   ? `<span class="tag tag-bga">BGA</span>` : '',
     banned ? `<span class="tag tag-ban">禁卡</span>` : '',
     vp    ? `<span class="tag ${String(card['勝利點數']).startsWith('-') ? 'tag-vp-neg' : 'tag-vp'}">VP:${card['勝利點數']}</span>` : '',
     bonus ? `<span class="tag tag-bonus">紅利分數</span>` : '',
+    minus ? `<span class="tag tag-minus">負分標記</span>` : '',
     pass  ? `<span class="tag tag-pass">←傳遞←</span>` : '',
     replacedCount ? `<span class="tag tag-replaces">取代 ${replacedCount} 張</span>` : '',
   ].join('');
