@@ -68,17 +68,27 @@
     return rel ? CARD_IMG_CDN + rel : '';
   }
 
-  function draw(canvas, imagePath, topFraction = 1, onError) {
+  // 卡圖解碼後一張約 2MB，縮圖牆一次上千張會炸掉記憶體，只留最近用到的
+  const IMAGE_CACHE_MAX = 120;
+  function remember(path, img) {
+    imageCache[path] = img;
+    const keys = Object.keys(imageCache);
+    if (keys.length > IMAGE_CACHE_MAX) delete imageCache[keys[0]];
+  }
+
+  // maxWidth：畫布寬度上限（0＝照原圖）。縮圖傳上限，卡片大圖／彈窗不傳。
+  function draw(canvas, imagePath, topFraction = 1, onError, maxWidth = 0) {
     if (!canvas || !imagePath) return false;
     const drawImage = img => {
       const sourceW = img.naturalWidth || img.width;
       const sourceH = img.naturalHeight || img.height;
       const drawH = Math.max(1, Math.round(sourceH * topFraction));
-      canvas.width = sourceW;
-      canvas.height = drawH;
+      const shrink = maxWidth > 0 ? Math.min(1, maxWidth / sourceW) : 1;   // 只縮不放
+      canvas.width = Math.max(1, Math.round(sourceW * shrink));
+      canvas.height = Math.max(1, Math.round(drawH * shrink));
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, sourceW, drawH);
-      ctx.drawImage(img, 0, 0, sourceW, drawH, 0, 0, sourceW, drawH);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, sourceW, drawH, 0, 0, canvas.width, canvas.height);
       canvas.dataset.drawn = '1';
     };
 
@@ -89,7 +99,7 @@
 
     const img = new Image();
     img.onload = () => {
-      imageCache[imagePath] = img;
+      remember(imagePath, img);
       drawImage(img);
     };
     img.onerror = () => {

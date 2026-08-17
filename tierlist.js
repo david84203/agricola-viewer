@@ -157,10 +157,41 @@ function getCachedRatings() {
   return null;
 }
 
-async function fetchAllRatings() {
-  const cached = getCachedRatings();
-  if (cached) return cached;
+// 把一筆 Firestore document 收進 map（list 與 runQuery 兩種回傳都是這個形狀）
+function collectRatingDoc(map, doc) {
+  if (!doc?.name) return;
+  const cardId = doc.name.split('/').pop();
+  const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1200);
+  const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
+  const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
+  const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
+  map[cardId] = { elo, seenCount, pickCount, rankSeen };
+}
 
+// 一次撈完：runQuery 沒有 300 筆的分頁上限，3500 筆一趟就回來（list 要串 12 趟）
+async function fetchRatingsViaQuery() {
+  const res = await fetch(`${FIRESTORE_BASE}:runQuery`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: 'agricola_ratings' }],
+        select: { fields: ['elo', 'seenCount', 'pickCount', 'rankSeen'].map(fieldPath => ({ fieldPath })) },
+        limit: 20000,
+      },
+    }),
+  });
+  if (!res.ok) throw new Error(`runQuery ${res.status}`);
+  const rows = await res.json();
+  if (!Array.isArray(rows)) throw new Error('runQuery 回傳格式非預期');
+  const map = {};
+  rows.forEach(row => collectRatingDoc(map, row.document)); // 沒 document 的心跳列會被略過
+  if (!Object.keys(map).length) throw new Error('runQuery 沒撈到資料');
+  return map;
+}
+
+// 舊路：300 筆一頁串著翻。留著當 runQuery 被規則擋掉時的退路
+async function fetchRatingsViaList() {
   const map = {};
   let pageToken = null;
   do {
@@ -168,16 +199,19 @@ async function fetchAllRatings() {
     if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
     const res = await fetch(url);
     const data = await res.json();
-    (data.documents || []).forEach(doc => {
-      const cardId = doc.name.split('/').pop();
-      const elo       = Number(doc.fields?.elo?.integerValue      ?? doc.fields?.elo?.doubleValue      ?? 1200);
-      const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
-      const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
-      const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
-      map[cardId] = { elo, seenCount, pickCount, rankSeen };
-    });
+    (data.documents || []).forEach(doc => collectRatingDoc(map, doc));
     pageToken = data.nextPageToken ?? null;
   } while (pageToken);
+  return map;
+}
+
+async function fetchAllRatings() {
+  const cached = getCachedRatings();
+  if (cached) return cached;
+
+  let map;
+  try { map = await fetchRatingsViaQuery(); }
+  catch (err) { console.warn('runQuery 失敗，退回分頁撈取：', err.message); map = await fetchRatingsViaList(); }
 
   try { localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
   return map;
@@ -229,6 +263,7 @@ function renderTierList() {
   rated.forEach((item, i) => { groups[getTier(i / n)].push(item); });
 
   const container = document.getElementById('tierContent');
+  thumbObserver?.disconnect();   // 舊卡片要退訂，否則 observer 抓著整批已丟棄的 canvas 不放
   container.innerHTML = '';
   container.style.display = 'block';
 
@@ -246,8 +281,7 @@ function renderTierList() {
       <div class="tier-card-grid"></div>
     `;
     section.querySelector('.tier-header').addEventListener('click', () => {
-      section.classList.toggle('collapsed');
-      if (!section.classList.contains('collapsed')) drawPendingCanvases(section);
+      section.classList.toggle('collapsed');  // 展開後由 thumbObserver 自己補畫視窗附近那幾張
     });
     const grid = section.querySelector('.tier-card-grid');
     groups[tier].forEach(({ card, elo, seenCount, pickCount, rankSeen }) => {
@@ -294,7 +328,6 @@ function renderBanSection(container, typeOk) {
   title.innerHTML = `<span class="tier-collapse-arrow">▼</span>🚫 禁卡`;
   title.addEventListener('click', () => {
     banSection.classList.toggle('collapsed');
-    if (!banSection.classList.contains('collapsed')) drawPendingCanvases(banSection);
   });
   banSection.appendChild(title);
 
@@ -319,7 +352,7 @@ function renderBanSection(container, typeOk) {
       el.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
       el.innerHTML = `<div class="tier-card-thumb"><canvas></canvas></div><div class="tier-ban-name">${card['牌名']}</div>`;
       el.addEventListener('click', () => openModal(card));
-      el.querySelector('canvas')._pendingCard = card;
+      watchThumb(el.querySelector('canvas'), card);
       grid.appendChild(el);
     });
     body.appendChild(group);
@@ -392,7 +425,7 @@ function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
     </div>
   `;
   div.addEventListener('click', () => openModal(card));
-  div.querySelector('canvas')._pendingCard = card;
+  watchThumb(div.querySelector('canvas'), card);
   return div;
 }
 
@@ -422,10 +455,7 @@ function applyTierSearch() {
     return;
   }
 
-  const lightUp = c => {
-    const canvas = c.querySelector('canvas');
-    if (canvas && canvas._pendingCard) { drawCrop(canvas, canvas._pendingCard); canvas._pendingCard = null; }
-  };
+  const lightUp = c => ensureThumbDrawn(c.querySelector('canvas'));
   let totalHits = 0;
 
   tierSections.forEach(section => {
@@ -464,22 +494,55 @@ function applyTierSearch() {
   if (hintEl) hintEl.textContent = totalHits ? `點亮 ${totalHits} 張` : '查無符合';
 }
 
-// ── Canvas ─────────────────────────────────────────
-function drawPendingCanvases(container) {
-  container.querySelectorAll('canvas').forEach(canvas => {
-    if (canvas._pendingCard) {
-      drawCrop(canvas, canvas._pendingCard);
-      canvas._pendingCard = null;
-    }
-  });
+// ── Canvas 懶載入 ───────────────────────────────────
+// 縮圖顯示只有 88~160px 寬，畫布卻照原圖尺寸開＝每張吃 2MB 記憶體。
+// 一個 Tier 有上千張，展開就一次全畫＝上千個圖片請求＋數 GB 像素。
+// 改成：只畫視窗附近的，滑遠了釋放像素，回來再畫（圖片走瀏覽器快取，重畫幾乎不花錢）。
+const THUMB_MAX_W = 300;          // 縮圖畫布寬度上限（顯示最寬 160px，留給 3 倍解析度手機還夠清楚）
+const THUMB_MARGIN = '1200px 0px'; // 視窗上下各多留這麼多才算「附近」
+
+const thumbObserver = ('IntersectionObserver' in window)
+  ? new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? ensureThumbDrawn(e.target) : releaseThumb(e.target));
+    }, { rootMargin: THUMB_MARGIN })
+  : null;
+
+// 建卡片時掛上，不立刻畫
+function watchThumb(canvas, card) {
+  canvas._card = card;
+  canvas.width = 1;                // 沒畫之前不要留 300x150 的預設畫布（上千張就是上百 MB）
+  canvas.height = 1;
+  if (thumbObserver) thumbObserver.observe(canvas);
+  else ensureThumbDrawn(canvas);   // 沒有 IntersectionObserver 的舊瀏覽器：照舊直接畫
 }
 
-function drawCrop(canvas, card, forceSheet = false) {
+function ensureThumbDrawn(canvas) {
+  if (!canvas?._card || canvas._thumbDrawn) return;
+  canvas._thumbDrawn = true;
+  drawCrop(canvas, canvas._card, false, THUMB_MAX_W);
+}
+
+function releaseThumb(canvas) {
+  if (!canvas?._thumbDrawn) return;
+  canvas._thumbDrawn = false;
+  canvas.width = 1;                // 交還像素記憶體；外層 .tier-card-thumb 有 aspect-ratio，版面不會跳
+  canvas.height = 1;
+}
+
+// 整張大圖（3x3 或 10x3 的合板）解碼後動輒 20MB，只留最近用到的幾張
+const SHEET_CACHE_MAX = 8;
+function cacheSheet(key, img) {
+  imageCache[key] = img;
+  const keys = Object.keys(imageCache);
+  if (keys.length > SHEET_CACHE_MAX) delete imageCache[keys[0]];
+}
+
+function drawCrop(canvas, card, forceSheet = false, maxWidth = 0) {
   if (!canvas || !card?.source_image) return;
   if (!forceSheet) {
     const singleCardPath = window.CardImages?.getPath?.(card);
     if (singleCardPath) {
-      window.CardImages.draw(canvas, singleCardPath, 1, () => drawCrop(canvas, card, true));
+      window.CardImages.draw(canvas, singleCardPath, 1, () => drawCrop(canvas, card, true, maxWidth), maxWidth);
       return;
     }
   }
@@ -517,14 +580,15 @@ function drawCrop(canvas, card, forceSheet = false) {
       sx = oL + (card.grid_col || 0) * cellW;
       sy = oT + (card.grid_row || 0) * cellH;
     }
-    canvas.width  = cellW;
-    canvas.height = cellH;
-    canvas.getContext('2d').drawImage(img, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
+    const shrink = maxWidth > 0 ? Math.min(1, maxWidth / cellW) : 1;  // 只縮不放
+    canvas.width  = Math.max(1, Math.round(cellW * shrink));
+    canvas.height = Math.max(1, Math.round(cellH * shrink));
+    canvas.getContext('2d').drawImage(img, sx, sy, cellW, cellH, 0, 0, canvas.width, canvas.height);
   };
 
   if (imageCache[key]) { draw(imageCache[key]); return; }
   const img = new Image();
-  img.onload = () => { imageCache[key] = img; draw(img); };
+  img.onload = () => { cacheSheet(key, img); draw(img); };
   img.onerror = () => {
     canvas.width = 180; canvas.height = 130;
     const ctx = canvas.getContext('2d');
