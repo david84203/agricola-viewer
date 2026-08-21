@@ -46,3 +46,13 @@ farm-assets-check.png
 # 扣牌分驗證的產出（每天排程重算，不進版）
 draft_accuracy.json
 draft_accuracy.md
+
+# 本機 npm 安裝物（viewer 只拿來跑 wrangler 等 CLI），不進版本庫
+node_modules/
+
+# 卡圖切圖／校稿的中間產物：已核對過，這些都沒有被 cards.json 或 card-images.json 參照
+_*.png
+images/z_crops/
+images/o_crops/
+images/debug_*
+images/*_test.jpg
