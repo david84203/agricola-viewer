@@ -1,6 +1,6 @@
 {
   "_note": "由 agricola-online/gen_online_implemented.cjs 自動產生，勿手改。id → 線上實作機制。",
-  "generatedAt": "2026-08-21T18:51:20.573Z",
+  "generatedAt": "2026-08-21T20:03:00.185Z",
   "count": 3173,
   "_excludedNote": "excluded＝已實作但被禁卡/重複卡排除、實際永遠抽不到的卡；effectiveCount＝count 扣掉它們。",
   "_exclusionsSource": "authoritative-audit",
