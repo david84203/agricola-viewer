@@ -1,11 +1,11 @@
 {
   "_note": "由 agricola-online/gen_online_implemented.cjs 自動產生，勿手改。id → 線上實作機制。",
-  "generatedAt": "2026-08-23T18:05:30.788Z",
-  "count": 3332,
+  "generatedAt": "2026-08-23T18:34:54.409Z",
+  "count": 3333,
   "_excludedNote": "excluded＝已實作但被禁卡/重複卡排除、實際永遠抽不到的卡；effectiveCount＝count 扣掉它們。",
   "_exclusionsSource": "authoritative-audit",
   "_exclusionsStale": false,
-  "effectiveCount": 3268,
+  "effectiveCount": 3269,
   "excluded": {
     "6174": "重複卡（被取代）",
     "2466-2": "重複卡（被取代）",
@@ -1454,6 +1454,7 @@
     "M09": "終局消耗式計分（棄資源換分，結算時分配）",
     "M10": "終局消耗式計分（棄資源換分，結算時分配）",
     "K122": "終局消耗式計分（棄資源換分，結算時分配）",
+    "5165-4": "收成付資源換食物",
     "WM086": "終局消耗式計分（棄資源換分，結算時分配）",
     "FR041": "終局消耗式計分（棄資源換分，結算時分配）",
     "D060": "終局消耗式計分（棄資源換分，結算時分配）",
