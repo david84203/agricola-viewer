@@ -1,11 +1,11 @@
 {
   "_note": "由 agricola-online/gen_online_implemented.cjs 自動產生，勿手改。id → 線上實作機制。",
-  "generatedAt": "2026-08-23T17:42:27.454Z",
-  "count": 3331,
+  "generatedAt": "2026-08-23T18:05:30.788Z",
+  "count": 3332,
   "_excludedNote": "excluded＝已實作但被禁卡/重複卡排除、實際永遠抽不到的卡；effectiveCount＝count 扣掉它們。",
   "_exclusionsSource": "authoritative-audit",
   "_exclusionsStale": false,
-  "effectiveCount": 3267,
+  "effectiveCount": 3268,
   "excluded": {
     "6174": "重複卡（被取代）",
     "2466-2": "重複卡（被取代）",
@@ -1786,6 +1786,7 @@
     "WM051": "終局計分自動",
     "5596-5": "回合結束自動入帳",
     "6090-3": "事件訂閱（他人動作連動）",
+    "4724-9": "事件訂閱（他人動作連動）",
     "6480-2": "事件訂閱（他人動作連動）",
     "Z328": "事件訂閱（他人動作連動）",
     "6005-3": "事件訂閱（他人動作連動）",
