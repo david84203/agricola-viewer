@@ -1,0 +1,4 @@
+agricola-cards 圖床部署戳
+commit: 9f6aebd
+deployed-at: 2026-08-29 05:48:02 +0800
+用途：抓 https://agricola-cards.pages.dev/images/DEPLOYED.txt 就知道 CDN 上的是哪一版，卡圖改完後用來確認真的上線了。
