@@ -1,4 +1,7 @@
 agricola-cards 圖床部署戳
-commit: 9f6aebd
-deployed-at: 2026-08-29 05:48:02 +0800
-用途：抓 https://agricola-cards.pages.dev/images/DEPLOYED.txt 就知道 CDN 上的是哪一版，卡圖改完後用來確認真的上線了。
+manifest-version: 20260830-k116-granary
+updated-at: 2026-08-30 04:37:17 +0800
+last-change: K116 穀倉改字（食物→麥子），新檔名 K116-v2.webp
+
+用途：抓 https://agricola-cards.pages.dev/images/DEPLOYED.txt 就知道 CDN 上是哪一版。
+卡圖走一年 immutable 快取，所以改圖一律換新檔名並更新 card-images.json，不覆蓋舊檔。

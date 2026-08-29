@@ -1,5 +1,5 @@
 {
-  "version": "20260711-b163-priest",
+  "version": "20260830-k116-granary",
   "byId": {
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
@@ -3201,7 +3201,7 @@
     "K113": "images/cards/K/K113.webp",
     "K114": "images/cards/K/K114.webp",
     "K115": "images/cards/K/K115.webp",
-    "K116": "images/cards/K/K116.webp",
+    "K116": "images/cards/K/K116-v2.webp",
     "K117": "images/cards/K/K117.webp",
     "K118": "images/cards/K/K118.webp",
     "K119": "images/cards/K/K119.webp",
@@ -6907,7 +6907,7 @@
     "K/K113": "images/cards/K/K113.webp",
     "K/K114": "images/cards/K/K114.webp",
     "K/K115": "images/cards/K/K115.webp",
-    "K/K116": "images/cards/K/K116.webp",
+    "K/K116": "images/cards/K/K116-v2.webp",
     "K/K117": "images/cards/K/K117.webp",
     "K/K118": "images/cards/K/K118.webp",
     "K/K119": "images/cards/K/K119.webp",
