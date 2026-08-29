@@ -1,0 +1,2702 @@
+{
+  "001.jpg": {
+    "master": "2016新版/中文化/001.jpg",
+    "dist": 0.52,
+    "runner_up": "2016新版/中文化/006.jpg",
+    "margin": 17.46
+  },
+  "002.jpg": {
+    "master": "2016新版/中文化/002.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/004.jpg",
+    "margin": 16.51
+  },
+  "003.jpg": {
+    "master": "2016新版/中文化/003.jpg",
+    "dist": 0.53,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 16.87
+  },
+  "004.jpg": {
+    "master": "2016新版/中文化/004.jpg",
+    "dist": 0.51,
+    "runner_up": "2016新版/中文化/002.jpg",
+    "margin": 16.55
+  },
+  "005.jpg": {
+    "master": "2016新版/中文化/005.jpg",
+    "dist": 0.57,
+    "runner_up": "2016新版/中文化/D004.jpg",
+    "margin": 16.15
+  },
+  "006.jpg": {
+    "master": "2016新版/中文化/006.jpg",
+    "dist": 0.52,
+    "runner_up": "2016新版/中文化/004.jpg",
+    "margin": 16.91
+  },
+  "007.jpg": {
+    "master": "2016新版/中文化/007.jpg",
+    "dist": 0.42,
+    "runner_up": "2016新版/中文化/E110.jpg",
+    "margin": 31.89
+  },
+  "010.jpg": {
+    "master": "2016新版/中文化/010.jpg",
+    "dist": 0.53,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 17.81
+  },
+  "011.jpg": {
+    "master": "2016新版/中文化/011.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/013.jpg",
+    "margin": 17.27
+  },
+  "012.jpg": {
+    "master": "2016新版/中文化/012.jpg",
+    "dist": 0.51,
+    "runner_up": "2016新版/中文化/003.jpg",
+    "margin": 17.23
+  },
+  "013.jpg": {
+    "master": "2016新版/中文化/013.jpg",
+    "dist": 0.5,
+    "runner_up": "2016新版/中文化/016.jpg",
+    "margin": 16.25
+  },
+  "017.jpg": {
+    "master": "2016新版/中文化/Gm7.jpg",
+    "dist": 18.36,
+    "runner_up": "2016新版/中文化/E110.jpg",
+    "margin": 0.87
+  },
+  "101.jpg": {
+    "master": "2016新版/中文化/101.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/102.jpg",
+    "margin": 18.12
+  },
+  "102.jpg": {
+    "master": "2016新版/中文化/102.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/105.jpg",
+    "margin": 16.54
+  },
+  "103.jpg": {
+    "master": "2016新版/中文化/103.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/105.jpg",
+    "margin": 19.33
+  },
+  "104.jpg": {
+    "master": "2016新版/中文化/104.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/111.jpg",
+    "margin": 17.79
+  },
+  "105.jpg": {
+    "master": "2016新版/中文化/105.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/108.jpg",
+    "margin": 15.86
+  },
+  "106.jpg": {
+    "master": "2016新版/中文化/106.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/107.jpg",
+    "margin": 17.1
+  },
+  "107.jpg": {
+    "master": "2016新版/中文化/107.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/110.jpg",
+    "margin": 16.48
+  },
+  "108.jpg": {
+    "master": "2016新版/中文化/108.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/105.jpg",
+    "margin": 15.9
+  },
+  "109.jpg": {
+    "master": "2016新版/中文化/109.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/102.jpg",
+    "margin": 17.03
+  },
+  "110.jpg": {
+    "master": "2016新版/中文化/110.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/107.jpg",
+    "margin": 16.53
+  },
+  "111.jpg": {
+    "master": "2016新版/中文化/111.jpg",
+    "dist": 0.57,
+    "runner_up": "2016新版/中文化/舊版改新2.jpg",
+    "margin": 17.38
+  },
+  "20251111勘誤.jpg": {
+    "master": "2016新版/TTS圖/20251111勘誤.jpg",
+    "dist": 2.35,
+    "runner_up": "2016新版/TTS圖/S4o2m1.jpg",
+    "margin": 33.72
+  },
+  "2版牌更新O1.jpg": {
+    "master": "2016新版/中文化/2版牌更新O1.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G8o56.jpg",
+    "margin": 21.98
+  },
+  "2版牌更新O2.jpg": {
+    "master": "2016新版/中文化/2版牌更新O2.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8o23.jpg",
+    "margin": 20.2
+  },
+  "2版牌更新O3.jpg": {
+    "master": "2016新版/中文化/2版牌更新O3.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/S10o1.jpg",
+    "margin": 20.22
+  },
+  "2版牌更新O4.jpg": {
+    "master": "2016新版/中文化/2版牌更新O4.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o4.jpg",
+    "margin": 21.08
+  },
+  "2版牌更新O5.jpg": {
+    "master": "2016新版/中文化/2版牌更新O5.jpg",
+    "dist": 0.46,
+    "runner_up": "2016新版/中文化/G6o10.jpg",
+    "margin": 13.0
+  },
+  "2版牌更新m1O5.jpg": {
+    "master": "2016新版/中文化/2版牌更新m1O5.jpg",
+    "dist": 3.31,
+    "runner_up": "2016新版/中文化/補印+勘誤.jpg",
+    "margin": 28.85
+  },
+  "A039church.jpg": {
+    "master": "2016新版/中文化/A039church.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/釘籃勘誤.jpg",
+    "margin": 38.88
+  },
+  "AYm1.jpg": {
+    "master": "2016新版/中文化/AYm1.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8m8.jpg",
+    "margin": 24.71
+  },
+  "AYm2.jpg": {
+    "master": "2016新版/中文化/AYm2.jpg",
+    "dist": 7.87,
+    "runner_up": "2016新版/中文化/G8m6.jpg",
+    "margin": 17.82
+  },
+  "AYo1.jpg": {
+    "master": "2016新版/中文化/AYo1.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G5o2.jpg",
+    "margin": 22.16
+  },
+  "AYo2.jpg": {
+    "master": "2016新版/中文化/AYo2.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o12.jpg",
+    "margin": 22.09
+  },
+  "AYo3.jpg": {
+    "master": "2016新版/中文化/AYo3.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/2版牌更新m1O5.jpg",
+    "margin": 31.91
+  },
+  "A次發部分.jpg": {
+    "master": "舊版牌/舊版E次發.jpg",
+    "dist": 42.88,
+    "runner_up": "舊版牌/K次發.jpg",
+    "margin": 3.89
+  },
+  "A職業部分.jpg": {
+    "master": "舊版牌/舊版E次發.jpg",
+    "dist": 42.06,
+    "runner_up": "舊版牌/K次發.jpg",
+    "margin": 3.68
+  },
+  "B01.jpg": {
+    "master": "2016新版/中文化/B01.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/D005.jpg",
+    "margin": 19.88
+  },
+  "B02.jpg": {
+    "master": "2016新版/中文化/B02.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/003.jpg",
+    "margin": 19.26
+  },
+  "B03.jpg": {
+    "master": "2016新版/中文化/B03.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/B04.jpg",
+    "margin": 21.04
+  },
+  "B04.jpg": {
+    "master": "2016新版/中文化/B04.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/D001.jpg",
+    "margin": 19.48
+  },
+  "B05.jpg": {
+    "master": "2016新版/中文化/B05.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/004.jpg",
+    "margin": 18.35
+  },
+  "B06.jpg": {
+    "master": "2016新版/中文化/B06.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/002.jpg",
+    "margin": 21.2
+  },
+  "B07.jpg": {
+    "master": "2016新版/中文化/B07.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/003.jpg",
+    "margin": 19.29
+  },
+  "B101.jpg": {
+    "master": "2016新版/中文化/B101.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/110.jpg",
+    "margin": 18.11
+  },
+  "B102.jpg": {
+    "master": "2016新版/中文化/B102.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/D102.jpg",
+    "margin": 20.79
+  },
+  "B103.jpg": {
+    "master": "2016新版/中文化/B103.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/D105.jpg",
+    "margin": 20.49
+  },
+  "B104.jpg": {
+    "master": "2016新版/中文化/B104.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/102.jpg",
+    "margin": 18.9
+  },
+  "B105.jpg": {
+    "master": "2016新版/中文化/B105.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/102.jpg",
+    "margin": 20.63
+  },
+  "B106.jpg": {
+    "master": "2016新版/中文化/B106.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/108.jpg",
+    "margin": 18.61
+  },
+  "B107.jpg": {
+    "master": "2016新版/中文化/B107.jpg",
+    "dist": 0.48,
+    "runner_up": "2016新版/中文化/NL05.jpg",
+    "margin": 22.51
+  },
+  "BIm1.jpg": {
+    "master": "2016新版/TTS圖/BIm1.jpg",
+    "dist": 0.95,
+    "runner_up": "2016新版/TTS圖/Gm3.jpg",
+    "margin": 33.23
+  },
+  "BIo1.jpg": {
+    "master": "2016新版/TTS圖/BIo1.jpg",
+    "dist": 0.83,
+    "runner_up": "2016新版/TTS圖/WA1.jpg",
+    "margin": 27.85
+  },
+  "B次發部分.jpg": {
+    "master": "舊版牌/舊版E次發.jpg",
+    "dist": 43.42,
+    "runner_up": "舊版牌/K次發.jpg",
+    "margin": 3.45
+  },
+  "B職業部分.jpg": {
+    "master": "舊版牌/舊版E次發.jpg",
+    "dist": 42.35,
+    "runner_up": "舊版牌/K次發.jpg",
+    "margin": 3.54
+  },
+  "C01.jpg": {
+    "master": "2016新版/中文化/C01.jpg",
+    "dist": 0.61,
+    "runner_up": "2016新版/中文化/E08.jpg",
+    "margin": 19.3
+  },
+  "C02.jpg": {
+    "master": "2016新版/中文化/C02.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/012.jpg",
+    "margin": 20.37
+  },
+  "C03.jpg": {
+    "master": "2016新版/中文化/C03.jpg",
+    "dist": 0.61,
+    "runner_up": "2016新版/中文化/011.jpg",
+    "margin": 20.71
+  },
+  "C04.jpg": {
+    "master": "2016新版/中文化/C04.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 20.62
+  },
+  "C05.jpg": {
+    "master": "2016新版/中文化/C05.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/011.jpg",
+    "margin": 21.13
+  },
+  "C06.jpg": {
+    "master": "2016新版/中文化/C06.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/014.jpg",
+    "margin": 19.07
+  },
+  "C07.jpg": {
+    "master": "2016新版/中文化/C07.jpg",
+    "dist": 0.43,
+    "runner_up": "2016新版/中文化/E010.jpg",
+    "margin": 15.44
+  },
+  "C101.jpg": {
+    "master": "2016新版/中文化/C101.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/111.jpg",
+    "margin": 19.67
+  },
+  "C102.jpg": {
+    "master": "2016新版/中文化/C102.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/110.jpg",
+    "margin": 20.0
+  },
+  "C103.jpg": {
+    "master": "2016新版/中文化/C103.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/C101.jpg",
+    "margin": 20.93
+  },
+  "C104.jpg": {
+    "master": "2016新版/中文化/C104.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/107.jpg",
+    "margin": 19.11
+  },
+  "C105.jpg": {
+    "master": "2016新版/中文化/C105.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/107.jpg",
+    "margin": 20.44
+  },
+  "C106.jpg": {
+    "master": "2016新版/中文化/C106.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/112.jpg",
+    "margin": 19.09
+  },
+  "Cz01.jpg": {
+    "master": "2016新版/中文化/Cz01.jpg",
+    "dist": 0.49,
+    "runner_up": "2016新版/中文化/舊版主次發加紅色.jpg",
+    "margin": 17.69
+  },
+  "Cz02.jpg": {
+    "master": "2016新版/中文化/Cz02.jpg",
+    "dist": 0.43,
+    "runner_up": "2016新版/中文化/Wmo郵差.jpg",
+    "margin": 15.69
+  },
+  "Cz101.jpg": {
+    "master": "2016新版/中文化/Cz101.jpg",
+    "dist": 0.52,
+    "runner_up": "2016新版/中文化/Cz01.jpg",
+    "margin": 19.07
+  },
+  "D001.jpg": {
+    "master": "2016新版/中文化/D001.jpg",
+    "dist": 0.53,
+    "runner_up": "2016新版/中文化/D004.jpg",
+    "margin": 13.88
+  },
+  "D002.jpg": {
+    "master": "2016新版/中文化/D002.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/D004.jpg",
+    "margin": 15.08
+  },
+  "D003.jpg": {
+    "master": "2016新版/中文化/D003.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/D004.jpg",
+    "margin": 16.5
+  },
+  "D004.jpg": {
+    "master": "2016新版/中文化/D004.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/D001.jpg",
+    "margin": 13.83
+  },
+  "D005.jpg": {
+    "master": "2016新版/中文化/D005.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 15.23
+  },
+  "D006.jpg": {
+    "master": "2016新版/中文化/D006.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 17.47
+  },
+  "D007.jpg": {
+    "master": "2016新版/中文化/D007.jpg",
+    "dist": 0.38,
+    "runner_up": "2016新版/中文化/S10m2.jpg",
+    "margin": 19.01
+  },
+  "D101.jpg": {
+    "master": "2016新版/中文化/D101.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/D103.jpg",
+    "margin": 16.91
+  },
+  "D102.jpg": {
+    "master": "2016新版/中文化/D102.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/D104.jpg",
+    "margin": 15.92
+  },
+  "D103.jpg": {
+    "master": "2016新版/中文化/D103.jpg",
+    "dist": 0.57,
+    "runner_up": "2016新版/中文化/D105.jpg",
+    "margin": 16.72
+  },
+  "D104.jpg": {
+    "master": "2016新版/中文化/D104.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/D102.jpg",
+    "margin": 15.93
+  },
+  "D105.jpg": {
+    "master": "2016新版/中文化/D105.jpg",
+    "dist": 0.57,
+    "runner_up": "2016新版/中文化/D104.jpg",
+    "margin": 16.21
+  },
+  "D106.jpg": {
+    "master": "2016新版/中文化/D106.jpg",
+    "dist": 0.4,
+    "runner_up": "2016新版/中文化/112.jpg",
+    "margin": 15.32
+  },
+  "E01.jpg": {
+    "master": "2016新版/中文化/E01.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/014.jpg",
+    "margin": 20.15
+  },
+  "E010.jpg": {
+    "master": "2016新版/中文化/E010.jpg",
+    "dist": 0.43,
+    "runner_up": "2016新版/中文化/C07.jpg",
+    "margin": 15.45
+  },
+  "E02.jpg": {
+    "master": "2016新版/中文化/E02.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/003.jpg",
+    "margin": 19.09
+  },
+  "E03.jpg": {
+    "master": "2016新版/中文化/E03.jpg",
+    "dist": 0.61,
+    "runner_up": "2016新版/中文化/D002.jpg",
+    "margin": 19.53
+  },
+  "E04.jpg": {
+    "master": "2016新版/中文化/E04.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/E08.jpg",
+    "margin": 16.92
+  },
+  "E05.jpg": {
+    "master": "2016新版/中文化/E05.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/E08.jpg",
+    "margin": 17.89
+  },
+  "E06.jpg": {
+    "master": "2016新版/中文化/E06.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/E09.jpg",
+    "margin": 18.4
+  },
+  "E07.jpg": {
+    "master": "2016新版/中文化/E07.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/E09.jpg",
+    "margin": 17.51
+  },
+  "E08.jpg": {
+    "master": "2016新版/中文化/E08.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/E04.jpg",
+    "margin": 16.92
+  },
+  "E09.jpg": {
+    "master": "2016新版/中文化/E09.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/E07.jpg",
+    "margin": 17.51
+  },
+  "E101.jpg": {
+    "master": "2016新版/中文化/E101.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/E102.jpg",
+    "margin": 18.16
+  },
+  "E102.jpg": {
+    "master": "2016新版/中文化/E102.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/E101.jpg",
+    "margin": 18.2
+  },
+  "E103.jpg": {
+    "master": "2016新版/中文化/E103.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/105.jpg",
+    "margin": 19.5
+  },
+  "E104.jpg": {
+    "master": "2016新版/中文化/E104.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/E101.jpg",
+    "margin": 19.41
+  },
+  "E105.jpg": {
+    "master": "2016新版/中文化/E105.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/B101.jpg",
+    "margin": 29.69
+  },
+  "E106.jpg": {
+    "master": "2016新版/中文化/E106.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/107.jpg",
+    "margin": 19.56
+  },
+  "E107.jpg": {
+    "master": "2016新版/中文化/E107.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/E102.jpg",
+    "margin": 22.03
+  },
+  "E108.jpg": {
+    "master": "2016新版/中文化/E108.jpg",
+    "dist": 0.61,
+    "runner_up": "2016新版/中文化/106.jpg",
+    "margin": 20.43
+  },
+  "E109.jpg": {
+    "master": "2016新版/中文化/E109.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/105.jpg",
+    "margin": 19.13
+  },
+  "E110.jpg": {
+    "master": "2016新版/中文化/E110.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/Gm7.jpg",
+    "margin": 17.39
+  },
+  "FL01.jpg": {
+    "master": "2016新版/中文化/FL01.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/WA01.jpg",
+    "margin": 21.35
+  },
+  "FL02NL01.jpg": {
+    "master": "2016新版/中文化/FL02NL01.jpg",
+    "dist": 0.53,
+    "runner_up": "2016新版/中文化/WA01.jpg",
+    "margin": 20.05
+  },
+  "FL1.jpg": {
+    "master": "2016新版/中文化/FL1.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/FL2.jpg",
+    "margin": 20.92
+  },
+  "FL2.jpg": {
+    "master": "2016新版/中文化/FL2.jpg",
+    "dist": 0.5,
+    "runner_up": "2016新版/中文化/NL2.jpg",
+    "margin": 18.72
+  },
+  "FRm1.jpg": {
+    "master": "2016新版/TTS圖/FRm1.jpg",
+    "dist": 0.84,
+    "runner_up": "2016新版/TTS圖/FRm6.jpg",
+    "margin": 27.5
+  },
+  "FRm2.jpg": {
+    "master": "2016新版/TTS圖/FRm2.jpg",
+    "dist": 14.15,
+    "runner_up": "2016新版/TTS圖/FRm1.jpg",
+    "margin": 14.08
+  },
+  "FRm3.jpg": {
+    "master": "2016新版/TTS圖/FRm3.jpg",
+    "dist": 0.84,
+    "runner_up": "2016新版/TTS圖/FRm5.jpg",
+    "margin": 29.0
+  },
+  "FRm4.jpg": {
+    "master": "2016新版/TTS圖/FRm4.jpg",
+    "dist": 0.8,
+    "runner_up": "2016新版/TTS圖/FRm5.jpg",
+    "margin": 28.67
+  },
+  "FRm5.jpg": {
+    "master": "2016新版/TTS圖/FRm5.jpg",
+    "dist": 0.81,
+    "runner_up": "2016新版/TTS圖/FRm1.jpg",
+    "margin": 27.75
+  },
+  "FRm6.jpg": {
+    "master": "2016新版/TTS圖/FRm6.jpg",
+    "dist": 0.77,
+    "runner_up": "2016新版/TTS圖/FRm1.jpg",
+    "margin": 27.56
+  },
+  "FRo1.jpg": {
+    "master": "2016新版/TTS圖/FRo1.jpg",
+    "dist": 0.87,
+    "runner_up": "2016新版/TTS圖/FRo4.jpg",
+    "margin": 29.25
+  },
+  "FRo2.jpg": {
+    "master": "2016新版/TTS圖/FRo2.jpg",
+    "dist": 0.89,
+    "runner_up": "2016新版/TTS圖/FRm6.jpg",
+    "margin": 29.86
+  },
+  "FRo3.jpg": {
+    "master": "2016新版/TTS圖/FRo3.jpg",
+    "dist": 0.9,
+    "runner_up": "2016新版/TTS圖/117.jpg",
+    "margin": 30.96
+  },
+  "FRo4.jpg": {
+    "master": "2016新版/TTS圖/FRo4.jpg",
+    "dist": 0.89,
+    "runner_up": "2016新版/TTS圖/FRo5.jpg",
+    "margin": 26.44
+  },
+  "FRo5.jpg": {
+    "master": "2016新版/TTS圖/FRo5.jpg",
+    "dist": 0.88,
+    "runner_up": "2016新版/TTS圖/FRo4.jpg",
+    "margin": 26.45
+  },
+  "FRo6.jpg": {
+    "master": "2016新版/TTS圖/FRo6.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/TTS圖/Wmo7.jpg",
+    "margin": 25.74
+  },
+  "G4m1.jpg": {
+    "master": "2016新版/中文化/G4m1.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G4m4.jpg",
+    "margin": 27.19
+  },
+  "G4m2.jpg": {
+    "master": "2016新版/中文化/G4m2.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8m65.jpg",
+    "margin": 28.25
+  },
+  "G4m3.jpg": {
+    "master": "2016新版/中文化/G4m3.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/AYm2.jpg",
+    "margin": 25.23
+  },
+  "G4m4.jpg": {
+    "master": "2016新版/中文化/G4m4.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8m5.jpg",
+    "margin": 26.44
+  },
+  "G4m5.jpg": {
+    "master": "2016新版/中文化/G4m5.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G7m7.jpg",
+    "margin": 25.93
+  },
+  "G4m6.jpg": {
+    "master": "2016新版/中文化/G4m6.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G7m10.jpg",
+    "margin": 24.35
+  },
+  "G4m7.jpg": {
+    "master": "2016新版/中文化/G4m7.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/S5m2.jpg",
+    "margin": 22.55
+  },
+  "G4o1.jpg": {
+    "master": "2016新版/中文化/G4o1.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G7o6.jpg",
+    "margin": 19.35
+  },
+  "G4o2.jpg": {
+    "master": "2016新版/中文化/G4o2.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G7o8.jpg",
+    "margin": 22.28
+  },
+  "G4o3.jpg": {
+    "master": "2016新版/中文化/G4o3.jpg",
+    "dist": 0.77,
+    "runner_up": "2016新版/中文化/G4o2.jpg",
+    "margin": 22.75
+  },
+  "G4o4.jpg": {
+    "master": "2016新版/中文化/G4o4.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o53.jpg",
+    "margin": 20.82
+  },
+  "G4o5.jpg": {
+    "master": "2016新版/中文化/G4o5.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G7o1.jpg",
+    "margin": 22.73
+  },
+  "G4o6.jpg": {
+    "master": "2016新版/中文化/G4o6.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G8o56.jpg",
+    "margin": 20.88
+  },
+  "G4o7.jpg": {
+    "master": "2016新版/中文化/G4o7.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/S12o2m2.jpg",
+    "margin": 27.52
+  },
+  "G5m1.jpg": {
+    "master": "2016新版/中文化/G5m1.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8m26.jpg",
+    "margin": 26.01
+  },
+  "G5m2.jpg": {
+    "master": "2016新版/中文化/G5m2.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8m46.jpg",
+    "margin": 24.0
+  },
+  "G5m3.jpg": {
+    "master": "2016新版/中文化/G5m3.jpg",
+    "dist": 0.77,
+    "runner_up": "2016新版/中文化/G8m48.jpg",
+    "margin": 25.67
+  },
+  "G5m4.jpg": {
+    "master": "2016新版/中文化/G5m4.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/G8m58.jpg",
+    "margin": 25.79
+  },
+  "G5m5.jpg": {
+    "master": "2016新版/中文化/G5m5.jpg",
+    "dist": 0.77,
+    "runner_up": "2016新版/中文化/G8m39.jpg",
+    "margin": 26.87
+  },
+  "G5m6.jpg": {
+    "master": "2016新版/中文化/G5m6.jpg",
+    "dist": 0.75,
+    "runner_up": "2016新版/中文化/G5m5.jpg",
+    "margin": 28.32
+  },
+  "G5m7.jpg": {
+    "master": "2016新版/中文化/G5m7.jpg",
+    "dist": 0.76,
+    "runner_up": "2016新版/中文化/G5m5.jpg",
+    "margin": 28.83
+  },
+  "G5m8.jpg": {
+    "master": "2016新版/中文化/G5m8.jpg",
+    "dist": 0.45,
+    "runner_up": "2016新版/中文化/G7m11.jpg",
+    "margin": 19.19
+  },
+  "G5o1.jpg": {
+    "master": "2016新版/中文化/G5o1.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o41.jpg",
+    "margin": 23.12
+  },
+  "G5o2.jpg": {
+    "master": "2016新版/中文化/G5o2.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G7o6.jpg",
+    "margin": 22.02
+  },
+  "G5o3.jpg": {
+    "master": "2016新版/中文化/G5o3.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G6o5.jpg",
+    "margin": 21.41
+  },
+  "G5o4.jpg": {
+    "master": "2016新版/中文化/G5o4.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8o6.jpg",
+    "margin": 21.87
+  },
+  "G5o5.jpg": {
+    "master": "2016新版/中文化/G5o5.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o23.jpg",
+    "margin": 22.85
+  },
+  "G5o6.jpg": {
+    "master": "2016新版/中文化/G5o6.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o4.jpg",
+    "margin": 21.02
+  },
+  "G5o7.jpg": {
+    "master": "2016新版/中文化/G5o7.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8o9.jpg",
+    "margin": 22.64
+  },
+  "G5o8.jpg": {
+    "master": "2016新版/中文化/G5o8.jpg",
+    "dist": 0.43,
+    "runner_up": "2016新版/中文化/2版牌更新O5.jpg",
+    "margin": 15.69
+  },
+  "G6m1.jpg": {
+    "master": "2016新版/中文化/G6m1.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/G8m22.jpg",
+    "margin": 24.47
+  },
+  "G6m10.jpg": {
+    "master": "2016新版/中文化/G6m10.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/G7m11.jpg",
+    "margin": 17.08
+  },
+  "G6m2.jpg": {
+    "master": "2016新版/中文化/G6m2.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G7m2.jpg",
+    "margin": 25.81
+  },
+  "G6m3.jpg": {
+    "master": "2016新版/中文化/G6m3.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G6m7.jpg",
+    "margin": 24.84
+  },
+  "G6m4.jpg": {
+    "master": "2016新版/中文化/G6m4.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G7m6.jpg",
+    "margin": 24.64
+  },
+  "G6m5.jpg": {
+    "master": "2016新版/中文化/G6m5.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/S8m1.jpg",
+    "margin": 22.69
+  },
+  "G6m6.jpg": {
+    "master": "2016新版/中文化/G6m6.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/G8m45.jpg",
+    "margin": 23.22
+  },
+  "G6m7.jpg": {
+    "master": "2016新版/中文化/G6m7.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8m30.jpg",
+    "margin": 24.73
+  },
+  "G6m8.jpg": {
+    "master": "2016新版/中文化/G6m8.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8m45.jpg",
+    "margin": 23.28
+  },
+  "G6m9.jpg": {
+    "master": "2016新版/中文化/G6m9.jpg",
+    "dist": 0.75,
+    "runner_up": "2016新版/中文化/G7m5.jpg",
+    "margin": 24.35
+  },
+  "G6o1.jpg": {
+    "master": "2016新版/中文化/G6o1.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 19.39
+  },
+  "G6o10.jpg": {
+    "master": "2016新版/中文化/G6o10.jpg",
+    "dist": 0.42,
+    "runner_up": "2016新版/中文化/2版牌更新O5.jpg",
+    "margin": 13.03
+  },
+  "G6o2.jpg": {
+    "master": "2016新版/中文化/G6o2.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o25.jpg",
+    "margin": 18.46
+  },
+  "G6o3.jpg": {
+    "master": "2016新版/中文化/G6o3.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o65.jpg",
+    "margin": 22.7
+  },
+  "G6o4.jpg": {
+    "master": "2016新版/中文化/G6o4.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o50.jpg",
+    "margin": 20.5
+  },
+  "G6o5.jpg": {
+    "master": "2016新版/中文化/G6o5.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o16.jpg",
+    "margin": 20.29
+  },
+  "G6o6.jpg": {
+    "master": "2016新版/中文化/G6o6.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S8o1.jpg",
+    "margin": 20.26
+  },
+  "G6o7.jpg": {
+    "master": "2016新版/中文化/G6o7.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o24.jpg",
+    "margin": 21.16
+  },
+  "G6o8.jpg": {
+    "master": "2016新版/中文化/G6o8.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o13.jpg",
+    "margin": 21.18
+  },
+  "G6o9.jpg": {
+    "master": "2016新版/中文化/G6o9.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G5o3.jpg",
+    "margin": 22.33
+  },
+  "G7m1.jpg": {
+    "master": "2016新版/中文化/G7m1.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m1.jpg",
+    "margin": 24.26
+  },
+  "G7m10.jpg": {
+    "master": "2016新版/中文化/G7m10.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m12.jpg",
+    "margin": 24.08
+  },
+  "G7m11.jpg": {
+    "master": "2016新版/中文化/G7m11.jpg",
+    "dist": 0.46,
+    "runner_up": "2016新版/中文化/G6m10.jpg",
+    "margin": 17.06
+  },
+  "G7m2.jpg": {
+    "master": "2016新版/中文化/G7m2.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m2.jpg",
+    "margin": 24.77
+  },
+  "G7m3.jpg": {
+    "master": "2016新版/中文化/G7m3.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m3.jpg",
+    "margin": 21.72
+  },
+  "G7m4.jpg": {
+    "master": "2016新版/中文化/G7m4.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m4.jpg",
+    "margin": 23.75
+  },
+  "G7m5.jpg": {
+    "master": "2016新版/中文化/G7m5.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/S7m1.jpg",
+    "margin": 23.32
+  },
+  "G7m6.jpg": {
+    "master": "2016新版/中文化/G7m6.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m6.jpg",
+    "margin": 22.25
+  },
+  "G7m7.jpg": {
+    "master": "2016新版/中文化/G7m7.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G4m5.jpg",
+    "margin": 26.02
+  },
+  "G7m8.jpg": {
+    "master": "2016新版/中文化/G7m8.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m8.jpg",
+    "margin": 24.62
+  },
+  "G7m9.jpg": {
+    "master": "2016新版/中文化/G7m9.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/(2018-12-10備)02最新版-可印文件/G7m9.jpg",
+    "margin": 24.6
+  },
+  "G7o1.jpg": {
+    "master": "2016新版/TTS圖/G7o1.jpg",
+    "dist": 4.21,
+    "runner_up": "2016新版/TTS圖/G8o40.jpg",
+    "margin": 22.07
+  },
+  "G7o10.jpg": {
+    "master": "2016新版/TTS圖/G7o10.jpg",
+    "dist": 2.67,
+    "runner_up": "2016新版/TTS圖/糖果房間勘誤.jpg",
+    "margin": 11.91
+  },
+  "G7o11.jpg": {
+    "master": "2016新版/TTS圖/G7o11.jpg",
+    "dist": 2.44,
+    "runner_up": "2016新版/TTS圖/G6o11.jpg",
+    "margin": 17.54
+  },
+  "G7o12.jpg": {
+    "master": "2016新版/TTS圖/G7o12.jpg",
+    "dist": 2.53,
+    "runner_up": "2016新版/TTS圖/換新圖3.jpg",
+    "margin": 32.66
+  },
+  "G7o2.jpg": {
+    "master": "2016新版/TTS圖/G7o2.jpg",
+    "dist": 2.67,
+    "runner_up": "2016新版/TTS圖/G6o2.jpg",
+    "margin": 25.54
+  },
+  "G7o3.jpg": {
+    "master": "2016新版/TTS圖/G7o3.jpg",
+    "dist": 2.59,
+    "runner_up": "2016新版/TTS圖/G8o9.jpg",
+    "margin": 25.48
+  },
+  "G7o4.jpg": {
+    "master": "2016新版/TTS圖/G7o4.jpg",
+    "dist": 2.66,
+    "runner_up": "2016新版/TTS圖/G8o41.jpg",
+    "margin": 22.94
+  },
+  "G7o5.jpg": {
+    "master": "2016新版/TTS圖/G7o5.jpg",
+    "dist": 2.78,
+    "runner_up": "2016新版/TTS圖/G7o1.jpg",
+    "margin": 26.71
+  },
+  "G7o6.jpg": {
+    "master": "2016新版/TTS圖/G7o6.jpg",
+    "dist": 2.79,
+    "runner_up": "2016新版/TTS圖/G8o4.jpg",
+    "margin": 24.23
+  },
+  "G7o7.jpg": {
+    "master": "2016新版/TTS圖/G7o7.jpg",
+    "dist": 2.67,
+    "runner_up": "2016新版/TTS圖/G8o57.jpg",
+    "margin": 26.25
+  },
+  "G7o8.jpg": {
+    "master": "2016新版/TTS圖/G7o8.jpg",
+    "dist": 2.56,
+    "runner_up": "2016新版/TTS圖/G8o22.jpg",
+    "margin": 25.99
+  },
+  "G7o9.jpg": {
+    "master": "2016新版/TTS圖/G7o9.jpg",
+    "dist": 2.62,
+    "runner_up": "2016新版/TTS圖/G8o53.jpg",
+    "margin": 25.86
+  },
+  "G8m1.jpg": {
+    "master": "2016新版/中文化/G8m1.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S13m1.jpg",
+    "margin": 23.5
+  },
+  "G8m10.jpg": {
+    "master": "2016新版/中文化/G8m10.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8m23.jpg",
+    "margin": 25.21
+  },
+  "G8m11.jpg": {
+    "master": "2016新版/中文化/G8m11.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G6m1.jpg",
+    "margin": 25.54
+  },
+  "G8m12.jpg": {
+    "master": "2016新版/中文化/G8m12.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8m51.jpg",
+    "margin": 23.81
+  },
+  "G8m13.jpg": {
+    "master": "2016新版/中文化/G8m13.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m59.jpg",
+    "margin": 23.84
+  },
+  "G8m14.jpg": {
+    "master": "2016新版/中文化/G8m14.jpg",
+    "dist": 0.79,
+    "runner_up": "2016新版/中文化/G6m8.jpg",
+    "margin": 26.51
+  },
+  "G8m15.jpg": {
+    "master": "2016新版/中文化/G8m15.jpg",
+    "dist": 0.8,
+    "runner_up": "2016新版/中文化/G5m3.jpg",
+    "margin": 26.34
+  },
+  "G8m16.jpg": {
+    "master": "2016新版/中文化/G8m16.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m54.jpg",
+    "margin": 23.56
+  },
+  "G8m17.jpg": {
+    "master": "2016新版/中文化/G8m17.jpg",
+    "dist": 0.76,
+    "runner_up": "2016新版/中文化/G8m34.jpg",
+    "margin": 25.81
+  },
+  "G8m18.jpg": {
+    "master": "2016新版/中文化/G8m18.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/換新照片次發2.jpg",
+    "margin": 26.35
+  },
+  "G8m19.jpg": {
+    "master": "2016新版/中文化/G8m19.jpg",
+    "dist": 0.76,
+    "runner_up": "2016新版/中文化/G8m63.jpg",
+    "margin": 26.91
+  },
+  "G8m2.jpg": {
+    "master": "2016新版/中文化/G8m2.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G7m4.jpg",
+    "margin": 24.16
+  },
+  "G8m20.jpg": {
+    "master": "2016新版/中文化/G8m20.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8m43.jpg",
+    "margin": 26.09
+  },
+  "G8m21.jpg": {
+    "master": "2016新版/中文化/G8m21.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S6m1.jpg",
+    "margin": 24.42
+  },
+  "G8m22.jpg": {
+    "master": "2016新版/中文化/G8m22.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G6m1.jpg",
+    "margin": 24.38
+  },
+  "G8m23.jpg": {
+    "master": "2016新版/中文化/G8m23.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8m10.jpg",
+    "margin": 25.21
+  },
+  "G8m24.jpg": {
+    "master": "2016新版/中文化/G8m24.jpg",
+    "dist": 0.75,
+    "runner_up": "2016新版/中文化/G6m3.jpg",
+    "margin": 25.99
+  },
+  "G8m25.jpg": {
+    "master": "2016新版/中文化/G8m25.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G6m8.jpg",
+    "margin": 23.72
+  },
+  "G8m26.jpg": {
+    "master": "2016新版/中文化/G8m26.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m51.jpg",
+    "margin": 25.52
+  },
+  "G8m27.jpg": {
+    "master": "2016新版/中文化/G8m27.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/G8m63.jpg",
+    "margin": 24.91
+  },
+  "G8m28.jpg": {
+    "master": "2016新版/中文化/G8m28.jpg",
+    "dist": 0.78,
+    "runner_up": "2016新版/中文化/G8m48.jpg",
+    "margin": 26.85
+  },
+  "G8m29.jpg": {
+    "master": "2016新版/中文化/G8m29.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8m21.jpg",
+    "margin": 25.94
+  },
+  "G8m3.jpg": {
+    "master": "2016新版/中文化/G8m3.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G6m2.jpg",
+    "margin": 26.08
+  },
+  "G8m30.jpg": {
+    "master": "2016新版/中文化/G8m30.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S8m1.jpg",
+    "margin": 24.59
+  },
+  "G8m31.jpg": {
+    "master": "2016新版/中文化/G8m31.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8m16.jpg",
+    "margin": 25.52
+  },
+  "G8m32.jpg": {
+    "master": "2016新版/中文化/G8m32.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G6m3.jpg",
+    "margin": 27.62
+  },
+  "G8m33.jpg": {
+    "master": "2016新版/中文化/G8m33.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S6m1.jpg",
+    "margin": 25.43
+  },
+  "G8m34.jpg": {
+    "master": "2016新版/中文化/G8m34.jpg",
+    "dist": 0.76,
+    "runner_up": "2016新版/中文化/G8m17.jpg",
+    "margin": 25.82
+  },
+  "G8m35.jpg": {
+    "master": "2016新版/中文化/G8m35.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G7m8.jpg",
+    "margin": 25.93
+  },
+  "G8m36.jpg": {
+    "master": "2016新版/中文化/G8m36.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8m46.jpg",
+    "margin": 25.98
+  },
+  "G8m37.jpg": {
+    "master": "2016新版/中文化/G8m37.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m60.jpg",
+    "margin": 24.94
+  },
+  "G8m38.jpg": {
+    "master": "2016新版/中文化/G8m38.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m42.jpg",
+    "margin": 25.15
+  },
+  "G8m39.jpg": {
+    "master": "2016新版/中文化/G8m39.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8m37.jpg",
+    "margin": 25.46
+  },
+  "G8m4.jpg": {
+    "master": "2016新版/中文化/G8m4.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8m30.jpg",
+    "margin": 24.6
+  },
+  "G8m40.jpg": {
+    "master": "2016新版/中文化/G8m40.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G6m5.jpg",
+    "margin": 25.95
+  },
+  "G8m41.jpg": {
+    "master": "2016新版/中文化/G8m41.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/AYm2.jpg",
+    "margin": 22.97
+  },
+  "G8m42.jpg": {
+    "master": "2016新版/中文化/G8m42.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8m38.jpg",
+    "margin": 25.16
+  },
+  "G8m43.jpg": {
+    "master": "2016新版/中文化/G8m43.jpg",
+    "dist": 0.75,
+    "runner_up": "2016新版/中文化/G8m20.jpg",
+    "margin": 26.05
+  },
+  "G8m44.jpg": {
+    "master": "2016新版/中文化/G8m44.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8m21.jpg",
+    "margin": 24.59
+  },
+  "G8m45.jpg": {
+    "master": "2016新版/中文化/G8m45.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S8m1.jpg",
+    "margin": 21.9
+  },
+  "G8m46.jpg": {
+    "master": "2016新版/中文化/G8m46.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 21.77
+  },
+  "G8m47.jpg": {
+    "master": "2016新版/中文化/G8m47.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m45.jpg",
+    "margin": 24.95
+  },
+  "G8m48.jpg": {
+    "master": "2016新版/中文化/G8m48.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G5m3.jpg",
+    "margin": 25.73
+  },
+  "G8m49.jpg": {
+    "master": "2016新版/中文化/G8m49.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8m54.jpg",
+    "margin": 27.16
+  },
+  "G8m5.jpg": {
+    "master": "2016新版/中文化/G8m5.jpg",
+    "dist": 0.76,
+    "runner_up": "2016新版/中文化/G4m4.jpg",
+    "margin": 26.37
+  },
+  "G8m50.jpg": {
+    "master": "2016新版/中文化/G8m50.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G7m5.jpg",
+    "margin": 24.54
+  },
+  "G8m51.jpg": {
+    "master": "2016新版/中文化/G8m51.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 22.99
+  },
+  "G8m52.jpg": {
+    "master": "2016新版/中文化/G8m52.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/G7m4.jpg",
+    "margin": 26.48
+  },
+  "G8m53.jpg": {
+    "master": "2016新版/中文化/G8m53.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G7m6.jpg",
+    "margin": 23.14
+  },
+  "G8m54.jpg": {
+    "master": "2016新版/中文化/G8m54.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8m16.jpg",
+    "margin": 23.45
+  },
+  "G8m55.jpg": {
+    "master": "2016新版/中文化/G8m55.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G6m5.jpg",
+    "margin": 24.93
+  },
+  "G8m56.jpg": {
+    "master": "2016新版/中文化/G8m56.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/S8m1.jpg",
+    "margin": 24.21
+  },
+  "G8m57.jpg": {
+    "master": "2016新版/中文化/G8m57.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/AYm1.jpg",
+    "margin": 25.36
+  },
+  "G8m58.jpg": {
+    "master": "2016新版/中文化/G8m58.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G6m1.jpg",
+    "margin": 24.61
+  },
+  "G8m59.jpg": {
+    "master": "2016新版/中文化/G8m59.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G8m46.jpg",
+    "margin": 23.49
+  },
+  "G8m6.jpg": {
+    "master": "2016新版/中文化/G8m6.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/AYm2.jpg",
+    "margin": 24.01
+  },
+  "G8m60.jpg": {
+    "master": "2016新版/中文化/G8m60.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G7m6.jpg",
+    "margin": 22.33
+  },
+  "G8m61.jpg": {
+    "master": "2016新版/中文化/G8m61.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G5m2.jpg",
+    "margin": 25.21
+  },
+  "G8m62.jpg": {
+    "master": "2016新版/中文化/G8m62.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/G8m25.jpg",
+    "margin": 26.99
+  },
+  "G8m63.jpg": {
+    "master": "2016新版/中文化/G8m63.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G6m5.jpg",
+    "margin": 23.01
+  },
+  "G8m64.jpg": {
+    "master": "2016新版/中文化/G8m64.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8m64勘誤.jpg",
+    "margin": 17.35
+  },
+  "G8m65.jpg": {
+    "master": "2016新版/中文化/G8m65.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8m46.jpg",
+    "margin": 25.07
+  },
+  "G8m66.jpg": {
+    "master": "2016新版/中文化/G8m66.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8m46.jpg",
+    "margin": 26.66
+  },
+  "G8m7.jpg": {
+    "master": "2016新版/中文化/G8m7.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G7m8.jpg",
+    "margin": 26.4
+  },
+  "G8m8.jpg": {
+    "master": "2016新版/中文化/G8m8.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/AYm1.jpg",
+    "margin": 24.66
+  },
+  "G8m9.jpg": {
+    "master": "2016新版/中文化/G8m9.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/換新照片次發2.jpg",
+    "margin": 25.86
+  },
+  "G8o1.jpg": {
+    "master": "2016新版/中文化/G8o1.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G6o2.jpg",
+    "margin": 21.86
+  },
+  "G8o10.jpg": {
+    "master": "2016新版/中文化/G8o10.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o21.jpg",
+    "margin": 20.88
+  },
+  "G8o11.jpg": {
+    "master": "2016新版/中文化/G8o11.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o63.jpg",
+    "margin": 22.72
+  },
+  "G8o12.jpg": {
+    "master": "2016新版/中文化/G8o12.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G6o8.jpg",
+    "margin": 21.92
+  },
+  "G8o13.jpg": {
+    "master": "2016新版/中文化/G8o13.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G6o8.jpg",
+    "margin": 21.14
+  },
+  "G8o14.jpg": {
+    "master": "2016新版/中文化/G8o14.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o35.jpg",
+    "margin": 21.2
+  },
+  "G8o15.jpg": {
+    "master": "2016新版/中文化/G8o15.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o53.jpg",
+    "margin": 21.49
+  },
+  "G8o16.jpg": {
+    "master": "2016新版/中文化/G8o16.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G6o5.jpg",
+    "margin": 20.24
+  },
+  "G8o17.jpg": {
+    "master": "2016新版/中文化/G8o17.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G7o3.jpg",
+    "margin": 21.75
+  },
+  "G8o18.jpg": {
+    "master": "2016新版/中文化/G8o18.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S12o1.jpg",
+    "margin": 19.62
+  },
+  "G8o19.jpg": {
+    "master": "2016新版/中文化/G8o19.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S7o1.jpg",
+    "margin": 20.69
+  },
+  "G8o2.jpg": {
+    "master": "2016新版/中文化/G8o2.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/G8o43.jpg",
+    "margin": 19.42
+  },
+  "G8o20.jpg": {
+    "master": "2016新版/中文化/G8o20.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o9.jpg",
+    "margin": 20.38
+  },
+  "G8o21.jpg": {
+    "master": "2016新版/中文化/G8o21.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o8.jpg",
+    "margin": 19.52
+  },
+  "G8o22.jpg": {
+    "master": "2016新版/中文化/G8o22.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S12o1eng.jpg",
+    "margin": 21.4
+  },
+  "G8o23.jpg": {
+    "master": "2016新版/中文化/G8o23.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/2版牌更新O2.jpg",
+    "margin": 20.3
+  },
+  "G8o24.jpg": {
+    "master": "2016新版/中文化/G8o24.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/G6o7.jpg",
+    "margin": 21.18
+  },
+  "G8o25.jpg": {
+    "master": "2016新版/中文化/G8o25.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G6o2.jpg",
+    "margin": 18.39
+  },
+  "G8o26.jpg": {
+    "master": "2016新版/中文化/G8o26.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/G8o4.jpg",
+    "margin": 19.7
+  },
+  "G8o27.jpg": {
+    "master": "2016新版/中文化/G8o27.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8o5.jpg",
+    "margin": 22.21
+  },
+  "G8o28.jpg": {
+    "master": "2016新版/中文化/G8o28.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o30.jpg",
+    "margin": 22.39
+  },
+  "G8o29.jpg": {
+    "master": "2016新版/中文化/G8o29.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o56.jpg",
+    "margin": 21.04
+  },
+  "G8o3.jpg": {
+    "master": "2016新版/中文化/G8o3.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/S3o1.jpg",
+    "margin": 19.14
+  },
+  "G8o30.jpg": {
+    "master": "2016新版/中文化/G8o30.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/S10o1.jpg",
+    "margin": 17.76
+  },
+  "G8o31.jpg": {
+    "master": "2016新版/中文化/G8o31.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G7o4.jpg",
+    "margin": 21.15
+  },
+  "G8o32.jpg": {
+    "master": "2016新版/中文化/G8o32.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 22.78
+  },
+  "G8o33.jpg": {
+    "master": "2016新版/中文化/G8o33.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G8o40.jpg",
+    "margin": 20.26
+  },
+  "G8o34.jpg": {
+    "master": "2016新版/中文化/G8o34.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o52.jpg",
+    "margin": 21.47
+  },
+  "G8o35.jpg": {
+    "master": "2016新版/中文化/G8o35.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o14.jpg",
+    "margin": 21.2
+  },
+  "G8o36.jpg": {
+    "master": "2016新版/中文化/G8o36.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o25.jpg",
+    "margin": 21.45
+  },
+  "G8o37.jpg": {
+    "master": "2016新版/中文化/G8o37.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8o25.jpg",
+    "margin": 22.18
+  },
+  "G8o38.jpg": {
+    "master": "2016新版/中文化/G8o38.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G7o10.jpg",
+    "margin": 19.78
+  },
+  "G8o39.jpg": {
+    "master": "2016新版/中文化/G8o39.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S12o1.jpg",
+    "margin": 22.51
+  },
+  "G8o4.jpg": {
+    "master": "2016新版/中文化/G8o4.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o26.jpg",
+    "margin": 19.7
+  },
+  "G8o40.jpg": {
+    "master": "2016新版/中文化/G8o40.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G6o2.jpg",
+    "margin": 19.31
+  },
+  "G8o41.jpg": {
+    "master": "2016新版/中文化/G8o41.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G7o4.jpg",
+    "margin": 19.13
+  },
+  "G8o42.jpg": {
+    "master": "2016新版/中文化/G8o42.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 19.19
+  },
+  "G8o43.jpg": {
+    "master": "2016新版/中文化/G8o43.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o2.jpg",
+    "margin": 19.41
+  },
+  "G8o44.jpg": {
+    "master": "2016新版/中文化/G8o44.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 19.83
+  },
+  "G8o45.jpg": {
+    "master": "2016新版/中文化/G8o45.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S1o1.jpg",
+    "margin": 20.26
+  },
+  "G8o46.jpg": {
+    "master": "2016新版/中文化/G8o46.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S3o1.jpg",
+    "margin": 21.54
+  },
+  "G8o47.jpg": {
+    "master": "2016新版/中文化/G8o47.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o35.jpg",
+    "margin": 21.36
+  },
+  "G8o48.jpg": {
+    "master": "2016新版/中文化/G8o48.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/G8o54.jpg",
+    "margin": 20.65
+  },
+  "G8o49.jpg": {
+    "master": "2016新版/中文化/G8o49.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/S10o1.jpg",
+    "margin": 22.8
+  },
+  "G8o5.jpg": {
+    "master": "2016新版/中文化/G8o5.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o42.jpg",
+    "margin": 21.11
+  },
+  "G8o50.jpg": {
+    "master": "2016新版/中文化/G8o50.jpg",
+    "dist": 0.74,
+    "runner_up": "2016新版/中文化/G6o4.jpg",
+    "margin": 20.48
+  },
+  "G8o51.jpg": {
+    "master": "2016新版/中文化/G8o51.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o14.jpg",
+    "margin": 21.38
+  },
+  "G8o52.jpg": {
+    "master": "2016新版/中文化/G8o52.jpg",
+    "dist": 0.72,
+    "runner_up": "2016新版/中文化/G8o34.jpg",
+    "margin": 21.49
+  },
+  "G8o53.jpg": {
+    "master": "2016新版/中文化/G8o53.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G4o4.jpg",
+    "margin": 20.79
+  },
+  "G8o54.jpg": {
+    "master": "2016新版/中文化/G8o54.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/S12o1.jpg",
+    "margin": 18.93
+  },
+  "G8o55.jpg": {
+    "master": "2016新版/中文化/G8o55.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o9.jpg",
+    "margin": 21.65
+  },
+  "G8o56.jpg": {
+    "master": "2016新版/中文化/G8o56.jpg",
+    "dist": 0.75,
+    "runner_up": "2016新版/中文化/G4o6.jpg",
+    "margin": 20.89
+  },
+  "G8o57.jpg": {
+    "master": "2016新版/中文化/G8o57.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/2版牌更新O3.jpg",
+    "margin": 20.95
+  },
+  "G8o58.jpg": {
+    "master": "2016新版/中文化/G8o58.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S3o1.jpg",
+    "margin": 20.83
+  },
+  "G8o59.jpg": {
+    "master": "2016新版/中文化/G8o59.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S2o1.jpg",
+    "margin": 21.28
+  },
+  "G8o6.jpg": {
+    "master": "2016新版/中文化/G8o6.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G5o4.jpg",
+    "margin": 21.9
+  },
+  "G8o60.jpg": {
+    "master": "2016新版/中文化/G8o60.jpg",
+    "dist": 0.73,
+    "runner_up": "2016新版/中文化/G8o66.jpg",
+    "margin": 21.17
+  },
+  "G8o61.jpg": {
+    "master": "2016新版/中文化/G8o61.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G6o6.jpg",
+    "margin": 23.12
+  },
+  "G8o62.jpg": {
+    "master": "2016新版/中文化/G8o62.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G8o18.jpg",
+    "margin": 19.78
+  },
+  "G8o63.jpg": {
+    "master": "2016新版/中文化/G8o63.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G7o2.jpg",
+    "margin": 22.41
+  },
+  "G8o64.jpg": {
+    "master": "2016新版/中文化/G8o64.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o25.jpg",
+    "margin": 20.9
+  },
+  "G8o65.jpg": {
+    "master": "2016新版/中文化/G8o65.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S10o1.jpg",
+    "margin": 21.49
+  },
+  "G8o66.jpg": {
+    "master": "2016新版/TTS圖/G8o66.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/S10o1.jpg",
+    "margin": 27.49
+  },
+  "G8o7.jpg": {
+    "master": "2016新版/中文化/G8o7.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o16.jpg",
+    "margin": 29.72
+  },
+  "G8o8.jpg": {
+    "master": "2016新版/中文化/G8o8.jpg",
+    "dist": 0.7,
+    "runner_up": "2016新版/中文化/G8o21.jpg",
+    "margin": 19.5
+  },
+  "G8o9.jpg": {
+    "master": "2016新版/中文化/G8o9.jpg",
+    "dist": 0.71,
+    "runner_up": "2016新版/中文化/G8o20.jpg",
+    "margin": 20.38
+  },
+  "Gm1.jpg": {
+    "master": "2016新版/TTS圖/Gm1.jpg",
+    "dist": 1.0,
+    "runner_up": "2016新版/TTS圖/Gm3.jpg",
+    "margin": 27.14
+  },
+  "Gm2.jpg": {
+    "master": "2016新版/TTS圖/Gm2.jpg",
+    "dist": 1.03,
+    "runner_up": "2016新版/TTS圖/CZ2.jpg",
+    "margin": 27.92
+  },
+  "Gm3.jpg": {
+    "master": "2016新版/TTS圖/Gm3.jpg",
+    "dist": 1.0,
+    "runner_up": "2016新版/TTS圖/Gm1.jpg",
+    "margin": 27.17
+  },
+  "Gm4.jpg": {
+    "master": "2016新版/TTS圖/Gm4.jpg",
+    "dist": 1.01,
+    "runner_up": "2016新版/TTS圖/Gm5.jpg",
+    "margin": 29.25
+  },
+  "Gm5.jpg": {
+    "master": "2016新版/TTS圖/Gm5.jpg",
+    "dist": 1.01,
+    "runner_up": "2016新版/TTS圖/CZ2.jpg",
+    "margin": 27.62
+  },
+  "Gm6.jpg": {
+    "master": "2016新版/TTS圖/Gm6.jpg",
+    "dist": 1.01,
+    "runner_up": "2016新版/TTS圖/Gm1.jpg",
+    "margin": 33.22
+  },
+  "Gm7.jpg": {
+    "master": "2016新版/TTS圖/Gm7.jpg",
+    "dist": 1.85,
+    "runner_up": "2016新版/TTS圖/116.jpg",
+    "margin": 18.86
+  },
+  "Go1.jpg": {
+    "master": "2016新版/TTS圖/Go1.jpg",
+    "dist": 1.02,
+    "runner_up": "2016新版/TTS圖/Go3.jpg",
+    "margin": 26.81
+  },
+  "Go2.jpg": {
+    "master": "2016新版/TTS圖/Go2.jpg",
+    "dist": 1.11,
+    "runner_up": "2016新版/TTS圖/Wmo3.jpg",
+    "margin": 25.43
+  },
+  "Go3.jpg": {
+    "master": "2016新版/TTS圖/Go3.jpg",
+    "dist": 1.07,
+    "runner_up": "2016新版/TTS圖/Wmo3.jpg",
+    "margin": 23.95
+  },
+  "Go4.jpg": {
+    "master": "2016新版/TTS圖/Go4.jpg",
+    "dist": 1.07,
+    "runner_up": "2016新版/TTS圖/Wmo3.jpg",
+    "margin": 29.53
+  },
+  "Go5.jpg": {
+    "master": "2016新版/TTS圖/Go5.jpg",
+    "dist": 1.05,
+    "runner_up": "2016新版/TTS圖/Wmo4.jpg",
+    "margin": 27.29
+  },
+  "Go6.jpg": {
+    "master": "2016新版/TTS圖/Go6.jpg",
+    "dist": 0.77,
+    "runner_up": "2016新版/TTS圖/110.jpg",
+    "margin": 26.75
+  },
+  "I次發.jpg": {
+    "master": "舊版牌/I次發.jpg",
+    "dist": 0.24,
+    "runner_up": "舊版牌/K次發.jpg",
+    "margin": 5.34
+  },
+  "I職業1.jpg": {
+    "master": "舊版牌/I職業1.jpg",
+    "dist": 0.35,
+    "runner_up": "舊版牌/K職業1.jpg",
+    "margin": 2.52
+  },
+  "I職業2.jpg": {
+    "master": "舊版牌/I職業2.jpg",
+    "dist": 0.28,
+    "runner_up": "舊版牌/K職業3.jpg",
+    "margin": 2.57
+  },
+  "I職業3.jpg": {
+    "master": "舊版牌/I職業3.jpg",
+    "dist": 0.52,
+    "runner_up": "舊版牌/K職業1.jpg",
+    "margin": 2.38
+  },
+  "K次發.jpg": {
+    "master": "舊版牌/K次發.jpg",
+    "dist": 0.24,
+    "runner_up": "舊版牌/I次發.jpg",
+    "margin": 5.36
+  },
+  "K職業1.jpg": {
+    "master": "舊版牌/K職業1.jpg",
+    "dist": 0.19,
+    "runner_up": "舊版牌/I職業1.jpg",
+    "margin": 2.72
+  },
+  "K職業2.jpg": {
+    "master": "舊版牌/K職業2.jpg",
+    "dist": 0.16,
+    "runner_up": "舊版牌/I職業1.jpg",
+    "margin": 3.22
+  },
+  "K職業3.jpg": {
+    "master": "舊版牌/K職業3.jpg",
+    "dist": 0.54,
+    "runner_up": "舊版牌/I職業2.jpg",
+    "margin": 2.19
+  },
+  "L01.jpg": {
+    "master": "2016新版/中文化/L01.jpg",
+    "dist": 0.63,
+    "runner_up": "2016新版/中文化/013.jpg",
+    "margin": 22.47
+  },
+  "L101.jpg": {
+    "master": "2016新版/中文化/L101.jpg",
+    "dist": 0.49,
+    "runner_up": "2016新版/中文化/補印+勘誤.jpg",
+    "margin": 22.91
+  },
+  "NL02.jpg": {
+    "master": "2016新版/中文化/NL02.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/WA01.jpg",
+    "margin": 21.64
+  },
+  "NL03.jpg": {
+    "master": "2016新版/中文化/NL03.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/NL02.jpg",
+    "margin": 22.24
+  },
+  "NL04.jpg": {
+    "master": "2016新版/中文化/NL04.jpg",
+    "dist": 0.57,
+    "runner_up": "2016新版/中文化/WA01.jpg",
+    "margin": 21.61
+  },
+  "NL05.jpg": {
+    "master": "2016新版/中文化/NL05.jpg",
+    "dist": 0.41,
+    "runner_up": "2016新版/中文化/B107.jpg",
+    "margin": 22.58
+  },
+  "NL1.jpg": {
+    "master": "2016新版/中文化/NL1.jpg",
+    "dist": 0.49,
+    "runner_up": "2016新版/中文化/NL3.jpg",
+    "margin": 22.36
+  },
+  "NL2.jpg": {
+    "master": "2016新版/中文化/NL2.jpg",
+    "dist": 0.56,
+    "runner_up": "2016新版/中文化/FL2.jpg",
+    "margin": 18.65
+  },
+  "NL3.jpg": {
+    "master": "2016新版/中文化/NL3.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/FL2.jpg",
+    "margin": 19.98
+  },
+  "NL4.jpg": {
+    "master": "2016新版/中文化/NL4.jpg",
+    "dist": 0.53,
+    "runner_up": "2016新版/中文化/FL2.jpg",
+    "margin": 20.44
+  },
+  "Om1.jpg": {
+    "master": "2016新版/TTS圖/CZ2.jpg",
+    "dist": 31.23,
+    "runner_up": "2016新版/TTS圖/Gm2.jpg",
+    "margin": 0.13
+  },
+  "Om2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 18.21,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 4.78
+  },
+  "Om2_test.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 19.44,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 4.13
+  },
+  "Oo1.jpg": {
+    "master": "2016新版/TTS圖/CZ1.jpg",
+    "dist": 33.08,
+    "runner_up": "2016新版/TTS圖/Wmo2.jpg",
+    "margin": 1.05
+  },
+  "Oo2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 20.53,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 1.43
+  },
+  "PI次發.jpg": {
+    "master": "舊版牌/PI次發.jpg",
+    "dist": 0.28,
+    "runner_up": "舊版牌/Z次發.jpg",
+    "margin": 3.22
+  },
+  "PI職業.jpg": {
+    "master": "舊版牌/PI職業.jpg",
+    "dist": 0.53,
+    "runner_up": "舊版牌/I次發.jpg",
+    "margin": 39.92
+  },
+  "S10m1.jpg": {
+    "master": "2016新版/中文化/S10m1.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S9m1.jpg",
+    "margin": 19.79
+  },
+  "S10m2.jpg": {
+    "master": "2016新版/中文化/S10m2.jpg",
+    "dist": 0.39,
+    "runner_up": "2016新版/中文化/D007.jpg",
+    "margin": 19.14
+  },
+  "S10o1.jpg": {
+    "master": "2016新版/中文化/S10o1.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/G8o30.jpg",
+    "margin": 17.79
+  },
+  "S11m1.jpg": {
+    "master": "2016新版/中文化/S11m1.jpg",
+    "dist": 2.34,
+    "runner_up": "2016新版/中文化/S9m1.jpg",
+    "margin": 19.42
+  },
+  "S11o1.jpg": {
+    "master": "2016新版/中文化/S11o1.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S5o1.jpg",
+    "margin": 17.68
+  },
+  "S12m1.jpg": {
+    "master": "2016新版/TTS圖/S12m1.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/S13m1.jpg",
+    "margin": 27.97
+  },
+  "S12o1.jpg": {
+    "master": "2016新版/TTS圖/S12o1.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/S7o1.jpg",
+    "margin": 23.3
+  },
+  "S12o2m2.jpg": {
+    "master": "2016新版/TTS圖/S13o2m2.jpg",
+    "dist": 19.08,
+    "runner_up": "2016新版/TTS圖/S9o2m2.jpg",
+    "margin": 3.99
+  },
+  "S13m1.jpg": {
+    "master": "2016新版/TTS圖/S13m1.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/S9m1.jpg",
+    "margin": 27.75
+  },
+  "S13o1.jpg": {
+    "master": "2016新版/TTS圖/S13o1.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/G8o43.jpg",
+    "margin": 26.57
+  },
+  "S13o2m2.jpg": {
+    "master": "2016新版/TTS圖/S13o2m2.jpg",
+    "dist": 0.0,
+    "runner_up": "2016新版/TTS圖/S3m2.jpg",
+    "margin": 28.66
+  },
+  "S1m2.jpg": {
+    "master": "2016新版/中文化/S1m2.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/S5m2.jpg",
+    "margin": 18.79
+  },
+  "S1o1.jpg": {
+    "master": "2016新版/中文化/S1o1.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/S12o1.jpg",
+    "margin": 18.73
+  },
+  "S1o2m1.jpg": {
+    "master": "2016新版/中文化/S1o2m1.jpg",
+    "dist": 0.6,
+    "runner_up": "2016新版/中文化/S2o2m1.jpg",
+    "margin": 24.08
+  },
+  "S2m2.jpg": {
+    "master": "2016新版/中文化/S2m2.jpg",
+    "dist": 0.42,
+    "runner_up": "2016新版/中文化/Gm7.jpg",
+    "margin": 23.98
+  },
+  "S2o1.jpg": {
+    "master": "2016新版/中文化/S2o1.jpg",
+    "dist": 0.65,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 18.04
+  },
+  "S2o2m1.jpg": {
+    "master": "2016新版/中文化/S2o2m1.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 22.07
+  },
+  "S3m2.jpg": {
+    "master": "2016新版/中文化/S3m2.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/S12o2m2.jpg",
+    "margin": 20.98
+  },
+  "S3o1.jpg": {
+    "master": "2016新版/中文化/S3o1.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o3.jpg",
+    "margin": 19.12
+  },
+  "S3o2m1.jpg": {
+    "master": "2016新版/中文化/S3o2m1.jpg",
+    "dist": 0.58,
+    "runner_up": "2016新版/中文化/S1o2m1.jpg",
+    "margin": 25.19
+  },
+  "S4m2.jpg": {
+    "master": "2016新版/中文化/S4m2.jpg",
+    "dist": 0.48,
+    "runner_up": "2016新版/中文化/S5m2.jpg",
+    "margin": 21.85
+  },
+  "S4o1.jpg": {
+    "master": "2016新版/中文化/S4o1.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/G8o33.jpg",
+    "margin": 20.58
+  },
+  "S4o2m1.jpg": {
+    "master": "2016新版/中文化/S4o2m1.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S11m1.jpg",
+    "margin": 24.29
+  },
+  "S5m2.jpg": {
+    "master": "2016新版/中文化/S5m2.jpg",
+    "dist": 0.49,
+    "runner_up": "2016新版/中文化/S1m2.jpg",
+    "margin": 18.78
+  },
+  "S5o1.jpg": {
+    "master": "2016新版/中文化/S5o1.jpg",
+    "dist": 0.66,
+    "runner_up": "2016新版/中文化/S11o1.jpg",
+    "margin": 17.68
+  },
+  "S5o2m1.jpg": {
+    "master": "2016新版/中文化/S5o2m1.jpg",
+    "dist": 0.67,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 26.28
+  },
+  "S6m1.jpg": {
+    "master": "2016新版/中文化/S6m1.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S9m1.jpg",
+    "margin": 23.33
+  },
+  "S6o1.jpg": {
+    "master": "2016新版/中文化/S6o1.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/S5o1.jpg",
+    "margin": 20.25
+  },
+  "S6o2m2.jpg": {
+    "master": "2016新版/中文化/S6o2m2.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/S8o2m2.jpg",
+    "margin": 15.29
+  },
+  "S7m1.jpg": {
+    "master": "2016新版/中文化/S7m1.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 21.12
+  },
+  "S7o1.jpg": {
+    "master": "2016新版/中文化/S7o1.jpg",
+    "dist": 0.64,
+    "runner_up": "2016新版/中文化/S12o1.jpg",
+    "margin": 17.42
+  },
+  "S7o2m2.jpg": {
+    "master": "2016新版/中文化/S7o2m2.jpg",
+    "dist": 0.47,
+    "runner_up": "2016新版/中文化/S12o2m2eng.jpg",
+    "margin": 21.94
+  },
+  "S8m1.jpg": {
+    "master": "2016新版/中文化/S8m1.jpg",
+    "dist": 0.69,
+    "runner_up": "2016新版/中文化/G8m45.jpg",
+    "margin": 21.89
+  },
+  "S8o1.jpg": {
+    "master": "2016新版/中文化/S8o1.jpg",
+    "dist": 0.68,
+    "runner_up": "2016新版/中文化/G8o18.jpg",
+    "margin": 20.07
+  },
+  "S8o2m2.jpg": {
+    "master": "2016新版/中文化/S8o2m2.jpg",
+    "dist": 0.45,
+    "runner_up": "2016新版/中文化/S6o2m2.jpg",
+    "margin": 15.3
+  },
+  "S9m1.jpg": {
+    "master": "2016新版/中文化/S9m1.jpg",
+    "dist": 0.59,
+    "runner_up": "2016新版/中文化/S10m1.jpg",
+    "margin": 19.9
+  },
+  "S9o1.jpg": {
+    "master": "2016新版/中文化/S9o1.jpg",
+    "dist": 0.62,
+    "runner_up": "2016新版/中文化/G8o45.jpg",
+    "margin": 25.08
+  },
+  "S9o2m2.jpg": {
+    "master": "2016新版/中文化/S9o2m2.jpg",
+    "dist": 0.49,
+    "runner_up": "2016新版/中文化/S6o2m2.jpg",
+    "margin": 20.3
+  },
+  "WA1.jpg": {
+    "master": "2016新版/TTS圖/WA1.jpg",
+    "dist": 2.31,
+    "runner_up": "2016新版/TTS圖/BIo1.jpg",
+    "margin": 26.22
+  },
+  "WA2.jpg": {
+    "master": "2016新版/TTS圖/WA2.jpg",
+    "dist": 2.62,
+    "runner_up": "2016新版/TTS圖/FRm4.jpg",
+    "margin": 28.86
+  },
+  "Wmm1.jpg": {
+    "master": "2016新版/TTS圖/Wmm1.jpg",
+    "dist": 0.95,
+    "runner_up": "2016新版/TTS圖/Wmm3.jpg",
+    "margin": 26.95
+  },
+  "Wmm2.jpg": {
+    "master": "2016新版/TTS圖/Wmm2.jpg",
+    "dist": 1.01,
+    "runner_up": "2016新版/TTS圖/Wmm4.jpg",
+    "margin": 28.03
+  },
+  "Wmm3.jpg": {
+    "master": "2016新版/TTS圖/Wmm3.jpg",
+    "dist": 0.94,
+    "runner_up": "2016新版/TTS圖/Wmm6.jpg",
+    "margin": 26.85
+  },
+  "Wmm4.jpg": {
+    "master": "2016新版/TTS圖/Wmm4.jpg",
+    "dist": 0.97,
+    "runner_up": "2016新版/TTS圖/Wmm5.jpg",
+    "margin": 27.11
+  },
+  "Wmm5.jpg": {
+    "master": "2016新版/TTS圖/Wmm5.jpg",
+    "dist": 0.97,
+    "runner_up": "2016新版/TTS圖/Wmm4.jpg",
+    "margin": 27.1
+  },
+  "Wmm6.jpg": {
+    "master": "2016新版/TTS圖/Wmm6.jpg",
+    "dist": 0.99,
+    "runner_up": "2016新版/TTS圖/Wmm3.jpg",
+    "margin": 26.79
+  },
+  "Wmm7.jpg": {
+    "master": "2016新版/TTS圖/Wmm7.jpg",
+    "dist": 0.87,
+    "runner_up": "2016新版/TTS圖/Wmm3.jpg",
+    "margin": 29.17
+  },
+  "Wmo1.jpg": {
+    "master": "2016新版/TTS圖/Wmo1.jpg",
+    "dist": 1.07,
+    "runner_up": "2016新版/TTS圖/Wmo3.jpg",
+    "margin": 22.07
+  },
+  "Wmo2.jpg": {
+    "master": "2016新版/TTS圖/Wmo2.jpg",
+    "dist": 1.06,
+    "runner_up": "2016新版/TTS圖/Wmo1.jpg",
+    "margin": 22.25
+  },
+  "Wmo3.jpg": {
+    "master": "2016新版/TTS圖/Wmo3.jpg",
+    "dist": 1.1,
+    "runner_up": "2016新版/TTS圖/Wmo6.jpg",
+    "margin": 21.04
+  },
+  "Wmo4.jpg": {
+    "master": "2016新版/TTS圖/Wmo4.jpg",
+    "dist": 1.02,
+    "runner_up": "2016新版/TTS圖/Wmo1.jpg",
+    "margin": 22.3
+  },
+  "Wmo6.jpg": {
+    "master": "2016新版/TTS圖/Wmo6.jpg",
+    "dist": 1.01,
+    "runner_up": "2016新版/TTS圖/Wmo3.jpg",
+    "margin": 21.06
+  },
+  "Wmo7.jpg": {
+    "master": "2016新版/TTS圖/Wmo7.jpg",
+    "dist": 0.45,
+    "runner_up": "2016新版/TTS圖/FRo6.jpg",
+    "margin": 25.99
+  },
+  "Zm1.jpg": {
+    "master": "2016新版/TTS圖/CZ2.jpg",
+    "dist": 30.85,
+    "runner_up": "2016新版/TTS圖/Wmm1.jpg",
+    "margin": 3.76
+  },
+  "Zm2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 20.81,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 2.34
+  },
+  "Zo1.jpg": {
+    "master": "2016新版/TTS圖/G6o5.jpg",
+    "dist": 54.75,
+    "runner_up": "2016新版/TTS圖/G8o7.jpg",
+    "margin": 0.44
+  },
+  "Zo2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 30.81,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 2.88
+  },
+  "debug_O_min_row1_3.jpg": {
+    "master": "舊版牌/WM次發.jpg",
+    "dist": 51.12,
+    "runner_up": "舊版牌/FR次發.jpg",
+    "margin": 1.02
+  },
+  "debug_O_min_row2_0.jpg": {
+    "master": "舊版牌/WM次發.jpg",
+    "dist": 55.08,
+    "runner_up": "舊版牌/FR次發.jpg",
+    "margin": 0.99
+  },
+  "debug_O_min_row2_1.jpg": {
+    "master": "2016新版/中文化/Edeck文字空白.jpg",
+    "dist": 45.63,
+    "runner_up": "舊版牌/WM次發.jpg",
+    "margin": 10.16
+  },
+  "debug_Om1_585.jpg": {
+    "master": "2016新版/TTS圖/CZ2.jpg",
+    "dist": 31.3,
+    "runner_up": "2016新版/TTS圖/Gm2.jpg",
+    "margin": 0.11
+  },
+  "debug_Om2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 36.4,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 3.89
+  },
+  "debug_Om2_final.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 20.54,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 3.76
+  },
+  "debug_Om2_final_2.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 21.39,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 3.53
+  },
+  "debug_Om2_final_3.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 19.44,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 4.15
+  },
+  "debug_Om2_final_4.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 18.19,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 4.81
+  },
+  "debug_Oo1_585.jpg": {
+    "master": "2016新版/TTS圖/Go2.jpg",
+    "dist": 34.91,
+    "runner_up": "2016新版/TTS圖/Wmo2.jpg",
+    "margin": 0.48
+  },
+  "debug_Oo1_broken.jpg": {
+    "master": "2016新版/TTS圖/Go2.jpg",
+    "dist": 34.91,
+    "runner_up": "2016新版/TTS圖/Wmo2.jpg",
+    "margin": 0.48
+  },
+  "debug_Oo1_perfect.jpg": {
+    "master": "2016新版/TTS圖/CZ1.jpg",
+    "dist": 33.07,
+    "runner_up": "2016新版/TTS圖/Wmo2.jpg",
+    "margin": 1.05
+  },
+  "debug_Oo2_broken.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 24.35,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 0.68
+  },
+  "debug_Oo2_perfect.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 20.54,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 1.41
+  },
+  "debug_O次發.jpg": {
+    "master": "舊版牌/O次發.jpg",
+    "dist": 0.51,
+    "runner_up": "舊版牌/Z次發.jpg",
+    "margin": 3.09
+  },
+  "debug_O次發2.jpg": {
+    "master": "舊版牌/O次發.jpg",
+    "dist": 0.51,
+    "runner_up": "舊版牌/Z次發.jpg",
+    "margin": 3.09
+  },
+  "debug_nl_1.jpg": {
+    "master": "2016新版/中文化/B163神父.jpg",
+    "dist": 40.97,
+    "runner_up": "舊版牌/圖板/httpsiimgurcomPNkw05bjpg.jpg",
+    "margin": 0.59
+  },
+  "debug_nl_2.jpg": {
+    "master": "2016新版/中文化/G7m4_crops/G7m4_card2.png",
+    "dist": 50.35,
+    "runner_up": "2016新版/中文化/G7m4_crops/G7m4_card7.png",
+    "margin": 2.3
+  },
+  "debug_overlap.jpg": {
+    "master": "2016新版/中文化/L deck/agricola-deck-city-plannner-l081-mini_1_d4f7565e75527b3aeba4aa3a1eb05eeb.jpg",
+    "dist": 50.8,
+    "runner_up": "2016新版/中文化/L deck/s-l1600 (1).jpg",
+    "margin": 1.81
+  },
+  "linepay-qr.jpg": {
+    "master": "2016新版/中文化/次發牌背65x90.jpg",
+    "dist": 46.73,
+    "runner_up": "2016新版/中文化/職業卡牌背65x90.jpg",
+    "margin": 1.99
+  },
+  "wa01.jpg": {
+    "master": "2016新版/TTS圖/wa01.jpg",
+    "dist": 2.73,
+    "runner_up": "2016新版/TTS圖/007.jpg",
+    "margin": 26.54
+  },
+  "wa02.jpg": {
+    "master": "2016新版/TTS圖/wa02.jpg",
+    "dist": 2.1,
+    "runner_up": "2016新版/TTS圖/E110.jpg",
+    "margin": 18.34
+  },
+  "舊版E次發.jpg": {
+    "master": "舊版牌/舊版E次發.jpg",
+    "dist": 0.3,
+    "runner_up": "舊版牌/G次發.jpg",
+    "margin": 33.47
+  },
+  "舊版E職業1.jpg": {
+    "master": "舊版牌/舊版E職業1.jpg",
+    "dist": 0.35,
+    "runner_up": "舊版牌/FR職業1.jpg",
+    "margin": 12.79
+  },
+  "舊版E職業2.jpg": {
+    "master": "舊版牌/舊版E職業2.jpg",
+    "dist": 0.17,
+    "runner_up": "舊版牌/WM職業2.jpg",
+    "margin": 3.62
+  },
+  "舊版E職業3.jpg": {
+    "master": "舊版牌/舊版E職業3.jpg",
+    "dist": 0.5,
+    "runner_up": "舊版牌/K職業1.jpg",
+    "margin": 16.23
+  },
+  "舊版主次發加紅色.jpg": {
+    "master": "2016新版/中文化/舊版主次發加紅色.jpg",
+    "dist": 0.54,
+    "runner_up": "2016新版/中文化/Cz01.jpg",
+    "margin": 17.56
+  },
+  "舊版改新.jpg": {
+    "master": "2016新版/中文化/舊版改新.jpg",
+    "dist": 0.5,
+    "runner_up": "2016新版/中文化/003.jpg",
+    "margin": 18.57
+  },
+  "舊版改新2.jpg": {
+    "master": "2016新版/中文化/舊版改新2.jpg",
+    "dist": 0.55,
+    "runner_up": "2016新版/中文化/102.jpg",
+    "margin": 16.85
+  }
+}
