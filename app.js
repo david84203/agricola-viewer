@@ -552,14 +552,10 @@ function drawCrop(canvas, card, forceSheet = false) {
     const scaleCropY = (value) => value === 0 ? 0 : value * img.naturalHeight / CROP_REF.height;
 
     let sx, sy, cellW, cellH;
-    if (src.startsWith('Zm')) {
-      const cols_x = [16, 388, 760];
-      const rows_y = [30, 651, 1274];
-      cellW = scaleCropX(342);
-      cellH = scaleCropY(558);
-      sx = scaleCropX(cols_x[card.grid_col || 0]);
-      sy = scaleCropY(rows_y[card.grid_row || 0]);
-    } else {
+    {
+      // Zm(1/2).jpg 過去曾用一組硬編碼像素校正(cols_x/rows_y，對應 2040×2807 參照尺寸)，
+      // 但實際圖檔是 720×1200 滿版無邊距的 3×3 均分表，套用舊校正會裁到相鄰卡/留白過多，
+      // 故 Zm 與 Zo 一致走下方 base(0,0,0,0) 均分裁切。
       const offsetLeft   = scaleCropX(card.crop_left   !== undefined ? card.crop_left   : base.l);
       const offsetRight  = scaleCropX(card.crop_right  !== undefined ? card.crop_right  : base.r);
       const offsetTop    = scaleCropY(card.crop_top    !== undefined ? card.crop_top    : base.t);
