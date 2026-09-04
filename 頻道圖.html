@@ -77,6 +77,7 @@
   .tc{background:#fdeae3;color:var(--cause)} .tr{background:#e6f0fa;color:var(--react)}
   .tb{background:var(--bindbg);color:var(--bind)}
   .tg{background:#eef1f4;color:#566} .ta{background:#fff;border:1px solid #ccd;color:#778}
+  .tp{background:var(--effbg);color:var(--eff)}
   .scrim{position:fixed;inset:0;background:rgba(20,25,35,.28);opacity:0;pointer-events:none;transition:.2s;z-index:8}
   .scrim.open{opacity:1;pointer-events:auto}
   @media(max-width:680px){.concepts{grid-template-columns:1fr}}
@@ -114,7 +115,9 @@
       <div class="concept">
         <h3>④ 資源頻道用另一組詞</h3>
         <p><b>get</b> 產出／<b>pay</b> 花掉／<b>react</b> 監聽你取得它／<b>read</b> 只看你持有多少。<br>
-        再配 <b>src</b>：<b>供應</b>＝卡直接從場外拿；<b>場格</b>＝從棋盤格取得（會觸發別人的 react）；<b>任意</b>／<b>繁殖</b> 為 react 專用。</p>
+        再配 <b>from</b>（資源從哪來）：<b>供應</b>＝卡直接從場外拿；<b>場格</b>＝從棋盤格取得（會觸發別人的 react）；<b>任意</b>／<b>繁殖</b> 為 react 專用。<br>
+        分數類改配 <b>pool</b>（哪一池）：紅利分數／基本計分／勝利點數／負分標記／基本扣分。<br>
+        頻道專屬詞（石／磚／圈內／受罰…）一律放 <b>attr</b> 屬性欄，role 只留 cause／react／get／pay／read／bind 六種。</p>
         <div class="plug"><span class="node" style="background:#1ca672;color:#fff">get·場格</span><span class="arrow">↔ 配對 ↔</span><span class="node nreact">react·場格</span></div>
       </div>
     </div>
@@ -159,8 +162,8 @@ const GROUP_DEFS = [
   {key:"狀態",   color:"var(--state)", bg:"var(--statebg)",
    names:["空田","已播種田","封田","房舍材質","馬廄","圈地","居住空間"]},
   {key:"計數",   color:"var(--cnt)",   bg:"var(--cntbg)",
-   names:["家庭人數","房間數","職業數","發展數","手牌","尚未打出職業卡","尚未打出發展卡"]},
-  {key:"格綁定", color:"var(--bind)",  bg:"var(--bindbg)", match:n=>n.startsWith("格綁定")},
+   names:["家庭人數","房間數","職業數","發展數","手牌"]},
+  {key:"格綁定", color:"var(--bind)",  bg:"var(--bindbg)", names:["格綁定"]},
   {key:"效果",   color:"var(--eff)",   bg:"var(--effbg)",  match:n=>n.startsWith("效果:")},
 ];
 const OTHER_GROUP = {key:"其他（未分類）", color:"var(--other)", bg:"var(--otherbg)"};
@@ -170,6 +173,8 @@ const NOTE = {
   "增加家庭成員":"永久工人（含旁門生人）",
   "空田":"狀態·與播種相反", "已播種田":"狀態", "封田":"狀態·永久鎖死",
   "動物":"母層·羊/野豬/牛擇一", "作物":"母層·麥/菜擇一",
+  "格綁定":"屬性＝綁哪些格（原 6 條頻道併成 1 條）",
+  "職業數":"屬性「尚未打出」＝原「尚未打出職業卡」頻道", "發展數":"屬性「尚未打出」＝原「尚未打出發展卡」頻道",
 };
 
 const ROLE_COLOR = {
@@ -178,17 +183,21 @@ const ROLE_COLOR = {
 };
 const ROLE_ORDER = ["cause","get","pay","react","read","bind"];
 const OTHER_ROLE_COLOR = "#9aa4b2";
-const FLAV_ORDER = ["行動格","行動","供應","場格","任意","繁殖","pay"];
+const FLAV_ORDER = ["行動格","行動","供應","場格","任意","繁殖","全部","卡面歸還","pay",
+                    "紅利分數","基本計分","勝利點數","負分標記","基本扣分"];
+const POOLS = new Set(["紅利分數","基本計分","勝利點數","負分標記","基本扣分"]);
 
-let CH = {};       // ch -> {cards:[{cid,nm,tags}], roles:{role:n}, flav:{on或src:n}}
+// entry 形狀（2026-09-05 正規化後）：{ch, role:[骨幹6種], attr?:[…], on?, from?, pool?}
+let CH = {};       // ch -> {cards:[{cid,nm,tags}], roles:{role:n}, attrs:{attr:n}, flav:{on或from或pool:n}}
 let CARDS = {};
 
-function add(ch, cid, nm, role, flav){
-  const o = CH[ch] || (CH[ch] = {cards:[], roles:{}, flav:{}, byId:{}});
+function add(ch, cid, nm, role, attrs, flav){
+  const o = CH[ch] || (CH[ch] = {cards:[], roles:{}, attrs:{}, flav:{}, byId:{}});
   let card = o.byId[cid];
   if(!card){ card = {cid, nm, tags:[]}; o.byId[cid] = card; o.cards.push(card); }
-  card.tags.push({role, flav});
+  card.tags.push({role, attrs, flav});
   o.roles[role] = (o.roles[role]||0) + 1;
+  attrs.forEach(a=> o.attrs[a] = (o.attrs[a]||0) + 1);
   if(flav) o.flav[flav] = (o.flav[flav]||0) + 1;
 }
 
@@ -226,27 +235,30 @@ function render(){
     const rec = window._chan[cid];
     (rec.channels||[]).forEach(e=>{
       entries++;
-      const flav = e.on || e.src || null;
-      const roles = (e.role||[]).length ? e.role : ["—"];
-      roles.forEach(r=> add(e.ch, cid, rec.牌名, r, flav));
+      const flav = e.on || e.from || e.pool || null;
+      const roles = (e.role||[]).length ? e.role : ["—"];   // 純屬性 entry（房舍材質·石…）role 是空的
+      const attrs = e.attr || [];
+      // 屬性與 on/from/pool 只在第一個 role 上算一次，避免 cause＋react 雙 role 的 entry 把數字灌兩倍
+      roles.forEach((r,i)=> add(e.ch, cid, rec.牌名, r, i===0 ? attrs : [], i===0 ? flav : null));
     });
-    (rec.effects||[]).forEach(x=> add("效果:"+x, cid, rec.牌名, "—", null));
+    (rec.effects||[]).forEach(x=> add("效果:"+x, cid, rec.牌名, "—", [], null));
   }
 
   document.getElementById("sCards").textContent = Object.keys(window._chan).length.toLocaleString();
   document.getElementById("sChan").textContent  = Object.keys(CH).length.toLocaleString();
   document.getElementById("sEntry").textContent = entries.toLocaleString();
 
-  // 圖例：通用 role 逐一列；頻道專屬詞（提供/免空/圈內/容量…）數量多又同色，併成一條
-  const allRoles = Object.keys(CH).reduce((acc,n)=>{
-    for(const r in CH[n].roles) acc[r] = (acc[r]||0) + CH[n].roles[r];
-    return acc;
-  }, {});
+  // 圖例：通用 role 逐一列；屬性（提供/免空/圈內/容量…）數量多又同色，併成一條
+  const allRoles = {}, allAttrs = {};
+  Object.keys(CH).forEach(n=>{
+    for(const r in CH[n].roles) allRoles[r] = (allRoles[r]||0) + CH[n].roles[r];
+    for(const a in CH[n].attrs) allAttrs[a] = (allAttrs[a]||0) + CH[n].attrs[a];
+  });
   const common = ROLE_ORDER.filter(r=> allRoles[r]);
-  const special = Object.keys(allRoles).filter(r=> r!=="—" && !ROLE_ORDER.includes(r));
+  const special = Object.keys(allAttrs).sort((a,b)=> allAttrs[b]-allAttrs[a]);
   document.getElementById("legend").innerHTML =
     common.map(r=>`<span><i style="background:${roleColor(r)}"></i>${r}</span>`).join("")
-    + (special.length ? `<span><i style="background:${OTHER_ROLE_COLOR}"></i>頻道專屬詞（${special.length} 種：${special.slice(0,4).join("／")}…）</span>` : "")
+    + (special.length ? `<span><i style="background:${OTHER_ROLE_COLOR}"></i>屬性 attr（${special.length} 種：${special.slice(0,4).join("／")}…）</span>` : "")
     + `<span><span class="dot dG"></span>行動格</span><span><span class="dot dA"></span>行動</span>`;
 
   // 把所有頻道分進群組（分組表沒列到的自動進「其他」）
@@ -276,6 +288,8 @@ function render(){
       const tot = rs.reduce((s,r)=> s + o.roles[r], 0) || 1;
       const bar = rs.map(r=>`<span style="width:${o.roles[r]/tot*100}%;background:${roleColor(r)}"></span>`).join("");
       const roleTxt = rs.filter(r=>r!=="—").map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—";
+      const as = Object.keys(o.attrs).sort((a,b)=> o.attrs[b]-o.attrs[a]);
+      const attrTxt = as.length ? `<div class="ct" style="margin-top:2px">屬性：${as.map(a=>`${a} ${o.attrs[a]}`).join(" / ")}</div>` : "";
       const fs = sortedFlav(o.flav);
       const flav = fs.length ? `<div class="flav">${fs.map(f=>{
         const dot = f==="行動格" ? '<span class="dot dG"></span>' : f==="行動" ? '<span class="dot dA"></span>' : "";
@@ -283,8 +297,8 @@ function render(){
       }).join("")}</div>` : "";
       const note = NOTE[name] ? `<div class="ct" style="margin-top:4px">${NOTE[name]}</div>` : "";
       const el = document.createElement("div"); el.className = "ch";
-      el.innerHTML = `<div class="nm">${name.replace("格綁定:","🔗 ").replace("效果:","✨ ")}</div>
-        <div class="ct">${o.cards.length} 張卡　·　${roleTxt}</div>
+      el.innerHTML = `<div class="nm">${dispName(name)}</div>
+        <div class="ct">${o.cards.length} 張卡　·　${roleTxt}</div>${attrTxt}
         <div class="bar">${bar}</div>
         ${flav}${note}`;
       el.onclick = ()=> openDrawer(name);
@@ -294,10 +308,12 @@ function render(){
   });
 }
 
+function dispName(name){ return name==="格綁定" ? "🔗 格綁定" : name.replace("效果:","✨ "); }
+
 function openDrawer(name){
   const o = CH[name];
   const rs = sortedRoles(o.roles).filter(r=>r!=="—");
-  document.getElementById("dName").textContent = name.replace("格綁定:","🔗 ").replace("效果:","✨ ");
+  document.getElementById("dName").textContent = dispName(name);
   document.getElementById("dMeta").textContent =
     `${o.cards.length} 張　·　` + (rs.map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—");
   const body = document.getElementById("dBody"); body.innerHTML = "";
@@ -306,8 +322,9 @@ function openDrawer(name){
     const tags = c.tags.map(t=>{
       const rt = t.role==="—" ? "" :
         `<span class="t" style="background:${roleColor(t.role)}22;color:${roleColor(t.role)}">${t.role}</span>`;
-      const ft = t.flav ? `<span class="t ${t.flav==="行動"?"ta":"tg"}">${t.flav}</span>` : "";
-      return rt + ft;
+      const at = t.attrs.map(a=>`<span class="t tb">${a}</span>`).join("");
+      const ft = t.flav ? `<span class="t ${t.flav==="行動"?"ta":POOLS.has(t.flav)?"tp":"tg"}">${t.flav}</span>` : "";
+      return rt + at + ft;
     }).join(" ");
     const desc = (CARDS[c.cid]||"").slice(0,70);
     const row = document.createElement("div"); row.className = "row";
