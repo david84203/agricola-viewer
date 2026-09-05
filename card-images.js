@@ -65,7 +65,9 @@
     if (!id) return '';
     const deck = sanitizePart(getCardDeck(card));
     const rel = (deck && manifest.byDeckId?.[`${deck}/${id}`]) || manifest.byId?.[id] || '';
-    return rel ? CARD_IMG_CDN + rel : '';
+    if (!rel) return '';
+    // 絕對網址原樣用（主要發展卡 M01～M10 的圖直接吃 LUGA 現成的 online-table 卡圖）
+    return /^https?:\/\//.test(rel) ? rel : CARD_IMG_CDN + rel;
   }
 
   // 卡圖解碼後一張約 2MB，縮圖牆一次上千張會炸掉記憶體，只留最近用到的

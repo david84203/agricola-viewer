@@ -1,6 +1,16 @@
 {
-  "version": "20260830-k116-granary",
+  "version": "20260905-major10-reference",
   "byId": {
+    "M01": "https://lulucola.pages.dev/images/online-table/M01.webp",
+    "M02": "https://lulucola.pages.dev/images/online-table/M02.webp",
+    "M03": "https://lulucola.pages.dev/images/online-table/M03.webp",
+    "M04": "https://lulucola.pages.dev/images/online-table/M04.webp",
+    "M05": "https://lulucola.pages.dev/images/online-table/M05.webp",
+    "M06": "https://lulucola.pages.dev/images/online-table/M06.webp",
+    "M07": "https://lulucola.pages.dev/images/online-table/M07.webp",
+    "M08": "https://lulucola.pages.dev/images/online-table/M08.webp",
+    "M09": "https://lulucola.pages.dev/images/online-table/M09.webp",
+    "M10": "https://lulucola.pages.dev/images/online-table/M10.webp",
     "4206": "images/cards/G5/4206.webp",
     "4250": "images/cards/G8/4250.webp",
     "4251": "images/cards/G8/4251.webp",

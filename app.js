@@ -35,8 +35,12 @@ let onlineImplMap = new Map();    // 卡片ID → 線上實作機制中文（onl
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
   const implViewer = typeof isImplStatusViewer === 'function' && isImplStatusViewer();
-  const [base, overrides, banGroups, dupPairs, bgaData, effectsData, onlineImplData] = await Promise.all([
+  const [base, refCards, overrides, banGroups, dupPairs, bgaData, effectsData, onlineImplData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
+    // 主要發展卡 10 張「參考卡」（reference:true）：只在這頁有卡片頁，故意不放進 cards.json——
+    // LUGA 引擎會整份抓 cards.json 發牌（非職業一律當次發），放進去就會被發到牌堆／上帝搜尋。
+    // 輪抽／排名／tier／清單頁都只讀 cards.json，自然排除。
+    fetch('./reference-cards.json').then(r => r.json()).catch(() => []),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
     typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
@@ -50,9 +54,10 @@ async function loadCards() {
   effectsById = new Map((effectsData || []).map(e => [e.cardId, e]));
   onlineImplMap = new Map(onlineImplData && onlineImplData.cards ? Object.entries(onlineImplData.cards) : []);
 
-  allCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
+  const realCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
+  allCards = realCards.concat(refCards);
 
-  latestCards = allCards.slice(-LATEST_COUNT).reverse();
+  latestCards = realCards.slice(-LATEST_COUNT).reverse();
   latestKeySet = new Set(latestCards.map(getCardKey));
 
   const dupInfo = await DuplicateCards.loadDuplicateInfo(allCards, dupPairs);
@@ -68,10 +73,10 @@ async function loadCards() {
 
   populateDeckFilter();
   if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
-  document.getElementById('totalCount').textContent = allCards.length;
-  const _bannedKeys = new Set(allCards.filter(c => BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))).map(getCardKey));
+  document.getElementById('totalCount').textContent = realCards.length;
+  const _bannedKeys = new Set(realCards.filter(c => BANNED_GROUPS.some(g => g.ids.includes(c['卡片ID']))).map(getCardKey));
   const _excluded = new Set([..._bannedKeys, ...dupNonCanonical]);
-  document.getElementById('netCount').textContent = allCards.length - _excluded.size;
+  document.getElementById('netCount').textContent = realCards.length - _excluded.size;
   applyFilters();
 }
 
@@ -453,6 +458,7 @@ function createCardEl(card, idx) {
   const typeBadgeClass = `badge-${card.card_type}`;
   const typeName = card.card_type === 'minor' ? '次要發展卡'
                  : card.card_type === 'occupation' ? '職業卡'
+                 : card.card_type === 'major' ? '主要發展卡'
                  : '<span class="badge-both-minor">次要及</span><span class="badge-both-occ">主要發展卡</span>';
 
   const isDupNonCanon = dupNonCanonical.has(getCardKey(card));
@@ -470,6 +476,7 @@ function createCardEl(card, idx) {
   const minus = card['負分標記'] === '有';
   const pass = card['是否傳遞'] === '是';
   const tagsHtml = [
+    card.reference ? `<span class="tag tag-ref">參考卡</span>` : '',
     bga   ? `<span class="tag tag-bga">BGA</span>` : '',
     banned ? `<span class="tag tag-ban">禁卡</span>` : '',
     vp    ? `<span class="tag ${String(card['勝利點數']).startsWith('-') ? 'tag-vp-neg' : 'tag-vp'}">VP:${card['勝利點數']}</span>` : '',

@@ -3,6 +3,7 @@
   function typeName(card) {
     if (card.card_type === 'minor') return '次要發展卡';
     if (card.card_type === 'occupation') return '職業卡';
+    if (card.card_type === 'major') return '主要發展卡';
     return '次要發展卡及主要發展卡';
   }
 

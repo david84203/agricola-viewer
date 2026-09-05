@@ -343,10 +343,11 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeDrawer(); });
 
 Promise.all([
   fetch("channels.json").then(r=>r.json()),
-  fetch("cards.json").then(r=>r.json()).catch(()=>[])
-]).then(([chan, cards])=>{
+  fetch("cards.json").then(r=>r.json()).catch(()=>[]),
+  fetch("reference-cards.json").then(r=>r.json()).catch(()=>[])   // 主發 10 張參考卡（M01～M10）的說明文
+]).then(([chan, cards, refCards])=>{
   window._chan = chan;
-  const arr = Array.isArray(cards)?cards:(cards.cards||[]);
+  const arr = (Array.isArray(cards)?cards:(cards.cards||[])).concat(refCards||[]);
   arr.forEach(c=> CARDS[c.卡片ID]=c.說明||"");
   render();
 }).catch(e=>{ document.getElementById("groups").innerHTML="<p class='muted'>讀不到 channels.json／cards.json。請用 <code>npx serve</code> 在 agricola-viewer 目錄開此頁（port 3333），不要直接雙擊檔案。</p>"; });
