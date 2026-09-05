@@ -1,0 +1,4 @@
+{
+  "_說明": "人工覆寫 card-profile.json 的推導結果。key＝卡片ID；欄位 types／routes 整個取代推導值，note 原樣帶進 profile。底線開頭的 key 會被 tools/build_card_profile.cjs 忽略。重跑腳本不會蓋掉這份。",
+  "_範例": { "types": ["建材供給"], "routes": [], "note": "任選建材只能掛貨物母層，推導看不到" }
+}
