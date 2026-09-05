@@ -6,7 +6,7 @@
         第三～七節（判定規則全在那裡，改規則先改規格再改這裡）。
 
    用法：node tools/build_card_profile.cjs [--report <md路徑>] [--exclusions <json路徑>] [--dry]
-     --report      另出抽樣校對檔（每類 10 張＋「—」全列）給 Lu 掃
+     --report      另出抽樣校對檔（每類 N 張＋「—」全列）給 Lu 掃；--sample N 預設 10
      --exclusions  排除卡名單，預設 ../agricola-online/exclusions_audit.json
                    （一定要先跑 agricola-online 的 audit_exclusions.cjs --json，不可手打）
      --dry         只印統計不寫檔
@@ -32,6 +32,7 @@ const argv = process.argv.slice(2);
 const argOf = (flag) => { const i = argv.indexOf(flag); return i >= 0 ? argv[i + 1] : null; };
 const DRY = argv.includes('--dry');
 const REPORT = argOf('--report');
+const SAMPLE = Number(argOf('--sample')) || 10; // 校對檔每類抽幾張
 const EXCL = path.resolve(argOf('--exclusions') || path.join(VIEWER, '..', 'agricola-online', 'exclusions_audit.json'));
 const OUT = path.join(VIEWER, 'card-profile.json');
 const OVR = path.join(VIEWER, 'card-profile-overrides.json');
@@ -40,7 +41,8 @@ const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const cid = (c) => String(c['卡片ID'] ?? '').trim();
 
 // ── 規格第三節：類型（順序＝同數時的先後）────────────────────────
-const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '打牌連鎖', '終局計分', '干擾互動'];
+// 0905 grill 定 10 類；0905 晚 Lu 加三類（減免資源／不卡格／加強行動）成 13 類，裁定見 三新類裁定_20260905.md
+const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '減免資源', '不卡格', '加強行動', '打牌連鎖', '終局計分', '干擾互動'];
 const LEAF = { 建築資源: ['木頭', '磚頭', '石頭', '蘆葦'], 作物: ['麥子', '蔬菜'], 動物: ['羊', '野豬', '牛'] };
 // 每條規則：[頻道集合, 判定函式(entry)→bool]
 const has = (e, r) => (e.role || []).includes(r);
@@ -58,6 +60,9 @@ const TYPE_RULES = {
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isGet(e)),
   家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && attrHas(e, '免空')),
   行動加速: (e) => (e.ch === '額外行動' && isCause(e)) || (e.ch === '格綁定' && has(e, 'bind')),
+  減免資源: (e) => e.ch === '減免資源' && isCause(e), // attr 替代＝可用另一種資源付（不開第 14 類）
+  不卡格: (e) => e.ch === '不卡格' && isCause(e),
+  加強行動: (e) => e.ch === '加強行動' && isCause(e), // attr 做兩次／加做行動
   打牌連鎖: (e) => ['打職業', '打發展'].includes(e.ch) && isCause(e),
   // 終局計分：不看頻道（下面用 紅利分數 欄）；干擾互動：暫空
 };
@@ -218,21 +223,21 @@ if (REPORT) {
   const chTxt = (id) => entriesOf(id).map((e) => `${e.ch}${e.role && e.role.length ? '·' + e.role.join('+') : ''}${e.attr ? '(' + e.attr.join('/') + ')' : ''}`).join('、');
 
   const md = [];
-  md.push(`# 農家樂 卡片類型 抽樣校對（${new Date().toISOString().slice(0, 10)}）`, '');
-  md.push('> 工序 3 推導腳本 `tools/build_card_profile.cjs` 的產出。每類抽 10 張（固定種子，重跑同一批）＋「—」全列。', '> 打勾＝對；分錯的在該行後面寫「應為 X」，我會收進 `card-profile-overrides.json`，不改規則。', '');
+  md.push(`# 農家樂 卡片類型 抽樣校對（${new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10)}）`, '');
+  md.push(`> 工序 3 推導腳本 \`tools/build_card_profile.cjs\` 的產出。每類抽 ${SAMPLE} 張（固定種子，重跑同一批）＋「—」全列。`, '> 打勾＝對；分錯的在該行後面寫「應為 X」，我會收進 `card-profile-overrides.json`，不改規則。', '');
   md.push('## 統計', '', `- 母數 ${cards.length} 張（排除 ${nExcluded}）；「—」${stats.none.length + stats.noChannel.length} 張`, `- 主類型：${fmt(stats.main, TYPE_ORDER)}`, `- 路線：${fmt(stats.route, ROUTE_ORDER)}`, '');
-  md.push('## 一、類型抽樣（每類 10 張）', '');
+  md.push(`## 一、類型抽樣（每類 ${SAMPLE} 張）`, '');
   for (const t of TYPE_ORDER) {
     const pool = cards.map(cid).filter((id) => profile[id].types.includes(t));
     md.push(`### ${t}（共 ${pool.length} 張）`, '');
     if (!pool.length) md.push('（暫無卡）', '');
-    else md.push(...sample(pool, 10).map(row), '');
+    else md.push(...sample(pool, SAMPLE).map(row), '');
   }
-  md.push('## 二、路線抽樣（每條 10 張）', '');
+  md.push(`## 二、路線抽樣（每條 ${SAMPLE} 張）`, '');
   for (const r of ROUTE_ORDER) {
     const pool = cards.map(cid).filter((id) => profile[id].routes.includes(r));
     md.push(`### ${r}（共 ${pool.length} 張）`, '');
-    md.push(...sample(pool, 10).map(row), '');
+    md.push(...sample(pool, SAMPLE).map(row), '');
   }
   md.push(`## 三、「—」全列：有頻道資料但推不出類型（${stats.none.length} 張）`, '', '> 這些卡的頻道只有 read／react／pay／狀態，沒有 get／cause。看一眼：是真的沒產出（純條件卡）、還是頻道漏標。', '');
   for (const id of stats.none) md.push(`- [ ] **${profile[id].name}**（${id}）　頻道：${chTxt(id)}　路線：${profile[id].routes.join('／') || '—'}\n  ${desc(id)}…`);
