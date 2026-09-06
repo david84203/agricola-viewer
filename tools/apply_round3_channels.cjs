@@ -58,6 +58,33 @@ const Q4_ADD = { // 預審檔 A 節查到的頻道漏標（Q4）；照同型卡�
 const Q5_REPLACE = { // 頂樓：木頭是從個人供應區拿去放新房間＝消耗，不是取得
   'WM060': { match: (e) => e.ch === '木頭' && (e.role || []).includes('get'), to: { ch: '木頭', role: ['pay'] } },
 };
+// ── 第四輪（0907 凌晨 Lu grill 裁定，規格第十一節「執行紀錄・第四輪」）：`--round4` 才套 ──
+const ROUND = process.argv.includes('--round4') ? 4 : 3;
+const ROUND4 = [
+  // 加強行動判不出 5 張：兩效果並存的 3 張兩類都標；門檻型 2 張維持加強行動
+  { id: '6445-5', add: [{ ch: '額外行動', role: ['cause'] }] },  // 嬰兒食品
+  { id: '8441-5', add: [{ ch: '額外行動', role: ['cause'] }] },  // 兼職教師
+  { id: '8785-4', add: [{ ch: '額外行動', role: ['cause'] }] },  // 仙人掌農夫
+  // 預審 B1：「你每有 N 個 X」計數條件沒 read 頻道
+  { id: '7082', add: [{ ch: '職業數', role: ['read'] }] },       // 七大奇蹟
+  { id: '10084-4', add: [{ ch: '發展數', role: ['read'] }] },    // 胡迪
+  { id: '8765', add: [{ ch: '動物', role: ['read'] }, { ch: '作物', role: ['read'] }] }, // 諾亞的祝福
+  { id: 'E117', add: [{ ch: '已播種田', role: ['read'] }] },     // 菸斗吸菸者：至少 1 塊麥田
+  // 預審 B2：role 標反
+  { id: '10559-5', remove: (e) => e.ch === '食物' && (e.role || []).includes('get') },          // 公平收購：只有付食物
+  { id: '11037-2', replace: (e) => e.ch === '木頭' && (e.role || []).includes('get'), to: { ch: '木頭', role: ['pay'] } }, // 廊橋：木頭放上卡
+  { id: '7012-6', replace: (e) => e.ch === '增加家庭成員', to: { ch: '增加家庭成員', role: ['react'], on: '行動' }, add: [{ ch: '動物', role: ['get'], from: '供應' }] }, // 故事書
+  // 蓋屋路線重定義：女繼承人三材質都有效果＝不算任何蓋屋路線；面具收藏家漏標磚
+  { id: 'WM027', remove: (e) => e.ch === '房舍材質' },
+  { id: '9118-3', add: [{ ch: '房舍材質', role: [], attr: ['磚'] }] },
+  // 方向判不出 5 筆＋花園犁田者漏標
+  { id: 'NL018', dir: { 房間數: '無方向' } },   // 前庭花園：看的是房邊空地
+  { id: 'NL026', dir: { 房間數: '無方向' } },   // 花園木
+  { id: '11941-3', dir: { 家庭人數: '無方向' } }, // 家庭計畫：第三子生人不卡，跟臥室同組
+  { id: '11380-4', dir: { 家庭人數: '無方向' } }, // 收據：通用
+  { id: 'NL083', dir: { 家庭人數: '多' } },     // 製籃者之子：3 位以上
+  { id: '5366-19', add: [{ ch: '房間數', role: ['read'], attr: ['多'] }] }, // 花園犁田者：至少 5 間房舍
+];
 
 // ── channels.json 切塊 ─────────────────────────────────────────
 function splitBlocks(text) {
@@ -152,7 +179,26 @@ const entriesOf = (id) => { if (!plan[id]) { if (!oldJson[id]) die(`channels.jso
 const sameEntry = (a, b) => a.ch === b.ch && S(a.role || []) === S(b.role || []);
 const warn = [];
 
-if (TRIGGERED) {
+const setDir = (id, ch, v) => {
+  const list = entriesOf(id);
+  const e = list.find((x) => x.ch === ch && (x.role || []).includes('read'));
+  if (!e) die(`${id} 沒有 ${ch}·read entry`);
+  if ((e.attr || []).some((a) => ['多', '少', '無方向'].includes(a))) { count('方向 已有跳過'); return; }
+  const rebuilt = {}; for (const k of Object.keys(e)) { rebuilt[k] = e[k]; if (k === 'role' && !e.attr) rebuilt.attr = [v]; }
+  if (e.attr) rebuilt.attr = [...e.attr, v];
+  Object.keys(e).forEach((k) => delete e[k]); Object.assign(e, rebuilt);
+  count(`方向 ${v}`);
+};
+if (ROUND === 4) {
+  for (const op of ROUND4) {
+    const list = entriesOf(op.id);
+    if (op.remove) { const i = list.findIndex(op.remove); if (i < 0) die(`${op.id} 找不到要刪的 entry`); list.splice(i, 1); count('第四輪 刪'); }
+    if (op.replace) { const i = list.findIndex(op.replace); if (i < 0) die(`${op.id} 找不到要換的 entry`); list[i] = op.to; count('第四輪 換'); }
+    for (const e of op.add || []) { if (list.some((x) => sameEntry(x, e))) { warn.push(`${op.id} 已有 ${S(e)}，跳過`); continue; } list.push(e); count('第四輪 加'); }
+    for (const ch in op.dir || {}) setDir(op.id, ch, op.dir[ch]);
+  }
+}
+if (ROUND === 3 && TRIGGERED) {
   const all = [...TRIGGERED, ...KEEP, ...UNSURE];
   if (new Set(all).size !== all.length) die('重篩檔三個陣列有重複 ID');
   for (const id of TRIGGERED) {
@@ -164,7 +210,7 @@ if (TRIGGERED) {
   }
   console.log(`重篩：觸發式 ${TRIGGERED.length}／自己的格 ${KEEP.length}／判不出 ${UNSURE.length}（判不出不動，等 Lu）`);
 }
-if (DIRECTION) {
+if (ROUND === 3 && DIRECTION) {
   let n = 0, skip = [];
   for (const id in DIRECTION) for (const ch in DIRECTION[id]) {
     const v = DIRECTION[id][ch];
@@ -182,12 +228,12 @@ if (DIRECTION) {
   }
   console.log(`方向：補 ${n} 筆；判不出 ${skip.length} 筆不動${skip.length ? '：' + skip.join('、') : ''}`);
 }
-for (const id in Q4_ADD) for (const e of Q4_ADD[id]) {
+if (ROUND === 3) for (const id in Q4_ADD) for (const e of Q4_ADD[id]) {
   const list = entriesOf(id);
   if (list.some((x) => sameEntry(x, e))) { warn.push(`${id} 已有 ${S(e)}，跳過`); continue; }
   list.push(e); count('Q4 補 entry');
 }
-for (const id in Q5_REPLACE) {
+if (ROUND === 3) for (const id in Q5_REPLACE) {
   const list = entriesOf(id);
   const i = list.findIndex(Q5_REPLACE[id].match);
   if (i < 0) { warn.push(`${id} 找不到要換的 entry，跳過`); continue; }

@@ -74,11 +74,14 @@ const scoreTypes = (card) => {
   if (!(bonus === '有' || bonus.startsWith('有 '))) return [];
   const text = String(card['說明'] ?? '').replace(/\s+/g, '');
   if (!text.includes('遊戲結束')) return ['即時得分'];
-  return /立即.{0,6}分/.test(text) ? ['終局計分', '即時得分'] : ['終局計分'];
+  // 0907 Lu 裁定：雙標廢掉。含「遊戲結束」但「立即」6 字內接「分」（豪華暖爐：剩幾回合立刻拿幾分，「遊戲結束」講的是翻修限制）＝純即時
+  return /立即.{0,6}分/.test(text) ? ['即時得分'] : ['終局計分'];
 };
 
 // ── 規格第四節：路線（0906 第十一節：+翻修流、+小戶流 成 9 條）──────────
-const ROUTE_ORDER = ['石屋流', '木屋／磚屋流', '翻修流', '動物流', '農耕流', '大家庭流', '大房子流', '小戶流', '多牌流'];
+// 0907 Lu 裁定蓋屋路線：石屋流＝卡要求「住石屋」才生效（要早翻石／石屋起家）；磚屋流＝要求「住磚屋」或「磚或石都行」（翻到磚就夠）；
+// 要求「住木屋」是限制條件不是流派（初始就是木屋），木／三種都行 一律不算。舊名「木屋／磚屋流」改「磚屋流」。
+const ROUTE_ORDER = ['石屋流', '磚屋流', '翻修流', '動物流', '農耕流', '大家庭流', '大房子流', '小戶流', '多牌流'];
 const isRR = (e) => has(e, 'read') || has(e, 'react');
 const isState = (e) => !(e.role || []).length; // 只有 attr 的狀態型 entry（房舍材質·石、馬廄·圈內…）
 const isRead = (e) => has(e, 'read');
@@ -86,8 +89,8 @@ const isReact = (e) => has(e, 'react');
 // 房間數／家庭人數·read 的方向 attr（多／少／無方向；0906 sonnet 從卡文補，判定檔 房間家庭方向_20260906.md）
 // 沒方向或無方向＝兩邊都不算（Q13：「多」才算大房子流／大家庭流，「少」才算小戶流）
 const ROUTE_RULES = {
-  石屋流: (e) => e.ch === '房舍材質' && attrHas(e, '石'), // Q11：翻修·react 不再算石屋流
-  '木屋／磚屋流': (e) => e.ch === '房舍材質' && (attrHas(e, '木') || attrHas(e, '磚')),
+  石屋流: (e) => e.ch === '房舍材質' && attrHas(e, '石') && !attrHas(e, '磚') && !attrHas(e, '木'), // 只認「只能石屋」；Q11：翻修·react 不算
+  磚屋流: (e) => e.ch === '房舍材質' && attrHas(e, '磚') && !attrHas(e, '木'), // 磚、石或磚
   翻修流: (e) => e.ch === '翻修房舍' && isReact(e), // Q11／Q15：只認 react；翻修·cause 靠 combo 行連
   動物流: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isRR(e))
     || (['馬廄', '圈地'].includes(e.ch) && (isRR(e) || isState(e)))
@@ -110,19 +113,13 @@ function prereqRoutes(prereq) {
   const few = /至多|只有|恰好|仍|尚未|沒有/.test(p);
   const num = (re) => { const m = p.match(re); return m ? Number(m[1]) : null; };
   if (/羊|野豬|牛|動物|馬廄|圈地|柵欄/.test(p) && !/沒有/.test(p)) out.add('動物流');
-  if (/石屋/.test(p)) out.add('石屋流');
-  if (/木屋|磚屋/.test(p)) out.add('木屋／磚屋流');
-  const rooms = num(/(\d+)間/); // 「3間房間」「恰好2間木屋」
-  if (rooms !== null || /房間/.test(p)) {
-    if (rooms !== null && (few || rooms <= 2)) out.add('小戶流');
-    else if (rooms !== null && rooms >= 3) out.add('大房子流');
-    else if (/至少|或更多/.test(p)) out.add('大房子流');
-  }
-  const members = num(/(\d+)(位|名)(成人)?(家庭)?成員/); // 「恰好2位成員」「3名家庭成員」；「家庭成員在「X」行動格上」不算
-  if (members !== null) {
-    if (few || members <= 2) out.add('小戶流');
-    else out.add('大家庭流');
-  }
+  // 0907 Lu 裁定：先決只往「多」推，「只有／恰好 2」是趁早打的限制不是小戶流；3 房 3 人是基本盤，門檻 4 以上（實際只有 5 的條件）
+  if (/石屋/.test(p) && !/磚屋|木屋/.test(p)) out.add('石屋流');
+  if (/磚屋/.test(p) && !/木屋/.test(p)) out.add('磚屋流');
+  const rooms = num(/(\d+)間/); // 「3間房間」「恰好兩間石屋」
+  if (rooms !== null && rooms >= 4 && !few) out.add('大房子流');
+  const members = num(/(\d+)(位|名)(成人)?(家庭)?成員/); // 「5位家庭成員」；「家庭成員在「X」行動格上」不算
+  if (members !== null && members >= 4 && !few) out.add('大家庭流');
   if (/職業卡|發展卡|已打出的卡片/.test(p) && !few) out.add('多牌流'); // 「尚未打出職業卡」「至多1張職業卡」是「少」，不算多牌流
   if (/田|麥|菜|播種/.test(p) && !/沒有/.test(p)) out.add('農耕流');
   return [...out];
