@@ -49,6 +49,7 @@ function minPackKey(playerIdx, round) {
 let allCards   = [];
 let imageCache = {};
 let bgaIdMap   = {};  // ourCardId → bgaId, for non-ABCDE BGA cards
+let cardProfileMap = {}; // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 
 const rs = {
   phase: 'setup',  // setup | input | result
@@ -314,15 +315,17 @@ async function init() {
   }
 
 
-  const [data, dupInfo] = await Promise.all([
+  const [data, dupInfo, , , , profileData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     loadDupExclusions(),
     loadBanlist(),
     loadBgaIdMap(),
     window.CardImages?.load?.() || Promise.resolve(),
+    fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
   ]);
   allCards = data;
   dupExcludedIds = dupInfo;
+  cardProfileMap = profileData || {};
   buildBannedIdMap();
   buildSetupScreen();
   bindGlobalEvents();
@@ -2413,6 +2416,9 @@ function openModal(card) {
   document.getElementById('modalId').textContent    = card['卡片ID'] || '';
   CardModal.renderTypeBadge(document.getElementById('modalBadge'), card);
   document.getElementById('modalDesc').textContent  = card['說明'] || '—';
+
+  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']]);
 
   const fieldsEl  = document.getElementById('modalFields');
   CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));

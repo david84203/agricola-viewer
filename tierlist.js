@@ -95,6 +95,7 @@ function getTier(rankPct) {
 
 let allCards = [];
 let ratingsMap = {};
+let cardProfileMap = {};   // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 let imageCache = {};
 let activeFilter = 'all';
 let activeBga = false;
@@ -111,16 +112,18 @@ async function loadDupExclusions() {
 // ── Init ───────────────────────────────────────────
 async function init() {
   try {
-    const [cards, ratings, dupExcluded] = await Promise.all([
+    const [cards, ratings, dupExcluded, , , , profileData] = await Promise.all([
       fetch('./cards.json?v=20260608').then(r => r.json()),
       fetchAllRatings(),
       loadDupExclusions(),
       loadBanlist(),
       loadBgaIds(),
       window.CardImages?.load?.() || Promise.resolve(),
+      fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
     ]);
     allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
+    cardProfileMap = profileData || {};
     populateDeckFilter();
     renderTierList();
   } catch (err) {
@@ -413,10 +416,12 @@ function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
   const div = document.createElement('div');
   div.className = 'tier-card';
   div.dataset.search = `${card['牌名'] || ''} ${card['牌組'] || ''} ${card['卡片ID'] || ''}`.toLowerCase();
+  const profileEntry = cardProfileMap[card['卡片ID']];
+  const mainType = profileEntry && profileEntry.main;
   div.innerHTML = `
     <div class="tier-card-thumb"><canvas></canvas></div>
     <div class="tier-card-info">
-      <div class="tier-card-name">${card['牌名'] || '—'}</div>
+      <div class="tier-card-name">${card['牌名'] || '—'}${mainType ? `<span class="tier-card-type">${mainType}</span>` : ''}</div>
       <div class="tier-card-meta">
         <span class="tier-card-score">${Math.round(elo)}</span>
         ${isBanned ? '<span class="tier-card-ban">禁</span>' : ''}
@@ -604,6 +609,9 @@ function openModal(card) {
   document.getElementById('modalId').textContent = card['卡片ID'] || '';
   CardModal.renderTypeBadge(document.getElementById('modalBadge'), card);
   document.getElementById('modalDesc').textContent = card['說明'] || '—';
+
+  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']]);
 
   const fieldsEl = document.getElementById('modalFields');
   CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));

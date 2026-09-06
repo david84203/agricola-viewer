@@ -16,6 +16,7 @@ const RANK_RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 
 let rankAllCards  = [];
 let rankImageCache = {};
+let rankCardProfileMap = {};  // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 let rankBannedIds = new Set();
 let rankDupExclusions = new Set();
 let rankRatingsMap = null; // null = 未載入；載入後為 map（失敗維持 null → 退回純隨機）
@@ -195,8 +196,12 @@ function rankGetCardKey(card) {
 // ── Load cards ────────────────────────────────────
 async function loadRankCards() {
   try {
-    await (window.CardImages?.load?.() || Promise.resolve());
-    const res = await fetch('./cards.json');
+    const [, res, profileData] = await Promise.all([
+      window.CardImages?.load?.() || Promise.resolve(),
+      fetch('./cards.json'),
+      fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
+    ]);
+    rankCardProfileMap = profileData || {};
     const data = await res.json();
     const BGA_BANNED_IDS = ['A127','B010*','A010','B021','A048','C031','A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','A100','A132','B147','C058','B052','B018','C093','C130','C003*','B022'];
     rankAllCards = data.filter(c => {
@@ -726,6 +731,9 @@ function openRankModal(card) {
   document.getElementById('rankModalId').textContent = card['卡片ID'] || '';
   CardModal.renderTypeBadge(document.getElementById('rankModalBadge'), card);
   document.getElementById('rankModalDesc').textContent = card['說明'] || card['效果'] || '';
+
+  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), rankCardProfileMap[card['卡片ID']]);
 
   const fieldsEl = document.getElementById('rankModalFields');
   CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));

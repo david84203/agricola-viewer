@@ -141,7 +141,7 @@ const inScope = new Set(cards.map(cid));
 for (const id of inScope) {
   for (const e of entriesOf(id)) {
     if (isCause(e) || isGet(e)) (srcIdx[e.ch] ||= new Set()).add(id);
-    if (isReact(e)) (reactIdx[e.ch] ||= new Set()).add(id);
+    if (isReact(e) || has(e, 'pay')) (reactIdx[e.ch] ||= new Set()).add(id); // 0906 規格第 24 題：替代卡的 pay 視同 react 連 combo
   }
 }
 function deriveCombo(id, entries) {
@@ -151,7 +151,7 @@ function deriveCombo(id, entries) {
       const n = [...(reactIdx[e.ch] || [])].filter((x) => x !== id).length;
       if (n) (combo[e.ch] ||= {}).to = n;
     }
-    if (isReact(e)) {
+    if (isReact(e) || has(e, 'pay')) { // 0906 規格第 24 題：pay 視同 react
       const n = [...(srcIdx[e.ch] || [])].filter((x) => x !== id).length;
       if (n) (combo[e.ch] ||= {}).from = n;
     }

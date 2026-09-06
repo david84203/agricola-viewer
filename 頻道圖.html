@@ -156,7 +156,7 @@
    沒列到的頻道一律落到「其他（未分類）」——新開的頻道會自己冒出來，不會被靜靜丟掉。 */
 const GROUP_DEFS = [
   {key:"動作",   color:"var(--act)",   bg:"var(--actbg)",
-   names:["犁田","播種","收割","烤麵包","圈柵欄","蓋馬廄","擴建房舍","翻修房舍","打職業","打發展","增加家庭成員","額外行動"]},
+   names:["犁田","播種","收割","烤麵包","圈柵欄","蓋馬廄","擴建房舍","翻修房舍","打職業","打發展","增加家庭成員","額外行動","減免資源","不卡格","加強行動"]},
   {key:"資源",   color:"var(--res)",   bg:"var(--resbg)",
    names:["木頭","蘆葦","石頭","磚頭","羊","野豬","牛","動物","麥子","蔬菜","作物"]},
   {key:"狀態",   color:"var(--state)", bg:"var(--statebg)",
@@ -297,6 +297,7 @@ function render(){
       }).join("")}</div>` : "";
       const note = NOTE[name] ? `<div class="ct" style="margin-top:4px">${NOTE[name]}</div>` : "";
       const el = document.createElement("div"); el.className = "ch";
+      el.id = "ch-" + encodeURIComponent(name);
       el.innerHTML = `<div class="nm">${dispName(name)}</div>
         <div class="ct">${o.cards.length} 張卡　·　${roleTxt}</div>${attrTxt}
         <div class="bar">${bar}</div>
@@ -350,7 +351,19 @@ Promise.all([
   const arr = (Array.isArray(cards)?cards:(cards.cards||[])).concat(refCards||[]);
   arr.forEach(c=> CARDS[c.卡片ID]=c.說明||"");
   render();
+  tryOpenFromHash();
 }).catch(e=>{ document.getElementById("groups").innerHTML="<p class='muted'>讀不到 channels.json／cards.json。請用 <code>npx serve</code> 在 agricola-viewer 目錄開此頁（port 3333），不要直接雙擊檔案。</p>"; });
+
+// 讓外部連結（例如卡片視窗的 combo 數字）用 #頻道名 直接開抽屜；hash 不是已知頻道名就什麼都不做
+function tryOpenFromHash(){
+  let name = "";
+  try{ name = decodeURIComponent(location.hash.slice(1)); }catch(e){ return; }
+  if(!name || !CH[name]) return;
+  openDrawer(name);
+  const node = document.getElementById("ch-" + encodeURIComponent(name));
+  if(node) node.scrollIntoView({block:"center", behavior:"smooth"});
+}
+window.addEventListener("hashchange", tryOpenFromHash);
 </script>
 </body>
 </html>

@@ -31,11 +31,12 @@ let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 let bgaExtraIds = new Set();     // manually marked BGA card IDs
 let effectsById = new Map();     // 卡片ID → 結構化卡效（effects.json，載入失敗則靜默降級為空）
 let onlineImplMap = new Map();    // 卡片ID → 線上實作機制中文（online-implemented.json；GM/YOYO 專用徽章）
+let cardProfileMap = {};          // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
   const implViewer = typeof isImplStatusViewer === 'function' && isImplStatusViewer();
-  const [base, refCards, overrides, banGroups, dupPairs, bgaData, effectsData, onlineImplData] = await Promise.all([
+  const [base, refCards, overrides, banGroups, dupPairs, bgaData, effectsData, profileData, onlineImplData] = await Promise.all([
     fetch('./cards.json').then(r => r.json()),
     // 主要發展卡 10 張「參考卡」（reference:true）：只在這頁有卡片頁，故意不放進 cards.json——
     // LUGA 引擎會整份抓 cards.json 發牌（非職業一律當次發），放進去就會被發到牌堆／上帝搜尋。
@@ -46,12 +47,14 @@ async function loadCards() {
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
     typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
     fetch('./effects.json').then(r => r.json()).catch(() => []),
+    fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
     // 線上已實作清單：僅 GM/YOYO 需要，非白名單不抓（比照 impl-status 的私有原則）
     implViewer ? fetch('./online-implemented.json').then(r => r.json()).catch(() => null) : Promise.resolve(null),
     window.CardImages?.load?.() || Promise.resolve(),
     (implViewer && typeof ensureImplStatus === 'function') ? ensureImplStatus() : Promise.resolve(null),
   ]);
   effectsById = new Map((effectsData || []).map(e => [e.cardId, e]));
+  cardProfileMap = profileData || {};
   onlineImplMap = new Map(onlineImplData && onlineImplData.cards ? Object.entries(onlineImplData.cards) : []);
 
   const realCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
@@ -675,6 +678,9 @@ function openModal(card) {
   const badgeEl = document.getElementById('modalBadge');
   CardModal.renderTypeBadge(badgeEl, card);
   document.getElementById('modalDesc').textContent = card['說明'] || '—';
+
+  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']]);
 
   // Fields
   const fieldsEl = document.getElementById('modalFields');
