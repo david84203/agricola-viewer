@@ -43,7 +43,8 @@ const cid = (c) => String(c['卡片ID'] ?? '').trim();
 // ── 規格第三節：類型（順序＝同數時的先後）────────────────────────
 // 0905 grill 定 10 類；0905 晚 Lu 加三類（減免資源／不卡格／加強行動）成 13 類，裁定見 三新類裁定_20260905.md
 // 0906 晚 grill 第三輪（規格第十一節）：+即時得分 成 14 類；行動加速拔掉格綁定（Q6）；居住空間·提供 → 家庭成長（Q9）
-const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '減免資源', '不卡格', '加強行動', '打牌連鎖', '終局計分', '即時得分', '干擾互動'];
+// 0907 「—」346 張補頻道（規格第十二節）：+任意貨物 成 15 類；動物養殖認 馬廄／圈地 容量 attr；干擾互動改用卡文關鍵字
+const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '減免資源', '不卡格', '加強行動', '打牌連鎖', '任意貨物', '終局計分', '即時得分', '干擾互動'];
 const LEAF = { 建築資源: ['木頭', '磚頭', '石頭', '蘆葦'], 作物: ['麥子', '蔬菜'], 動物: ['羊', '野豬', '牛'] };
 // 每條規則：[頻道集合, 判定函式(entry)→bool]
 const has = (e, r) => (e.role || []).includes(r);
@@ -55,7 +56,8 @@ const TYPE_RULES = {
   建材供給: (e) => ['木頭', '磚頭', '石頭', '蘆葦', '建築資源'].includes(e.ch) && isGet(e),
   擴建房舍: (e) => ['擴建房舍', '翻修房舍'].includes(e.ch) && isCause(e),
   動物養殖: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isGet(e))
-    || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e)),
+    || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e))
+    || (['馬廄', '圈地'].includes(e.ch) && (attrHas(e, '容量') || attrHas(e, '容量大'))), // 0907 Lu：多養動物的容量備註要認得
   農耕播種: (e) => (['犁田', '播種', '收割', '封田'].includes(e.ch) && isCause(e))
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isGet(e)),
   家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && (attrHas(e, '免空') || attrHas(e, '提供'))), // Q9：提供 19 張全是家庭成員居住空間
@@ -155,8 +157,16 @@ function deriveTypes(card, entries) {
     for (const t of Object.keys(TYPE_RULES)) if (TYPE_RULES[t](e)) counts[t]++;
   }
   for (const t of scoreTypes(card)) counts[t] = 1;
+  // 0907 任意貨物（Lu）：只有母層 貨物·get、同卡沒有任何葉頻道 get ＝ 卡文寫「任意貨物」沒指明種類
+  if (entries.some((e) => e.ch === '貨物' && isGet(e)) && !entries.some((e) => e.ch !== '貨物' && isGet(e))) counts['任意貨物'] = 1;
+  if (isInteract(card)) counts['干擾互動'] = 1;
   return rank(TYPE_ORDER, counts);
 }
+// 0907 干擾互動（Lu 2A）：不等互動頻道，先用卡文關鍵字；「傳給左手邊玩家」是傳遞卡的特性不算互動，先剔掉那句
+// 0907 抽驗 19 張：另剔「將這張牌傳給」變體、「即使已被其他玩家佔據」（不卡格句型，不是互動）
+const PASS_RE = /將(其|此卡|這張牌)傳給你?左手邊的玩家[^。]*。?|即使已?被其他玩家佔據/g;
+const INTERACT_RE = /其他玩家|其它玩家|所有玩家|每位玩家|任意玩家|對手|左手邊|右手邊/;
+const isInteract = (card) => INTERACT_RE.test(String(card['說明'] ?? '').replace(PASS_RE, ''));
 function deriveRoutes(card, entries) {
   const counts = Object.fromEntries(ROUTE_ORDER.map((r) => [r, 0]));
   for (const e of entries) for (const r of ROUTE_ORDER) if (ROUTE_RULES[r](e)) counts[r]++;
