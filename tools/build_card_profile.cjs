@@ -99,7 +99,8 @@ const ROUTE_RULES = {
   大房子流: (e) => (e.ch === '房間數' && isRead(e) && attrHas(e, '多')) || (e.ch === '擴建房舍' && isReact(e)),
   小戶流: (e) => (['房間數', '家庭人數'].includes(e.ch) && isRead(e) && attrHas(e, '少')) // Q13
     || (e.ch === '居住空間' && (attrHas(e, '提供') || attrHas(e, '免空'))),
-  多牌流: (e) => (['職業數', '發展數', '手牌'].includes(e.ch) && isRead(e)) || (['打職業', '打發展'].includes(e.ch) && isReact(e)),
+  多牌流: (e) => (['職業數', '發展數', '手牌'].includes(e.ch) && isRead(e) && !attrHas(e, '尚未打出')) // 「尚未打出職業卡」是「少」，不算多牌流（0906 預審抓到，同型 29 張）
+    || (['打職業', '打發展'].includes(e.ch) && isReact(e)),
 };
 // Q12：cards.json 先決條件欄一律推路線（關鍵字；channels.json 零星的 read entry 不動）
 function prereqRoutes(prereq) {
