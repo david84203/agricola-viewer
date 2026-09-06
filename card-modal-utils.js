@@ -220,10 +220,11 @@
       if (row) rows.push(row);
     }
 
-    // 路線（最多 3 個）
-    if (Array.isArray(entry.routes) && entry.routes.length) {
+    // 路線（最多 3 個）；有類型但路線空＝「通用」（規格第十一節 Q2）。類型也空的整塊照舊不顯示
+    if (rows.length) {
+      const routes = (Array.isArray(entry.routes) && entry.routes.length) ? entry.routes : ['通用'];
       const row = profileRow('路線', (valueEl) => {
-        entry.routes.slice(0, 3).forEach((r) => {
+        routes.slice(0, 3).forEach((r) => {
           const tag = document.createElement('span');
           tag.className = 'card-profile-tag';
           tag.textContent = r;

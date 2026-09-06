@@ -20,7 +20,7 @@
    - 類型只看 role 含 get／cause（bind 視同 cause）；母層 貨物 一律忽略，
      建築資源／作物／動物 只在同卡沒有對應葉頻道 get 時才算。
    - 路線只看 read／react，以及「沒有 role 只有 attr」的狀態型 entry（房舍材質·石、馬廄·圈內…）。
-   - 終局計分＝cards.json 紅利分數 欄「有」或「有 (依條件)」，不看頻道。
+   - 終局計分／即時得分＝cards.json 紅利分數 欄「有」或「有 (依條件)」＋卡文有沒有「遊戲結束」，不看頻道（第十一節 Q10）。
    - 排序：命中 entry 數多者在前，同數依規格表順序；main＝第一個。全空＝「—」進待補清單。
    - combo：本卡 cause／get 的頻道 → 其他卡 react 的張數（to）；本卡 react 的頻道 → 其他卡 cause／get 的張數（from）。
    ══════════════════════════════════════════════════ */
@@ -42,7 +42,8 @@ const cid = (c) => String(c['卡片ID'] ?? '').trim();
 
 // ── 規格第三節：類型（順序＝同數時的先後）────────────────────────
 // 0905 grill 定 10 類；0905 晚 Lu 加三類（減免資源／不卡格／加強行動）成 13 類，裁定見 三新類裁定_20260905.md
-const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '減免資源', '不卡格', '加強行動', '打牌連鎖', '終局計分', '干擾互動'];
+// 0906 晚 grill 第三輪（規格第十一節）：+即時得分 成 14 類；行動加速拔掉格綁定（Q6）；居住空間·提供 → 家庭成長（Q9）
+const TYPE_ORDER = ['食物引擎', '建材供給', '擴建房舍', '動物養殖', '農耕播種', '家庭成長', '行動加速', '減免資源', '不卡格', '加強行動', '打牌連鎖', '終局計分', '即時得分', '干擾互動'];
 const LEAF = { 建築資源: ['木頭', '磚頭', '石頭', '蘆葦'], 作物: ['麥子', '蔬菜'], 動物: ['羊', '野豬', '牛'] };
 // 每條規則：[頻道集合, 判定函式(entry)→bool]
 const has = (e, r) => (e.role || []).includes(r);
@@ -54,39 +55,77 @@ const TYPE_RULES = {
   建材供給: (e) => ['木頭', '磚頭', '石頭', '蘆葦', '建築資源'].includes(e.ch) && isGet(e),
   擴建房舍: (e) => ['擴建房舍', '翻修房舍'].includes(e.ch) && isCause(e),
   動物養殖: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isGet(e))
-    || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e))
-    || (e.ch === '居住空間' && attrHas(e, '提供')),
+    || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e)),
   農耕播種: (e) => (['犁田', '播種', '收割', '封田'].includes(e.ch) && isCause(e))
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isGet(e)),
-  家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && attrHas(e, '免空')),
-  行動加速: (e) => (e.ch === '額外行動' && isCause(e)) || (e.ch === '格綁定' && has(e, 'bind')),
+  家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && (attrHas(e, '免空') || attrHas(e, '提供'))), // Q9：提供 19 張全是家庭成員居住空間
+  行動加速: (e) => e.ch === '額外行動' && isCause(e), // Q6：格綁定·bind 不算；Q7：觸發式已從加強行動改標成額外行動
   減免資源: (e) => e.ch === '減免資源' && isCause(e), // attr 替代＝可用另一種資源付（不開第 14 類）
   不卡格: (e) => e.ch === '不卡格' && isCause(e),
   加強行動: (e) => e.ch === '加強行動' && isCause(e), // attr 做兩次／加做行動
   打牌連鎖: (e) => ['打職業', '打發展'].includes(e.ch) && isCause(e),
-  // 終局計分：不看頻道（下面用 紅利分數 欄）；干擾互動：暫空
+  // 終局計分／即時得分：不看頻道（下面用 紅利分數 欄＋卡文關鍵字，Q10）；干擾互動：暫空
+};
+// Q10：紅利分數欄「有」→ 卡文含「遊戲結束」＝終局計分，不含＝即時得分；
+// 含「遊戲結束」但「立即」6 字內就接「分」（豪華暖爐那種）＝兩類都標。
+// 0906 抽驗 25 張：純即時／純終局 20/20 對；原本「含立即就雙標」5/5 錯（立即多半修飾別的動作），故收緊成緊鄰。
+const scoreTypes = (card) => {
+  const bonus = String(card['紅利分數'] ?? '').trim();
+  if (!(bonus === '有' || bonus.startsWith('有 '))) return [];
+  const text = String(card['說明'] ?? '').replace(/\s+/g, '');
+  if (!text.includes('遊戲結束')) return ['即時得分'];
+  return /立即.{0,6}分/.test(text) ? ['終局計分', '即時得分'] : ['終局計分'];
 };
 
-// ── 規格第四節：路線 ────────────────────────────────────────────
-const ROUTE_ORDER = ['石屋流', '木屋／磚屋流', '動物流', '農耕流', '大家庭流', '大房子流', '多牌流'];
+// ── 規格第四節：路線（0906 第十一節：+翻修流、+小戶流 成 9 條）──────────
+const ROUTE_ORDER = ['石屋流', '木屋／磚屋流', '翻修流', '動物流', '農耕流', '大家庭流', '大房子流', '小戶流', '多牌流'];
 const isRR = (e) => has(e, 'read') || has(e, 'react');
 const isState = (e) => !(e.role || []).length; // 只有 attr 的狀態型 entry（房舍材質·石、馬廄·圈內…）
 const isRead = (e) => has(e, 'read');
 const isReact = (e) => has(e, 'react');
+// 房間數／家庭人數·read 的方向 attr（多／少／無方向；0906 sonnet 從卡文補，判定檔 房間家庭方向_20260906.md）
+// 沒方向或無方向＝兩邊都不算（Q13：「多」才算大房子流／大家庭流，「少」才算小戶流）
 const ROUTE_RULES = {
-  石屋流: (e) => (e.ch === '房舍材質' && attrHas(e, '石')) || (e.ch === '翻修房舍' && isReact(e)),
+  石屋流: (e) => e.ch === '房舍材質' && attrHas(e, '石'), // Q11：翻修·react 不再算石屋流
   '木屋／磚屋流': (e) => e.ch === '房舍材質' && (attrHas(e, '木') || attrHas(e, '磚')),
+  翻修流: (e) => e.ch === '翻修房舍' && isReact(e), // Q11／Q15：只認 react；翻修·cause 靠 combo 行連
   動物流: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isRR(e))
     || (['馬廄', '圈地'].includes(e.ch) && (isRR(e) || isState(e)))
-    || (['圈柵欄', '蓋馬廄'].includes(e.ch) && isReact(e))
-    || (e.ch === '居住空間' && attrHas(e, '提供')),
+    || (['圈柵欄', '蓋馬廄'].includes(e.ch) && isReact(e)),
   農耕流: (e) => (['犁田', '播種', '收割', '烤麵包'].includes(e.ch) && isReact(e))
     || (['已播種田', '空田', '封田', '農田'].includes(e.ch) && (isRR(e) || isState(e)))
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isRR(e)),
-  大家庭流: (e) => (e.ch === '家庭人數' && isRead(e)) || (e.ch === '增加家庭成員' && isReact(e)) || (e.ch === '居住空間' && attrHas(e, '免空')),
-  大房子流: (e) => (e.ch === '房間數' && isRead(e)) || (e.ch === '擴建房舍' && isReact(e)),
+  大家庭流: (e) => (e.ch === '家庭人數' && isRead(e) && attrHas(e, '多')) || (e.ch === '增加家庭成員' && isReact(e)) || (e.ch === '居住空間' && attrHas(e, '免空')),
+  大房子流: (e) => (e.ch === '房間數' && isRead(e) && attrHas(e, '多')) || (e.ch === '擴建房舍' && isReact(e)),
+  小戶流: (e) => (['房間數', '家庭人數'].includes(e.ch) && isRead(e) && attrHas(e, '少')) // Q13
+    || (e.ch === '居住空間' && (attrHas(e, '提供') || attrHas(e, '免空'))),
   多牌流: (e) => (['職業數', '發展數', '手牌'].includes(e.ch) && isRead(e)) || (['打職業', '打發展'].includes(e.ch) && isReact(e)),
 };
+// Q12：cards.json 先決條件欄一律推路線（關鍵字；channels.json 零星的 read entry 不動）
+function prereqRoutes(prereq) {
+  const p = String(prereq ?? '').replace(/\s+/g, '');
+  if (!p || p === '無' || p === '見下文') return [];
+  const out = new Set();
+  const few = /至多|只有|恰好|仍|尚未|沒有/.test(p);
+  const num = (re) => { const m = p.match(re); return m ? Number(m[1]) : null; };
+  if (/羊|野豬|牛|動物|馬廄|圈地|柵欄/.test(p) && !/沒有/.test(p)) out.add('動物流');
+  if (/石屋/.test(p)) out.add('石屋流');
+  if (/木屋|磚屋/.test(p)) out.add('木屋／磚屋流');
+  const rooms = num(/(\d+)間/); // 「3間房間」「恰好2間木屋」
+  if (rooms !== null || /房間/.test(p)) {
+    if (rooms !== null && (few || rooms <= 2)) out.add('小戶流');
+    else if (rooms !== null && rooms >= 3) out.add('大房子流');
+    else if (/至少|或更多/.test(p)) out.add('大房子流');
+  }
+  const members = num(/(\d+)(位|名)(成人)?(家庭)?成員/); // 「恰好2位成員」「3名家庭成員」；「家庭成員在「X」行動格上」不算
+  if (members !== null) {
+    if (few || members <= 2) out.add('小戶流');
+    else out.add('大家庭流');
+  }
+  if (/職業卡|發展卡|已打出的卡片/.test(p) && !few) out.add('多牌流'); // 「尚未打出職業卡」「至多1張職業卡」是「少」，不算多牌流
+  if (/田|麥|菜|播種/.test(p) && !/沒有/.test(p)) out.add('農耕流');
+  return [...out];
+}
 
 // ── 讀檔 ───────────────────────────────────────────────────────
 if (!fs.existsSync(EXCL)) {
@@ -117,13 +156,13 @@ function deriveTypes(card, entries) {
     if (LEAF[e.ch] && isGet(e) && LEAF[e.ch].some((l) => leafGet.has(l))) continue; // 有葉頻道就不算母層
     for (const t of Object.keys(TYPE_RULES)) if (TYPE_RULES[t](e)) counts[t]++;
   }
-  const bonus = String(card['紅利分數'] ?? '').trim();
-  if (bonus === '有' || bonus.startsWith('有 ')) counts['終局計分'] = 1;
+  for (const t of scoreTypes(card)) counts[t] = 1;
   return rank(TYPE_ORDER, counts);
 }
-function deriveRoutes(entries) {
+function deriveRoutes(card, entries) {
   const counts = Object.fromEntries(ROUTE_ORDER.map((r) => [r, 0]));
   for (const e of entries) for (const r of ROUTE_ORDER) if (ROUTE_RULES[r](e)) counts[r]++;
+  for (const r of prereqRoutes(card['先決條件'])) counts[r]++;
   return rank(ROUTE_ORDER, counts);
 }
 function deriveCost(card, entries) {
@@ -166,7 +205,7 @@ for (const card of cards) {
   const id = cid(card);
   const entries = entriesOf(id);
   let types = deriveTypes(card, entries);
-  let routes = deriveRoutes(entries);
+  let routes = deriveRoutes(card, entries);
   const ov = overrides[id];
   if (ov) {
     stats.overridden++;
@@ -244,7 +283,7 @@ if (REPORT) {
   md.push('', `## 四、「—」全列：完全沒有頻道資料（${stats.noChannel.length} 張）`, '', '> channels.json 沒這張卡。要嘛補標，要嘛用覆寫檔直接給類型。', '');
   for (const id of stats.noChannel) md.push(`- [ ] **${profile[id].name}**（${id}）${byId[id]['類型'] ? '　' + byId[id]['類型'] : ''}\n  ${desc(id)}…`);
   // 資料互相打架：頻道標了 分數·get pool 紅利分數，cards.json 的 紅利分數 欄卻不是「有」
-  const clash = cards.map(cid).filter((id) => !profile[id].types.includes('終局計分') && entriesOf(id).some((e) => e.ch === '分數' && isGet(e) && e.pool === '紅利分數'));
+  const clash = cards.map(cid).filter((id) => !profile[id].types.some((t) => t === '終局計分' || t === '即時得分') && entriesOf(id).some((e) => e.ch === '分數' && isGet(e) && e.pool === '紅利分數'));
   md.push('', `## 五、資料打架：頻道標「紅利分數」但 cards.json 紅利分數欄不是「有」（${clash.length} 張）`, '', '> 二選一：改 cards.json 的欄位，或頻道標錯。翻卡圖為準。', '');
   for (const id of clash) md.push(`- [ ] **${profile[id].name}**（${id}）　紅利分數欄「${byId[id]['紅利分數'] ?? ''}」\n  ${desc(id)}…`);
   fs.writeFileSync(REPORT, md.join('\n') + '\n', 'utf8');
