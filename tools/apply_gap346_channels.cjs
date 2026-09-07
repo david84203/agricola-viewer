@@ -56,6 +56,8 @@ const CONTAINER = {
   '5927-8': '牛棚：6 頭牛', '9284-8': '廢棄筒倉：4 羊或 3 豬', '11680-2': '開放式農舍：2 隻', '7013-2': '巴夫洛夫制約：無 VP 次發上各 1 隻',
   '6100-2': '忠心的動物：1 隻', '7014-5': '古生物學家：每剩餘收成階段 2 隻', '7255-6': '動物魔術師：依已打出卡數容納 8/5/3/2',
   // B 判「無可標」但機制跟 A ③ 的牧羊犬（未使用區域）／依偎的豬（房舍）一模一樣，同型同標
+  // 0907 預審抓到、Lu 裁定「算」：主效果是別的，附帶「該區域／此卡可養 1 隻動物」
+  11852: '獵犬的窩：放木頭的區域可飼養 1 隻動物', '8983-3': '鰻魚養殖場：該區域可容納 1 隻動物', WM057: '動物托兒所：新生動物可放到此卡上',
   FL063: '比利時牧羊犬：未使用區域 2 羊（同牧羊犬）', FR033: '兒童天地：房舍多容納 1 隻（同依偎的豬）', G071: '牛鈴：每格未使用區域 2 牛（同牧羊犬）', BI22: '抗爭歌手：每格未使用空地 1 隻（同牧羊犬）',
 };
 // 主對話比照同型卡加碼（判讀判「判不出」，但同批次已有同機制卡判出來了；列進校對檔給 Lu 看）
@@ -72,6 +74,12 @@ const EXTRA = {
   // 迴力鏢 5807-15 純傳遞卡操作，沒有產出，留「—」
   // 校對檔第五節「資料打架」翻卡圖：懸賞金 7087-4 圖上明寫「此卡沒有紅利分數符號」＝頻道 分數·react+get 的 get 標錯，拿掉 get
   '7087-4': { fix: (e) => e.ch === '分數' && (e.role || []).includes('get'), to: { ch: '分數', role: ['react'], pool: '紅利分數' }, why: '懸賞金：卡圖明寫沒有紅利分數符號，分數只 react 不 get' },
+  // 0907 預審 8 張 → Lu 裁定
+  WA060: { fix: (e) => e.ch === '加強行動', to: { ch: '額外行動', role: ['cause'] }, why: '兩個孩子的媽：派到兩個不同格＝多一次派遣，不是同一行動做兩次（Lu：多一次派遣）' },
+  '10846-3': { fix: (e) => e.ch === '圈柵欄', to: { ch: '額外行動', role: ['cause'] }, why: '獨輪駕駛者：柵欄放在行動格之間當道路移動人員，不是農莊圈柵欄（Lu：多一次派遣）' },
+  WM070: { remove: (e) => ['打職業', '打發展'].includes(e.ch), why: '發條人：「視為職業卡與發展卡」只是給計數條件用，沒多打牌（Lu：不算連鎖）→ 留「—」' },
+  '6940-2': { remove: (e) => e.ch === '打職業', why: '發條人專家：同發條人（Lu：不算連鎖）→ 留「—」' },
+  WM022: { remove: (e) => e.ch === '貨物', add: ['磚頭', '蔬菜', '石頭', '麥子', '木頭', '蘆葦'].map((ch) => ({ ch, role: ['get'], from: '供應' })), why: '美食鑑賞家：堆疊每層指定種類（磚／菜／石／麥／木／葦），判讀 B 標母層貨物是標錯' },
 };
 // 校對檔第五節「資料打架」7 張翻卡圖（0907 主對話逐張看圖）：圖上有給分文字＋底部紅利分數符號的改「有」，同判讀 D 的判準
 const BONUS_EXTRA = {
@@ -300,6 +308,7 @@ for (const id in CONTAINER) {
   if (addEntry(id, validate(id, { ch: '圈地', role: [], attr: ['容量'] }), '容器')) note(id, `　↳ ${CONTAINER[id]}`);
 }
 for (const id in EXTRA) {
+  if (EXTRA[id].remove) { const list = entriesOf(id); const before = list.length; for (let i = list.length - 1; i >= 0; i--) if (EXTRA[id].remove(list[i])) list.splice(i, 1); if (list.length === before) die(`${id} 找不到要刪的 entry`); count('加碼 刪', before - list.length); note(id, `加碼 刪 ${before - list.length} 筆`); }
   for (const e of EXTRA[id].add || []) addEntry(id, validate(id, e), '加碼');
   if (EXTRA[id].fix) { const list = entriesOf(id); const i = list.findIndex(EXTRA[id].fix); if (i < 0) die(`${id} 找不到要修的 entry`); list[i] = validate(id, EXTRA[id].to); count('加碼 修'); note(id, `加碼 修 → ${S(EXTRA[id].to)}`); }
   note(id, `　↳ ${EXTRA[id].why}`);
@@ -310,7 +319,7 @@ const touched = Object.keys(plan).filter((id) => !oldJson[id] ? plan[id].length 
 const bad = touched.filter((id) => excluded[id] || excluded[id.replaceAll('*', '')]);
 if (bad.length) die(`混到排除卡：${bad.join('、')}`);
 for (const id of touched) for (const e of plan[id]) validate(id, e);
-const emptyNew = newCards.filter((c) => !plan[c.id].length).map((c) => c.id);
+const emptyNew = newCards.filter((c) => !plan[c.id].length && !(EXTRA[c.id] || {}).remove).map((c) => c.id); // Lu 裁定刪光的（發條人×2）本來就該留「—」
 if (emptyNew.length) die(`新卡沒 entry 卻被建了：${emptyNew}`);
 
 // ── 寫回 channels.json 文字層 ─────────────────────────────────────
