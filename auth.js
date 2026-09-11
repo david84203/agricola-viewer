@@ -125,6 +125,40 @@ async function fetchAccount(id) {
   }
 }
 
+// 帳號 ID 正規化：全形英數轉半形（中文輸入法常打出 ＫＧ）、去掉複製貼上夾帶的隱形字元。
+// 大小寫不動——既有帳號本來就區分大小寫，改靠「相似帳號提示」提醒。
+// 2026-09-11：KG 桌機登成一個長得一模一樣的另一個帳號，整局被判成觀戰者（房號 9UZE）。
+function normalizeAccountId(id) {
+  return String(id || '').normalize('NFKC').replace(/[\u00AD\u200B-\u200F\u2060\uFEFF]/g, '').trim();
+}
+
+// 找出只差大小寫、但已經存在的帳號（查無帳號時提醒「你是不是要登入 KG」）
+async function findSimilarAccountId(id) {
+  const capitalized = id.charAt(0).toUpperCase() + id.slice(1).toLowerCase();
+  const variants = [...new Set([id.toUpperCase(), id.toLowerCase(), capitalized])].filter(v => v !== id);
+  for (const v of variants) {
+    if ((await fetchAccount(v)).exists) return v;
+  }
+  return null;
+}
+
+// 依 ID＋PIN 找出要登入的帳號：先試正規化後的 ID，再試原字串（相容當初就用全形註冊的舊帳號）。
+// 回傳 { id, acc } / { badPin:true } / { missing:true, id }（兩種寫法都查無帳號）/ { error:true }
+async function resolveLogin(rawId, pin) {
+  const normId = normalizeAccountId(rawId);
+  const ids = [...new Set([normId, String(rawId || '').trim()])].filter(Boolean);
+  const hash = await hashPin(pin);
+  let anyExists = false;
+  for (const id of ids) {
+    const acc = await fetchAccount(id);
+    if (acc.error) return { error: true };
+    if (!acc.exists) continue;
+    anyExists = true;
+    if (acc.pinHash === hash) return { id, acc };
+  }
+  return anyExists ? { badPin: true } : { missing: true, id: normId };
+}
+
 // 建立新帳號（role 傳 null = 一般玩家；'rater' = 評分者）。回傳是否成功。
 async function createAccount(id, pin, role) {
   const fields = {
@@ -162,35 +196,32 @@ function persistLogin(id, docRole, settings) {
 // ── 統一登入（只登入、不自動建帳號；供評分者入口與線上大廳使用）──
 // 回傳：{ok:true,role,id} / {ok:false,error} / {needMigrate:true,id,code}（舊評分者用共用碼首次登入）
 async function loginAccount(id, pin) {
-  const trimmedId = id.trim();
-  if (!trimmedId) return { ok: false, error: '請輸入 ID' };
+  if (!normalizeAccountId(id)) return { ok: false, error: '請輸入 ID' };
   if (!pin)        return { ok: false, error: '請輸入 PIN' };
 
   const settings = await fetchAuthSettings();
-  const acc = await fetchAccount(trimmedId);
-  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
-
-  if (acc.exists) {
-    if (acc.pinHash !== await hashPin(pin)) {
-      return { ok: false, error: 'PIN 錯誤，請重試（忘記請聯絡管理員重設）' };
-    }
-    return persistLogin(trimmedId, acc.role, settings);
-  }
+  const found = await resolveLogin(id, pin);
+  if (found.error) return { ok: false, error: '網路錯誤，請重試' };
+  if (found.badPin) return { ok: false, error: 'PIN 錯誤，請重試（忘記請聯絡管理員重設）' };
+  if (!found.missing) return persistLogin(found.id, found.acc.role, settings);
 
   // 尚無個人帳號 → 若輸入的是共用通關密碼，視為舊評分者首次登入，帶去設定新 PIN
   if (settings.raterPin && pin === settings.raterPin) {
-    return { needMigrate: true, id: trimmedId, code: pin };
+    return { needMigrate: true, id: found.id, code: pin };
   }
+  const similarId = await findSimilarAccountId(found.id);
   return {
     ok: false,
     unregistered: true,
-    error: '查無此帳號或 PIN 錯誤。若你是評分者但還沒設定新密碼，請用「ID＋原本的通關密碼」登入一次，系統會帶你設定新密碼。',
+    error: similarId
+      ? `查無「${found.id}」這個帳號，但有相似的帳號「${similarId}」（大小寫要完全一樣）。如果那是你，請改用「${similarId}」登入。`
+      : '查無此帳號或 PIN 錯誤。若你是評分者但還沒設定新密碼，請用「ID＋原本的通關密碼」登入一次，系統會帶你設定新密碼。',
   };
 }
 
 // ── 評分者授權／舊帳號遷移：用共用碼換一組個人 PIN ──
 async function setRaterPin(id, code, newPin) {
-  const trimmedId = id.trim();
+  const trimmedId = normalizeAccountId(id);
   if (!trimmedId) return { ok: false, error: '請輸入 ID' };
   const settings = await fetchAuthSettings();
   if (!settings.raterPin || code !== settings.raterPin) return { ok: false, error: '授權碼錯誤' };
@@ -208,21 +239,17 @@ async function setRaterPin(id, code, newPin) {
 }
 
 // ── 玩家登入／自助註冊（首次登入即建立帳號）──
-async function loginPlayer(id, pin) {
-  const trimmedId = id.trim();
+// options.confirmCreate：玩家已確認要建新帳號；沒帶就只回 needConfirmCreate，不會建。
+async function loginPlayer(id, pin, options = {}) {
+  const trimmedId = normalizeAccountId(id);
   if (!trimmedId) return { ok: false, error: '請輸入 ID' };
   if (!pin)        return { ok: false, error: '請輸入 PIN' };
 
   const settings = await fetchAuthSettings();
-  const acc = await fetchAccount(trimmedId);
-  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
-
-  if (acc.exists) {
-    if (acc.pinHash !== await hashPin(pin)) {
-      return { ok: false, error: 'PIN 錯誤，請重試（ID 已被使用，若忘記 PIN 請聯絡管理員重設）' };
-    }
-    return persistLogin(trimmedId, acc.role, settings);
-  }
+  const found = await resolveLogin(id, pin);
+  if (found.error) return { ok: false, error: '網路錯誤，請重試' };
+  if (found.badPin) return { ok: false, error: 'PIN 錯誤，請重試（ID 已被使用，若忘記 PIN 請聯絡管理員重設）' };
+  if (!found.missing) return persistLogin(found.id, found.acc.role, settings);
 
   // 尚未被使用 → 自助建立玩家帳號
   if (!validatePin(pin)) return { ok: false, error: `PIN 至少 ${MIN_PIN_LEN} 碼，請重新設定` };
@@ -231,6 +258,10 @@ async function loginPlayer(id, pin) {
   }
   if (await isUsedAsRaterId(trimmedId)) {
     return { ok: false, error: `「${trimmedId}」已是評分者身份，請改用「評分者登入」設定密碼（或換一個 ID）` };
+  }
+  // 建帳號前先讓玩家確認：打錯大小寫就默默多一個空帳號，戰績、積分、皮膚都不在那邊。
+  if (!options.confirmCreate) {
+    return { needConfirmCreate: true, id: trimmedId, similarId: await findSimilarAccountId(trimmedId) };
   }
   const created = await createAccount(trimmedId, pin, null);
   if (!created) return { ok: false, error: '建立帳號失敗，請重試' };
@@ -424,7 +455,7 @@ function injectPlayerLoginModal() {
   modal.innerHTML = `
     <div class="auth-modal">
       <div class="auth-modal-title">玩家登入</div>
-      <p class="player-auth-hint">第一次登入會自動用此 ID＋PIN 建立帳號（PIN 至少 ${MIN_PIN_LEN} 碼），之後請固定用同一組登入。請自行記住，遺失需請管理員協助重設。</p>
+      <p class="player-auth-hint">第一次登入會先跟你確認，再用此 ID＋PIN 建立帳號（PIN 至少 ${MIN_PIN_LEN} 碼），之後請固定用同一組登入。請自行記住，遺失需請管理員協助重設。</p>
       <div class="auth-field">
         <label>你的 ID（暱稱）</label>
         <input type="text" id="playerAuthIdInput" class="auth-input" placeholder="設定一個好記的 ID" autocomplete="off" maxlength="20" />
@@ -462,6 +493,13 @@ function closePlayerLoginModal() {
   document.getElementById('playerAuthModal').style.display = 'none';
 }
 
+function createAccountPrompt({ id, similarId }) {
+  const hint = similarId
+    ? `已有相似的帳號「${similarId}」（大小寫要完全一樣）。如果那是你，請按「取消」改用「${similarId}」登入。`
+    : '如果你已經有帳號，請按「取消」檢查 ID 有沒有打錯（大小寫要完全一樣）。';
+  return `查無「${id}」這個帳號。\n\n${hint}\n\n確定要用「${id}」建立一個新帳號嗎？`;
+}
+
 async function doPlayerLogin() {
   const id  = document.getElementById('playerAuthIdInput').value.trim();
   const pin = document.getElementById('playerAuthPinInput').value;
@@ -473,7 +511,10 @@ async function doPlayerLogin() {
   err.textContent = '';
 
   try {
-    const result = await loginPlayer(id, pin);
+    let result = await loginPlayer(id, pin);
+    if (result.needConfirmCreate && confirm(createAccountPrompt(result))) {
+      result = await loginPlayer(id, pin, { confirmCreate: true });
+    }
     if (result.ok) {
       closePlayerLoginModal();
       refreshAuthBar();
@@ -481,6 +522,8 @@ async function doPlayerLogin() {
     } else if (result.needMigrate) {
       closePlayerLoginModal();
       openMigrateModal(result.id, result.code);
+    } else if (result.needConfirmCreate) {
+      err.textContent = '已取消建立帳號，請確認 ID 後再登入。';
     } else {
       err.textContent = result.error;
     }
