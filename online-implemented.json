@@ -1,6 +1,6 @@
 {
   "_note": "由 agricola-online/gen_online_implemented.cjs 自動產生，勿手改。id → 線上實作機制。",
-  "generatedAt": "2026-09-23T12:57:31.842Z",
+  "generatedAt": "2026-10-22T20:23:17.902Z",
   "count": 3563,
   "_excludedNote": "excluded＝已實作但被禁卡/重複卡排除、實際永遠抽不到的卡；effectiveCount＝count 扣掉它們。",
   "_exclusionsSource": "authoritative-audit",
@@ -1562,7 +1562,7 @@
     "I103": "收成付資源換食物",
     "C049": "收成付資源換食物",
     "C059": "終局計分自動",
-    "E132": "終局計分自動",
+    "E132": "終局消耗式計分（棄資源換分，結算時分配）",
     "M08": "終局消耗式計分（棄資源換分，結算時分配）",
     "M09": "終局消耗式計分（棄資源換分，結算時分配）",
     "M10": "終局消耗式計分（棄資源換分，結算時分配）",
