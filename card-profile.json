@@ -402,7 +402,7 @@
   "D047": {"name":"教堂墓地","types":["食物引擎"],"main":"食物引擎","routes":[],"cost":{"pay":[],"prereq":"你面前有10張卡*","face":"1石+1蘆葦","beg":false,"feed":false},"combo":{"食物":{"to":607}},"dual":false},
   "D034": {"name":"豪華旅館","types":["終局計分"],"main":"終局計分","routes":["石屋流"],"cost":{"pay":[],"prereq":null,"face":"1木+2磚","beg":false,"feed":false},"combo":{},"dual":false},
   "D059": {"name":"土坑烤爐","types":["食物引擎"],"main":"食物引擎","routes":["農耕流"],"cost":{"pay":["作物","動物"],"prereq":"退還1個火爐","face":null,"beg":false,"feed":false},"combo":{"烤麵包":{"to":71,"from":70},"作物":{"from":106},"食物":{"to":607},"動物":{"from":84}},"dual":true},
-  "D044": {"name":"森林井","types":["食物引擎","建材供給"],"main":"食物引擎","routes":["多牌流"],"cost":{"pay":[],"prereq":"2張職業卡","face":"1木+1食物","beg":false,"feed":false},"combo":{"木頭":{"to":177},"食物":{"to":607}},"dual":false},
+  "D044": {"name":"森林井","types":["食物引擎","建材供給"],"main":"食物引擎","routes":["多牌流"],"cost":{"pay":[],"prereq":"2張職業卡","face":"1石+1食物","beg":false,"feed":false},"combo":{"木頭":{"to":177},"食物":{"to":607}},"dual":false},
   "D063": {"name":"小階","types":["食物引擎"],"main":"食物引擎","routes":["農耕流"],"cost":{"pay":[],"prereq":null,"face":null,"beg":false,"feed":false},"combo":{"收割":{"from":38},"食物":{"to":607}},"dual":false},
   "D026": {"name":"木匠的庭院","types":["打牌連鎖"],"main":"打牌連鎖","routes":[],"cost":{"pay":[],"prereq":null,"face":"1木+1蘆葦","beg":false,"feed":false},"combo":{"打發展":{"to":91}},"dual":false},
   "D036": {"name":"品種註冊","types":["食物引擎","終局計分"],"main":"食物引擎","routes":["動物流"],"cost":{"pay":[],"prereq":"沒有羊","face":null,"beg":false,"feed":false},"combo":{"食物":{"to":607}},"dual":false},
