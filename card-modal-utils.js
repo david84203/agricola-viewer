@@ -295,9 +295,10 @@
       }
     }
 
-    // 最搭（1103）：頻道對得上最多的前 10 張，按搭配度排序
-    if (Array.isArray(entry.best) && entry.best.length) {
-      const row = profileRow('最搭', (valueEl) => {
+    // 推薦搭配（1103 原名「最搭」）：Lu 1103 判定規則不準先收起，規則重寫後把 SHOW_BEST 改回 true
+    const SHOW_BEST = false;
+    if (SHOW_BEST && Array.isArray(entry.best) && entry.best.length) {
+      const row = profileRow('推薦搭配', (valueEl) => {
         const span = document.createElement('span');
         span.className = 'card-profile-combo-item';
         span.textContent = entry.best.join('、');
