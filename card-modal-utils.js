@@ -169,6 +169,17 @@
       .card-profile-combo-item { color: var(--text2); }
       .card-profile-value a { color: var(--blue); font-weight: 600; text-decoration: none; }
       .card-profile-value a:hover { text-decoration: underline; }
+      .card-profile-dispute-btn { margin-left: auto; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border2); background: transparent; color: var(--text3); font-size: .72rem; cursor: pointer; }
+      .card-profile-dispute-btn:hover { color: var(--text2); border-color: var(--text3); }
+      .card-profile-dispute { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding: 8px; border: 1px dashed var(--border2); border-radius: 8px; }
+      .card-profile-dispute-hint { font-size: .75rem; color: var(--text3); }
+      .card-profile-dispute-chips { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: .8rem; color: var(--text2); }
+      .card-profile-dispute-chips label { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; }
+      .card-profile-dispute textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: .8rem; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border2); background: transparent; color: var(--text2); resize: vertical; }
+      .card-profile-dispute-actions { display: flex; align-items: center; gap: 8px; }
+      .card-profile-dispute-actions button { padding: 3px 14px; border-radius: 6px; border: 1px solid var(--gold); background: transparent; color: var(--gold2); font-size: .8rem; cursor: pointer; }
+      .card-profile-dispute-actions button:disabled { opacity: .5; cursor: default; }
+      .card-profile-dispute-msg { font-size: .75rem; color: var(--text3); }
     `;
     document.head.appendChild(style);
   }
@@ -194,6 +205,68 @@
     a.rel = 'noopener';
     a.textContent = String(n);
     return a;
+  }
+
+  // 推薦搭配異議（Lu 1103：任何使用者都能提，不限評分者／GM）→ Firestore agricola_best_disputes，一筆一則
+  const DISPUTE_URL = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/agricola_best_disputes';
+  function disputeForm(entry) {
+    const box = document.createElement('div');
+    box.className = 'card-profile-dispute';
+    const hint = document.createElement('div');
+    hint.className = 'card-profile-dispute-hint';
+    hint.textContent = '勾出不該推薦的卡，或寫下應該推哪些／理由：';
+    const chips = document.createElement('div');
+    chips.className = 'card-profile-dispute-chips';
+    const checks = entry.best.map((name) => {
+      const label = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = name;
+      label.append(cb, document.createTextNode(name));
+      chips.appendChild(label);
+      return cb;
+    });
+    const note = document.createElement('textarea');
+    note.maxLength = 500;
+    note.rows = 2;
+    note.placeholder = '例：犁具彼此是替代品，該配農田夢想家這類卡';
+    const send = document.createElement('button');
+    send.type = 'button';
+    send.textContent = '送出';
+    const msg = document.createElement('span');
+    msg.className = 'card-profile-dispute-msg';
+    send.addEventListener('click', async () => {
+      const wrong = checks.filter((c) => c.checked).map((c) => c.value);
+      const text = note.value.trim();
+      if (!wrong.length && !text) { msg.textContent = '請至少勾一張或寫一句理由'; return; }
+      const auth = typeof getAuth === 'function' ? getAuth() : null;
+      const str = (v) => ({ stringValue: String(v) });
+      const fields = {
+        cardName: str(entry.name),
+        shown: { arrayValue: { values: entry.best.map(str) } },
+        wrong: { arrayValue: { values: wrong.map(str) } },
+        note: str(text),
+        reporter: str((auth && (auth.displayId || auth.id)) || '訪客'),
+        role: str((auth && auth.role) || 'anonymous'),
+        status: str('pending'),
+        createdAt: { timestampValue: new Date().toISOString() },
+      };
+      send.disabled = true;
+      msg.textContent = '送出中…';
+      try {
+        const res = await fetch(DISPUTE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        box.replaceChildren(Object.assign(document.createElement('span'), { className: 'card-profile-dispute-msg', textContent: '已送出，謝謝！我們會依回報調整推薦規則。' }));
+      } catch (e) {
+        send.disabled = false;
+        msg.textContent = `送出失敗（${e.message}），請稍後再試`;
+      }
+    });
+    const actions = document.createElement('div');
+    actions.className = 'card-profile-dispute-actions';
+    actions.append(send, msg);
+    box.append(hint, chips, note, actions);
+    return box;
   }
 
   function renderProfile(entry) {
@@ -295,14 +368,22 @@
       }
     }
 
-    // 推薦搭配（1103 原名「最搭」）：Lu 1103 判定規則不準先收起，規則重寫後把 SHOW_BEST 改回 true
-    const SHOW_BEST = false;
+    // 推薦搭配（1103 原名「最搭」）：1103 晚規則重寫（同觸發點疊加／開路／免空同打法／衝突不推，見 build_card_profile.cjs deriveBest）後重開
+    const SHOW_BEST = true;
     if (SHOW_BEST && Array.isArray(entry.best) && entry.best.length) {
       const row = profileRow('推薦搭配', (valueEl) => {
         const span = document.createElement('span');
         span.className = 'card-profile-combo-item';
         span.textContent = entry.best.join('、');
-        valueEl.appendChild(span);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'card-profile-dispute-btn';
+        btn.textContent = '提出異議';
+        btn.addEventListener('click', () => {
+          const open = row.querySelector('.card-profile-dispute');
+          if (open) open.remove(); else row.appendChild(disputeForm(entry));
+        });
+        valueEl.append(span, btn);
       });
       if (row) rows.push(row);
     }

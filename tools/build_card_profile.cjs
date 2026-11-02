@@ -217,28 +217,83 @@ function deriveCombo(id, entries) {
 const TRAIT_ORDER = ['任務卡', '烹飪工具', '卡片農田', '動物飼養空間', '晚生不生'];
 const deriveTraits = (entries) => TRAIT_ORDER.filter((t) => entries.some((e) => e.ch === t));
 
-// ── 1103 藍圖 2：最搭前 10 張（Lu 1103 定 10 張）──────────────────
-// 分數＝兩卡之間對得上的頻道數（本卡 get/cause→對方 react/pay，或反過來；雙向都算，
-// 純 react 的卡才找得到餵牠的卡）。對方那一側超過 80 張的泛用頻道不計（跟視窗「連動 >80 隱藏」同門檻）。
-// 同分比稀有度：Σ 1/該頻道張數（越冷門的連動越像真 combo），再同分照卡片順序。
-const BEST_N = 10, GENERIC_MAX = 80;
-function deriveBest(id, entries) {
-  const score = new Map(); // otherId -> [count, weight]
-  const bump = (set, ch) => {
-    if (!set || set.size - (set.has(id) ? 1 : 0) > GENERIC_MAX) return;
+// ── 1103 藍圖 2：推薦搭配前 10 張（Lu 1103 定 10 張；同日晚重寫，舊版「我產出＝你吃」把同類卡互推、木頭被當泛用丟掉）──
+// 觸發點＝頻道＋時機（on 行動／行動格、from 場格…），兩卡要在「同一個觸發點」上才算真搭配：
+//   疊加 1 分：兩卡 react 同一觸發點（伐木工＋木頭推車＋石斧都吃「用木頭累積格」）
+//   開路 2 分：一張 cause 出另一張 react 的觸發點（森林主人開木頭格 → 伐木工；行動格 cause 也觸發「行動」react）
+//   同一頻道只取較高那種，不重複加（否則泛用 react 卡靠「又疊又開」灌分）
+//   同打法 3 分：兩張都標 居住空間·免空（收穫魔像、雙生子之母、農場幹事）
+//   打法衝突＝不推：免空卡 vs「增加家庭成員·cause 卻沒標免空」的卡（要空房間；維納斯神像、友愛之家）
+// 以上合計是主分，主分 0 不推。同主分才看副分：資源接力（我 get 的＝你 pay 的，食物／分數太泛不算）；
+// 再同分比專注度（對方整張卡有幾成在跟我連），再比稀有度 Σ1/觸發點張數，再照卡片順序。同名卡（別的版本）不推。
+const BEST_N = 10, PLAIN_RES = new Set(['食物', '分數', '負分']);
+const tkey = (e) => `${e.ch}|${e.on || ''}|${e.from || ''}`;
+const isNoRoom = (es) => es.some((e) => e.ch === '居住空間' && attrHas(e, '免空'));
+const needsRoom = (es) => !isNoRoom(es) && es.some((e) => e.ch === '增加家庭成員' && isCause(e));
+// 「每當其他玩家…」的 react 是別人觸發、不是跟我疊加（森林維護員、擅取木材者），不進觸發點索引
+// 有上限的動作（Lu 1103：田 5 塊就滿分，第 6 塊只能填空地分）：兩張都「多做這個動作」的卡是替代品不互推；
+// 加速卡該配的是「犁田時拿獎勵」（農田夢想家）與「吃空田」（花園設計師）的卡
+const CAPPED = new Set(['犁田']);
+const FIELD_STATE = new Set(['空田', '農田']);
+const OTHERS_REACT_RE = /(每當|每次|當)(其他|其它)玩家/;
+const cardById = new Map(cards.map((c) => [cid(c), c]));
+const bestIdx = { react: {}, cause: {} };
+const bestMeta = {};
+for (const id of inScope) {
+  const es = entriesOf(id);
+  const othersReact = OTHERS_REACT_RE.test(String(cardById.get(id)['說明'] ?? '').replace(/\s+/g, ''));
+  const m = { react: new Set(), cause: new Set(), get: new Set(), pay: new Set(), accel: new Set(), noRoom: isNoRoom(es), needRoom: needsRoom(es), n: es.length || 1 };
+  for (const e of es) {
+    if (isReact(e) && !othersReact) m.react.add(tkey(e));
+    if (FIELD_STATE.has(e.ch) && isRead(e) && !othersReact) m.react.add(`${e.ch}||`); // 看空田／農田數的卡也吃「多犁出來的田」
+    if (isCause(e)) {
+      m.cause.add(tkey(e));
+      if (e.on === '行動格') m.cause.add(`${e.ch}|行動|${e.from || ''}`); // 用行動格＝也做了那個行動
+      if (CAPPED.has(e.ch)) m.accel.add(e.ch);
+      if (e.ch === '犁田') for (const f of FIELD_STATE) m.cause.add(`${f}||`); // 犁出來的是空田
+    }
+    if (isGet(e) && !PLAIN_RES.has(e.ch)) m.get.add(e.ch);
+    if (has(e, 'pay') && !PLAIN_RES.has(e.ch)) m.pay.add(e.ch);
+  }
+  bestMeta[id] = m;
+  for (const k of m.react) (bestIdx.react[k] ||= new Set()).add(id);
+  for (const k of m.cause) (bestIdx.cause[k] ||= new Set()).add(id);
+}
+const noRoomIds = [...inScope].filter((id) => bestMeta[id].noRoom);
+function deriveBest(id) {
+  const me = bestMeta[id], myName = byIdName.get(id);
+  const score = new Map(); // otherId -> { ch: 最高連結分, rare }
+  const link = (set, k, pts) => {
+    if (!set) return;
+    const ch = k.split('|')[0];
     for (const o of set) {
       if (o === id) continue;
-      const s = score.get(o) || [0, 0];
-      s[0]++; s[1] += 1 / set.size;
+      const s = score.get(o) || { ch: {}, rare: 0 };
+      if ((s.ch[ch] || 0) < pts) s.ch[ch] = pts;
+      s.rare += 1 / set.size;
       score.set(o, s);
     }
   };
-  const outCh = new Set(entries.filter((e) => isCause(e) || isGet(e)).map((e) => e.ch));
-  const inCh = new Set(entries.filter((e) => isReact(e) || has(e, 'pay')).map((e) => e.ch));
-  for (const ch of outCh) bump(reactIdx[ch], ch);
-  for (const ch of inCh) bump(srcIdx[ch], ch);
-  return [...score.entries()]
-    .sort((a, b) => (b[1][0] - a[1][0]) || (b[1][1] - a[1][1]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
+  for (const k of me.react) { link(bestIdx.react[k], k, 1); link(bestIdx.cause[k], k, 2); }
+  for (const k of me.cause) link(bestIdx.react[k], k, 2);
+  const rows = [];
+  const cand = new Set(score.keys());
+  if (me.noRoom) for (const o of noRoomIds) if (o !== id) cand.add(o);
+  for (const o of cand) {
+    const om = bestMeta[o];
+    if (byIdName.get(o) === myName) continue;
+    if ((me.noRoom && om.needRoom) || (me.needRoom && om.noRoom)) continue;
+    if ([...me.accel].some((c) => om.accel.has(c))) continue; // 兩張都加速同一個有上限的動作＝替代品
+    const s = score.get(o) || { ch: {}, rare: 0 };
+    const main = Object.values(s.ch).reduce((a, b) => a + b, 0) + (me.noRoom && om.noRoom ? 3 : 0);
+    if (!main) continue;
+    let sub = 0;
+    for (const r of me.get) if (om.pay.has(r)) sub++;
+    for (const r of me.pay) if (om.get.has(r)) sub++;
+    const focus = (Object.keys(s.ch).length + sub) / om.n; // 對方整張卡有幾成繞著跟我的連結（伐木工 2/2 勝過木匠的長凳 2/5）
+    rows.push([o, main, sub, focus, s.rare]);
+  }
+  return rows.sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]) || (b[3] - a[3]) || (b[4] - a[4]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
     .slice(0, BEST_N).map(([o]) => o);
 }
 const cardOrder = new Map(cards.map((c, i) => [cid(c), i]));
@@ -295,7 +350,7 @@ console.log(`路線（含多標）：${fmt(stats.route, ROUTE_ORDER)}`);
 console.log(`「—」：${stats.none.length + stats.noChannel.length} 張（有頻道但推不出 ${stats.none.length}／完全沒頻道資料 ${stats.noChannel.length}）；無直接效果 ${stats.noEffect || 0}；雙色卡 ${stats.dual}`);
 const typeCountDist = {}; for (const p of Object.values(profile)) typeCountDist[p.types.length] = (typeCountDist[p.types.length] || 0) + 1;
 console.log(`每張類型數分布：${JSON.stringify(typeCountDist)}`);
-console.log(`特性：${fmt(stats.trait, TRAIT_ORDER)}；有「最搭」名單 ${stats.best} 張`);
+console.log(`特性：${fmt(stats.trait, TRAIT_ORDER)}；有「推薦搭配」名單 ${stats.best} 張`);
 
 if (DRY) process.exit(0);
 
