@@ -158,7 +158,7 @@ const GROUP_DEFS = [
   {key:"動作",   color:"var(--act)",   bg:"var(--actbg)",
    names:["犁田","播種","收割","烤麵包","圈柵欄","蓋馬廄","擴建房舍","翻修房舍","打職業","打發展","增加家庭成員","額外行動","減免資源","不卡格","加強行動"]},
   {key:"資源",   color:"var(--res)",   bg:"var(--resbg)",
-   names:["食物","建築資源","木頭","蘆葦","石頭","磚頭","羊","野豬","牛","動物","麥子","蔬菜","作物","貨物"]},
+   names:["食物","建築資源","木頭","蘆葦","石頭","磚頭","羊","野豬","牛","動物","麥子","蔬菜","作物","貨物","效果:增產"]},
   {key:"狀態",   color:"var(--state)", bg:"var(--statebg)",
    names:["空田","已播種田","封田","農田","未使用區域","柵欄","房舍材質","馬廄","圈地","居住空間"]},
   // 1103：原本落在「其他（未分類）」的分數／懲罰類
@@ -291,7 +291,7 @@ function render(){
       const rs = sortedRoles(o.roles);
       const tot = rs.reduce((s,r)=> s + o.roles[r], 0) || 1;
       const bar = rs.map(r=>`<span style="width:${o.roles[r]/tot*100}%;background:${roleColor(r)}"></span>`).join("");
-      const roleTxt = rs.filter(r=>r!=="—").map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—";
+      const roleTxt = rs.filter(r=>r!=="—").map(r=>`${r} ${o.roles[r]}`).join(" / ") || "只標屬性";
       const as = Object.keys(o.attrs).sort((a,b)=> o.attrs[b]-o.attrs[a]);
       const attrTxt = as.length ? `<div class="ct" style="margin-top:2px">屬性：${as.map(a=>`${a} ${o.attrs[a]}`).join(" / ")}</div>` : "";
       const fs = sortedFlav(o.flav);
@@ -320,7 +320,7 @@ function openDrawer(name){
   const rs = sortedRoles(o.roles).filter(r=>r!=="—");
   document.getElementById("dName").textContent = dispName(name);
   document.getElementById("dMeta").textContent =
-    `${o.cards.length} 張　·　` + (rs.map(r=>`${r} ${o.roles[r]}`).join(" / ") || "—");
+    `${o.cards.length} 張　·　` + (rs.map(r=>`${r} ${o.roles[r]}`).join(" / ") || "只標屬性");
   const body = document.getElementById("dBody"); body.innerHTML = "";
   o.cards.sort((a,b)=> a.nm.localeCompare(b.nm,"zh-Hant"));
   o.cards.forEach(c=>{
@@ -331,11 +331,12 @@ function openDrawer(name){
       const ft = t.flav ? `<span class="t ${t.flav==="行動"?"ta":POOLS.has(t.flav)?"tp":"tg"}">${t.flav}</span>` : "";
       return rt + at + ft;
     }).join(" ");
-    const desc = (CARDS[c.cid]||"").slice(0,70);
+    const full = CARDS[c.cid]||"";
+    const desc = full.length > 70 ? full.slice(0,70) + "…" : full;
     const row = document.createElement("div"); row.className = "row";
     row.innerHTML = `<div class="rn">${c.nm} <span class="muted" style="font-weight:400;font-size:11px">${c.cid}</span></div>
       <div class="rt">${tags}</div>
-      <div class="muted" style="font-size:11.5px;margin-top:4px;line-height:1.5">${desc}…</div>`;
+      <div class="muted" style="font-size:11.5px;margin-top:4px;line-height:1.5">${desc}</div>`;
     body.appendChild(row);
   });
   document.getElementById("drawer").classList.add("open");
