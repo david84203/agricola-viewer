@@ -57,7 +57,7 @@ const TYPE_RULES = {
   擴建房舍: (e) => ['擴建房舍', '翻修房舍'].includes(e.ch) && isCause(e),
   動物養殖: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isGet(e))
     || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e))
-    || (['馬廄', '圈地'].includes(e.ch) && (attrHas(e, '容量') || attrHas(e, '容量大'))), // 0907 Lu：多養動物的容量備註要認得
+    || (['馬廄', '圈地'].includes(e.ch) && !has(e, 'read') && (attrHas(e, '容量') || attrHas(e, '容量大'))), // 0907 Lu：多養動物的容量備註要認得；1102 wave2：結算時「看」容量（read）不算多養
   農耕播種: (e) => (['犁田', '播種', '收割', '封田'].includes(e.ch) && isCause(e))
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isGet(e)),
   家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && (attrHas(e, '免空') || attrHas(e, '提供'))), // Q9：提供 19 張全是家庭成員居住空間
@@ -139,6 +139,9 @@ const baseCards = readJson(path.join(VIEWER, 'cards.json'));
 const refCards = fs.existsSync(path.join(VIEWER, 'reference-cards.json')) ? readJson(path.join(VIEWER, 'reference-cards.json')) : [];
 const overridesRaw = fs.existsSync(OVR) ? readJson(OVR) : {};
 const overrides = Object.fromEntries(Object.entries(overridesRaw).filter(([k]) => !k.startsWith('_')));
+// 1102 Lu 裁定：「—」裡真的沒產出的卡標「無直接效果」；只在推導為空時套用（日後補了頻道就自動讓位）
+// 名單由 tools/apply_wave2_score.cjs 從 wave2_work/1102/dash_out.md 產生
+const NO_EFFECT = new Set(fs.existsSync(path.join(__dirname, 'no_effect_ids.json')) ? readJson(path.join(__dirname, 'no_effect_ids.json')) : []);
 
 const allCards = baseCards.concat(refCards);
 const cards = allCards.filter((c) => cid(c) && !excluded[cid(c)]);
@@ -158,7 +161,7 @@ function deriveTypes(card, entries) {
   }
   for (const t of scoreTypes(card)) counts[t] = 1;
   // 0907 任意貨物（Lu）：只有母層 貨物·get、同卡沒有任何葉頻道 get ＝ 卡文寫「任意貨物」沒指明種類
-  if (entries.some((e) => e.ch === '貨物' && isGet(e)) && !entries.some((e) => e.ch !== '貨物' && isGet(e))) counts['任意貨物'] = 1;
+  if (entries.some((e) => e.ch === '貨物' && isGet(e)) && !entries.some((e) => e.ch !== '貨物' && e.ch !== '分數' && isGet(e))) counts['任意貨物'] = 1; // 1102：分數·get 不是貨物，不擋
   if (isInteract(card)) counts['干擾互動'] = 1;
   return rank(TYPE_ORDER, counts);
 }
@@ -214,6 +217,7 @@ for (const card of cards) {
   const entries = entriesOf(id);
   let types = deriveTypes(card, entries);
   let routes = deriveRoutes(card, entries);
+  if (!types.length && NO_EFFECT.has(id)) { types = ['無直接效果']; stats.noEffect = (stats.noEffect || 0) + 1; }
   const ov = overrides[id];
   if (ov) {
     stats.overridden++;
@@ -246,7 +250,7 @@ console.log(`排除名單：${Object.keys(excluded).length} 張（${audit.genera
 console.log(`類型（含多標）：${fmt(stats.type, TYPE_ORDER)}`);
 console.log(`主類型：${fmt(stats.main, TYPE_ORDER)}`);
 console.log(`路線（含多標）：${fmt(stats.route, ROUTE_ORDER)}`);
-console.log(`「—」：${stats.none.length + stats.noChannel.length} 張（有頻道但推不出 ${stats.none.length}／完全沒頻道資料 ${stats.noChannel.length}）；雙色卡 ${stats.dual}`);
+console.log(`「—」：${stats.none.length + stats.noChannel.length} 張（有頻道但推不出 ${stats.none.length}／完全沒頻道資料 ${stats.noChannel.length}）；無直接效果 ${stats.noEffect || 0}；雙色卡 ${stats.dual}`);
 const typeCountDist = {}; for (const p of Object.values(profile)) typeCountDist[p.types.length] = (typeCountDist[p.types.length] || 0) + 1;
 console.log(`每張類型數分布：${JSON.stringify(typeCountDist)}`);
 
