@@ -246,7 +246,7 @@
         shown: { arrayValue: { values: entry.best.map(str) } },
         wrong: { arrayValue: { values: wrong.map(str) } },
         note: str(text),
-        reporter: str((auth && (auth.displayId || auth.id)) || '訪客'),
+        reporter: str(auth ? (auth.displayId || auth.id) : '?'),
         role: str((auth && auth.role) || 'anonymous'),
         status: str('pending'),
         createdAt: { timestampValue: new Date().toISOString() },
@@ -380,6 +380,12 @@
         btn.className = 'card-profile-dispute-btn';
         btn.textContent = '提出異議';
         btn.addEventListener('click', () => {
+          // Lu 1103：要登入才能提（玩家／評分者／GM 都行，訪客不行）
+          if (!(typeof getAuth === 'function' && getAuth())) {
+            if (typeof openLoginModal === 'function') openLoginModal();
+            else btn.textContent = '請先登入再提出異議';
+            return;
+          }
           const open = row.querySelector('.card-profile-dispute');
           if (open) open.remove(); else row.appendChild(disputeForm(entry));
         });

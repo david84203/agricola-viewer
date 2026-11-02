@@ -233,7 +233,7 @@ const needsRoom = (es) => !isNoRoom(es) && es.some((e) => e.ch === '增加家庭
 // 「每當其他玩家…」的 react 是別人觸發、不是跟我疊加（森林維護員、擅取木材者），不進觸發點索引
 // 有上限的動作（Lu 1103：田 5 塊就滿分，第 6 塊只能填空地分）：兩張都「多做這個動作」的卡是替代品不互推；
 // 加速卡該配的是「犁田時拿獎勵」（農田夢想家）與「吃空田」（花園設計師）的卡
-const CAPPED = new Set(['犁田']);
+const CAPPED = new Set(['犁田', '翻修房舍', '蓋馬廄', '圈柵欄']); // Lu 1103 擴大：翻修最多 2 次、馬廄 4 個、柵欄 15 根
 const FIELD_STATE = new Set(['空田', '農田']);
 const OTHERS_REACT_RE = /(每當|每次|當)(其他|其它)玩家/;
 const cardById = new Map(cards.map((c) => [cid(c), c]));
