@@ -234,6 +234,19 @@
       if (row) rows.push(row);
     }
 
+    // 特性（1103：Lu 舊 25 類補進來的 5 類）
+    if (Array.isArray(entry.traits) && entry.traits.length) {
+      const row = profileRow('特性', (valueEl) => {
+        entry.traits.forEach((t) => {
+          const tag = document.createElement('span');
+          tag.className = 'card-profile-tag';
+          tag.textContent = t;
+          valueEl.appendChild(tag);
+        });
+      });
+      if (row) rows.push(row);
+    }
+
     // 代價（支付／乞討／餵養）
     if (entry.cost) {
       const parts = [];
@@ -280,6 +293,31 @@
         });
         if (row) rows.push(row);
       }
+    }
+
+    // 最搭（1103）：頻道對得上最多的前 10 張，按搭配度排序
+    if (Array.isArray(entry.best) && entry.best.length) {
+      const row = profileRow('最搭', (valueEl) => {
+        const span = document.createElement('span');
+        span.className = 'card-profile-combo-item';
+        span.textContent = entry.best.join('、');
+        valueEl.appendChild(span);
+      });
+      if (row) rows.push(row);
+    }
+
+    // 實戰（1103）：LUGA 正式 4 人局（不含雙打）打出這張的紀錄；<5 局只報局數＋樣本不足
+    if (entry.match && entry.match.n > 0) {
+      const m = entry.match;
+      const row = profileRow('實戰', (valueEl) => {
+        const span = document.createElement('span');
+        span.className = 'card-profile-combo-item';
+        span.textContent = m.n >= 5
+          ? `出現 ${m.n} 局・平均第 ${m.avgRank.toFixed(1)} 名・前兩名 ${Math.round(m.top2 * 100)}%`
+          : `出現 ${m.n} 局・樣本不足`;
+        valueEl.appendChild(span);
+      });
+      if (row) rows.push(row);
     }
 
     if (!rows.length) return null;

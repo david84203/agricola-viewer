@@ -143,6 +143,10 @@ const overrides = Object.fromEntries(Object.entries(overridesRaw).filter(([k]) =
 // 名單由 tools/apply_wave2_score.cjs 從 wave2_work/1102/dash_out.md 產生
 const NO_EFFECT = new Set(fs.existsSync(path.join(__dirname, 'no_effect_ids.json')) ? readJson(path.join(__dirname, 'no_effect_ids.json')) : []);
 
+// 1103 藍圖 2：LUGA 實戰單卡統計（tools/build_match_stats.cjs 產；沒有就不顯示）
+const MATCH = path.join(VIEWER, 'card-match-stats.json');
+const matchStats = fs.existsSync(MATCH) ? readJson(MATCH) : {};
+
 const allCards = baseCards.concat(refCards);
 const cards = allCards.filter((c) => cid(c) && !excluded[cid(c)]);
 const nExcluded = allCards.length - cards.length;
@@ -209,9 +213,40 @@ function deriveCombo(id, entries) {
   return combo;
 }
 
+// ── 1103 藍圖 2：特性（Lu 的舊 25 類補進來的 5 類，role read 純標籤，見 apply_trait_channels.cjs）──
+const TRAIT_ORDER = ['任務卡', '烹飪工具', '卡片農田', '動物飼養空間', '晚生不生'];
+const deriveTraits = (entries) => TRAIT_ORDER.filter((t) => entries.some((e) => e.ch === t));
+
+// ── 1103 藍圖 2：最搭前 10 張（Lu 1103 定 10 張）──────────────────
+// 分數＝兩卡之間對得上的頻道數（本卡 get/cause→對方 react/pay，或反過來；雙向都算，
+// 純 react 的卡才找得到餵牠的卡）。對方那一側超過 80 張的泛用頻道不計（跟視窗「連動 >80 隱藏」同門檻）。
+// 同分比稀有度：Σ 1/該頻道張數（越冷門的連動越像真 combo），再同分照卡片順序。
+const BEST_N = 10, GENERIC_MAX = 80;
+function deriveBest(id, entries) {
+  const score = new Map(); // otherId -> [count, weight]
+  const bump = (set, ch) => {
+    if (!set || set.size - (set.has(id) ? 1 : 0) > GENERIC_MAX) return;
+    for (const o of set) {
+      if (o === id) continue;
+      const s = score.get(o) || [0, 0];
+      s[0]++; s[1] += 1 / set.size;
+      score.set(o, s);
+    }
+  };
+  const outCh = new Set(entries.filter((e) => isCause(e) || isGet(e)).map((e) => e.ch));
+  const inCh = new Set(entries.filter((e) => isReact(e) || has(e, 'pay')).map((e) => e.ch));
+  for (const ch of outCh) bump(reactIdx[ch], ch);
+  for (const ch of inCh) bump(srcIdx[ch], ch);
+  return [...score.entries()]
+    .sort((a, b) => (b[1][0] - a[1][0]) || (b[1][1] - a[1][1]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
+    .slice(0, BEST_N).map(([o]) => o);
+}
+const cardOrder = new Map(cards.map((c, i) => [cid(c), i]));
+const byIdName = new Map(cards.map((c) => [cid(c), c['牌名']]));
+
 // ── 主流程 ─────────────────────────────────────────────────────
 const profile = {};
-const stats = { type: {}, main: {}, route: {}, none: [], noChannel: [], dual: 0, overridden: 0 };
+const stats = { type: {}, main: {}, route: {}, none: [], noChannel: [], dual: 0, overridden: 0, trait: {}, best: 0 };
 for (const card of cards) {
   const id = cid(card);
   const entries = entriesOf(id);
@@ -232,6 +267,13 @@ for (const card of cards) {
     combo: deriveCombo(id, entries),
     dual,
   };
+  const traits = deriveTraits(entries);
+  if (traits.length) p.traits = traits;
+  const best = deriveBest(id, entries);
+  if (best.length) p.best = best.map((o) => byIdName.get(o)); // 視窗直接列卡名
+  if (matchStats[id]) p.match = matchStats[id];
+  for (const t of traits) stats.trait[t] = (stats.trait[t] || 0) + 1;
+  if (best.length) stats.best++;
   if (card.reference) p.reference = true;
   if (ov && ov.note) p.note = ov.note;
   profile[id] = p;
@@ -253,6 +295,7 @@ console.log(`路線（含多標）：${fmt(stats.route, ROUTE_ORDER)}`);
 console.log(`「—」：${stats.none.length + stats.noChannel.length} 張（有頻道但推不出 ${stats.none.length}／完全沒頻道資料 ${stats.noChannel.length}）；無直接效果 ${stats.noEffect || 0}；雙色卡 ${stats.dual}`);
 const typeCountDist = {}; for (const p of Object.values(profile)) typeCountDist[p.types.length] = (typeCountDist[p.types.length] || 0) + 1;
 console.log(`每張類型數分布：${JSON.stringify(typeCountDist)}`);
+console.log(`特性：${fmt(stats.trait, TRAIT_ORDER)}；有「最搭」名單 ${stats.best} 張`);
 
 if (DRY) process.exit(0);
 
