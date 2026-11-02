@@ -2382,7 +2382,7 @@
   "7782-2": {"name":"灌溉犁","types":["農耕播種","加強行動"],"main":"農耕播種","routes":["農耕流"],"cost":{"pay":[],"prereq":"主發「井」","face":"2木","beg":false,"feed":false},"combo":{"播種":{"from":108},"犁田":{"to":135,"from":168}},"dual":false},
   "8652-4": {"name":"土石流","types":["減免資源"],"main":"減免資源","routes":[],"cost":{"pay":[],"prereq":null,"face":"4石","beg":false,"feed":false},"combo":{},"dual":false},
   "8526": {"name":"上學遲到","types":["即時得分"],"main":"即時得分","routes":["磚屋流","多牌流"],"cost":{"pay":[],"prereq":"居住在磚屋房舍","face":null,"beg":false,"feed":false},"combo":{"打職業":{"from":135},"分數":{"to":85,"from":575}},"dual":false},
-  "10565-5": {"name":"產蛋箱","types":["食物引擎"],"main":"食物引擎","routes":["動物流"],"cost":{"pay":[],"prereq":"1棟馬廄","face":"2木/1麥","beg":false,"feed":false},"combo":{"食物":{"to":607}},"dual":false},
+  "10565-5": {"name":"產蛋箱","types":["食物引擎"],"main":"食物引擎","routes":["動物流"],"cost":{"pay":[],"prereq":"1棟馬廄","face":"2木+1麥","beg":false,"feed":false},"combo":{"食物":{"to":607}},"dual":false},
   "11841-2": {"name":"日式茶室","types":["食物引擎","即時得分","干擾互動"],"main":"食物引擎","routes":[],"cost":{"pay":[],"prereq":null,"face":"3木+1蘆葦","beg":false,"feed":false},"combo":{"食物":{"to":607},"分數":{"to":86}},"dual":false},
   "6381-6": {"name":"律師事務所","types":["擴建房舍","減免資源","干擾互動"],"main":"擴建房舍","routes":["多牌流"],"cost":{"pay":["食物"],"prereq":"2張職業卡","face":null,"beg":false,"feed":false},"combo":{"翻修房舍":{"to":76},"食物":{"from":1098}},"dual":false},
   "8554-3": {"name":"檸檬花園","types":["建材供給"],"main":"建材供給","routes":["農耕流"],"cost":{"pay":["麥子"],"prereq":"1x麥田","face":"1木","beg":false,"feed":false},"combo":{"麥子":{"from":181},"建築資源":{"to":116}},"dual":false},
