@@ -25,8 +25,19 @@ async function makeAuth(accounts) {
   const storage = {};
   const patches = [];
   const PLAYERS = '/documents/agricola_players/';
+  const reply = (status, data) => ({ status, ok: status < 300, json: async () => data });
   const fetch = async (url, opts = {}) => {
     const u = String(url);
+    if (u.includes('signInWithCustomToken')) return reply(200, { idToken: 'id', refreshToken: 'r', expiresIn: '3600' });
+    if (u.endsWith('/api/login')) { // 伺服器的行為（lib/player-login.js）由 agricola-online/login_test.cjs 驗，這裡只模擬回應
+      const b = JSON.parse(opts.body);
+      if (b.action === 'register') { const id = ctx.normalizeAccountId(b.id); patches.push(id); return reply(200, { ok: true, id, role: 'player', customToken: 'ct' }); }
+      const hash = await sha256(b.pin);
+      const ids = [...new Set([b.id.trim(), ctx.normalizeAccountId(b.id)])].filter((id) => docs[id]);
+      const hit = ids.find((id) => docs[id].pinHash === hash);
+      if (hit) return reply(200, { ok: true, id: hit, role: hit === 'GM' ? 'admin' : (docs[hit].role || 'player'), customToken: 'ct' });
+      return ids.length ? reply(401, { error: 'bad_pin', remaining: 4 }) : reply(404, { error: 'not_found' });
+    }
     if (u.endsWith('/documents/settings/auth')) {
       return { status: 200, ok: true, json: async () => ({ fields: { adminId: { stringValue: 'GM' }, raterPin: { stringValue: 'shared-code' } } }) };
     }

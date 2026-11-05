@@ -368,10 +368,11 @@ function bindNoticeModal() {
 function openResetPinModal(id) {
   resetPinTargetId = id;
   document.getElementById('resetPinTargetId').textContent = id;
+  document.getElementById('resetPinAdminInput').value = '';
   document.getElementById('resetPinInput').value = '';
   document.getElementById('resetPinError').textContent = '';
   document.getElementById('resetPinModal').style.display = 'flex';
-  document.getElementById('resetPinInput').focus();
+  document.getElementById('resetPinAdminInput').focus();
 }
 
 function closeResetPinModal() {
@@ -380,6 +381,7 @@ function closeResetPinModal() {
 }
 
 async function submitResetPin() {
+  const adminPin = document.getElementById('resetPinAdminInput').value;
   const newPin = document.getElementById('resetPinInput').value;
   const btn    = document.getElementById('resetPinSubmit');
   const err    = document.getElementById('resetPinError');
@@ -392,17 +394,14 @@ async function submitResetPin() {
   err.textContent = '';
 
   try {
-    const pinHash = await hashPin(newPin);
-    const url = `${FIRESTORE_BASE_PLAYERS}/agricola_players/${encodeURIComponent(resetPinTargetId)}?updateMask.fieldPaths=pinHash`;
-    const res = await fetch(url, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: { pinHash: { stringValue: pinHash } } }),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    closeResetPinModal();
-    alert(`已將「${resetPinTargetId}」的 PIN 重設為新密碼，請告知玩家本人。`);
+    const target = resetPinTargetId;
+    const result = await adminResetPin(target, adminPin, newPin);
+    if (result.ok) {
+      closeResetPinModal();
+      alert(`已將「${target}」的 PIN 重設為新密碼，請告知玩家本人。`);
+    } else {
+      err.textContent = result.error;
+    }
   } catch (e) {
     err.textContent = `重設失敗：${e.message}`;
   }

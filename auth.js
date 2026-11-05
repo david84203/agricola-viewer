@@ -100,25 +100,16 @@ async function isUsedAsRaterId(id) {
   }
 }
 
-// ── 帳號基礎工具（統一存在 agricola_players/{id}）─────
-async function hashPin(pin) {
-  const data = new TextEncoder().encode(pin);
-  const buf  = await crypto.subtle.digest('SHA-256', data);
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
+// ── 帳號基礎工具 ─────
 function validatePin(pin) {
   return typeof pin === 'string' && pin.trim().length >= MIN_PIN_LEN;
 }
 
-// 讀取帳號文件。回傳 { exists, pinHash, role } 或 { exists:false }（error:true 表示網路錯）
+// 查公開帳號文件（只拿來提示相似帳號）。PIN 雜湊在伺服器的封閉集合，瀏覽器碰不到。
 async function fetchAccount(id) {
   try {
     const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}`);
-    if (res.status === 200) {
-      const d = await res.json();
-      return { exists: true, pinHash: d.fields?.pinHash?.stringValue, role: d.fields?.role?.stringValue || null };
-    }
+    if (res.status === 200) return { exists: true };
     if (res.status === 404) return { exists: false };
     return { exists: false, error: true };
   } catch {
@@ -143,11 +134,9 @@ async function findSimilarAccountId(id) {
   return null;
 }
 
-// ── 伺服器登入（2026-11-06 第 0 階段）────────────────
-// 由 lulucola 的 /api/login 比對 PIN、記連錯（5 次鎖 15 分鐘）、發 Firebase 自訂憑證。
-// 回退開關：出事把 SERVER_LOGIN 改 false 推上去，就回到瀏覽器自己比對。
-// 伺服器連不上時也會自動退回舊做法——PIN 雜湊搬進封閉集合後，這條退路要拿掉。
-const SERVER_LOGIN = true;
+// ── 伺服器帳號 API（2026-11-06 第 0 階段）────────────────
+// 由 lulucola 的 /api/login 比對 PIN、記連錯（5 次鎖 15 分鐘）、發 Firebase 自訂憑證；
+// 註冊、改 PIN、重設 PIN 也都走它。瀏覽器不再有 PIN 雜湊，伺服器連不上就是登入不了。
 const FIREBASE_API_KEY = 'AIzaSyDjuk9vK_czsmBVikKqujdl6yXNml7hTEw';
 const FB_SESSION_KEY = 'agricola_fb_session';
 function loginApiUrl() {
@@ -155,26 +144,36 @@ function loginApiUrl() {
   return /(^|\.)lulucola\.pages\.dev$/.test(host) ? '/api/login' : 'https://lulucola.pages.dev/api/login';
 }
 
-// 回傳 { id, acc } / { badPin, remaining } / { missing } / { failMessage } / null（伺服器不可用，走舊路）
-// 只有連不上、5xx、回的不是 JSON 才走舊路；伺服器明確拒絕（鎖住、限流、格式錯）都照它的話。
+// 回傳伺服器的 JSON；連不上、5xx、回的不是 JSON 都回 null。
+async function accountCall(payload) {
+  try {
+    const res = await fetch(loginApiUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    return data && typeof data === 'object' && res.status < 500 ? data : null;
+  } catch { return null; }
+}
+
+// 各動作共通的拒絕訊息；不屬於這幾種回 null，由呼叫端自己解讀。
+function commonFailMessage(data) {
+  if (!data) return '暫時連不上伺服器，請稍後再試';
+  if (data.error === 'locked') return `PIN 連續錯太多次，帳號暫時鎖住，請 ${Math.max(1, Math.ceil(data.retryAfter / 60))} 分鐘後再試`;
+  if (data.error === 'rate_limited') return '嘗試太頻繁，請稍等一分鐘再試';
+  if (data.error === 'busy') return '處理中，請再按一次';
+  return null;
+}
+
+// 回傳 { id, acc } / { badPin, remaining } / { missing } / { failMessage } / { error }（連不上伺服器）
 async function serverLogin(rawId, pin) {
-  if (!SERVER_LOGIN) return null;
   for (let attempt = 0; attempt < 2; attempt++) {
-    let res, data;
-    try {
-      res = await fetch(loginApiUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ id: String(rawId || ''), pin }) });
-      data = await res.json();
-    } catch { return null; }
-    if (!data || typeof data !== 'object' || res.status >= 500) return null;
-    if (res.ok && data.ok) {
+    const data = await accountCall({ id: String(rawId || ''), pin });
+    if (!data) return { error: true };
+    if (data.ok) {
       await startFirebaseSession(data.customToken);
       return { id: data.id, acc: { role: data.role } };
     }
     if (data.error === 'bad_pin') return { badPin: true, remaining: data.remaining };
     if (data.error === 'not_found') return { missing: true };
-    if (data.error === 'locked') return { failMessage: `PIN 連續錯太多次，帳號暫時鎖住，請 ${Math.max(1, Math.ceil(data.retryAfter / 60))} 分鐘後再試` };
-    if (data.error === 'rate_limited') return { failMessage: '嘗試太頻繁，請稍等一分鐘再試' };
-    if (data.error !== 'busy') return { failMessage: '登入失敗，請重新整理頁面再試' };
+    if (data.error !== 'busy') return { failMessage: commonFailMessage(data) || '登入失敗，請重新整理頁面再試' };
     await new Promise(r => setTimeout(r, 700)); // 同帳號另一個請求剛好在比對，稍等再試一次
   }
   return { failMessage: '登入處理中，請再按一次' };
@@ -203,55 +202,16 @@ function loginFailMessage(found, fallback) {
   return fallback;
 }
 
-// 依 ID＋PIN 找出要登入的帳號：先試正規化後的 ID，再試原字串（相容當初就用全形註冊的舊帳號）。
+// 依 ID＋PIN 找出要登入的帳號（全形舊帳號的相容由伺服器處理）。
 // 回傳 { id, acc } / { badPin:true } / { missing:true, id }（兩種寫法都查無帳號）/ { error:true }
 async function resolveLogin(rawId, pin) {
-  const normId = normalizeAccountId(rawId);
-  const viaServer = await serverLogin(rawId, pin);
-  if (viaServer) return viaServer.missing ? { missing: true, id: normId } : viaServer;
-  const ids = [...new Set([normId, String(rawId || '').trim()])].filter(Boolean);
-  const hash = await hashPin(pin);
-  let anyExists = false;
-  for (const id of ids) {
-    const acc = await fetchAccount(id);
-    if (acc.error) return { error: true };
-    if (!acc.exists) continue;
-    anyExists = true;
-    if (acc.pinHash === hash) return { id, acc };
-  }
-  return anyExists ? { badPin: true } : { missing: true, id: normId };
+  const found = await serverLogin(rawId, pin);
+  return found.missing ? { missing: true, id: normalizeAccountId(rawId) } : found;
 }
 
-// 建立新帳號（role 傳 null = 一般玩家；'rater' = 評分者）。回傳是否成功。
-async function createAccount(id, pin, role) {
-  const fields = {
-    pinHash:   { stringValue: await hashPin(pin) },
-    createdAt: { stringValue: new Date().toISOString() },
-  };
-  if (role) fields.role = { stringValue: role };
-  // exists=false：帳號已存在就失敗，不會蓋掉別人的 PIN
-  const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}?currentDocument.exists=false`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fields }),
-  });
-  return res.ok;
-}
-
-// 只更新 pinHash（用 updateMask 才不會把 role/createdAt 洗掉）
-async function patchPinHash(id, newPin) {
-  const url = `${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}?updateMask.fieldPaths=pinHash`;
-  const res = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fields: { pinHash: { stringValue: await hashPin(newPin) } } }),
-  });
-  return res.ok;
-}
-
-// 寫入登入狀態並回傳結果（role: admin 由 settings.adminId 判定，優先於文件裡的 role）
-function persistLogin(id, docRole, settings) {
-  const role = (settings && id === settings.adminId) ? 'admin' : (docRole || 'player');
+// 寫入登入狀態並回傳結果（角色以伺服器回的為準）
+function persistLogin(id, serverRole, settings) {
+  const role = serverRole || 'player';
   const displayId = (role === 'admin' && settings && settings.adminName) ? settings.adminName : id;
   localStorage.setItem(AUTH_LS_KEY, JSON.stringify({ id, role, displayId }));
   return { ok: true, role, id };
@@ -292,14 +252,14 @@ async function setRaterPin(id, code, newPin) {
   if (!validatePin(newPin)) return { ok: false, error: `新 PIN 至少 ${MIN_PIN_LEN} 碼` };
   if (newPin === settings.raterPin) return { ok: false, error: '新 PIN 不能跟原本的通關密碼一樣' };
 
-  const acc = await fetchAccount(trimmedId);
-  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
-  if (acc.exists) return { ok: false, error: '此 ID 已有帳號，請直接用個人 PIN 登入' };
-
-  const isAdmin = trimmedId === settings.adminId;
-  const created = await createAccount(trimmedId, newPin, isAdmin ? null : 'rater');
-  if (!created) return { ok: false, error: '設定失敗，請重試' };
-  return persistLogin(trimmedId, isAdmin ? null : 'rater', settings);
+  const data = await accountCall({ action: 'rater-setup', id: trimmedId, code, newPin });
+  if (!data?.ok) {
+    if (data?.error === 'bad_code') return { ok: false, error: '授權碼錯誤' };
+    if (data?.error === 'id_taken' || data?.error === 'id_reserved') return { ok: false, error: '此 ID 已有帳號，請直接用個人 PIN 登入' };
+    return { ok: false, error: commonFailMessage(data) || '設定失敗，請重試' };
+  }
+  await startFirebaseSession(data.customToken);
+  return persistLogin(data.id, data.role, settings);
 }
 
 // ── 玩家登入／自助註冊（首次登入即建立帳號）──
@@ -327,24 +287,44 @@ async function loginPlayer(id, pin, options = {}) {
   if (!options.confirmCreate) {
     return { needConfirmCreate: true, id: trimmedId, similarId: await findSimilarAccountId(trimmedId) };
   }
-  const created = await createAccount(trimmedId, pin, null);
-  if (!created) return { ok: false, error: '建立帳號失敗，請重試' };
-  return persistLogin(trimmedId, null, settings);
+  const data = await accountCall({ action: 'register', id: trimmedId, pin });
+  if (!data?.ok) {
+    if (data?.error === 'id_taken') return { ok: false, error: '這個 ID 剛被使用了，請換一個' };
+    if (data?.error === 'id_reserved') return { ok: false, error: '此 ID 為保留帳號，無法用玩家登入建立' };
+    if (data?.error === 'invalid_request') return { ok: false, error: '這個 ID 不能使用，請換一個' };
+    return { ok: false, error: commonFailMessage(data) || '建立帳號失敗，請重試' };
+  }
+  await startFirebaseSession(data.customToken);
+  return persistLogin(data.id, data.role, settings);
 }
 
 // ── 自助修改 PIN（需驗證原 PIN）──
 async function changePin(id, oldPin, newPin) {
   const trimmedId = id.trim();
   if (!trimmedId) return { ok: false, error: '缺少帳號' };
-  const acc = await fetchAccount(trimmedId);
-  if (acc.error) return { ok: false, error: '網路錯誤，請重試' };
-  if (!acc.exists) return { ok: false, error: '找不到帳號' };
-  if (acc.pinHash !== await hashPin(oldPin)) return { ok: false, error: '原 PIN 錯誤' };
+  if (!oldPin) return { ok: false, error: '請輸入原 PIN' };
   if (!validatePin(newPin)) return { ok: false, error: `新 PIN 至少 ${MIN_PIN_LEN} 碼` };
   const settings = await fetchAuthSettings().catch(() => ({}));
   if (settings.raterPin && newPin === settings.raterPin) return { ok: false, error: '新 PIN 不能跟原本的通關密碼一樣' };
-  const ok = await patchPinHash(trimmedId, newPin);
-  return ok ? { ok: true } : { ok: false, error: '更新失敗，請重試' };
+  const data = await accountCall({ action: 'change-pin', id: trimmedId, pin: oldPin, newPin });
+  if (data?.ok) return { ok: true };
+  if (data?.error === 'bad_pin') return { ok: false, error: loginFailMessage({ remaining: data.remaining }, '原 PIN 錯誤') };
+  if (data?.error === 'not_found') return { ok: false, error: '找不到帳號' };
+  return { ok: false, error: commonFailMessage(data) || '更新失敗，請重試' };
+}
+
+// ── 管理員重設玩家 PIN（要再輸入一次管理員自己的 PIN，伺服器確認過才動）──
+async function adminResetPin(targetId, adminPin, newPin) {
+  const adminId = getAuth()?.id;
+  if (!adminId) return { ok: false, error: '請先登入' };
+  if (!adminPin) return { ok: false, error: '請輸入你自己的 PIN' };
+  if (!validatePin(newPin)) return { ok: false, error: `新 PIN 至少 ${MIN_PIN_LEN} 碼` };
+  const data = await accountCall({ action: 'admin-reset', id: adminId, pin: adminPin, targetId, newPin });
+  if (data?.ok) return { ok: true };
+  if (data?.error === 'bad_pin') return { ok: false, error: loginFailMessage({ remaining: data.remaining }, '你自己的 PIN 錯誤') };
+  if (data?.error === 'forbidden') return { ok: false, error: '這個帳號沒有管理員權限' };
+  if (data?.error === 'not_found') return { ok: false, error: '找不到這個帳號' };
+  return { ok: false, error: commonFailMessage(data) || '重設失敗，請重試' };
 }
 
 // ── Mount UI ───────────────────────────────────────
