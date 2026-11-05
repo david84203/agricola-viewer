@@ -20,6 +20,7 @@ function getAuth() {
 
 function clearAuth() {
   localStorage.removeItem(AUTH_LS_KEY);
+  localStorage.removeItem(FB_SESSION_KEY);
 }
 
 // ── Auth settings cache ────────────────────────────
@@ -142,10 +143,72 @@ async function findSimilarAccountId(id) {
   return null;
 }
 
+// ── 伺服器登入（2026-11-06 第 0 階段）────────────────
+// 由 lulucola 的 /api/login 比對 PIN、記連錯（5 次鎖 15 分鐘）、發 Firebase 自訂憑證。
+// 回退開關：出事把 SERVER_LOGIN 改 false 推上去，就回到瀏覽器自己比對。
+// 伺服器連不上時也會自動退回舊做法——PIN 雜湊搬進封閉集合後，這條退路要拿掉。
+const SERVER_LOGIN = true;
+const FIREBASE_API_KEY = 'AIzaSyDjuk9vK_czsmBVikKqujdl6yXNml7hTEw';
+const FB_SESSION_KEY = 'agricola_fb_session';
+function loginApiUrl() {
+  const host = typeof location !== 'undefined' ? location.hostname : '';
+  return /(^|\.)lulucola\.pages\.dev$/.test(host) ? '/api/login' : 'https://lulucola.pages.dev/api/login';
+}
+
+// 回傳 { id, acc } / { badPin, remaining } / { missing } / { failMessage } / null（伺服器不可用，走舊路）
+// 只有連不上、5xx、回的不是 JSON 才走舊路；伺服器明確拒絕（鎖住、限流、格式錯）都照它的話。
+async function serverLogin(rawId, pin) {
+  if (!SERVER_LOGIN) return null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let res, data;
+    try {
+      res = await fetch(loginApiUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ id: String(rawId || ''), pin }) });
+      data = await res.json();
+    } catch { return null; }
+    if (!data || typeof data !== 'object' || res.status >= 500) return null;
+    if (res.ok && data.ok) {
+      await startFirebaseSession(data.customToken);
+      return { id: data.id, acc: { role: data.role } };
+    }
+    if (data.error === 'bad_pin') return { badPin: true, remaining: data.remaining };
+    if (data.error === 'not_found') return { missing: true };
+    if (data.error === 'locked') return { failMessage: `PIN 連續錯太多次，帳號暫時鎖住，請 ${Math.max(1, Math.ceil(data.retryAfter / 60))} 分鐘後再試` };
+    if (data.error === 'rate_limited') return { failMessage: '嘗試太頻繁，請稍等一分鐘再試' };
+    if (data.error !== 'busy') return { failMessage: '登入失敗，請重新整理頁面再試' };
+    await new Promise(r => setTimeout(r, 700)); // 同帳號另一個請求剛好在比對，稍等再試一次
+  }
+  return { failMessage: '登入處理中，請再按一次' };
+}
+
+// 把自訂憑證換成 Firebase 登入（之後的 API／規則靠它認人）。失敗不影響這次登入，但舊帳號的憑證一定先清掉。
+async function startFirebaseSession(customToken) {
+  localStorage.removeItem(FB_SESSION_KEY);
+  try {
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${FIREBASE_API_KEY}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: customToken, returnSecureToken: true }),
+    });
+    const d = await res.json();
+    if (!res.ok || !d.refreshToken) throw new Error(d.error?.message || res.status);
+    localStorage.setItem(FB_SESSION_KEY, JSON.stringify({ refreshToken: d.refreshToken, idToken: d.idToken, expiresAt: Date.now() + (Number(d.expiresIn) - 60) * 1000 }));
+  } catch (e) {
+    console.warn('[auth] Firebase 登入憑證換發失敗', e && e.message);
+  }
+}
+
+function loginFailMessage(found, fallback) {
+  if (found.failMessage) return found.failMessage;
+  if (found.remaining > 0 && found.remaining <= 2) return `${fallback}（再錯 ${found.remaining} 次會鎖 15 分鐘）`;
+  if (found.remaining === 0) return 'PIN 連續錯太多次，帳號暫時鎖住，請 15 分鐘後再試';
+  return fallback;
+}
+
 // 依 ID＋PIN 找出要登入的帳號：先試正規化後的 ID，再試原字串（相容當初就用全形註冊的舊帳號）。
 // 回傳 { id, acc } / { badPin:true } / { missing:true, id }（兩種寫法都查無帳號）/ { error:true }
 async function resolveLogin(rawId, pin) {
   const normId = normalizeAccountId(rawId);
+  const viaServer = await serverLogin(rawId, pin);
+  if (viaServer) return viaServer.missing ? { missing: true, id: normId } : viaServer;
   const ids = [...new Set([normId, String(rawId || '').trim()])].filter(Boolean);
   const hash = await hashPin(pin);
   let anyExists = false;
@@ -166,7 +229,8 @@ async function createAccount(id, pin, role) {
     createdAt: { stringValue: new Date().toISOString() },
   };
   if (role) fields.role = { stringValue: role };
-  const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}`, {
+  // exists=false：帳號已存在就失敗，不會蓋掉別人的 PIN
+  const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id.trim())}?currentDocument.exists=false`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ fields }),
@@ -202,7 +266,7 @@ async function loginAccount(id, pin) {
   const settings = await fetchAuthSettings();
   const found = await resolveLogin(id, pin);
   if (found.error) return { ok: false, error: '網路錯誤，請重試' };
-  if (found.badPin) return { ok: false, error: 'PIN 錯誤，請重試（忘記請聯絡管理員重設）' };
+  if (found.badPin || found.failMessage) return { ok: false, error: loginFailMessage(found, 'PIN 錯誤，請重試（忘記請聯絡管理員重設）') };
   if (!found.missing) return persistLogin(found.id, found.acc.role, settings);
 
   // 尚無個人帳號 → 若輸入的是共用通關密碼，視為舊評分者首次登入，帶去設定新 PIN
@@ -248,7 +312,7 @@ async function loginPlayer(id, pin, options = {}) {
   const settings = await fetchAuthSettings();
   const found = await resolveLogin(id, pin);
   if (found.error) return { ok: false, error: '網路錯誤，請重試' };
-  if (found.badPin) return { ok: false, error: 'PIN 錯誤，請重試（ID 已被使用，若忘記 PIN 請聯絡管理員重設）' };
+  if (found.badPin || found.failMessage) return { ok: false, error: loginFailMessage(found, 'PIN 錯誤，請重試（ID 已被使用，若忘記 PIN 請聯絡管理員重設）') };
   if (!found.missing) return persistLogin(found.id, found.acc.role, settings);
 
   // 尚未被使用 → 自助建立玩家帳號
