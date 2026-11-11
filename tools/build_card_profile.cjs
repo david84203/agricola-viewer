@@ -235,6 +235,7 @@ const needsRoom = (es) => !isNoRoom(es) && es.some((e) => e.ch === '增加家庭
 // 加速卡該配的是「犁田時拿獎勵」（農田夢想家）與「吃空田」（花園設計師）的卡
 const CAPPED = new Set(['犁田', '翻修房舍', '蓋馬廄', '圈柵欄']); // Lu 1103 擴大：翻修最多 2 次、馬廄 4 個、柵欄 15 根
 const FIELD_STATE = new Set(['空田', '農田']);
+const FILL_SPACE = new Set(['犁田', '擴建房舍', '蓋馬廄', '圈柵欄']); // 會把未使用區域變成已使用的動作
 const OTHERS_REACT_RE = /(每當|每次|當)(其他|其它)玩家/;
 const cardById = new Map(cards.map((c) => [cid(c), c]));
 const bestIdx = { react: {}, cause: {} };
@@ -251,7 +252,9 @@ for (const id of inScope) {
       if (e.on === '行動格') m.cause.add(`${e.ch}|行動|${e.from || ''}`); // 用行動格＝也做了那個行動
       if (CAPPED.has(e.ch)) m.accel.add(e.ch);
       if (e.ch === '犁田') for (const f of FIELD_STATE) m.cause.add(`${f}||`); // 犁出來的是空田
+      if (FILL_SPACE.has(e.ch)) m.cause.add('已使用空間||');
     }
+    if (e.ch === '未使用區域' && isRead(e) && attrHas(e, '少') && !othersReact) m.react.add('已使用空間||'); // 土地研究員／土地登記：農莊填越滿越好
     if (isGet(e) && !PLAIN_RES.has(e.ch)) m.get.add(e.ch);
     if (has(e, 'pay') && !PLAIN_RES.has(e.ch)) m.pay.add(e.ch);
   }
