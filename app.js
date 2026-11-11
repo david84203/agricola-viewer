@@ -699,12 +699,24 @@ function openModal(card) {
     const rr = ratingsMap[rid];
     if (isCardBannedById(rid)) {
       fieldDefs.push(['牌力', '禁卡']);
+      if (rr && rr.seenCount >= RATING_MIN_SEEN) fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
     } else if (rr && rr.seenCount >= RATING_MIN_SEEN) {
       fieldDefs.push(['牌力 Tier', tierMap.get(rid) || '—']);
       fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
+    } else {
+      fieldDefs.push(['ELO 分數', '樣本不足']);
     }
+  } else {
+    // Lu 1111：點開卡片就要看得到 ELO，不必先切牌力排序；載完若視窗仍停在這張就重畫一次
+    ensureRatings().then(() => {
+      if (document.getElementById('modalOverlay').classList.contains('open')
+        && document.getElementById('modalId').textContent === (card['卡片ID'] || '')) openModal(card);
+    }).catch(() => {});
   }
   CardModal.renderFields(fieldsEl, fieldDefs);
+
+  const compareLink = document.getElementById('modalCompareLink');
+  if (compareLink) compareLink.href = `./compare.html?ids=${encodeURIComponent(card['卡片ID'] || '')}`;
 
   // 結構化卡效（純顯示；沒有編碼的卡完全不顯示）
   const effRec = effectsById.get(card['卡片ID']);

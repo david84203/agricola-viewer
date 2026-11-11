@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>農家樂 Agricola — 卡牌比較</title>
+  <meta name="description" content="任選 2～4 張農家樂卡牌並排比較：費用、條件、牌力 ELO、實戰數據、類型路線。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cmp-main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
+    .cmp-hint { color: var(--text3); font-size: .85rem; margin-bottom: 14px; line-height: 1.6; }
+    .cmp-status { color: var(--text3); font-size: .85rem; margin: 8px 0 14px; min-height: 1.2em; }
+    .cmp-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg2); }
+    .cmp-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .875rem; }
+    .cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; text-align: left; line-height: 1.6; color: var(--text2); word-break: break-word; }
+    .cmp-table col.cmp-label-col { width: 96px; }
+    .cmp-table col.cmp-card-col { width: 240px; }
+    .cmp-label { position: sticky; left: 0; z-index: 2; background: var(--bg3); color: var(--text3) !important; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+    .cmp-section td { background: var(--bg); color: var(--gold2) !important; font-weight: 700; font-size: .8rem; letter-spacing: .08em; padding: 6px 12px; }
+    .cmp-section td:first-child { position: sticky; left: 0; z-index: 2; }
+    .cmp-head th { background: var(--bg2); }
+    .cmp-head .cmp-label { vertical-align: middle; }
+    .cmp-best { color: var(--gold2) !important; font-weight: 700; background: rgba(232,184,75,.08); }
+    .cmp-best::after { content: ' ▲'; font-size: .7em; }
+    .cmp-dim { color: var(--text3); }
+    .cmp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cmp-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border2); font-size: .76rem; }
+    .cmp-tag.is-main { border-color: var(--gold); color: var(--gold2); font-weight: 600; }
+    .cmp-desc { white-space: pre-wrap; }
+
+    /* 卡位（表頭） */
+    .cmp-slot { display: flex; flex-direction: column; gap: 8px; }
+    .cmp-search { position: relative; }
+    .cmp-search input { width: 100%; box-sizing: border-box; padding: 8px 30px 8px 10px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font: inherit; font-size: .85rem; }
+    .cmp-search input:focus { outline: none; border-color: var(--gold); }
+    .cmp-remove { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: var(--text3); cursor: pointer; font-size: .9rem; padding: 4px 6px; }
+    .cmp-remove:hover { color: var(--red); }
+    .cmp-suggest { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20; background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; max-height: 320px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,.4); display: none; }
+    .cmp-suggest.open { display: block; }
+    .cmp-suggest button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--text2); padding: 7px 10px; font: inherit; font-size: .84rem; cursor: pointer; border-bottom: 1px solid var(--border); }
+    .cmp-suggest button:last-child { border-bottom: 0; }
+    .cmp-suggest button:hover, .cmp-suggest button.active { background: var(--bg3); color: var(--text); }
+    .cmp-suggest small { color: var(--text3); margin-left: 6px; }
+    .cmp-suggest .cmp-empty { padding: 8px 10px; color: var(--text3); font-size: .82rem; }
+    .cmp-img { width: 100%; max-width: 200px; aspect-ratio: 565 / 865; object-fit: contain; border-radius: 8px; background: var(--bg3); cursor: zoom-in; }
+    .cmp-img-empty { width: 100%; max-width: 200px; aspect-ratio: 565 / 865; border-radius: 8px; border: 1px dashed var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: .8rem; text-align: center; padding: 8px; box-sizing: border-box; }
+    .cmp-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .cmp-add { border: 1px dashed var(--border2); background: transparent; color: var(--text2); border-radius: 8px; padding: 8px 14px; cursor: pointer; font: inherit; font-size: .85rem; }
+    .cmp-add:hover { border-color: var(--gold); color: var(--gold); }
+    .cmp-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .cmp-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); font-size: .85rem; cursor: pointer; user-select: none; }
+    .cmp-zoom { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none; align-items: center; justify-content: center; z-index: 100; cursor: zoom-out; padding: 16px; }
+    .cmp-zoom.open { display: flex; }
+    .cmp-zoom img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+    @media (max-width: 640px) {
+      .cmp-table col.cmp-label-col { width: 64px; }
+      .cmp-table col.cmp-card-col { width: 170px; }
+      .cmp-table th, .cmp-table td { padding: 8px; font-size: .8rem; }
+      .cmp-label { font-size: .7rem; white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-brand-bar">
+    <div class="brand-left">
+      <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
+      <div class="brand-text">
+        <div class="brand-title">農家樂 Agricola — 卡牌比較</div>
+        <div class="brand-sub">任選 2～4 張並排比較，職業、次發可混著比</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <div class="brand-nav">
+        <a href="tierlist.html" class="draft-nav-btn">📊 牌力排行</a>
+        <a href="cards.html" class="draft-nav-btn">← 卡牌圖鑑</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="cmp-main">
+    <div class="cmp-hint">在每一欄輸入牌名或卡片 ID 選卡。▲ 標示該列表現較好的那張（ELO、選取率、前兩名率越高越好，平均名次越低越好）。比較結果的網址可以直接分享。</div>
+    <div class="cmp-toolbar">
+      <button type="button" class="cmp-add" id="cmpAdd">＋ 再加一張</button>
+      <label class="cmp-toggle"><input type="checkbox" id="cmpDiffOnly" /> 只看不同處</label>
+    </div>
+    <div class="cmp-status" id="cmpStatus">載入卡牌資料中…</div>
+    <div class="cmp-scroll">
+      <table class="cmp-table" id="cmpTable"></table>
+    </div>
+  </main>
+
+  <div class="cmp-zoom" id="cmpZoom"><img alt="" /></div>
+
+  <script src="card-images.js"></script>
+  <script src="compare.js"></script>
+
+  <footer class="site-footer">
+    圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用 ・ <a href="./about.html#donate" class="footer-donate-link">小額贊助支持</a>
+  </footer>
+</body>
+</html>

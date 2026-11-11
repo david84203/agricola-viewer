@@ -857,6 +857,16 @@ body {
   color: var(--text3);
   letter-spacing: .06em;
 }
+.modal-compare-link {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--gold2);
+  border: 1px solid var(--gold);
+  padding: 1px 8px;
+  border-radius: 100px;
+  text-decoration: none;
+}
+.modal-compare-link:hover { background: rgba(232,184,75,.12); }
 .modal-ban-badge {
   font-size: .72rem;
   font-weight: 700;
