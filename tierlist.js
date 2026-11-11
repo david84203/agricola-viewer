@@ -89,10 +89,6 @@ function getCardKey(card) {
   return [card['卡片ID'] || '', card.source_image || '', card.position ?? ''].join('|');
 }
 
-function getTier(rankPct) {
-  return TIERS[TIER_BOUNDS.findIndex(b => rankPct < b)];
-}
-
 let allCards = [];
 let ratingsMap = {};
 let cardProfileMap = {};   // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
@@ -102,27 +98,37 @@ let activeBga = false;
 let activeDecks = new Set();
 let tierSearchQuery = '';   // 原地高亮搜尋的關鍵字
 
+let tierRanks = new Map();   // 卡片ID → { tier, rank, total, pool, score }（tier-utils.js）
+
+// 排名母體的禁卡＝Firestore 禁卡表（與卡牌圖鑑、比較頁同一份）；讀不到才退回寫死清單
+function isTierBanned(card) {
+  return BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
+}
+
 // ── Duplicate exclusions ───────────────────────────
-async function loadDupExclusions() {
+// 與卡牌圖鑑同口徑：只排除「被取代」的那張（nonCanonicalKeys），正主保留
+async function loadDupExclusions(cards) {
   try {
-    return (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
+    return (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
   } catch { return new Set(); }
 }
 
 // ── Init ───────────────────────────────────────────
 async function init() {
   try {
+    const cardsP = fetch('./cards.json?v=20260608').then(r => r.json());
     const [cards, ratings, dupExcluded, , , , profileData] = await Promise.all([
-      fetch('./cards.json?v=20260608').then(r => r.json()),
+      cardsP,
       fetchAllRatings(),
-      loadDupExclusions(),
+      cardsP.then(loadDupExclusions),
       loadBanlist(),
       loadBgaIds(),
       window.CardImages?.load?.() || Promise.resolve(),
       fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
     ]);
-    allCards = cards.filter(c => !dupExcluded.has(c['卡片ID']) && !dupExcluded.has(getCardKey(c)));
+    allCards = cards.filter(c => !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
+    tierRanks = CardTiers.compute(allCards, ratingsMap, isTierBanned);
     cardProfileMap = profileData || {};
     populateDeckFilter();
     renderTierList();
@@ -233,15 +239,16 @@ function renderTierList() {
 
   const eligible = allCards.filter(c => {
     if (!activeDecks.has(c['牌組']) || !typeOk(c)) return false;
-    if (BANNED_IDS.has(c['卡片ID'])) return BGA_DECKS.includes(c['牌組']); // BGA 牌組禁卡放行，需真實評分
-    return true;
+    return !isTierBanned(c); // 禁卡一律不上榜（Lu 1111），改列在下方禁卡區
   });
 
+  // Tier 固定取自完整牌池（tier-utils.js，職業／次發各自排），篩選只決定顯示哪些卡（Lu 1111）
   const rated = [], unrated = [];
   eligible.forEach(card => {
     const r = ratingsMap[card['卡片ID']];
-    if (r && r.seenCount >= MIN_SEEN) {
-      rated.push({ card, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount, rankSeen: r.rankSeen || 0 });
+    const k = tierRanks.get(card['卡片ID']);
+    if (k) {
+      rated.push({ card, k, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount, rankSeen: r.rankSeen || 0 });
     } else {
       unrated.push(card);
     }
@@ -249,21 +256,9 @@ function renderTierList() {
 
   document.getElementById('tierEmpty').style.display = 'none';
 
-  rated.sort((a, b) => {
-    // 信心依歷史有效場數（輪抽 seenCount + 快排 rankSeen），現有 ELO 由兩者共同養成
-    const score = ({ elo, seenCount, pickCount, rankSeen }) => {
-      const eff = seenCount + rankSeen;
-      const conf = Math.min(eff / 30, 1);
-      if (conf >= 1) return elo;                          // 場數夠多→完全信任 ELO
-      const pickRate = seenCount ? pickCount / seenCount : 0.11; // 場數不足時用輪抽選取率當保險
-      const prior = 1200 + (pickRate - 0.11) * 450;       // 0.11 ≈ 1/9（9張包隨機基準）
-      return conf * elo + (1 - conf) * prior;
-    };
-    return score(b) - score(a);
-  });
-  const n = rated.length;
+  rated.sort((a, b) => b.k.score - a.k.score);
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
-  rated.forEach((item, i) => { groups[getTier(i / n)].push(item); });
+  rated.forEach(item => { groups[item.k.tier].push(item); });
 
   const container = document.getElementById('tierContent');
   thumbObserver?.disconnect();   // 舊卡片要退訂，否則 observer 抓著整批已丟棄的 canvas 不放
@@ -309,7 +304,7 @@ function renderTierList() {
   renderBanSection(container, typeOk);
 
   const statsEl = document.getElementById('tierStats');
-  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張`;
+  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 職業與次發各自排名`;
   statsEl.textContent = baseStats;
   // 全站累計評分場次：從 session log 算（不對外拆分模式，避免一般玩家看到無關雜訊）
   fetchGameCounts().then(({ draft, rank }) => {

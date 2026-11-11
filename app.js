@@ -130,8 +130,6 @@ const RATINGS_FS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hu
 const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
 const RATING_MIN_SEEN = 5;
-const RATING_TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
-const RATING_TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
 
 let activeSort = 'default';
 let domSorted = false;          // DOM 目前是否已被牌力排序重排
@@ -140,16 +138,6 @@ let ratingsLoading = null;      // 載入中的 Promise（避免重複抓）
 let tierMap = new Map();        // 卡片ID → 'S'..'E'（完整牌池排名）
 let ratingScoreMap = new Map(); // 卡片ID → 綜合分數（排序用）
 
-function ratingTierGet(pct) {
-  return RATING_TIERS[RATING_TIER_BOUNDS.findIndex(b => pct < b)];
-}
-function ratingCompositeScore({ elo, seenCount, pickCount }) {
-  if (!seenCount) return elo;
-  const pickRate = pickCount / seenCount;
-  const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
-  const conf = Math.min(seenCount / 30, 1);
-  return conf * elo + (1 - conf) * prior;
-}
 function isCardBannedById(id) {
   return BANNED_GROUPS.some(g => g.ids.includes(id));
 }
@@ -182,22 +170,15 @@ async function fetchAllRatings() {
   return map;
 }
 
-// 以完整牌池（排除禁卡）計算 canonical Tier，與牌力排行頁一致
+// Tier 走三頁共用的 tier-utils.js（職業／次發各自排、扣禁卡與被取代的重複卡；Lu 1111）
 function buildTierMap() {
-  const rated = [];
-  allCards.forEach(card => {
-    const id = card['卡片ID'];
-    if (isCardBannedById(id)) return;
-    const r = ratingsMap[id];
-    if (r && r.seenCount >= RATING_MIN_SEEN) rated.push({ id, score: ratingCompositeScore(r) });
-  });
-  rated.sort((a, b) => b.score - a.score);
-  const n = rated.length;
+  const ranks = CardTiers.compute(allCards, ratingsMap,
+    c => isCardBannedById(c['卡片ID']) || dupNonCanonical.has(getCardKey(c)));
   tierMap = new Map();
   ratingScoreMap = new Map();
-  rated.forEach((item, i) => {
-    tierMap.set(item.id, ratingTierGet(i / n));
-    ratingScoreMap.set(item.id, item.score);
+  ranks.forEach((k, id) => {
+    tierMap.set(id, k.tier);
+    ratingScoreMap.set(id, k.score);
   });
 }
 

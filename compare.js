@@ -12,7 +12,6 @@
   const BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000;
   const MIN_SEEN = 5;
   const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
-  const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
   const MAX_SLOTS = 4;
 
   let cards = [];
@@ -20,7 +19,7 @@
   let profiles = {};
   let ratings = {};
   let bannedIds = new Set();
-  const rankInfo = new Map(); // 卡片ID → { tier, rank, total }
+  let rankInfo = new Map(); // 卡片ID → { tier, rank, total, pool, score }
   let slots = [];             // 卡片ID 或 ''（空欄）
 
   const $ = (id) => document.getElementById(id);
@@ -85,24 +84,11 @@
     return map;
   }
 
-  // 與卡牌圖鑑（app.js buildTierMap）同一套：完整牌池、排除禁卡、樣本 ≥5 才排名
-  function compositeScore({ elo, seenCount, pickCount }) {
-    if (!seenCount) return elo;
-    const prior = 1200 + (pickCount / seenCount - 0.11) * 450;
-    const conf = Math.min(seenCount / 30, 1);
-    return conf * elo + (1 - conf) * prior;
-  }
+  // 三頁共用 tier-utils.js：職業／次發各自排、扣禁卡與被取代的重複卡
+  let dupNonCanonicalKeys = new Set();
   function buildRanks() {
-    const rated = [];
-    cards.forEach((c) => {
-      const id = c['卡片ID'];
-      const r = ratings[id];
-      if (!bannedIds.has(id) && r && r.seenCount >= MIN_SEEN) rated.push({ id, score: compositeScore(r) });
-    });
-    rated.sort((a, b) => b.score - a.score);
-    rated.forEach((x, i) => rankInfo.set(x.id, {
-      tier: TIERS[TIER_BOUNDS.findIndex((b) => i / rated.length < b)], rank: i + 1, total: rated.length,
-    }));
+    rankInfo = window.CardTiers.compute(cards, ratings,
+      (c) => bannedIds.has(c['卡片ID']) || dupNonCanonicalKeys.has(window.DuplicateCards.getCardKey(c)));
   }
 
   // ── 比較列定義 ────────────────────────────────────
@@ -140,9 +126,10 @@
         if (bannedIds.has(c['卡片ID'])) return { html: '<span class="cmp-dim">禁卡不排名</span>' };
         return k ? { html: `<b>${k.tier}</b>`, num: -TIERS.indexOf(k.tier), better: 'max' } : { html: '<span class="cmp-dim">—</span>' };
       }],
-      ['全牌池排名', (c) => {
+      ['同類排名', (c) => {
         const k = rankInfo.get(c['卡片ID']);
-        return k ? { html: `第 ${k.rank} / ${k.total}（前 ${Math.max(1, Math.round(k.rank / k.total * 100))}%）`, num: -k.rank, better: 'max' } : { html: '<span class="cmp-dim">—</span>' };
+        // 職業與次發各自排名；▲ 比的是「前百分之幾」，跨類型也成立
+        return k ? { html: `${window.CardTiers.POOL_LABEL[k.pool]}第 ${k.rank} / ${k.total}（前 ${Math.max(1, Math.round(k.rank / k.total * 100))}%）`, num: k.rank / k.total, better: 'min' } : { html: '<span class="cmp-dim">—</span>' };
       }],
       ['輪抽選取率', (c) => {
         const r = ratingOf(c);
@@ -345,6 +332,7 @@
       cards = base.map((c) => (overrides[c['卡片ID']] ? { ...c, ...overrides[c['卡片ID']] } : c)).concat(refCards);
       cards.forEach((c) => byId.set(c['卡片ID'], c));
       bannedIds = banned;
+      try { dupNonCanonicalKeys = (await window.DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys; } catch {}
       profiles = profileData || {};
       slots = slots.map((id) => (id && byId.has(id) ? id : ''));
       while (slots.length < 2) slots.push('');
