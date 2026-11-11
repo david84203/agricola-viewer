@@ -282,6 +282,22 @@ function deriveBest(id) {
   };
   for (const k of me.react) { link(bestIdx.react[k], k, 1); link(bestIdx.cause[k], k, 2); }
   for (const k of me.cause) link(bestIdx.react[k], k, 2);
+  // 1111 Lu 選 1：完全沒觸發點的卡（烹飪工具這類「付 X 換食物／分數」）主分恆 0、76 張空白 →
+  // 改用資源接力當主分：推「拿得到我要付的東西」的卡，同分比專注度（專門產這個資源的卡優先）
+  if (!me.react.size && !me.cause.size && me.pay.size) {
+    const want = new Set();
+    for (const r of me.pay) { want.add(r); for (const leaf of LEAF[r] || []) want.add(leaf); }
+    const parentOf = (r) => Object.keys(LEAF).find((p) => LEAF[p].includes(r));
+    const rows = [];
+    for (const o of inScope) {
+      if (o === id || byIdName.get(o) === myName) continue;
+      const om = bestMeta[o];
+      const hit = new Set([...om.get].filter((r) => want.has(r) || want.has(parentOf(r)))).size;
+      if (hit) rows.push([o, hit, hit / om.n]);
+    }
+    return rows.sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
+      .slice(0, BEST_N).map(([o]) => o);
+  }
   const rows = [];
   const cand = new Set(score.keys());
   if (me.noRoom) for (const o of noRoomIds) if (o !== id) cand.add(o);
