@@ -180,6 +180,16 @@
       .card-profile-dispute-actions button { padding: 3px 14px; border-radius: 6px; border: 1px solid var(--gold); background: transparent; color: var(--gold2); font-size: .8rem; cursor: pointer; }
       .card-profile-dispute-actions button:disabled { opacity: .5; cursor: default; }
       .card-profile-dispute-msg { font-size: .75rem; color: var(--text3); }
+      .card-comments-block { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+      .card-comments-title { font-size: .75rem; color: var(--text3); letter-spacing: .05em; }
+      .card-comments-list { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--text3); max-height: 240px; overflow-y: auto; }
+      .card-comment { padding: 6px 8px; border-radius: 6px; background: var(--bg2, rgba(127,127,127,.08)); }
+      .card-comment-meta { font-size: .7rem; color: var(--text3); display: flex; align-items: center; gap: 8px; }
+      .card-comment-del { margin-left: auto; padding: 0 6px; font-size: .7rem; border: none; background: transparent; color: var(--text3); cursor: pointer; text-decoration: underline; }
+      .card-comment-text { font-size: .85rem; color: var(--text2); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+      .card-comments-form { display: flex; flex-direction: column; gap: 6px; }
+      .card-comments-form > .card-profile-dispute-btn { align-self: flex-start; }
+      .card-comments-form textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: .8rem; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border2); background: transparent; color: var(--text2); resize: vertical; }
     `;
     document.head.appendChild(style);
   }
@@ -416,13 +426,145 @@
     return block;
   }
 
+  // ── 每張卡留言板（Lu 1111：人人可看、登入才能留、本人與 GM 可刪、新留言推播 GM）──
+  // Firestore agricola_card_comments 一則一筆；規則目前全開，「誰能刪」只在前端擋（同 agricola_notices 的既有作法）
+  const FS_DOCS = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
+  const COMMENT_URL = `${FS_DOCS}/agricola_card_comments`;
+  const NOTIFY_URL = 'https://lulucola.pages.dev/api/notify-event';
+  const fsVal = (v) => (v ? (v.stringValue ?? v.timestampValue ?? '') : '');
+
+  async function loadComments(cardId) {
+    const res = await fetch(`${FS_DOCS}:runQuery`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ structuredQuery: {
+        from: [{ collectionId: 'agricola_card_comments' }],
+        where: { fieldFilter: { field: { fieldPath: 'cardId' }, op: 'EQUAL', value: { stringValue: cardId } } },
+        limit: 200,
+      } }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()).filter((r) => r.document).map(({ document: d }) => ({
+      name: d.name, authorId: fsVal(d.fields.authorId), author: fsVal(d.fields.author),
+      text: fsVal(d.fields.text), createdAt: fsVal(d.fields.createdAt),
+    })).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  }
+
+  function renderComments(card) {
+    const cardId = String(card['卡片ID'] || '');
+    const box = document.createElement('div');
+    box.className = 'card-comments-block';
+    const title = document.createElement('div');
+    title.className = 'card-comments-title';
+    title.textContent = '💬 留言板';
+    const list = document.createElement('div');
+    list.className = 'card-comments-list';
+    list.textContent = '載入中…';
+    const form = document.createElement('div');
+    form.className = 'card-comments-form';
+    box.append(title, list, form);
+    if (!cardId) { list.textContent = '這張卡沒有編號，無法留言'; return box; }
+
+    const auth = typeof getAuth === 'function' ? getAuth() : null;
+    const refresh = async () => {
+      try {
+        const rows = await loadComments(cardId);
+        list.replaceChildren();
+        if (!rows.length) list.textContent = '還沒有留言，問問題或分享用法吧！';
+        for (const c of rows) {
+          const item = document.createElement('div');
+          item.className = 'card-comment';
+          const meta = document.createElement('div');
+          meta.className = 'card-comment-meta';
+          const when = c.createdAt ? new Date(c.createdAt).toLocaleString('zh-TW', { hour12: false, month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+          meta.textContent = `${c.author || c.authorId || '?'}・${when}`;
+          if (auth && (auth.id === c.authorId || auth.role === 'admin')) {
+            const del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'card-comment-del';
+            del.textContent = '刪除';
+            del.addEventListener('click', async () => {
+              del.disabled = true;
+              try {
+                const res = await fetch(`https://firestore.googleapis.com/v1/${c.name}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                item.remove();
+                if (!list.children.length) list.textContent = '還沒有留言，問問題或分享用法吧！';
+              } catch (e) { del.disabled = false; del.textContent = `刪除失敗（${e.message}）`; }
+            });
+            meta.appendChild(del);
+          }
+          const body = document.createElement('div');
+          body.className = 'card-comment-text';
+          body.textContent = c.text; // 純文字，不解析 HTML
+          item.append(meta, body);
+          list.appendChild(item);
+        }
+      } catch (e) { list.textContent = `留言載入失敗（${e.message}）`; }
+    };
+
+    if (!auth) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'card-profile-dispute-btn';
+      btn.textContent = '登入後留言';
+      // 開視窗後才登入：再按一次就換成留言框
+      btn.addEventListener('click', () => {
+        if (typeof getAuth === 'function' && getAuth()) box.replaceWith(renderComments(card));
+        else if (typeof openLoginModal === 'function') openLoginModal();
+        else btn.textContent = '請先到首頁登入';
+      });
+      form.appendChild(btn);
+    } else {
+      const note = document.createElement('textarea');
+      note.maxLength = 500;
+      note.rows = 2;
+      note.placeholder = '問問題、分享用法或搭配心得（最多 500 字）';
+      const send = document.createElement('button');
+      send.type = 'button';
+      send.textContent = '送出留言';
+      const msg = document.createElement('span');
+      msg.className = 'card-profile-dispute-msg';
+      send.addEventListener('click', async () => {
+        const text = note.value.trim();
+        if (!text) { msg.textContent = '請先寫點內容'; return; }
+        const str = (v) => ({ stringValue: String(v) });
+        send.disabled = true;
+        msg.textContent = '送出中…';
+        try {
+          const res = await fetch(COMMENT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: {
+            cardId: str(cardId), cardName: str(card['牌名'] || ''), authorId: str(auth.id),
+            author: str(auth.displayId || auth.id), role: str(auth.role || 'player'), text: str(text),
+            createdAt: { timestampValue: new Date().toISOString() },
+          } }) });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const docId = String((await res.json()).name || '').split('/').pop();
+          // 推播 GM：失敗不影響留言本身（text/plain 免 CORS 預檢，同 auth.js 登入的作法）
+          fetch(NOTIFY_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ kind: 'card-comment', eventId: docId }) }).catch(() => {});
+          note.value = '';
+          msg.textContent = '已送出';
+          await refresh();
+        } catch (e) { msg.textContent = `送出失敗（${e.message}），請稍後再試`; }
+        send.disabled = false;
+      });
+      const actions = document.createElement('div');
+      actions.className = 'card-profile-dispute-actions';
+      actions.append(send, msg);
+      form.append(note, actions);
+    }
+    refresh();
+    return box;
+  }
+
   // 掛在 afterEl（通常是 .modal-desc-wrap）之後；每次開視窗先清掉上一次插入的區塊
-  function mountProfile(afterEl, entry) {
+  // card 有給才掛留言板（沒有卡片類型資料的卡也有留言板）
+  function mountProfile(afterEl, entry, card) {
     if (!afterEl) return;
-    const next = afterEl.nextElementSibling;
-    if (next && next.classList.contains('card-profile-block')) next.remove();
+    for (let next = afterEl.nextElementSibling; next && /card-(profile|comments)-block/.test(next.className); next = afterEl.nextElementSibling) next.remove();
+    injectProfileStyles();
     const block = renderProfile(entry);
-    if (block) afterEl.insertAdjacentElement('afterend', block);
+    let anchor = afterEl;
+    if (block) { afterEl.insertAdjacentElement('afterend', block); anchor = block; }
+    if (card) anchor.insertAdjacentElement('afterend', renderComments(card));
   }
 
   window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile };

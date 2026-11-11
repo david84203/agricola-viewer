@@ -81,6 +81,10 @@ async function loadCards() {
   const _excluded = new Set([..._bannedKeys, ...dupNonCanonical]);
   document.getElementById('netCount').textContent = realCards.length - _excluded.size;
   applyFilters();
+  // ?card=<卡片ID> 直接開那張卡（留言推播點進來用）
+  const deepId = new URLSearchParams(location.search).get('card');
+  const deepCard = deepId && allCards.find(c => c['卡片ID'] === deepId);
+  if (deepCard) openModal(deepCard);
 }
 
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
@@ -680,7 +684,7 @@ function openModal(card) {
   document.getElementById('modalDesc').textContent = card['說明'] || '—';
 
   // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
-  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']]);
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']], card);
 
   // Fields
   const fieldsEl = document.getElementById('modalFields');

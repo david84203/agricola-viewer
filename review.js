@@ -2418,7 +2418,7 @@ function openModal(card) {
   document.getElementById('modalDesc').textContent  = card['說明'] || '—';
 
   // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
-  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']]);
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']], card);
 
   const fieldsEl  = document.getElementById('modalFields');
   CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
