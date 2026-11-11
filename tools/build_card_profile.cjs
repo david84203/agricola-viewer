@@ -174,7 +174,8 @@ function deriveTypes(card, entries) {
 // 0907 抽驗 19 張：另剔「將這張牌傳給」變體、「即使已被其他玩家佔據」（不卡格句型，不是互動）
 // 1111 Lu 2A：補「任何玩家／任一玩家」（生日賀卡等約 60 張漏抓）；「被任何玩家佔據」同樣是不卡格句型，剔掉
 const PASS_RE = /將(其|此卡|這張牌)傳給你?左手邊的玩家[^。]*。?|即使已?被(其他|任何)玩家佔據|已被任何玩家佔據/g;
-const INTERACT_RE = /其他玩家|其它玩家|所有玩家|每位玩家|任意玩家|任何玩家|任一玩家|對手|左手邊|右手邊/;
+// 1111 Lu「打牌時要盯著對手」也算互動：補「其他N位玩家」（冒險家漏抓）
+const INTERACT_RE = /其[他它]\d*位?玩家|所有玩家|每位玩家|任意玩家|任何玩家|任一玩家|對手|左手邊|右手邊/;
 const isInteract = (card) => INTERACT_RE.test(String(card['說明'] ?? '').replace(PASS_RE, ''));
 function deriveRoutes(card, entries) {
   const counts = Object.fromEntries(ROUTE_ORDER.map((r) => [r, 0]));
