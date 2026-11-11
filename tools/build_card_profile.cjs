@@ -57,7 +57,8 @@ const TYPE_RULES = {
   擴建房舍: (e) => ['擴建房舍', '翻修房舍'].includes(e.ch) && isCause(e),
   動物養殖: (e) => (['羊', '野豬', '牛', '動物'].includes(e.ch) && isGet(e))
     || (['蓋馬廄', '圈柵欄'].includes(e.ch) && isCause(e))
-    || (['馬廄', '圈地'].includes(e.ch) && !has(e, 'read') && (attrHas(e, '容量') || attrHas(e, '容量大'))), // 0907 Lu：多養動物的容量備註要認得；1102 wave2：結算時「看」容量（read）不算多養
+    || (['馬廄', '圈地'].includes(e.ch) && !has(e, 'read') && (attrHas(e, '容量') || attrHas(e, '容量大')))
+    || e.ch === '飼養空間', // 1111 Lu：卡片自帶容量從 圈地[容量] 移到 飼養空間，照樣算多養動物；// 0907 Lu：多養動物的容量備註要認得；1102 wave2：結算時「看」容量（read）不算多養
   農耕播種: (e) => (['犁田', '播種', '收割', '封田'].includes(e.ch) && isCause(e))
     || (['麥子', '蔬菜', '作物'].includes(e.ch) && isGet(e)),
   家庭成長: (e) => (e.ch === '增加家庭成員' && isCause(e)) || (e.ch === '居住空間' && (attrHas(e, '免空') || attrHas(e, '提供'))), // Q9：提供 19 張全是家庭成員居住空間
@@ -165,7 +166,7 @@ function deriveTypes(card, entries) {
   }
   for (const t of scoreTypes(card)) counts[t] = 1;
   // 0907 任意貨物（Lu）：只有母層 貨物·get、同卡沒有任何葉頻道 get ＝ 卡文寫「任意貨物」沒指明種類
-  if (entries.some((e) => e.ch === '貨物' && isGet(e)) && !entries.some((e) => e.ch !== '貨物' && e.ch !== '分數' && isGet(e))) counts['任意貨物'] = 1; // 1102：分數·get 不是貨物，不擋
+  if (entries.some((e) => e.ch === '貨物' && isGet(e)) && !entries.some((e) => !['貨物', '分數', '負分', '乞討'].includes(e.ch) && isGet(e))) counts['任意貨物'] = 1; // 1102：分數·get 不是貨物，不擋；1111：負分／乞討·get 也不是
   if (isInteract(card)) counts['干擾互動'] = 1;
   return rank(TYPE_ORDER, counts);
 }
@@ -214,7 +215,7 @@ function deriveCombo(id, entries) {
 }
 
 // ── 1103 藍圖 2：特性（Lu 的舊 25 類補進來的 5 類，role read 純標籤，見 apply_trait_channels.cjs）──
-const TRAIT_ORDER = ['任務卡', '烹飪工具', '卡片農田', '動物飼養空間', '晚生不生'];
+const TRAIT_ORDER = ['任務卡', '烹飪工具', '卡片農田', '飼養空間', '晚生不生']; // 1111 Lu：動物飼養空間 改名 飼養空間
 const deriveTraits = (entries) => TRAIT_ORDER.filter((t) => entries.some((e) => e.ch === t));
 
 // ── 1103 藍圖 2：推薦搭配前 10 張（Lu 1103 定 10 張；同日晚重寫，舊版「我產出＝你吃」把同類卡互推、木頭被當泛用丟掉）──
