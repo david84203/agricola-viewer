@@ -148,6 +148,16 @@ const NO_EFFECT = new Set(fs.existsSync(path.join(__dirname, 'no_effect_ids.json
 const MATCH = path.join(VIEWER, 'card-match-stats.json');
 const matchStats = fs.existsSync(MATCH) ? readJson(MATCH) : {};
 
+// 1111 Lu：推薦搭配「先照相關性，同相關性 ELO 高的靠前」→ 產檔當下抓 Firestore 輪抽 ELO 快照
+// 樣本不足（輪抽場數 < 5，跟比較頁同門檻）當 0 排最後；抓不到就警告、退回舊排序（不擋產檔）
+const ELO = (() => {
+  if (argv.includes('--no-elo')) return {};
+  const js = `(async()=>{const B='https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents/agricola_ratings?pageSize=300';const m={};let t=null;do{const r=await fetch(B+(t?'&pageToken='+encodeURIComponent(t):''));if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();for(const doc of d.documents||[]){const f=doc.fields||{};if(Number(f.seenCount?.integerValue??0)>=5)m[doc.name.split('/').pop()]=Number(f.elo?.integerValue??f.elo?.doubleValue??1200);}t=d.nextPageToken??null;}while(t);process.stdout.write(JSON.stringify(m));})().catch(e=>{console.error(e.message);process.exit(1);});`;
+  try { return JSON.parse(require('child_process').execFileSync(process.execPath, ['-e', js], { encoding: 'utf8', maxBuffer: 64 << 20, timeout: 120000 })); }
+  catch (e) { console.warn(`⚠ 抓不到 ELO（${String(e.message).split('\n')[0]}），推薦搭配退回舊排序`); return {}; }
+})();
+const eloOf = (id) => ELO[id] || 0;
+
 const allCards = baseCards.concat(refCards);
 const cards = allCards.filter((c) => cid(c) && !excluded[cid(c)]);
 const nExcluded = allCards.length - cards.length;
@@ -228,7 +238,7 @@ const deriveTraits = (entries) => TRAIT_ORDER.filter((t) => entries.some((e) => 
 //   同打法 3 分：兩張都標 居住空間·免空（收穫魔像、雙生子之母、農場幹事）
 //   打法衝突＝不推：免空卡 vs「增加家庭成員·cause 卻沒標免空」的卡（要空房間；維納斯神像、友愛之家）
 // 以上合計是主分，主分 0 不推。同主分才看副分：資源接力（我 get 的＝你 pay 的，食物／分數太泛不算）；
-// 再同分比專注度（對方整張卡有幾成在跟我連），再比稀有度 Σ1/觸發點張數，再照卡片順序。同名卡（別的版本）不推。
+// 再同分比 ELO（1111 Lu：相關性同級時 ELO 高的靠前），再比專注度（對方整張卡有幾成在跟我連），再比稀有度 Σ1/觸發點張數，再照卡片順序。同名卡（別的版本）不推。
 const BEST_N = 10, PLAIN_RES = new Set(['食物', '分數', '負分']);
 const tkey = (e) => `${e.ch}|${e.on || ''}|${e.from || ''}`;
 const isNoRoom = (es) => es.some((e) => e.ch === '居住空間' && attrHas(e, '免空'));
@@ -295,7 +305,7 @@ function deriveBest(id) {
       const hit = new Set([...om.get].filter((r) => want.has(r) || want.has(parentOf(r)))).size;
       if (hit) rows.push([o, hit, hit / om.n]);
     }
-    return rows.sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
+    return rows.sort((a, b) => (b[1] - a[1]) || (eloOf(b[0]) - eloOf(a[0])) || (b[2] - a[2]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
       .slice(0, BEST_N).map(([o]) => o);
   }
   const rows = [];
@@ -315,7 +325,7 @@ function deriveBest(id) {
     const focus = (Object.keys(s.ch).length + sub) / om.n; // 對方整張卡有幾成繞著跟我的連結（伐木工 2/2 勝過木匠的長凳 2/5）
     rows.push([o, main, sub, focus, s.rare]);
   }
-  return rows.sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]) || (b[3] - a[3]) || (b[4] - a[4]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
+  return rows.sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]) || (eloOf(b[0]) - eloOf(a[0])) || (b[3] - a[3]) || (b[4] - a[4]) || (cardOrder.get(a[0]) - cardOrder.get(b[0])))
     .slice(0, BEST_N).map(([o]) => o);
 }
 const cardOrder = new Map(cards.map((c, i) => [cid(c), i]));
