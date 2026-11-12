@@ -96,7 +96,7 @@
   const typeLabel = (c) => c.card_type === 'occupation' ? '職業卡' : c.card_type === 'both' ? '雙色卡' : (c.reference ? '主要發展卡' : '次要發展卡');
   const ratingOf = (c) => {
     const r = ratings[c['卡片ID']];
-    return r && r.seenCount >= MIN_SEEN ? r : null; // 禁卡（如 BGA 牌組）有評分也照顯示，只是不進排名
+    return r && r.seenCount + (r.rankSeen || 0) >= MIN_SEEN ? r : null; // 禁卡（如 BGA 牌組）有評分也照顯示，只是不進排名
   };
   const matchOf = (c) => profiles[c['卡片ID']]?.match || null;
   const tags = (arr, mainFirst) => (arr && arr.length)

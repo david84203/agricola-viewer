@@ -294,7 +294,7 @@ function renderTierList() {
     section.innerHTML = `
       <div class="tier-header tier-unrated">
         <span class="tier-badge">?</span>
-        <span class="tier-range">資料不足（需至少 ${MIN_SEEN} 筆）</span>
+        <span class="tier-range">資料不足（輪抽＋快速排序合計需至少 ${MIN_SEEN} 次）</span>
         <span class="tier-count">${unrated.length} 張</span>
       </div>
     `;

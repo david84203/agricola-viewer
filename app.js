@@ -210,7 +210,7 @@ function applyRatingBadges() {
     if (isCardBannedById(id)) {
       badge.className = 'card-rating rating-banned';
       badge.innerHTML = `<span class="rating-tier">🚫</span>`;
-    } else if (r && r.seenCount >= RATING_MIN_SEEN) {
+    } else if (r && r.seenCount + (r.rankSeen || 0) >= RATING_MIN_SEEN) {
       const tier = tierMap.get(id) || '?';
       badge.className = `card-rating rating-tier-${tier.toLowerCase()}`;
       badge.innerHTML = `<span class="rating-tier">${tier}</span><span class="rating-elo">${Math.round(r.elo)}</span>`;
@@ -680,8 +680,8 @@ function openModal(card) {
     const rr = ratingsMap[rid];
     if (isCardBannedById(rid)) {
       fieldDefs.push(['牌力', '禁卡']);
-      if (rr && rr.seenCount >= RATING_MIN_SEEN) fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
-    } else if (rr && rr.seenCount >= RATING_MIN_SEEN) {
+      if (rr && rr.seenCount + (rr.rankSeen || 0) >= RATING_MIN_SEEN) fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
+    } else if (rr && rr.seenCount + (rr.rankSeen || 0) >= RATING_MIN_SEEN) {
       fieldDefs.push(['牌力 Tier', tierMap.get(rid) || '—']);
       fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
     } else {

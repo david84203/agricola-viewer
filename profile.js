@@ -164,6 +164,7 @@ async function fetchAllRatings() {
       map[id] = {
         elo:       Number(f.elo?.integerValue       ?? f.elo?.doubleValue       ?? 1200),
         seenCount: Number(f.seenCount?.integerValue ?? 0),
+        rankSeen:  Number(f.rankSeen?.integerValue  ?? 0),
         pickCount: Number(f.pickCount?.integerValue ?? 0),
       };
     });
@@ -177,7 +178,7 @@ async function fetchAllRatings() {
 function computeTierMap(ratingsMap, cards) {
   const rated = cards
     .map(c => ({ id: c['卡片ID'], r: ratingsMap[c['卡片ID']] }))
-    .filter(x => x.r && x.r.seenCount >= MIN_SEEN_TIER)
+    .filter(x => x.r && x.r.seenCount + (x.r.rankSeen || 0) >= MIN_SEEN_TIER)
     .sort((a, b) => b.r.elo - a.r.elo);
   const n = rated.length;
   const tierMap = {};

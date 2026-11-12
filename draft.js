@@ -442,7 +442,7 @@ function startMinorPhase() {
 // ── ELO-weighted sim picks ─────────────────────────
 const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
-const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低輪抽場數
+const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低場數（輪抽＋快排，Lu 1112）
 const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
 
 async function fetchEloForDraft() {
@@ -493,7 +493,7 @@ function computeSTierIds(map) {
     return conf * r.elo + (1 - conf) * prior;
   };
   const rated = Object.entries(map)
-    .filter(([id, r]) => r.seenCount >= SIM_MIN_SEEN && !BANNED_IDS.has(id))
+    .filter(([id, r]) => r.seenCount + (r.rankSeen || 0) >= SIM_MIN_SEEN && !BANNED_IDS.has(id))
     .sort((a, b) => score(b[1]) - score(a[1]));
   return new Set(rated.slice(0, Math.ceil(rated.length * SIM_S_TIER_PCT)).map(([id]) => id));
 }

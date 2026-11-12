@@ -36,7 +36,7 @@
       if (!pool || (isExcluded && isExcluded(c))) return;
       const id = c['卡片ID'];
       const r = ratings && ratings[id];
-      if (r && r.seenCount >= MIN_SEEN) pools[pool].push({ id, score: score(r) });
+      if (r && r.seenCount + (r.rankSeen || 0) >= MIN_SEEN) pools[pool].push({ id, score: score(r) });
     });
     const out = new Map();
     Object.entries(pools).forEach(([pool, list]) => {
