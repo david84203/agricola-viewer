@@ -118,7 +118,10 @@
       ['同類排名', (c) => {
         const k = rankInfo.get(c['卡片ID']);
         // 職業與次發各自排名；▲ 比的是「前百分之幾」，跨類型也成立
-        return k ? { html: `${window.CardTiers.POOL_LABEL[k.pool]}第 ${k.rank} / ${k.total}（前 ${Math.max(1, Math.round(k.rank / k.total * 100))}%）`, num: k.rank / k.total, better: 'min' } : { html: '<span class="cmp-dim">—</span>' };
+        if (!k) return { html: '<span class="cmp-dim">—</span>' };
+        const pct = Math.max(1, Math.round(k.rank / k.total * 100)); // 50% 以內講「前」，超過講「後」：前 97% → 後 3%
+        const pos = pct <= 50 ? `前 ${pct}%` : `後 ${Math.max(1, 100 - pct)}%`;
+        return { html: `${window.CardTiers.POOL_LABEL[k.pool]}第 ${k.rank} / ${k.total}（${pos}）`, num: k.rank / k.total, better: 'min' };
       }],
       ['輪抽選取率', (c) => {
         const r = ratingOf(c);
