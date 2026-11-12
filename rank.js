@@ -81,7 +81,7 @@ async function setupEliteMode() {
       const eff = r.seen + r.rank;
       const conf = Math.min(eff / 30, 1);
       if (conf >= 1) return r.elo;
-      const pr = r.seen ? r.pick / r.seen : 0.11;
+      const pr = (r.pick + 1) / (r.seen + 9); // 與 tier-utils 同：先墊 9 看 1 選（Lu 1112）
       return conf * r.elo + (1 - conf) * (1200 + (pr - 0.11) * 450);
     };
     const topSet = pool => {

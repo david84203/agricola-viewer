@@ -487,7 +487,7 @@ async function fetchEloForDraft() {
 function computeSTierIds(map) {
   const score = r => {
     if (!r.seenCount) return r.elo;
-    const pickRate = r.pickCount / r.seenCount;
+    const pickRate = (r.pickCount + 1) / (r.seenCount + 9); // 與 tier-utils 同：先墊 9 看 1 選（Lu 1112）
     const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
     const conf = Math.min(r.seenCount / 30, 1);
     return conf * r.elo + (1 - conf) * prior;

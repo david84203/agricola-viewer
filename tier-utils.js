@@ -6,7 +6,7 @@
    - 排名母體一律扣除禁卡與被取代的重複卡（由呼叫端的 isExcluded 決定）
    - Tier 固定以完整牌池計算，不隨頁面上的牌組／類型篩選變動
    - 分數：有效場數（輪抽 seenCount＋快排 rankSeen）滿 30 完全信任 ELO，
-     不足時與輪抽選取率推估值加權（原牌力排行頁公式）
+     不足時與輪抽選取率推估值加權（原牌力排行頁公式；選取率先墊 9 看 1 選，Lu 1112）
    ══════════════════════════════════════════════════ */
 (function () {
   const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
@@ -17,7 +17,8 @@
   function score({ elo, seenCount = 0, pickCount = 0, rankSeen = 0 }) {
     const conf = Math.min((seenCount + rankSeen) / 30, 1);
     if (conf >= 1) return elo;
-    const pickRate = seenCount ? pickCount / seenCount : 0.11; // 0.11 ≈ 1/9（9 張包隨機基準）
+    // 選取率先墊 9 次看到、1 次選（＝普通卡 1/9），樣本少時不會因幾次運氣衝頂或墊底（Lu 1112）
+    const pickRate = (pickCount + 1) / (seenCount + 9);
     const prior = 1200 + (pickRate - 0.11) * 450;
     return conf * elo + (1 - conf) * prior;
   }
