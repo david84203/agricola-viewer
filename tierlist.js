@@ -6,7 +6,7 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v6'; // v6：加讀實戰次數 lugaSeen／lugaPick
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 const CROP_REF = { width: 2040, height: 2807 };
@@ -95,6 +95,7 @@ let cardProfileMap = {};   // 卡片ID → 類型系統（card-profile.json；�
 let imageCache = {};
 let activeFilter = 'all';
 let activeBga = false;
+let activeLuga = false; // 只看有實戰輪抽資料的卡，Tier 內改依實戰次數排
 let activeDecks = new Set();
 let tierSearchQuery = '';   // 原地高亮搜尋的關鍵字
 
@@ -174,7 +175,9 @@ function collectRatingDoc(map, doc) {
   const seenCount = Number(doc.fields?.seenCount?.integerValue ?? 0);
   const pickCount = Number(doc.fields?.pickCount?.integerValue ?? 0);
   const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
-  map[cardId] = { elo, seenCount, pickCount, rankSeen };
+  const lugaSeen  = Number(doc.fields?.lugaSeen?.integerValue  ?? 0);
+  const lugaPick  = Number(doc.fields?.lugaPick?.integerValue  ?? 0);
+  map[cardId] = { elo, seenCount, pickCount, rankSeen, lugaSeen, lugaPick };
 }
 
 // 一次撈完：runQuery 沒有 300 筆的分頁上限，3500 筆一趟就回來（list 要串 12 趟）
@@ -185,7 +188,7 @@ async function fetchRatingsViaQuery() {
     body: JSON.stringify({
       structuredQuery: {
         from: [{ collectionId: 'agricola_ratings' }],
-        select: { fields: ['elo', 'seenCount', 'pickCount', 'rankSeen'].map(fieldPath => ({ fieldPath })) },
+        select: { fields: ['elo', 'seenCount', 'pickCount', 'rankSeen', 'lugaSeen', 'lugaPick'].map(fieldPath => ({ fieldPath })) },
         limit: 20000,
       },
     }),
@@ -239,6 +242,7 @@ function renderTierList() {
 
   const eligible = allCards.filter(c => {
     if (!activeDecks.has(c['牌組']) || !typeOk(c)) return false;
+    if (activeLuga && !(ratingsMap[c['卡片ID']]?.lugaSeen > 0)) return false;
     return !isTierBanned(c); // 禁卡一律不上榜（Lu 1111），改列在下方禁卡區
   });
 
@@ -248,7 +252,7 @@ function renderTierList() {
     const r = ratingsMap[card['卡片ID']];
     const k = tierRanks.get(card['卡片ID']);
     if (k) {
-      rated.push({ card, k, elo: r.elo, seenCount: r.seenCount, pickCount: r.pickCount, rankSeen: r.rankSeen || 0 });
+      rated.push({ card, k, r });
     } else {
       unrated.push(card);
     }
@@ -256,7 +260,9 @@ function renderTierList() {
 
   document.getElementById('tierEmpty').style.display = 'none';
 
-  rated.sort((a, b) => b.k.score - a.k.score);
+  rated.sort(activeLuga
+    ? (a, b) => b.r.lugaSeen - a.r.lugaSeen || b.k.score - a.k.score
+    : (a, b) => b.k.score - a.k.score);
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
   rated.forEach(item => { groups[item.k.tier].push(item); });
 
@@ -282,8 +288,8 @@ function renderTierList() {
       section.classList.toggle('collapsed');  // 展開後由 thumbObserver 自己補畫視窗附近那幾張
     });
     const grid = section.querySelector('.tier-card-grid');
-    groups[tier].forEach(({ card, elo, seenCount, pickCount, rankSeen }) => {
-      grid.appendChild(createTierCardEl(card, elo, seenCount, pickCount, rankSeen));
+    groups[tier].forEach(({ card, r }) => {
+      grid.appendChild(createTierCardEl(card, r));
     });
     container.appendChild(section);
   });
@@ -304,7 +310,7 @@ function renderTierList() {
   renderBanSection(container, typeOk);
 
   const statsEl = document.getElementById('tierStats');
-  const baseStats = `已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 職業與次發各自排名`;
+  const baseStats = `${activeLuga ? '有實戰資料：' : ''}已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 職業與次發各自排名${activeLuga ? ' · 各 Tier 內依實戰次數排' : ''}`;
   statsEl.textContent = baseStats;
   // 全站累計評分場次：從 session log 算（不對外拆分模式，避免一般玩家看到無關雜訊）
   fetchGameCounts().then(({ draft, rank }) => {
@@ -404,7 +410,8 @@ function confidenceLevel(n) {
   if (n >= 30) return { key: 'ref', label: '參考' };
   return { key: 'warm', label: '暖機' };
 }
-function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
+function createTierCardEl(card, r) {
+  const { elo, seenCount, rankSeen = 0, lugaSeen = 0, lugaPick = 0 } = r;
   const eff = seenCount + rankSeen;  // 現有 ELO 由歷史輪抽+快排共同養成，信心算兩者合計
   const conf = confidenceLevel(eff);
   const isBanned = BANNED_IDS.has(card['卡片ID']);
@@ -421,6 +428,7 @@ function createTierCardEl(card, elo, seenCount, pickCount, rankSeen = 0) {
         <span class="tier-card-score">${Math.round(elo)}</span>
         ${isBanned ? '<span class="tier-card-ban">禁</span>' : ''}
         <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}">${conf.label}·${eff}</span>
+        ${lugaSeen ? `<span class="tier-card-luga" title="實戰輪抽：看過 ${lugaSeen} 次、選了 ${lugaPick} 次">實戰 ${lugaSeen}·選${lugaPick}</span>` : ''}
       </div>
     </div>
   `;
@@ -634,6 +642,12 @@ document.querySelectorAll('.chip[data-filter]').forEach(chip => {
 document.getElementById('bgaChip').addEventListener('click', () => {
   activeBga = !activeBga;
   document.getElementById('bgaChip').classList.toggle('active', activeBga);
+  renderTierList();
+});
+
+document.getElementById('lugaChip').addEventListener('click', () => {
+  activeLuga = !activeLuga;
+  document.getElementById('lugaChip').classList.toggle('active', activeLuga);
   renderTierList();
 });
 

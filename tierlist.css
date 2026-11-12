@@ -188,6 +188,8 @@
 }
 .tier-card-meta {
   display: flex;
+  flex-wrap: wrap;
+  gap: 3px 4px;
   justify-content: space-between;
   align-items: center;
 }
@@ -213,6 +215,17 @@
 .tier-conf-ref       { background: rgba(245, 158, 11, .18);  color: #f59e0b; }
 .tier-conf-converged { background: rgba(34, 197, 94, .18);   color: #22c55e; }
 .tier-conf-solid     { background: rgba(16, 185, 129, .24);  color: #10b981; }
+/* 實戰輪抽次數（選/看） */
+.tier-card-luga {
+  font-size: .58rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+  line-height: 1.5;
+  white-space: nowrap;
+  background: rgba(99, 102, 241, .2);
+  color: #818cf8;
+}
 /* BGA 牌組禁卡標籤（只在 Tier List 標示，排序卡片刻意不標以避免錨定偏差） */
 .tier-card-ban {
   font-size: .58rem;
@@ -390,7 +403,7 @@
   .tier-card-name { font-size: .7rem; }
   .tier-card-score { font-size: .72rem; }
   .tier-card-seen { font-size: .6rem; }
-  .tier-card-conf { font-size: .54rem; padding: 1px 4px; }
+  .tier-card-conf, .tier-card-luga { font-size: .54rem; padding: 1px 4px; }
 
   /* Ban section */
   .tier-ban-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
