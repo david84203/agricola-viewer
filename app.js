@@ -127,7 +127,7 @@ let activeImplStatus = 'all'; // 卡牌實作狀態篩選（白名單專用，�
 // 預設不顯示、不抓資料；使用者選「牌力排序」才懶載入。
 // 快取與 tierlist 共用同一把 key，零額外 Firestore 成本。
 const RATINGS_FS_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v6'; // v6：加讀實戰次數 lugaSeen／lugaPick
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v6'; // v6：加讀實戰次數 lugaDealt／lugaPick／lugaPickPosSum
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
 const RATING_MIN_SEEN = 5;
 
@@ -163,7 +163,9 @@ async function fetchAllRatings() {
       const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
       const lugaSeen  = Number(doc.fields?.lugaSeen?.integerValue  ?? 0);
       const lugaPick  = Number(doc.fields?.lugaPick?.integerValue  ?? 0);
-      map[cardId] = { elo, seenCount, pickCount, rankSeen, lugaSeen, lugaPick };
+      const lugaDealt = Number(doc.fields?.lugaDealt?.integerValue ?? 0);      // 實戰被發到幾次
+      const lugaPickPosSum = Number(doc.fields?.lugaPickPosSum?.integerValue ?? 0); // 被選時第幾手的總和
+      map[cardId] = { elo, seenCount, pickCount, rankSeen, lugaSeen, lugaPick, lugaDealt, lugaPickPosSum };
     });
     pageToken = data.nextPageToken ?? null;
   } while (pageToken);
@@ -689,7 +691,9 @@ function openModal(card) {
     } else {
       fieldDefs.push(['ELO 分數', '樣本不足']);
     }
-    fieldDefs.push(['實戰輪抽', rr?.lugaSeen ? `看過 ${rr.lugaSeen} 次・選了 ${rr.lugaPick} 次（${Math.round(rr.lugaPick / rr.lugaSeen * 100)}%）` : '尚無']);
+    fieldDefs.push(['實戰輪抽', rr?.lugaDealt
+      ? `發到 ${rr.lugaDealt} 次・被選 ${rr.lugaPick} 次${rr.lugaPick ? `・平均第 ${(rr.lugaPickPosSum / rr.lugaPick).toFixed(1)} 手被拿` : '・都沒人拿'}`
+      : '尚無']);
   } else {
     // Lu 1111：點開卡片就要看得到 ELO，不必先切牌力排序；載完若視窗仍停在這張就重畫一次
     ensureRatings().then(() => {

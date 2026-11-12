@@ -6,7 +6,7 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub
 const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 
-const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v6'; // v6：加讀實戰次數 lugaSeen／lugaPick
+const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v6'; // v6：加讀實戰次數 lugaDealt／lugaPick／lugaPickPosSum
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 const CROP_REF = { width: 2040, height: 2807 };
@@ -177,7 +177,9 @@ function collectRatingDoc(map, doc) {
   const rankSeen  = Number(doc.fields?.rankSeen?.integerValue  ?? 0);
   const lugaSeen  = Number(doc.fields?.lugaSeen?.integerValue  ?? 0);
   const lugaPick  = Number(doc.fields?.lugaPick?.integerValue  ?? 0);
-  map[cardId] = { elo, seenCount, pickCount, rankSeen, lugaSeen, lugaPick };
+  const lugaDealt = Number(doc.fields?.lugaDealt?.integerValue ?? 0);      // 實戰被發到幾次
+  const lugaPickPosSum = Number(doc.fields?.lugaPickPosSum?.integerValue ?? 0); // 被選時第幾手的總和
+  map[cardId] = { elo, seenCount, pickCount, rankSeen, lugaSeen, lugaPick, lugaDealt, lugaPickPosSum };
 }
 
 // 一次撈完：runQuery 沒有 300 筆的分頁上限，3500 筆一趟就回來（list 要串 12 趟）
@@ -188,7 +190,7 @@ async function fetchRatingsViaQuery() {
     body: JSON.stringify({
       structuredQuery: {
         from: [{ collectionId: 'agricola_ratings' }],
-        select: { fields: ['elo', 'seenCount', 'pickCount', 'rankSeen', 'lugaSeen', 'lugaPick'].map(fieldPath => ({ fieldPath })) },
+        select: { fields: ['elo', 'seenCount', 'pickCount', 'rankSeen', 'lugaSeen', 'lugaPick', 'lugaDealt', 'lugaPickPosSum'].map(fieldPath => ({ fieldPath })) },
         limit: 20000,
       },
     }),
@@ -261,7 +263,7 @@ function renderTierList() {
   document.getElementById('tierEmpty').style.display = 'none';
 
   rated.sort(activeLuga
-    ? (a, b) => b.r.lugaSeen - a.r.lugaSeen || b.k.score - a.k.score
+    ? (a, b) => (b.r.lugaDealt || 0) - (a.r.lugaDealt || 0) || b.k.score - a.k.score
     : (a, b) => b.k.score - a.k.score);
   const groups = { S: [], A: [], B: [], C: [], D: [], E: [] };
   rated.forEach(item => { groups[item.k.tier].push(item); });
@@ -310,7 +312,7 @@ function renderTierList() {
   renderBanSection(container, typeOk);
 
   const statsEl = document.getElementById('tierStats');
-  const baseStats = `${activeLuga ? '有實戰資料：' : ''}已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 職業與次發各自排名${activeLuga ? ' · 各 Tier 內依實戰次數排' : ''}`;
+  const baseStats = `${activeLuga ? '有實戰資料：' : ''}已上榜 ${rated.length} 張 · 資料不足 ${unrated.length} 張 · 職業與次發各自排名${activeLuga ? ' · 各 Tier 內依實戰發到次數排' : ''}`;
   statsEl.textContent = baseStats;
   // 全站累計評分場次：從 session log 算（不對外拆分模式，避免一般玩家看到無關雜訊）
   fetchGameCounts().then(({ draft, rank }) => {
@@ -411,7 +413,8 @@ function confidenceLevel(n) {
   return { key: 'warm', label: '暖機' };
 }
 function createTierCardEl(card, r) {
-  const { elo, seenCount, rankSeen = 0, lugaSeen = 0, lugaPick = 0 } = r;
+  const { elo, seenCount, rankSeen = 0, lugaSeen = 0, lugaPick = 0, lugaDealt = 0, lugaPickPosSum = 0 } = r;
+  const lugaAvg = lugaPick ? (lugaPickPosSum / lugaPick).toFixed(1) : null; // 平均第幾手被拿
   const eff = seenCount + rankSeen;  // 現有 ELO 由歷史輪抽+快排共同養成，信心算兩者合計
   const conf = confidenceLevel(eff);
   const isBanned = BANNED_IDS.has(card['卡片ID']);
@@ -428,7 +431,7 @@ function createTierCardEl(card, r) {
         <span class="tier-card-score">${Math.round(elo)}</span>
         ${isBanned ? '<span class="tier-card-ban">禁</span>' : ''}
         <span class="tier-card-conf tier-conf-${conf.key}" title="有效場數 ${eff}">${conf.label}·${eff}</span>
-        ${lugaSeen ? `<span class="tier-card-luga" title="實戰輪抽：看過 ${lugaSeen} 次、選了 ${lugaPick} 次">實戰 ${lugaSeen}·選${lugaPick}</span>` : ''}
+        ${lugaDealt ? `<span class="tier-card-luga" title="實戰輪抽：發到 ${lugaDealt} 次、被選 ${lugaPick} 次${lugaAvg ? `、平均第 ${lugaAvg} 手被拿` : ''}">實戰 選${lugaPick}/${lugaDealt}${lugaAvg ? `·第${lugaAvg}手` : ''}</span>` : ''}
       </div>
     </div>
   `;
