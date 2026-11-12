@@ -105,17 +105,6 @@
   const plain = (v) => (v === undefined || v === null || v === '' ? '<span class="cmp-dim">—</span>' : esc(v));
 
   const SECTIONS = [
-    ['基本資料', [
-      ['類型', (c) => ({ html: esc(typeLabel(c)) })],
-      ['牌組', (c) => ({ html: plain(c['牌組']) })],
-      ['費用', (c) => ({ html: plain(c['費用']) })],
-      ['先決條件', (c) => ({ html: plain(c['先決條件']) })],
-      ['人數', (c) => ({ html: plain(c['人數'] || c['需求人數']) })],
-      ['勝利點數', (c) => ({ html: plain(c['勝利點數']), num: Number.isFinite(parseFloat(c['勝利點數'])) ? parseFloat(c['勝利點數']) : null, better: 'max' })],
-      ['紅利分數', (c) => ({ html: plain(c['紅利分數']) })],
-      ['傳遞', (c) => ({ html: plain(c['是否傳遞']) })],
-      ['禁卡', (c) => ({ html: bannedIds.has(c['卡片ID']) ? '<span class="tag tag-ban">禁卡</span>' : '<span class="cmp-dim">否</span>' })],
-    ]],
     ['牌力（輪抽評分）', [
       ['ELO', (c) => {
         const r = ratingOf(c);
@@ -139,6 +128,17 @@
         const r = ratings[c['卡片ID']];
         return r ? { html: String(r.seenCount + (r.rankSeen || 0)) } : { html: '<span class="cmp-dim">0</span>' };
       }],
+    ]],
+    ['基本資料', [
+      ['類型', (c) => ({ html: esc(typeLabel(c)) })],
+      ['牌組', (c) => ({ html: plain(c['牌組']) })],
+      ['費用', (c) => ({ html: plain(c['費用']) })],
+      ['先決條件', (c) => ({ html: plain(c['先決條件']) })],
+      ['人數', (c) => ({ html: plain(c['人數'] || c['需求人數']) })],
+      ['勝利點數', (c) => ({ html: plain(c['勝利點數']), num: Number.isFinite(parseFloat(c['勝利點數'])) ? parseFloat(c['勝利點數']) : null, better: 'max' })],
+      ['紅利分數', (c) => ({ html: plain(c['紅利分數']) })],
+      ['傳遞', (c) => ({ html: plain(c['是否傳遞']) })],
+      ['禁卡', (c) => ({ html: bannedIds.has(c['卡片ID']) ? '<span class="tag tag-ban">禁卡</span>' : '<span class="cmp-dim">否</span>' })],
     ]],
     ['實戰（LUGA 四人局）', [
       ['出現局數', (c) => { const m = matchOf(c); return m ? { html: String(m.n) } : { html: '<span class="cmp-dim">0</span>' }; }],
