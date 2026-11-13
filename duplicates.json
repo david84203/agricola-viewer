@@ -2348,5 +2348,15 @@
     ],
     "defaultCanonical": "WA057b",
     "type": "replacement"
+  },
+  {
+    "id": "n235",
+    "label": "小鎮姑娘／秋季母親",
+    "cards": [
+      "Z325",
+      "C092"
+    ],
+    "defaultCanonical": "Z325",
+    "type": "effect"
   }
 ]
