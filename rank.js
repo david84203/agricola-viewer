@@ -733,7 +733,7 @@ function openRankModal(card) {
   document.getElementById('rankModalDesc').textContent = card['說明'] || card['效果'] || '';
 
   // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
-  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), rankCardProfileMap[card['卡片ID']], card);
+  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), rankCardProfileMap[card['卡片ID']], card, (id) => { const c = rankAllCards.find((x) => String(x['卡片ID']).trim() === id); if (c) openRankModal(c); });
 
   const fieldsEl = document.getElementById('rankModalFields');
   CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));

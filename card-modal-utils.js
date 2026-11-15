@@ -248,14 +248,24 @@
       loadComboIndex().then(({ src, sink, pf }) => {
         if (panel.dataset.key !== key) return;
         const ids = [...((dir === 'to' ? sink : src)[channel] || [])].filter((id) => id !== selfId);
-        const names = ids.map((id) => (pf[id] && pf[id].name) || id).sort((x, y) => x.localeCompare(y, 'zh-Hant'));
+        const items = ids.map((id) => ({ id, name: (pf[id] && pf[id].name) || id })).sort((x, y) => x.name.localeCompare(y.name, 'zh-Hant'));
         panel.textContent = '';
         const title = document.createElement('div');
         title.className = 'card-profile-combo-title';
-        title.textContent = `${channel}・${dir === 'to' ? '可接' : '可餵'} ${names.length} 張`;
+        title.textContent = `${channel}・${dir === 'to' ? '可接' : '可餵'} ${items.length} 張`;
         const list = document.createElement('div');
         list.className = 'card-profile-combo-names';
-        list.textContent = names.join('、');
+        // 1115 Lu：牌名可點，直接換成那張卡的視窗（頁面有傳 openCard 才可點）
+        const opener = openCardById;
+        items.forEach(({ id, name }, i) => {
+          if (i) list.appendChild(document.createTextNode('、'));
+          if (!opener) { list.appendChild(document.createTextNode(name)); return; }
+          const b = document.createElement('a');
+          b.href = '#';
+          b.textContent = name;
+          b.addEventListener('click', (e) => { e.preventDefault(); opener(id); });
+          list.appendChild(b);
+        });
         panel.append(title, list);
       }).catch(() => {
         if (panel.dataset.key === key) panel.textContent = '名單載入失敗，請重新整理再試。';
@@ -607,8 +617,13 @@
 
   // 掛在 afterEl（通常是 .modal-desc-wrap）之後；每次開視窗先清掉上一次插入的區塊
   // card 有給才掛留言板（沒有卡片類型資料的卡也有留言板）
-  function mountProfile(afterEl, entry, card) {
+  // openCard(cardId)：頁面提供的「打開某張卡」函式，連動名單的牌名靠它換卡（沒傳就只顯示文字）
+  let openCardById = null;
+  function mountProfile(afterEl, entry, card, openCard) {
     if (!afterEl) return;
+    openCardById = typeof openCard === 'function'
+      ? (id) => { openCard(id); const box = afterEl.closest('.modal-box, .modal-content, .modal'); if (box) box.scrollTop = 0; }
+      : null;
     for (let next = afterEl.nextElementSibling; next && /card-(profile|comments)-block/.test(next.className); next = afterEl.nextElementSibling) next.remove();
     injectProfileStyles();
     const block = renderProfile(entry, card ? String(card['卡片ID'] ?? '').trim() : '');
