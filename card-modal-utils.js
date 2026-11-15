@@ -169,6 +169,8 @@
       .card-profile-combo-item { color: var(--text2); }
       .card-profile-value a { color: var(--blue); font-weight: 600; text-decoration: none; }
       .card-profile-value a:hover { text-decoration: underline; }
+      .card-profile-combo-panel { margin-top: 4px; padding: 8px 10px; border: 1px solid var(--border2); border-radius: 8px; font-size: .8rem; color: var(--text2); line-height: 1.6; max-height: 220px; overflow-y: auto; }
+      .card-profile-combo-title { font-size: .75rem; color: var(--text3); margin-bottom: 4px; }
       .card-profile-dispute-btn { margin-left: auto; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border2); background: transparent; color: var(--text3); font-size: .72rem; cursor: pointer; }
       .card-profile-dispute-btn:hover { color: var(--text2); border-color: var(--text3); }
       .card-profile-dispute { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding: 8px; border: 1px dashed var(--border2); border-radius: 8px; }
@@ -208,12 +210,57 @@
     return row;
   }
 
-  function comboNumberLink(channel, n) {
+  // 連動名單（1115 Lu：點數字留在 viewer 內展開，不跳頻道圖）
+  // 規則與 tools/build_card_profile.cjs deriveCombo 一致：可接＝其他卡 react／pay 該頻道；可餵＝其他卡 cause／bind／get 該頻道
+  let comboIdxPromise = null;
+  function loadComboIndex() {
+    if (!comboIdxPromise) {
+      comboIdxPromise = Promise.all([
+        fetch('./channels.json').then((r) => r.json()),
+        fetch('./card-profile.json').then((r) => r.json()),
+      ]).then(([ch, pf]) => {
+        const has = (e, r) => (e.role || []).includes(r);
+        const src = {}, sink = {};
+        for (const id of Object.keys(pf)) {
+          for (const e of (ch[id] && ch[id].channels) || []) {
+            // 同卡同頻道可能有多筆 entry（例如 react 與 pay 各一），用 Set 去重
+            if (has(e, 'cause') || has(e, 'bind') || has(e, 'get')) (src[e.ch] ||= new Set()).add(id);
+            if (has(e, 'react') || has(e, 'pay')) (sink[e.ch] ||= new Set()).add(id);
+          }
+        }
+        return { src, sink, pf };
+      }).catch((err) => { comboIdxPromise = null; throw err; });
+    }
+    return comboIdxPromise;
+  }
+
+  function comboNumberLink(channel, n, dir, selfId, panel) {
     const a = document.createElement('a');
-    a.href = `頻道圖.html#${encodeURIComponent(channel)}`;
-    a.target = '_blank';
-    a.rel = 'noopener';
+    a.href = '#';
     a.textContent = String(n);
+    a.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const key = channel + '|' + dir;
+      if (panel.dataset.key === key && !panel.hidden) { panel.hidden = true; return; }
+      panel.dataset.key = key;
+      panel.hidden = false;
+      panel.textContent = '載入中…';
+      loadComboIndex().then(({ src, sink, pf }) => {
+        if (panel.dataset.key !== key) return;
+        const ids = [...((dir === 'to' ? sink : src)[channel] || [])].filter((id) => id !== selfId);
+        const names = ids.map((id) => (pf[id] && pf[id].name) || id).sort((x, y) => x.localeCompare(y, 'zh-Hant'));
+        panel.textContent = '';
+        const title = document.createElement('div');
+        title.className = 'card-profile-combo-title';
+        title.textContent = `${channel}・${dir === 'to' ? '可接' : '可餵'} ${names.length} 張`;
+        const list = document.createElement('div');
+        list.className = 'card-profile-combo-names';
+        list.textContent = names.join('、');
+        panel.append(title, list);
+      }).catch(() => {
+        if (panel.dataset.key === key) panel.textContent = '名單載入失敗，請重新整理再試。';
+      });
+    });
     return a;
   }
 
@@ -279,7 +326,7 @@
     return box;
   }
 
-  function renderProfile(entry) {
+  function renderProfile(entry, selfId) {
     if (!entry) return null;
     injectProfileStyles();
     const rows = [];
@@ -356,6 +403,9 @@
         items.push({ channel, to, from });
       });
       if (items.length) {
+        const panel = document.createElement('div');
+        panel.className = 'card-profile-combo-panel';
+        panel.hidden = true;
         const row = profileRow('連動', (valueEl) => {
           items.forEach(({ channel, to, from }) => {
             const span = document.createElement('span');
@@ -363,18 +413,18 @@
             span.appendChild(document.createTextNode(channel + ' '));
             if (to !== null) {
               span.appendChild(document.createTextNode('可接 '));
-              span.appendChild(comboNumberLink(channel, to));
+              span.appendChild(comboNumberLink(channel, to, 'to', selfId, panel));
               span.appendChild(document.createTextNode(' 張'));
             }
             if (from !== null) {
               span.appendChild(document.createTextNode(to !== null ? ' ← ' : '← '));
-              span.appendChild(comboNumberLink(channel, from));
+              span.appendChild(comboNumberLink(channel, from, 'from', selfId, panel));
               span.appendChild(document.createTextNode(' 張可餵'));
             }
             valueEl.appendChild(span);
           });
         });
-        if (row) rows.push(row);
+        if (row) { row.appendChild(panel); rows.push(row); }
       }
     }
 
@@ -561,7 +611,7 @@
     if (!afterEl) return;
     for (let next = afterEl.nextElementSibling; next && /card-(profile|comments)-block/.test(next.className); next = afterEl.nextElementSibling) next.remove();
     injectProfileStyles();
-    const block = renderProfile(entry);
+    const block = renderProfile(entry, card ? String(card['卡片ID'] ?? '').trim() : '');
     let anchor = afterEl;
     if (block) { afterEl.insertAdjacentElement('afterend', block); anchor = block; }
     if (card) anchor.insertAdjacentElement('afterend', renderComments(card));
