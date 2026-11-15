@@ -2038,3 +2038,9 @@
   opacity: 1;
   background: rgba(240, 192, 96, .12);
 }
+
+/* 手機：BGA 模式說明文字不換行會把整頁撐到比螢幕寬（Lu 1115 第一波順修） */
+@media (max-width: 560px) {
+  .bga-toggle-wrap { flex-shrink: 1; min-width: 0; }
+  .bga-mode-bar-main { flex-wrap: wrap; }
+}

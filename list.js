@@ -277,8 +277,10 @@ function renderTable() {
     return;
   }
 
-  filteredCards.forEach(card => {
+  filteredCards.forEach((card, i) => {
     const tr = document.createElement('tr');
+    tr.dataset.i = i;
+    tr.style.cursor = 'pointer';
     COLUMNS.forEach(col => {
       const td = document.createElement('td');
       td.className = col.className;
@@ -292,6 +294,16 @@ function renderTable() {
 }
 
 // ── Event Listeners ────────────────────────────────
+// 點列開完整卡片視窗（Lu 1115 第一波）；card-profile.json 第一次點才載
+let listProfileMapP = null;
+document.getElementById('tableBody').addEventListener('click', async (e) => {
+  const tr = e.target.closest('tr[data-i]');
+  if (!tr || e.target.closest('a, button, input')) return;
+  const card = filteredCards[Number(tr.dataset.i)];
+  if (!card) return;
+  listProfileMapP ||= fetch('./card-profile.json').then(r => r.json()).catch(() => ({}));
+  CardModal.open(card, { profileMap: await listProfileMapP, allCards });
+});
 // Filter chips
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {

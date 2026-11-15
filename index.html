@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>烏嘎嘎農家樂卡牌中心</title>
-  <meta name="description" content="烏嘎嘎農家樂卡牌中心，提供卡牌列表、輪抽模擬與牌力排行工具。" />
+  <meta name="description" content="烏嘎嘎農家樂卡牌中心，提供卡牌圖鑑、輪抽模擬與牌力排行工具。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
@@ -36,7 +36,7 @@
         方便開局、測牌與討論。
       </p>
       <div class="home-actions" aria-label="主要工具">
-        <a class="home-action" href="./cards.html">查看卡牌列表</a>
+        <a class="home-action" href="./cards.html">查看卡牌圖鑑</a>
         <a class="home-action" href="./draft.html">開始輪抽模擬</a>
         <a class="home-action" href="./rank.html" id="rankLink" style="display:none">排序評分（快速）</a>
         <a class="home-action" href="./review.html">覆盤輪抽模擬</a>
@@ -106,11 +106,13 @@
     function onAuthChange() {
       const show = typeof isRater === 'function' && isRater();
       document.getElementById('rankLink').style.display = show ? '' : 'none';
+      window.SiteNav?.refresh();
     }
   </script>
 
   <footer class="site-footer">
     圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用 ・ <a href="./about.html#donate" class="footer-donate-link">小額贊助支持</a>
   </footer>
+  <script src="nav.js"></script>
 </body>
 </html>

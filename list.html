@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth.css" />
   <style>
     /* ── List Page Specific ──────────────────────────── */
     .list-toolbar {
@@ -156,6 +157,13 @@
       align-items: center;
       gap: 12px;
     }
+    /* 手機：頂欄右側原本會把整頁撐到比螢幕寬（改前就有），收起牌組清單、允許換行 */
+    @media (max-width: 540px) {
+      .brand-right { flex-shrink: 1; min-width: 0; max-width: 100%; }
+      .brand-right-row { flex-wrap: wrap; }
+      .brand-right-row small { display: none; }
+      .brand-right .auth-bar { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
@@ -163,7 +171,7 @@
     <div class="brand-left">
       <a href="./index.html" class="logo-link"><img src="./images/ugg-logo.png" alt="UGG Logo" class="ugg-logo" /></a>
       <div class="brand-text">
-        <div class="brand-title">農家樂 Agricola 卡牌圖鑑</div>
+        <div class="brand-title">農家樂 Agricola 卡牌圖鑑・文字列表</div>
         <div class="brand-sub">台灣繁體中文版翻譯</div>
       </div>
     </div>
@@ -176,8 +184,8 @@
           <span class="highlight">共 <span id="totalCount">0</span> 張卡牌</span><br/>
           <small style="color:var(--text3);">目前收錄：A, B, C, D, E, G, G4, G5, G5+, G6, G6*, G7, G8, AY, FL, FR, I, K, L, NL, S, Wm, WA, PI, Z, O, QQ, Cz, BI, 舊版E</small>
         </div>
-        <a href="./index.html" class="view-switch">
-          🖼 卡牌圖鑑版
+        <a href="./cards.html" class="view-switch">
+          🖼 圖片版
         </a>
       </div>
     </div>
@@ -231,10 +239,14 @@
     </div>
   </main>
 
+  <script src="auth.js"></script>
+  <script src="card-images.js"></script>
+  <script src="card-modal-utils.js"></script>
   <script src="list.js"></script>
 
   <footer class="site-footer">
     圖片版權歸原出版社所有，本網站僅供玩家交流與推廣使用 ・ <a href="./about.html#donate" class="footer-donate-link">小額贊助支持</a>
   </footer>
+  <script src="nav.js"></script>
 </body>
 </html>

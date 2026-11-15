@@ -368,6 +368,7 @@ function refreshAuthBar() {
     });
   }
   if (typeof onAuthChange === 'function') onAuthChange();
+  window.SiteNav?.refresh(); // 共用導覽列：排序評分跟著登入狀態出現／消失
 }
 
 // ── Login Modal ────────────────────────────────────

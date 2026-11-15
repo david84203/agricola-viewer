@@ -336,6 +336,14 @@
     return box;
   }
 
+  // 實戰統計的產生日期（card-match-stats.json 的 _meta.generatedAt「2026-11-09 12:00 (台北)」→「11/09」）；只抓一次
+  let matchDateP = null;
+  function matchDate() {
+    return matchDateP ||= fetch('./card-match-stats.json').then((r) => r.json())
+      .then((j) => { const m = /^\d{4}-(\d{2})-(\d{2})/.exec(j?._meta?.generatedAt || ''); return m ? `${m[1]}/${m[2]}` : ''; })
+      .catch(() => '');
+  }
+
   function renderProfile(entry, selfId) {
     if (!entry) return null;
     injectProfileStyles();
@@ -474,6 +482,12 @@
           ? `出現 ${m.n} 局・平均第 ${m.avgRank.toFixed(1)} 名・前兩名 ${Math.round(m.top2 * 100)}%`
           : `出現 ${m.n} 局・樣本不足`;
         valueEl.appendChild(span);
+        // Lu 1115：標資料日期（每週一排程才更新；有新局才推，所以日期＝最後一次有新局的統計）
+        const at = document.createElement('span');
+        at.className = 'card-profile-match-at';
+        at.style.cssText = 'color:var(--text3);font-size:.85em;margin-left:6px';
+        valueEl.appendChild(at);
+        matchDate().then((d) => { if (d) at.textContent = `資料至 ${d}`; });
       });
       if (row) rows.push(row);
     }
@@ -570,7 +584,7 @@
       // 開視窗後才登入：再按一次就換成留言框
       btn.addEventListener('click', () => {
         if (typeof getAuth === 'function' && getAuth()) box.replaceWith(renderComments(card));
-        else if (typeof openLoginModal === 'function') openLoginModal();
+        else if (typeof openLoginModal === 'function' && document.getElementById('authModal')) openLoginModal();
         else btn.textContent = '請先到首頁登入';
       });
       form.appendChild(btn);
@@ -632,5 +646,63 @@
     if (card) anchor.insertAdjacentElement('afterend', renderComments(card));
   }
 
-  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile };
+  // ── 自帶 DOM 的卡片視窗（Lu 1115 第一波：文字列表、卡牌比較頁也要點得開完整卡片視窗）──
+  // 跟卡牌圖鑑同一套樣式（style.css 的 .modal-*）；卡圖用 CardImages.getPath（頁面要先載 card-images.js）
+  // opts.profileMap：卡片ID → card-profile；opts.allCards：連動名單換卡時用來找卡
+  let quick = null;
+  function open(card, opts = {}) {
+    if (!quick) {
+      quick = document.createElement('div');
+      quick.className = 'modal-overlay';
+      quick.innerHTML = `<div class="modal" role="dialog" aria-modal="true">
+        <button class="modal-close" type="button" aria-label="關閉">✕</button>
+        <div class="modal-inner">
+          <div class="modal-image-wrap"><img alt="" class="cm-quick-img" /></div>
+          <div class="modal-info">
+            <div class="modal-title-row"><h2 class="modal-title"></h2><div class="modal-badge"></div></div>
+            <div class="modal-sub-row"><div class="modal-id"></div>
+              <a class="modal-compare-link" href="./compare.html" title="拿這張去跟別張卡並排比較">⚖ 比較</a></div>
+            <div class="modal-fields"></div>
+            <div class="modal-desc-wrap"><div class="modal-desc-label">說明</div><div class="modal-desc"></div></div>
+          </div>
+        </div></div>`;
+      document.body.appendChild(quick);
+      // 卡圖整張縮進框內（手機版圖框只有 200px 高，同圖鑑的 canvas）
+      const st = document.createElement('style');
+      st.textContent = '.cm-quick-img{display:block;max-width:100%;max-height:70vh;object-fit:contain}@media (max-width:540px){.cm-quick-img{max-height:200px}}';
+      document.head.appendChild(st);
+      const close =() => { quick.classList.remove('open'); document.body.style.overflow = ''; };
+      quick.querySelector('.modal-close').addEventListener('click', close);
+      quick.addEventListener('click', (e) => { if (e.target === quick) close(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && quick.classList.contains('open')) close(); });
+    }
+    const q = (s) => quick.querySelector(s);
+    const id = String(card['卡片ID'] ?? '').trim();
+    q('.modal-title').textContent = card['牌名'] || '—';
+    q('.modal-id').textContent = id;
+    renderTypeBadge(q('.modal-badge'), card);
+    renderFields(q('.modal-fields'), fieldDefs(card));
+    q('.modal-desc').textContent = card['說明'] || '—';
+    q('.modal-compare-link').href = `./compare.html?ids=${encodeURIComponent(id)}`;
+    const img = q('.modal-image-wrap img');
+    img.style.display = 'none';
+    img.removeAttribute('src');
+    img.alt = card['牌名'] || '';
+    // 卡圖清單要先載完才查得到路徑；載完時視窗若已換卡就不蓋
+    Promise.resolve(window.CardImages?.load?.()).catch(() => {}).then(() => {
+      if (q('.modal-id').textContent !== id) return;
+      const src = window.CardImages?.getPath?.(card) || '';
+      img.style.display = src ? '' : 'none';
+      if (src) img.src = src;
+    });
+    const all = opts.allCards || [];
+    mountProfile(q('.modal-desc-wrap'), (opts.profileMap || {})[id], card, (cid) => {
+      const c = all.find((x) => String(x['卡片ID'] ?? '').trim() === cid);
+      if (c) open(c, opts);
+    });
+    quick.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile, open };
 })();

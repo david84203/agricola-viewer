@@ -191,7 +191,7 @@
         </div>
         ${c ? (img ? `<img class="cmp-img" src="${esc(img)}" alt="${esc(c['牌名'])}" loading="lazy" data-zoom="${esc(img)}" />` : '<div class="cmp-img-empty">沒有卡圖</div>')
             : '<div class="cmp-img-empty">還沒選卡</div>'}
-        ${c ? `<div><div class="cmp-name">${esc(c['牌名'])}</div><div class="cmp-dim">${esc(c['卡片ID'])}</div></div>` : ''}
+        ${c ? `<div data-open="${esc(c['卡片ID'])}" title="點開看完整卡片資訊" style="cursor:pointer"><div class="cmp-name">${esc(c['牌名'])} <span class="cmp-dim">ⓘ</span></div><div class="cmp-dim">${esc(c['卡片ID'])}</div></div>` : ''}
       </div></th>`;
     });
     html += '</tr>';
@@ -302,6 +302,9 @@
       if (rm) { slots.splice(Number(rm.dataset.remove), 1); render(); return; }
       const z = e.target.closest('[data-zoom]');
       if (z) { $('cmpZoom').querySelector('img').src = z.dataset.zoom; $('cmpZoom').classList.add('open'); }
+      // 牌名點開完整卡片視窗（Lu 1115 第一波）
+      const o = e.target.closest('[data-open]');
+      if (o && byId.has(o.dataset.open)) window.CardModal?.open(byId.get(o.dataset.open), { profileMap: profiles, allCards: cards });
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.cmp-search')) document.querySelectorAll('.cmp-suggest.open').forEach((b) => b.classList.remove('open'));
