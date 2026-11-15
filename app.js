@@ -31,6 +31,12 @@ let dupCanonicalMap = new Map(); // cardId → [{ pair, replacedIds }]
 let bgaExtraIds = new Set();     // manually marked BGA card IDs
 let effectsById = new Map();     // 卡片ID → 結構化卡效（effects.json，載入失敗則靜默降級為空）
 let onlineImplMap = new Map();    // 卡片ID → 線上實作機制中文（online-implemented.json；GM/YOYO 專用徽章）
+let onlineImplAt = '';            // 清單產生日 MM/DD（功能狀態篩選標籤用）
+function setOnlineImpl(data) {
+  onlineImplMap = new Map(data && data.cards ? Object.entries(data.cards) : []);
+  const m = data && /^\d{4}-(\d{2})-(\d{2})/.exec(data.generatedAt || '');
+  onlineImplAt = m ? `${m[1]}/${m[2]}` : '';
+}
 let cardProfileMap = {};          // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 
 // ── Load Data ──────────────────────────────────────
@@ -51,11 +57,10 @@ async function loadCards() {
     // 線上已實作清單：僅 GM/YOYO 需要，非白名單不抓（比照 impl-status 的私有原則）
     implViewer ? fetch('./online-implemented.json').then(r => r.json()).catch(() => null) : Promise.resolve(null),
     window.CardImages?.load?.() || Promise.resolve(),
-    (implViewer && typeof ensureImplStatus === 'function') ? ensureImplStatus() : Promise.resolve(null),
   ]);
   effectsById = new Map((effectsData || []).map(e => [e.cardId, e]));
   cardProfileMap = profileData || {};
-  onlineImplMap = new Map(onlineImplData && onlineImplData.cards ? Object.entries(onlineImplData.cards) : []);
+  setOnlineImpl(onlineImplData);
 
   const realCards = typeof adminApplyOverrides === 'function' ? adminApplyOverrides(base, overrides) : base;
   allCards = realCards.concat(refCards);
@@ -308,10 +313,9 @@ function applyFilters() {
     if (excludeDups && dupNonCanonical.has(getCardKey(c))) return false;
     // impl status filter（白名單專用；非白名單一律忽略此篩選）
     if (activeImplStatus !== 'all' && typeof isImplStatusViewer === 'function' && isImplStatusViewer()) {
-      if (activeImplStatus === 'online') {
-        // 線上已實作＝online-implemented.json 白名單（play.js 自動真相）；ID 帶星號要先去掉
-        if (!onlineImplMap.has(String(c['卡片ID']).replace(/\*$/, ''))) return false;
-      } else if (String(getImplStatus(c['卡片ID'])) !== activeImplStatus) return false;
+      // 線上已實作＝online-implemented.json 白名單（play.js 自動真相）；ID 帶星號要先去掉
+      const online = onlineImplMap.has(String(c['卡片ID']).replace(/\*$/, ''));
+      if (online !== (activeImplStatus === 'online')) return false;
     }
     // deck filter
     if (activeDeck === 'latest') {
@@ -495,8 +499,6 @@ function createCardEl(card, idx) {
       ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
     </div>
   `;
-
-  if (typeof renderImplStatusBadge === 'function') renderImplStatusBadge(card, div);
 
   div.addEventListener('click', () => {
     if (dupNonCanonical.has(getCardKey(card))) openDupCompare(card);
@@ -742,9 +744,6 @@ function openModal(card) {
   editBtn.style.display = (typeof isAdmin === 'function' && isAdmin()) ? '' : 'none';
   editBtn.onclick = () => openCardEditModal(card, allCards);
 
-  // 卡牌功能實作狀態編輯（白名單專用，DOM 層級不渲染非白名單）
-  if (typeof renderImplStatusEditor === 'function') renderImplStatusEditor(card);
-
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -759,18 +758,16 @@ function onAuthChange() {
   const editBtn = document.getElementById('modalAdminEditBtn');
   if (editBtn) editBtn.style.display = admin ? '' : 'none';
 
-  // 卡牌功能實作狀態：篩選器與徽章跟著登入狀態顯示/隱藏
+  // 功能狀態篩選跟著登入狀態顯示/隱藏；開頁後才登入的 GM 補抓自動清單
   if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
   const viewer = typeof isImplStatusViewer === 'function' && isImplStatusViewer();
-  const implEditor = document.getElementById('implStatusEditor');
-  if (implEditor && !viewer) implEditor.remove();
-  if (viewer && typeof ensureImplStatus === 'function') {
-    ensureImplStatus().then(() => { if (typeof refreshAllImplStatusBadges === 'function') refreshAllImplStatusBadges(); });
-  } else {
-    implStatusMap = null; // 登出/切換身份後清掉記憶體中的快取，縱深防禦
-    if (typeof refreshAllImplStatusBadges === 'function') refreshAllImplStatusBadges();
-    if (typeof applyFilters === 'function') applyFilters();
+  if (viewer && !onlineImplMap.size) {
+    fetch('./online-implemented.json').then(r => r.json()).then(d => {
+      setOnlineImpl(d);
+      if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
+    }).catch(() => {});
   }
+  if (typeof applyFilters === 'function') applyFilters();
 }
 
 function closeModal() {
