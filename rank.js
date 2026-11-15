@@ -203,7 +203,6 @@ async function loadRankCards() {
     ]);
     rankCardProfileMap = profileData || {};
     const data = await res.json();
-    const BGA_BANNED_IDS = ['A127','B010*','A010','B021','A048','C031','A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','A100','A132','B147','C058','B052','B018','C093','C130','C003*','B022'];
     rankAllCards = data.filter(c => {
       const id = c['卡片ID'];
       if (!id) return false;
@@ -214,16 +213,6 @@ async function loadRankCards() {
       if (rankDupExclusions.has(rankGetCardKey(c))) return false;
       return c.card_type === 'occupation' || c.card_type === 'minor' || c.card_type === 'both';
     });
-    // 報告 BGA 禁卡中被重複卡機制排除的清單（它們由正本代表評分，不需處理）
-    const bgaBannedExcluded = BGA_BANNED_IDS.filter(id =>
-      rankDupExclusions.has(id) ||
-      data.filter(c => c['卡片ID'] === id).some(c => rankDupExclusions.has(rankGetCardKey(c)))
-    );
-    if (bgaBannedExcluded.length) {
-      console.log('[rank] BGA 禁卡中被重複卡排除（由正本代表）:', bgaBannedExcluded);
-    } else {
-      console.log('[rank] BGA 禁卡與重複卡無交集，26 張全數可進池');
-    }
   } catch {}
 }
 

@@ -82,16 +82,102 @@
     T7_AUCTION: '競標',
   };
 
+  // 內部代碼 → 中文對照；找不到對照的代碼一律不顯示（不露英文代碼與原始 JSON）
+  const AT_LABELS = {
+    HARVEST_FEED: '收穫・餵食階段', HARVEST_FIELD: '收穫・田地階段', HARVEST_BREED: '收穫・繁殖階段',
+    HARVEST_START: '收穫開始', HARVEST_END: '收穫結束', HARVEST_REAP_END: '收穫・收成後',
+    WORK_PHASE: '工作階段', WORK_PHASE_START: '工作階段開始', WORK_PHASE_END: '工作階段結束',
+    RETURN_HOME: '回家階段', REPLENISH_PHASE: '補充階段', ROUND_START: '回合開始', ROUND_END: '回合結束',
+  };
+  const FREQ_LABELS = {
+    max_1_per_game: '每場限 1 次', max_2_per_game: '每場限 2 次', max_1_per_round: '每回合限 1 次',
+    max_1_per_turn: '每次輪到限 1 次', max_1_per_harvest: '每次收穫限 1 次', unlimited: '次數不限',
+  };
+  const GOOD_LABELS = {
+    wood: '木材', clay: '黏土', reed: '蘆葦', stone: '石頭', food: '食物', grain: '穀物', vegetable: '蔬菜',
+    sheep: '羊', boar: '野豬', cattle: '牛', animal: '動物', any: '任一資源', building_resource: '建材',
+    vp_bonus: '獎勵分', begging_card: '乞討卡', field: '田地', family_member: '家庭成員',
+  };
+  const OP_LABELS = {
+    CONVERT: '轉換', PLACE_ON_ROUND_SPACE: '放到回合格', BUILD_STABLE: '蓋馬廄', PERFORM_ACTION: '執行行動',
+    DEPLOY_WORKER: '放置工人', PLOW: '犁田', RENOVATE: '整修', PLAY_CARD: '打出卡牌', FOR_EACH: '依數量計算',
+    CHOOSE: '擇一', STORE_ON_CARD: '存放在卡上', BREED: '繁殖', IF: '符合條件時', MOVE: '移動',
+    FORGO_ACTION: '放棄行動', EXTRA_DEPLOYMENT: '額外放置工人', BUY_FROM_SUPPLY: '向供應區購買',
+    PROVIDE_ZONE: '提供區域', HARVEST_CROP: '收成作物', CREATE_ACTION_SPACE: '新增行動格',
+    LEAVE_ON_SPACE: '留在行動格', BUILD_ROOM: '蓋房間', PLACE_MARKER: '放置標記', REFILL_SPACE: '補充行動格',
+    OPPONENT_GAINS: '對手獲得', ATTACH_TO_SPACE: '附加於行動格', STACK: '堆疊放置', BUILD_FENCES: '蓋圍欄',
+    SKIP_PLACEMENT: '略過放置', SOW: '播種', RECALL_WORKER: '收回工人', REPEAT: '重複',
+  };
+  const EVENT_LABELS = {
+    BUILD_STABLE: '蓋馬廄', BUILD_ROOM: '蓋房間', SOW: '播種', BUILD_FENCES: '蓋圍欄', TAKE_ACCUMULATE: '拿取累積物',
+    ANY_ACTION: '任一行動', RENOVATE: '整修', BAKE_BREAD: '烤麵包', HARVEST_CROP: '收成作物',
+    PLAY_IMPROVEMENT: '打出發展卡', DEPLOY_WORKER: '放置工人', PLAY_MAJOR: '打出主要發展', PLAY_MINOR: '打出次要發展',
+    PLAY_OCCUPATION: '打出職業', PLAY_CARD: '打出卡牌', PLOW: '犁田', FAMILY_GROWTH: '家庭成員增加', BREED: '繁殖',
+  };
+  const SPACE_LABELS = {
+    PLOW_SPACE: '犁田', PLOW_SOW_SPACE: '犁田播種', WOOD1_SPACE: '1 木材', WOOD2_SPACE: '2 木材', WOOD3_SPACE: '3 木材',
+    CLAY1_SPACE: '1 黏土', CLAY2_SPACE: '2 黏土', REED_SPACE: '蘆葦', STONE_S2_SPACE: '石頭（第 2 階段）',
+    STONE_S4_SPACE: '石頭（第 4 階段）', FISHING_SPACE: '釣魚', DAY_LABORER_SPACE: '日工', TAKE_GRAIN_SPACE: '拿穀物',
+    TAKE_VEG_SPACE: '拿蔬菜', TRAVELING_PLAYERS_SPACE: '巡迴藝人', BOAR_SPACE: '野豬', SHEEP_SPACE: '羊', CATTLE_SPACE: '牛',
+    FAMILY_GROWTH_SPACE: '家庭成員增加', OCCUPATION_SPACE: '職業', FENCES_SPACE: '圍欄', STARTING_PLAYER_SPACE: '起始玩家',
+    SOW_BAKE_SPACE: '播種烤麵包', RENOVATE_BUILD_SPACE: '整修', BUILD_ROOM_STABLE_SPACE: '蓋房間／馬廄',
+    BUILD_MAJOR_MINOR_SPACE: '主要／次要發展',
+  };
+  const HOOK_LABELS = {
+    SPACE_OCCUPIED: '行動格被占用', COST_PLAY_OCCUPATION: '打出職業的費用', CAPACITY_PASTURE: '牧場容量',
+    COST_BUILD_ROOM: '蓋房間的費用', ACTION_REPLACE: '行動替換', COST_RENOVATE: '整修的費用',
+    COST_PLAY_IMPROVEMENT: '打出發展卡的費用', COST_BUILD_FENCE: '蓋圍欄的費用', COST_BUILD_STABLE: '蓋馬廄的費用',
+    SPACE_RESTRICTION: '行動格限制', SOW_PLACEMENT: '播種位置', CAPACITY_STABLE: '馬廄容量', COST_FEED: '餵食的費用',
+    BREED_RULE: '繁殖規則', CAPACITY_HOUSE_ANIMAL: '房屋可養動物數',
+  };
+  const TRANSFORM_LABELS = {
+    RELAX: '放寬限制', SUBSTITUTE_RESOURCE: '資源替代', SET_VALUE: '改為固定值', DISCOUNT: '折扣',
+    SWAP_ACTION: '行動互換', RECLASSIFY: '改變分類', RESTRICT: '加上限制',
+  };
+
+  // 備註含內部代碼（如 SOW、PERFORM_ACTION）或原始 JSON 的整段不顯示
+  const isPlainNote = (t) => typeof t === 'string' && t.trim() && !/[A-Z]{2,}_[A-Z_]+|\{"|\[\{|\b(?:hook|event:|trigger)\b/.test(t);
+
   function triggerLabel(trigger) {
-    const zh = TRIGGER_LABELS[trigger] || trigger;
-    return `${zh}（${trigger}）`;
+    return TRIGGER_LABELS[trigger] || '';
+  }
+
+  function atLabel(at) {
+    return String(at || '').split(',').map((p) => {
+      const t = p.trim();
+      const m = /^R(\d+)$/.exec(t);
+      return m ? `第 ${m[1]} 回合` : (AT_LABELS[t] || '');
+    }).filter(Boolean).join('、');
+  }
+
+  function eventOne(ev) {
+    if (typeof ev !== 'string') return '';
+    if (EVENT_LABELS[ev]) return EVENT_LABELS[ev];
+    const i = ev.indexOf(':');
+    if (i < 0) return ev === 'USE_SPACE' ? '使用行動格' : '';
+    const head = ev.slice(0, i), tail = ev.slice(i + 1);
+    if (head === 'USE_SPACE' && SPACE_LABELS[tail]) return `使用「${SPACE_LABELS[tail]}」行動格`;
+    if (head === 'GAIN' && GOOD_LABELS[tail]) return `獲得${GOOD_LABELS[tail]}`;
+    return '';
+  }
+
+  function eventLabel(event) {
+    return [].concat(event || []).map(eventOne).filter(Boolean).join('／');
   }
 
   function opLine(op) {
-    // 逐條顯示效果指令：常見 GAIN/PAY 類給簡短摘要，其餘退回精簡 JSON
-    if (op && op.op === 'GAIN' && op.good) return `獲得 ${op.good} × ${JSON.stringify(op.amount)}`;
-    if (op && op.op === 'PAY' && op.good) return `支付 ${op.good} × ${JSON.stringify(op.amount)}`;
-    return JSON.stringify(op);
+    // 逐條顯示效果指令：只顯示有中文對照的內容，其餘不顯示（回傳空字串）
+    if (!op || !OP_LABELS[op.op] && op.op !== 'GAIN' && op.op !== 'PAY' && op.op !== 'LOSE') return '';
+    if (op.op === 'GAIN' || op.op === 'PAY' || op.op === 'LOSE') {
+      const good = GOOD_LABELS[op.good];
+      if (!good) return '';
+      const verb = { GAIN: '獲得', PAY: '支付', LOSE: '失去' }[op.op];
+      return typeof op.amount === 'number' ? `${verb} ${good} × ${op.amount}` : `${verb} ${good}`;
+    }
+    if (op.op === 'CONVERT' && GOOD_LABELS[op.from] && GOOD_LABELS[op.to]) {
+      return `轉換：${GOOD_LABELS[op.from]} → ${GOOD_LABELS[op.to]}`;
+    }
+    return OP_LABELS[op.op];
   }
 
   function renderEffects(el, rec) {
@@ -107,11 +193,11 @@
     };
 
     (rec.effects || []).forEach((group) => {
-      section(triggerLabel(group.trigger) + (group.event ? ` ・ ${JSON.stringify(group.event)}` : '') + (group.at ? ` ・ ${group.at}` : ''));
+      section([triggerLabel(group.trigger), eventLabel(group.event), atLabel(group.at)].filter(Boolean).join(' ・ ') || '效果');
       const meta = [];
       if (group.optional) meta.push('可選');
-      if (group.freq) meta.push(group.freq);
-      if (group.condition) meta.push(`條件: ${JSON.stringify(group.condition)}`);
+      if (FREQ_LABELS[group.freq]) meta.push(FREQ_LABELS[group.freq]);
+      if (group.condition) meta.push('有附帶條件');
       if (meta.length) {
         const m = document.createElement('div');
         m.className = 'effects-meta-line';
@@ -119,35 +205,40 @@
         el.appendChild(m);
       }
       (group.effects || []).forEach((op) => {
+        const text = opLine(op);
+        if (!text) return;
         const line = document.createElement('div');
         line.className = 'effects-op-line';
-        line.textContent = opLine(op);
+        line.textContent = text;
         el.appendChild(line);
       });
     });
 
     if (rec.modifiers && rec.modifiers.length) {
-      section('規則修正（modifiers）');
-      rec.modifiers.forEach((mod) => {
+      const lines = rec.modifiers
+        .filter((mod) => HOOK_LABELS[mod.hook] && TRANSFORM_LABELS[mod.transform])
+        .map((mod) => `${HOOK_LABELS[mod.hook]}：${TRANSFORM_LABELS[mod.transform]}`);
+      if (lines.length) section('規則修正');
+      lines.forEach((text) => {
         const line = document.createElement('div');
         line.className = 'effects-op-line';
-        line.textContent = `${mod.hook} → ${mod.transform} ${JSON.stringify(mod.params || {})}`;
+        line.textContent = text;
         el.appendChild(line);
       });
     }
 
-    if (rec.scoringRule) {
-      section('計分規則（scoringRule）');
+    if (rec.scoringRule && isPlainNote(rec.scoringRule.notes)) {
+      section('計分規則');
       const line = document.createElement('div');
       line.className = 'effects-op-line';
-      line.textContent = JSON.stringify(rec.scoringRule);
+      line.textContent = rec.scoringRule.notes;
       el.appendChild(line);
     }
 
     const foot = document.createElement('div');
     foot.className = 'effects-meta-line';
     const confLabel = { high: '高', medium: '中', low: '低' }[rec.confidence] || rec.confidence || '—';
-    foot.textContent = `信心度: ${confLabel}${rec.notes ? ' ・ 備註: ' + rec.notes : ''}`;
+    foot.textContent = `信心度: ${confLabel}${isPlainNote(rec.notes) ? ' ・ 備註: ' + rec.notes : ''}`;
     el.appendChild(foot);
   }
 

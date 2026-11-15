@@ -29,13 +29,19 @@
   // ── 資料載入 ──────────────────────────────────────
   async function loadOverrides() {
     try {
-      const data = await fetch(`${FS}/card_overrides?pageSize=300`).then((r) => r.json());
       const out = {};
-      (data.documents || []).forEach((doc) => {
-        const f = {};
-        Object.entries(doc.fields || {}).forEach(([k, v]) => { f[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? ''); });
-        out[decodeURIComponent(doc.name.split('/').pop())] = f;
-      });
+      let pageToken = null;
+      do {
+        let url = `${FS}/card_overrides?pageSize=300`;
+        if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+        const data = await fetch(url).then((r) => r.json());
+        (data.documents || []).forEach((doc) => {
+          const f = {};
+          Object.entries(doc.fields || {}).forEach(([k, v]) => { f[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? ''); });
+          out[decodeURIComponent(doc.name.split('/').pop())] = f;
+        });
+        pageToken = data.nextPageToken ?? null;
+      } while (pageToken);
       return out;
     } catch { return {}; }
   }

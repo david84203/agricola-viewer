@@ -442,8 +442,6 @@ function startMinorPhase() {
 // ── ELO-weighted sim picks ─────────────────────────
 const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5'; // v5：BGA 禁卡種分＋顯示邏輯調整後刷新快取
 const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours（與 tierlist.js 一致）
-const SIM_MIN_SEEN = 5;       // 與 tierlist MIN_SEEN 一致：列入分級所需最低場數（輪抽＋快排，Lu 1112）
-const SIM_S_TIER_PCT = 0.08;  // 與 tierlist TIER_BOUNDS 一致：前 8% 為 Tier S
 
 async function fetchEloForDraft() {
   state.eloCache = {};
@@ -483,19 +481,12 @@ async function fetchEloForDraft() {
   } catch { /* fail silently — sim picks fall back to uniform random */ }
 }
 
-// 與 tierlist.js 相同的混合分數排名，取非禁卡前 8% 作為 Tier S
+// 與牌力排行同一套（tier-utils.js）：職業／次發各自排、扣禁卡與被取代的重複卡、有效場數含快排；S 牌＝兩個牌池各自的 Tier S
 function computeSTierIds(map) {
-  const score = r => {
-    if (!r.seenCount) return r.elo;
-    const pickRate = (r.pickCount + 1) / (r.seenCount + 9); // 與 tier-utils 同：先墊 9 看 1 選（Lu 1112）
-    const prior = 1200 + (pickRate - 0.11) * 450; // 0.11 ≈ 1/9（9張包隨機基準）
-    const conf = Math.min(r.seenCount / 30, 1);
-    return conf * r.elo + (1 - conf) * prior;
-  };
-  const rated = Object.entries(map)
-    .filter(([id, r]) => r.seenCount + (r.rankSeen || 0) >= SIM_MIN_SEEN && !BANNED_IDS.has(id))
-    .sort((a, b) => score(b[1]) - score(a[1]));
-  return new Set(rated.slice(0, Math.ceil(rated.length * SIM_S_TIER_PCT)).map(([id]) => id));
+  const ranks = CardTiers.compute(allCards, map, c => BANNED_IDS.has(c['卡片ID']));
+  const out = new Set();
+  ranks.forEach((k, id) => { if (k.tier === 'S') out.add(id); });
+  return out;
 }
 
 function simPickWeighted(avail, count) {

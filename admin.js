@@ -9,17 +9,23 @@ const FIRESTORE_BASE_ADMIN = 'https://firestore.googleapis.com/v1/projects/proje
 
 async function loadCardOverrides() {
   try {
-    const res  = await fetch(`${FIRESTORE_BASE_ADMIN}/card_overrides?pageSize=300`);
-    const data = await res.json();
     const overrides = {};
-    (data.documents || []).forEach(doc => {
-      const cardId = doc.name.split('/').pop();
-      const fields = {};
-      Object.entries(doc.fields || {}).forEach(([k, v]) => {
-        fields[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? '');
+    let pageToken = null;
+    do {
+      let url = `${FIRESTORE_BASE_ADMIN}/card_overrides?pageSize=300`;
+      if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      (data.documents || []).forEach(doc => {
+        const cardId = doc.name.split('/').pop();
+        const fields = {};
+        Object.entries(doc.fields || {}).forEach(([k, v]) => {
+          fields[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? '');
+        });
+        overrides[decodeURIComponent(cardId)] = fields;
       });
-      overrides[decodeURIComponent(cardId)] = fields;
-    });
+      pageToken = data.nextPageToken ?? null;
+    } while (pageToken);
     return overrides;
   } catch { return {}; }
 }

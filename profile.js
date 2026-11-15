@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════
    農家樂 Profile — profile.js
-   評分者個人分析頁（解鎖條件：500 場評分）
+   個人分析頁（玩家／評分者皆可；100 場起解鎖，至 400 場全部解鎖）
    ══════════════════════════════════════════════════ */
 
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
@@ -8,11 +8,8 @@ const IMG_BASE = './images/';
 const GRID_COLS = 3, GRID_ROWS = 3;
 const CROP = { offsetTop: 113, offsetBottom: 99, offsetLeft: 182, offsetRight: 164 };
 const CROP_REF = { width: 2040, height: 2807 };
-const MIN_SEEN_TIER  = 5;  // minimum raterLog appearances to be assigned a tier
 const MIN_SEEN_HATE  = 10; // minimum appearances required to appear in "disliked" list
-const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
-const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
-const UNLOCK_THRESHOLD = 500;       // 完整解鎖所需場次
+const UNLOCK_THRESHOLD = 400;       // 完整解鎖所需場次（＝SECTION_TIERS 最高門檻）
 const MIN_UNLOCK_THRESHOLD = 100;   // 進入個人分析頁所需最低場次
 
 // 各分析卡片的解鎖門檻（場次數）── 樣本需求越大的越晚解鎖
@@ -34,11 +31,6 @@ const UNLOCK_TIER_LIST = [...new Set(Object.values(SECTION_TIERS))].sort((a, b) 
 
 let imageCache = {};
 let gAnalytics = null; // global after compute
-
-// ── Tier Helper ────────────────────────────────────
-function getTier(rankPct) {
-  return TIERS[TIER_BOUNDS.findIndex(b => rankPct < b)];
-}
 
 // ── Canvas Crop (from draft.js) ────────────────────
 function drawCrop(canvas, card, topFraction = 1, forceSheet = false) {
@@ -175,14 +167,38 @@ async function fetchAllRatings() {
 
 // ── Tier Map ───────────────────────────────────────
 
-function computeTierMap(ratingsMap, cards) {
-  const rated = cards
-    .map(c => ({ id: c['卡片ID'], r: ratingsMap[c['卡片ID']] }))
-    .filter(x => x.r && x.r.seenCount + (x.r.rankSeen || 0) >= MIN_SEEN_TIER)
-    .sort((a, b) => b.r.elo - a.r.elo);
-  const n = rated.length;
+// 與公開牌力排行同一套（tier-utils.js）：職業／次發各自排、扣禁卡與被取代的重複卡、有效場數含快排
+const PROFILE_BANLIST_CACHE_KEY = 'agricola_banlist_cache';
+const PROFILE_BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+async function loadBannedIdSet() {
+  try {
+    const s = JSON.parse(localStorage.getItem(PROFILE_BANLIST_CACHE_KEY));
+    if (s && Date.now() - s.cachedAt < PROFILE_BANLIST_CACHE_TTL && s.data?.length) return new Set(s.data.flatMap(g => g.ids));
+  } catch {}
+  try {
+    const doc = await fetch(`${FIRESTORE_BASE}/settings/banlist`).then(r => r.json());
+    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
+      label: g.mapValue.fields.label.stringValue,
+      ids: (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
+    }));
+    if (groups.length) {
+      try { localStorage.setItem(PROFILE_BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() })); } catch {}
+    }
+    return new Set(groups.flatMap(g => g.ids));
+  } catch { return new Set(); }
+}
+
+async function loadDupNonCanonicalKeys(cards) {
+  try { return (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys; }
+  catch { return new Set(); }
+}
+
+function computeTierMap(ratingsMap, cards, bannedIds, dupKeys) {
+  const ranks = CardTiers.compute(cards, ratingsMap,
+    c => bannedIds.has(c['卡片ID']) || dupKeys.has(DuplicateCards.getCardKey(c)));
   const tierMap = {};
-  rated.forEach(({ id }, i) => { tierMap[id] = getTier(i / n); });
+  ranks.forEach((k, id) => { tierMap[id] = k.tier; });
   return tierMap;
 }
 
@@ -689,7 +705,7 @@ function renderTypePref() {
   document.getElementById('typePrefContent').innerHTML = `
     ${row('occ', '職業牌', occEfficiency, occAvgElo)}
     ${row('min', '次要發展牌', minEfficiency, minAvgElo)}
-    <div class="pref-note">「效率分數」與上方總覽的「平均得分」用同一套算法──每次選擇取「你選的牌 ELO ÷ 當輪候選牌中最高 ELO」的比例，平均後換算成 0~100 分；分數越高代表你越常選到接近當輪最強的牌。這裡依「職業牌」「次要發展卡」分開計算，可以看出你在哪一種牌型上挑得比較準</div>
+    <div class="pref-note">「效率分數」與上方總覽的「平均得分」用同一套算法──每次選擇比較「你選的牌」和「當輪候選牌中最強的牌」的 ELO 分差：差 20 分以內視為勢均力敵、算滿分，差距再拉大就逐步扣分，差到約 170 分以上該次就是 0 分；出現次數少的牌，分數會先往中間值靠攏，避免偶然的高低影響。所有選擇平均後換算成 0~100 分，分數越高代表你越常選到接近當輪最強的牌。這裡依「職業牌」「次要發展卡」分開計算，可以看出你在哪一種牌型上挑得比較準</div>
   `;
 }
 
@@ -959,14 +975,12 @@ function renderPickPriority() {
 // ── Toggle Handlers ────────────────────────────────
 
 function bindToggles() {
-  document.getElementById('favOccExcS').addEventListener('change', e =>
-    buildFavList('favOccList', 'occupation', e.target.checked));
-  document.getElementById('favMinExcS').addEventListener('change', e =>
-    buildFavList('favMinList', 'minor', e.target.checked));
-  document.getElementById('hateOccExcE').addEventListener('change', e =>
-    buildHateList('hateOccList', 'occupation', e.target.checked));
-  document.getElementById('hateMinExcE').addEventListener('change', e =>
-    buildHateList('hateMinList', 'minor', e.target.checked));
+  // 用 onchange 賦值（重新載入時不會重複綁定），並把勾選還原成與剛渲染的清單一致
+  const bind = (id, fn) => { const el = document.getElementById(id); el.checked = false; el.onchange = e => fn(e.target.checked); };
+  bind('favOccExcS',  v => buildFavList('favOccList', 'occupation', v));
+  bind('favMinExcS',  v => buildFavList('favMinList', 'minor', v));
+  bind('hateOccExcE', v => buildHateList('hateOccList', 'occupation', v));
+  bind('hateMinExcE', v => buildHateList('hateMinList', 'minor', v));
 }
 
 // ── Main Render ────────────────────────────────────
@@ -1006,6 +1020,25 @@ function setLoading(msg) {
   document.getElementById('profileLoadingMsg').textContent = msg;
 }
 
+let loadedFor = null;     // 目前畫面上的分析屬於哪個帳號（含管理員檢視對象）
+let loadSeq = 0;          // 每次載入遞增，晚到的舊結果丟棄
+let profileReady = false; // 首次 init 跑完登入判斷前，不處理登入狀態變化
+
+// 目前登入者要看的分析對象；沒有權限回傳 null
+function currentProfileKey() {
+  const auth = typeof getAuth === 'function' ? getAuth() : null;
+  if (!auth || !hasProfileAccess()) return null;
+  const urlRater = new URLSearchParams(location.search).get('rater');
+  return (isAdmin() && urlRater) ? urlRater : getRaterId();
+}
+
+function showAuthRequired() {
+  ['profileLoading', 'profileLocked', 'profileContent'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  document.getElementById('profileAuthRequired').style.display = '';
+  document.getElementById('profileLoginBtn').onclick = openLoginModal;
+  document.getElementById('profilePlayerLoginBtn').onclick = openPlayerLoginModal;
+}
+
 async function init() {
   // Wait for auth.js to mount
   await new Promise(r => {
@@ -1013,19 +1046,18 @@ async function init() {
     window.addEventListener('load', r);
   });
 
-  const auth = typeof getAuth === 'function' ? getAuth() : null;
+  const seq = ++loadSeq;
+  const raterId = currentProfileKey();
+  profileReady = true;
 
-  if (!auth || !hasProfileAccess()) {
-    document.getElementById('profileLoading').style.display = 'none';
-    document.getElementById('profileAuthRequired').style.display = '';
-    document.getElementById('profileLoginBtn').addEventListener('click', openLoginModal);
-    document.getElementById('profilePlayerLoginBtn').addEventListener('click', openPlayerLoginModal);
+  if (!raterId) {
+    loadedFor = null;
+    gAnalytics = null;
+    showAuthRequired();
     return;
   }
-
-  const urlRater  = new URLSearchParams(location.search).get('rater');
-  const adminView = isAdmin() && !!urlRater;
-  const raterId   = adminView ? urlRater : getRaterId();
+  loadedFor = raterId;
+  const adminView = isAdmin() && !!new URLSearchParams(location.search).get('rater');
 
   try {
     setLoading('統計評分場次…');
@@ -1056,15 +1088,19 @@ async function init() {
     }
 
     setLoading('載入評分紀錄…');
-    const [sessions, cards, ratingsMap] = await Promise.all([
+    const cardsP = fetch('./cards.json').then(r => r.json());
+    const [sessions, cards, ratingsMap, bannedIds, dupKeys] = await Promise.all([
       fetchSessions(raterId),
-      fetch('./cards.json').then(r => r.json()),
+      cardsP,
       fetchAllRatings(),
+      loadBannedIdSet(),
+      cardsP.then(loadDupNonCanonicalKeys),
       window.CardImages?.load?.() || Promise.resolve(),
     ]);
+    if (seq !== loadSeq) return; // 載入途中帳號已變，丟棄這批結果
 
     setLoading('計算分析數據…');
-    const tierMap = computeTierMap(ratingsMap, cards);
+    const tierMap = computeTierMap(ratingsMap, cards, bannedIds, dupKeys);
     gAnalytics = computeAnalytics(sessions, cards, ratingsMap, tierMap);
     gAnalytics.unlockCount = adminView ? Infinity : count;
 
@@ -1072,6 +1108,8 @@ async function init() {
     renderProfile(raterId);
 
   } catch (err) {
+    if (seq !== loadSeq) return;
+    loadedFor = null; // 失敗後換帳號／重新登入可再試
     document.getElementById('profileLoadingMsg').textContent = `載入失敗：${err.message}`;
   }
 }
@@ -1079,11 +1117,20 @@ async function init() {
 document.addEventListener('DOMContentLoaded', init);
 
 // Re-init after login
+// 登入／登出／換帳號：登出清畫面並顯示登入提示；換成另一個有權限的帳號就重新載入
 function onAuthChange() {
-  const auth = typeof getAuth === 'function' ? getAuth() : null;
-  if (auth && hasProfileAccess() && document.getElementById('profileAuthRequired').style.display !== 'none') {
-    document.getElementById('profileAuthRequired').style.display = 'none';
-    document.getElementById('profileLoading').style.display = '';
-    init();
+  if (!profileReady) return; // 首次 init 還沒判斷完，由它自己處理
+  const key = currentProfileKey();
+  if (key === loadedFor) return; // 同一個帳號（auth.js 每次刷新列都會呼叫），不重載
+  loadSeq++; // 作廢載入中的舊請求
+  if (!key) {
+    loadedFor = null;
+    gAnalytics = null;
+    showAuthRequired();
+    return;
   }
+  ['profileAuthRequired', 'profileLocked', 'profileContent'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  document.getElementById('profileLoading').style.display = '';
+  setLoading('載入中…');
+  init();
 }
