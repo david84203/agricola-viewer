@@ -15,37 +15,14 @@ const MIN_SEEN = 5;
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
 const TIER_BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
 
-let BANNED_GROUPS = [
-  { label: '過強職業卡',     ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '8720-9', '7873-7', '7252-3', '6022-5', '舊版E198', 'K270', 'NL098', 'PI10', 'PI03', 'PI06', 'Z329', 'Ö03', 'Ö01', '2913-2'] },
-  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', '6515-6', '5869-10', '5881-9', '4988-8', 'I081', 'Z320', 'K138', 'K125', 'Ö13', 'Ö17', '6044-7', 'Ö20', '9244-5', '12019-2'] },
-  { label: '過爛職業卡',     ids: ['A107', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E198', '舊版E171', '5030-2', 'Ö05', 'K304', 'Ö02', '5698-2', 'WM033', 'Ö09', '6575-4', 'WA042', 'Z333', 'K317', 'FL053', 'A100', 'A132', 'B147', 'I224'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', '8315', '6960-2', 'NL023', 'K109', 'FL016', 'FL028', 'Z324', 'FL021', 'NL025'] },
-  { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*', 'B022', 'Ö04', 'PI17'] },
-];
-let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
-
-const BANLIST_CACHE_KEY = 'agricola_banlist_cache';
-const BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (shared with draft.js)
-
-const BGA_CACHE_KEY = 'agricola_bga_cache';
-const BGA_CACHE_TTL = 24 * 60 * 60 * 1000;
+// 禁卡表＋BGA 額外卡由 site-lists.js 載入（Firestore 唯一來源）
+let BANNED_GROUPS = [];
+let BANNED_IDS = new Set();
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 let bgaExtraIds = new Set();
 
 async function loadBgaIds() {
-  try {
-    const cached = (() => {
-      try {
-        const s = JSON.parse(localStorage.getItem(BGA_CACHE_KEY));
-        return s && Date.now() - s.cachedAt < BGA_CACHE_TTL ? s.data : null;
-      } catch { return null; }
-    })();
-    const ids = cached ?? await fetch(`${FIRESTORE_BASE}/settings/bga_cards`)
-      .then(r => r.json())
-      .then(doc => (doc.fields?.ids?.arrayValue?.values || []).map(v => v.stringValue).filter(Boolean));
-    bgaExtraIds = new Set(ids);
-    if (!cached) localStorage.setItem(BGA_CACHE_KEY, JSON.stringify({ data: ids, cachedAt: Date.now() }));
-  } catch {}
+  bgaExtraIds = await SiteLists.loadBgaExtraIds();
 }
 
 function isCardBga(card) {
@@ -53,36 +30,8 @@ function isCardBga(card) {
 }
 
 async function loadBanlist() {
-  try {
-    let groups = null;
-    const cached = (() => {
-      try {
-        const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
-        return s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL ? s.data : null;
-      } catch { return null; }
-    })();
-
-    if (cached) {
-      groups = cached;
-    } else {
-      const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
-      if (!res.ok) return;
-      const doc = await res.json();
-      groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-        label: g.mapValue.fields.label.stringValue,
-        ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-      }));
-      if (groups.length) {
-        localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() }));
-      }
-    }
-
-    if (groups?.length) {
-      const hardcodedIds = BANNED_IDS;
-      BANNED_GROUPS = groups;
-      BANNED_IDS = new Set([...hardcodedIds, ...BANNED_GROUPS.flatMap(g => g.ids)]);
-    }
-  } catch { /* 使用 hardcode fallback */ }
+  BANNED_GROUPS = await SiteLists.loadBannedGroups();
+  BANNED_IDS = SiteLists.bannedIdSet(BANNED_GROUPS);
 }
 
 function getCardKey(card) {
@@ -101,9 +50,9 @@ let tierSearchQuery = '';   // 原地高亮搜尋的關鍵字
 
 let tierRanks = new Map();   // 卡片ID → { tier, rank, total, pool, score }（tier-utils.js）
 
-// 排名母體的禁卡＝Firestore 禁卡表（與卡牌圖鑑、比較頁同一份）；讀不到才退回寫死清單
+// 排名母體的禁卡＝Firestore 禁卡表（與卡牌圖鑑、比較頁同一份）；讀不到才退回 site-lists.js 備援
 function isTierBanned(card) {
-  return BANNED_GROUPS.some(g => g.ids.includes(card['卡片ID']));
+  return BANNED_IDS.has(card['卡片ID']);
 }
 
 // ── Duplicate exclusions ───────────────────────────

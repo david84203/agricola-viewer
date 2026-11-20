@@ -654,6 +654,8 @@ async function saveBgaToFirestore(ids) {
     body,
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  // 其他頁（輪抽／排行／覆盤）讀 site-lists.js 的 24 小時快取，改完清掉讓本機立刻生效
+  try { localStorage.removeItem('agricola_bga_cache'); } catch {}
 }
 
 async function addCardToBga(card, statusEl) {

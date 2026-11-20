@@ -49,9 +49,9 @@ async function loadCards() {
     // 輪抽／排名／tier／清單頁都只讀 cards.json，自然排除。
     fetch('./reference-cards.json').then(r => r.json()).catch(() => []),
     typeof adminLoadOverrides === 'function' ? adminLoadOverrides() : Promise.resolve({}),
-    typeof loadBanlistFromFirestore === 'function' ? loadBanlistFromFirestore() : Promise.resolve(null),
+    SiteLists.loadBannedGroups({ fresh: true }),
     fetch('./duplicates.json').then(r => r.json()).catch(() => []),
-    typeof loadBgaFromFirestore === 'function' ? loadBgaFromFirestore() : Promise.resolve([]),
+    SiteLists.loadBgaExtraIds({ fresh: true }),
     fetch('./effects.json').then(r => r.json()).catch(() => []),
     fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
     // 線上已實作清單：僅 GM/YOYO 需要，非白名單不抓（比照 impl-status 的私有原則）
@@ -77,7 +77,7 @@ async function loadCards() {
     BANNED_GROUPS.length = 0;
     banGroups.forEach(g => BANNED_GROUPS.push(g));
   }
-  bgaExtraIds = new Set(bgaData || []);
+  bgaExtraIds = bgaData;
 
   populateDeckFilter();
   if (typeof renderImplStatusFilterControl === 'function') renderImplStatusFilterControl();
@@ -92,9 +92,9 @@ async function loadCards() {
   if (deepCard) openModal(deepCard);
 }
 
-const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
+const BGA_DECKS = SiteLists.BGA_DECKS;
 function isCardBga(card) {
-  return BGA_DECKS.includes(card['牌組']) || bgaExtraIds.has(card['卡片ID']);
+  return SiteLists.isBga(card, bgaExtraIds);
 }
 
 // ── Deck filter options ────────────────────────────
@@ -862,13 +862,7 @@ document.getElementById('clearSearch').addEventListener('click', () => {
 });
 
 // ── Banlist ────────────────────────────────────────
-const BANNED_GROUPS = [  // populated from Firestore on load; fallback hardcoded
-  { label: '過強職業卡',     ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '8720-9', '7873-7', '7252-3', '6022-5', '舊版E198', 'K270', 'NL098', 'PI10', 'PI03', 'PI06', 'Z329', 'Ö03', 'Ö01'] },
-  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', '6515-6', '5869-10', '5881-9', '4988-8', 'I081', 'Z320', 'K138', 'K125', 'Ö13', 'Ö17'] },
-  { label: '過爛職業卡',     ids: ['A107', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E198', '舊版E171', '5030-2', 'Ö05', 'K304', 'Ö02', '5698-2', 'WM033', 'Ö09', '6575-4', 'WA042', 'Z333', 'K317'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', '8315', '6960-2', 'NL023', 'K109', 'FL016', 'FL028', 'Z324'] },
-  { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*'] },
-];
+const BANNED_GROUPS = [];  // 載入時由 site-lists.js 填入（Firestore 唯一來源，讀不到才用備援）
 
 function openBanlist() {
   const body = document.getElementById('banlistBody');

@@ -18,52 +18,19 @@ const CROP_REF = { width: 2040, height: 2807 };
 const BGA_DECKS = ['A', 'B', 'C', 'D', 'E'];
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
-// 禁卡表（不進入輪抽池）— 從 Firestore 載入後會覆蓋此預設值
-let BANNED_GROUPS = [
-  { label: '過強職業卡',     ids: ['FL049', 'A127', 'I251', 'I260', 'I234', 'I255', '8720-9', '7873-7', '7252-3', '6022-5', '舊版E198', 'K270', 'NL098', 'PI10', 'PI03', 'PI06', 'Z329', 'Ö03', 'Ö01', '2913-2'] },
-  { label: '過強次要發展卡', ids: ['B010*', '906-8', 'A010', 'B021', 'A048', 'C031', '6515-6', '5869-10', '5881-9', '4988-8', 'I081', 'Z320', 'K138', 'K125', 'Ö13', 'Ö17', '6044-7', 'Ö20', '9244-5', '12019-2'] },
-  { label: '過爛職業卡',     ids: ['A107', 'A151', 'C144*', 'C111', 'D158*', 'B146', 'C157', 'B101', 'D140', 'A154', '舊版E158', '舊版E170', '舊版E155', 'I247', '舊版E198', '舊版E171', '5030-2', 'Ö05', 'K304', 'Ö02', '5698-2', 'WM033', 'Ö09', '6575-4', 'WA042', 'Z333', 'K317', 'FL053', 'A100', 'A132', 'B147', 'I224'] },
-  { label: '過爛次要發展卡', ids: ['C058', 'B052', 'B018', '舊版E17', '舊版E29', 'I093', '舊版E51', '8315', '6960-2', 'NL023', 'K109', 'FL016', 'FL028', 'Z324', 'FL021', 'NL025'] },
-  { label: '擾亂戰局',       ids: ['C093', 'C130', 'C003*', 'B022', 'Ö04', 'PI17'] },
-];
-let BANNED_IDS = new Set(BANNED_GROUPS.flatMap(g => g.ids));
+// 禁卡表（不進入輪抽池）— 由 site-lists.js 載入（Firestore 唯一來源，讀不到才用備援）
+let BANNED_GROUPS = [];
+let BANNED_IDS = new Set();
+let bgaExtraIds = new Set(); // GM 額外標記的 BGA 卡（非 A～E 牌組）
 
-const BANLIST_CACHE_KEY  = 'agricola_banlist_cache';
-const BANLIST_CACHE_TTL  = 24 * 60 * 60 * 1000; // 24 hours
 const PROGRESS_CACHE_KEY = 'agricola_progress_cache';
 const PROGRESS_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function loadBanlist() {
-  try {
-    let groups = null;
-    const cached = (() => {
-      try {
-        const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
-        return s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL ? s.data : null;
-      } catch { return null; }
-    })();
-
-    if (cached) {
-      groups = cached;
-    } else {
-      const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
-      if (!res.ok) return;
-      const doc = await res.json();
-      groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-        label: g.mapValue.fields.label.stringValue,
-        ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-      }));
-      if (groups.length) {
-        localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() }));
-      }
-    }
-
-    if (groups?.length) {
-      const hardcodedIds = BANNED_IDS; // capture before overwrite
-      BANNED_GROUPS = groups;
-      BANNED_IDS = new Set([...hardcodedIds, ...BANNED_GROUPS.flatMap(g => g.ids)]);
-    }
-  } catch { /* 使用 hardcode fallback */ }
+  const [groups, bga] = await Promise.all([SiteLists.loadBannedGroups(), SiteLists.loadBgaExtraIds()]);
+  BANNED_GROUPS = groups;
+  BANNED_IDS = SiteLists.bannedIdSet(groups);
+  bgaExtraIds = bga;
 }
 
 function getCardKey(card) {
@@ -102,6 +69,7 @@ let state = {
   phase: 'setup',        // setup | occupation | transition | minor | result | combined
   draftMode: 'separate', // 'separate' | 'combined'
   selectedDecks: [],
+  includeBgaExtra: false,
   packs: {},             // { A: Card[], B: Card[], C: Card[], D: Card[] }
   removedIds: {},        // { A: Set<id>, B: Set<id>, ... }
   // combined mode: separate occ/minor packs with same pack keys
@@ -349,6 +317,8 @@ function startDraft() {
     return;
   }
   state.selectedDecks = checked;
+  const bgaInPool = BGA_DECKS.filter(d => allCards.some(c => c['牌組'] === d));
+  state.includeBgaExtra = checked.length === bgaInPool.length && bgaInPool.every(d => checked.includes(d));
 
   state.occPicks = [];
   state.minPicks = [];
@@ -370,7 +340,7 @@ function buildPacks(cardType) {
     const matchType = cardType === 'occupation'
       ? c.card_type === 'occupation'
       : (c.card_type === 'minor' || c.card_type === 'both');
-    return matchType && state.selectedDecks.includes(c['牌組']);
+    return matchType && (state.selectedDecks.includes(c['牌組']) || (state.includeBgaExtra && bgaExtraIds.has(c['卡片ID'])));
   });
 
   if (pool.length < 36) {

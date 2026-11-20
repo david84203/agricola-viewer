@@ -10,19 +10,13 @@ const CROP_REF   = { width: 2040, height: 2807 };
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
 
 const BGA_DECKS          = ['A', 'B', 'C', 'D', 'E'];
-const BANLIST_CACHE_KEY  = 'agricola_banlist_cache';
-const BANLIST_CACHE_TTL  = 24 * 60 * 60 * 1000;
 const SCORE_ELO_CEILING  = 1700;
 const DRAFT_ROUNDS       = 7;   // 每人永遠選 7 張；handSize 是包牌大小可為 7~10
 
-// 禁卡表（hardcode fallback，Firestore 載入後更新）
-let BANNED_GROUPS = [
-  { label: '過強職業卡',     eloPreset: 1300, ids: ['FL049','A127','I251','I260','I234','I255','8720-9','7873-7','7252-3','6022-5','舊版E198','K270','NL098','PI10','PI03','PI06','Z329','Ö03','Ö01','2913-2'] },
-  { label: '過強次要發展卡', eloPreset: 1300, ids: ['B010*','906-8','A010','B021','A048','C031','6515-6','5869-10','5881-9','4988-8','I081','Z320','K138','K125','Ö13','Ö17','6044-7','Ö20','9244-5','12019-2'] },
-  { label: '過爛職業卡',     eloPreset: 850,  ids: ['A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','舊版E158','舊版E170','舊版E155','I247','舊版E198','舊版E171','5030-2','Ö05','K304','Ö02','5698-2','WM033','Ö09','6575-4','WA042','Z333','K317','FL053','A100','A132','B147','I224'] },
-  { label: '過爛次要發展卡', eloPreset: 850,  ids: ['C058','B052','B018','舊版E17','舊版E29','I093','舊版E51','8315','6960-2','NL023','K109','FL016','FL028','Z324','FL021','NL025'] },
-  { label: '擾亂戰局',       eloPreset: 1200, ids: ['C093','C130','C003*','B022','Ö04','PI17'] },
-];
+// 禁卡表由 site-lists.js 載入（Firestore 唯一來源）；各分組的預設 ELO 寫在這裡
+const BAN_ELO_PRESET = { '過強職業卡': 1300, '過強次要發展卡': 1300, '過爛職業卡': 850, '過爛次要發展卡': 850, '擾亂戰局': 1200 };
+let BANNED_GROUPS = [];
+let bgaExtraIds = new Set(); // GM 額外標記的 BGA 卡（非 A～E 牌組）
 let BANNED_ID_MAP  = {};          // cardId → { label, eloPreset }
 let dupExcludedIds = new Set();   // 重複卡 ID 集合
 
@@ -346,36 +340,9 @@ async function loadBgaIdMap() {
 }
 
 async function loadBanlist() {
-  try {
-    const cached = (() => {
-      try {
-        const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
-        return s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL ? s.data : null;
-      } catch { return null; }
-    })();
-    let groups = cached;
-    if (!groups) {
-      const res = await fetch(`${FIRESTORE_BASE}/settings/banlist`);
-      if (!res.ok) return;
-      const doc = await res.json();
-      groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-        label: g.mapValue.fields.label.stringValue,
-        ids:   (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-      }));
-      if (groups.length) {
-        localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() }));
-      }
-    }
-    if (groups?.length) {
-      const presetMap = {};
-      BANNED_GROUPS.forEach(g => { presetMap[g.label] = g.eloPreset; });
-      BANNED_GROUPS = groups.map(g => ({
-        label:     g.label,
-        ids:       g.ids,
-        eloPreset: presetMap[g.label] ?? 1200,
-      }));
-    }
-  } catch { /* 使用 hardcode fallback */ }
+  const [groups, bga] = await Promise.all([SiteLists.loadBannedGroups(), SiteLists.loadBgaExtraIds()]);
+  BANNED_GROUPS = groups.map(g => ({ label: g.label, ids: g.ids, eloPreset: BAN_ELO_PRESET[g.label] ?? 1200 }));
+  bgaExtraIds = bga;
   buildBannedIdMap();
 }
 
@@ -419,7 +386,7 @@ function getAdjElo(cardId) {
   if (special) {
     if (special.type === 'ban') {
       const card = allCards.find(c => c['卡片ID'] === cardId);
-      if (card && BGA_DECKS.includes(card['牌組'])) {
+      if (card && SiteLists.isBga(card, bgaExtraIds)) {
         const cached = rs.eloCache[cardId];
         if (cached) {
           const eff  = cached.rankSeen ?? 0;
@@ -593,9 +560,9 @@ function bindPackSearchEvents(player, type) {
         ? c.card_type === 'occupation'
         : (c.card_type === 'minor' || c.card_type === 'both');
       if (!matchType) return false;
-      // BGA 模式：只顯示 BGA 牌組（A/B/C/D/E），含重複卡與禁卡
+      // BGA 模式：只顯示 BGA 卡（A～E 牌組＋GM 額外標記），含重複卡與禁卡
       if (rs.bgaMode) {
-        if (!BGA_DECKS.includes(c['牌組'])) return false;
+        if (!SiteLists.isBga(c, bgaExtraIds)) return false;
       } else {
         // 一般模式：排除重複卡與禁卡
         if (dupExcludedIds.has(c['卡片ID'])) return false;
@@ -2072,7 +2039,7 @@ async function calculateAllScores() {
         // BGA 牌組禁卡已進評分系統（eloCache 有文件）→ 不再列入「使用預設」清單
         if (x.special.type === 'ban') {
           const card = allCards.find(c => c['卡片ID'] === x.id);
-          if (card && BGA_DECKS.includes(card['牌組']) && rs.eloCache[x.id]) return false;
+          if (card && SiteLists.isBga(card, bgaExtraIds) && rs.eloCache[x.id]) return false;
         }
         return true;
       });

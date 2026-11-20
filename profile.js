@@ -168,25 +168,8 @@ async function fetchAllRatings() {
 // ── Tier Map ───────────────────────────────────────
 
 // 與公開牌力排行同一套（tier-utils.js）：職業／次發各自排、扣禁卡與被取代的重複卡、有效場數含快排
-const PROFILE_BANLIST_CACHE_KEY = 'agricola_banlist_cache';
-const PROFILE_BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000;
-
 async function loadBannedIdSet() {
-  try {
-    const s = JSON.parse(localStorage.getItem(PROFILE_BANLIST_CACHE_KEY));
-    if (s && Date.now() - s.cachedAt < PROFILE_BANLIST_CACHE_TTL && s.data?.length) return new Set(s.data.flatMap(g => g.ids));
-  } catch {}
-  try {
-    const doc = await fetch(`${FIRESTORE_BASE}/settings/banlist`).then(r => r.json());
-    const groups = (doc.fields?.groups?.arrayValue?.values || []).map(g => ({
-      label: g.mapValue.fields.label.stringValue,
-      ids: (g.mapValue.fields.ids.arrayValue.values || []).map(v => v.stringValue),
-    }));
-    if (groups.length) {
-      try { localStorage.setItem(PROFILE_BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() })); } catch {}
-    }
-    return new Set(groups.flatMap(g => g.ids));
-  } catch { return new Set(); }
+  return SiteLists.bannedIdSet(await SiteLists.loadBannedGroups());
 }
 
 async function loadDupNonCanonicalKeys(cards) {

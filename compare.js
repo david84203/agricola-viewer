@@ -8,8 +8,6 @@
   // 與 app.js／tierlist.js 共用同一把快取 key：看過圖鑑或排行的人零額外讀取
   const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5';
   const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
-  const BANLIST_CACHE_KEY = 'agricola_banlist_cache';
-  const BANLIST_CACHE_TTL = 24 * 60 * 60 * 1000;
   const MIN_SEEN = 5;
   const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
   const MAX_SLOTS = 4;
@@ -47,21 +45,7 @@
   }
 
   async function loadBanned() {
-    try {
-      const s = JSON.parse(localStorage.getItem(BANLIST_CACHE_KEY));
-      if (s && Date.now() - s.cachedAt < BANLIST_CACHE_TTL && s.data?.length) return new Set(s.data.flatMap((g) => g.ids));
-    } catch {}
-    try {
-      const doc = await fetch(`${FS}/settings/banlist`).then((r) => r.json());
-      const groups = (doc.fields?.groups?.arrayValue?.values || []).map((g) => ({
-        label: g.mapValue.fields.label.stringValue,
-        ids: (g.mapValue.fields.ids.arrayValue.values || []).map((v) => v.stringValue),
-      }));
-      if (groups.length) {
-        try { localStorage.setItem(BANLIST_CACHE_KEY, JSON.stringify({ data: groups, cachedAt: Date.now() })); } catch {}
-      }
-      return new Set(groups.flatMap((g) => g.ids));
-    } catch { return new Set(); }
+    return SiteLists.bannedIdSet(await SiteLists.loadBannedGroups());
   }
 
   async function loadRatings() {

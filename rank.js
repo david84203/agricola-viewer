@@ -18,6 +18,7 @@ let rankAllCards  = [];
 let rankImageCache = {};
 let rankCardProfileMap = {};  // 卡片ID → 類型系統（card-profile.json；載入失敗則靜默降級為空物件）
 let rankBannedIds = new Set();
+let rankBgaExtraIds = new Set();
 let rankDupExclusions = new Set();
 let rankRatingsMap = null; // null = 未載入；載入後為 map（失敗維持 null → 退回純隨機）
 
@@ -120,23 +121,9 @@ function onAuthChange() {
 
 // ── Load banned cards ─────────────────────────────
 async function loadRankBanlist() {
-  const hardcoded = [
-    'FL049','A127','I251','I260','I234','I255','8720-9','7873-7','7252-3','6022-5','舊版E198','K270','NL098','PI10','PI03','PI06','Z329','Ö03','Ö01','2913-2',
-    'B010*','906-8','A010','B021','A048','C031','6515-6','5869-10','5881-9','4988-8','I081','Z320','K138','K125','Ö13','Ö17','6044-7','Ö20','9244-5','12019-2',
-    'A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','舊版E158','舊版E170','舊版E155','I247','舊版E171','5030-2','Ö05','K304','Ö02','5698-2','WM033','Ö09','6575-4','WA042','Z333','K317','FL053','A100','A132','B147','I224',
-    'C058','B052','B018','舊版E17','舊版E29','I093','舊版E51','8315','6960-2','NL023','K109','FL016','FL028','Z324','FL021','NL025',
-    'C093','C130','C003*','B022','Ö04','PI17',
-  ];
-  rankBannedIds = new Set(hardcoded);
-
-  try {
-    const res = await fetch(`${RANK_FS_BASE}/settings/banlist`);
-    if (!res.ok) return;
-    const doc = await res.json();
-    (doc.fields?.groups?.arrayValue?.values || []).forEach(g => {
-      (g.mapValue.fields.ids?.arrayValue?.values || []).forEach(v => rankBannedIds.add(v.stringValue));
-    });
-  } catch {}
+  const [groups, bga] = await Promise.all([SiteLists.loadBannedGroups(), SiteLists.loadBgaExtraIds()]);
+  rankBannedIds = SiteLists.bannedIdSet(groups);
+  rankBgaExtraIds = bga;
 }
 
 async function loadRankDupExclusions() {
@@ -206,8 +193,8 @@ async function loadRankCards() {
     rankAllCards = data.filter(c => {
       const id = c['卡片ID'];
       if (!id) return false;
-      // 禁卡照常排除，但 BGA 牌組（A~E）的禁卡放行——它們出現在 BGA 覆盤對局，需要真實評分
-      if (rankBannedIds.has(id) && !BGA_DECKS.includes(c['牌組'])) return false;
+      // 禁卡照常排除，但 BGA 卡（A~E＋GM 額外標記）的禁卡放行——它們出現在 BGA 覆盤對局，需要真實評分
+      if (rankBannedIds.has(id) && !SiteLists.isBga(c, rankBgaExtraIds)) return false;
       // 重複卡：純 ID 與複合 key 都要比對，跟輪抽一致
       if (rankDupExclusions.has(id)) return false;
       if (rankDupExclusions.has(rankGetCardKey(c))) return false;
