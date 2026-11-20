@@ -660,6 +660,7 @@ body {
 .tag-minus { background: rgba(224,92,92,.15);   color: var(--red); }
 .tag-pass  { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ban   { background: rgba(192,57,43,.18);   color: #e74c3c; font-weight: 600; }
+.tag-dup   { background: rgba(168,179,204,.12); color: var(--text2); }
 .tag-ref   { background: rgba(168,179,204,.12); color: var(--text2); }
 /* 卡牌功能實作狀態徽章（GM／YOYO 專用私有 tag，見 impl-status.js） */
 .tag-impl-1 { background: rgba(232,184,75,.2);  color: #e8b84b; font-weight: 600; }

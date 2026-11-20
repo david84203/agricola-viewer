@@ -679,6 +679,11 @@ function openModal(card) {
 
   const replacedCardsText = getReplacedCardsText(card);
   if (replacedCardsText) fieldDefs.push(['取代卡牌', replacedCardsText, 'replace']);
+  const replacedBy = dupCardToPair.get(getCardKey(card));
+  if (replacedBy) {
+    const canon = resolveCardRef(replacedBy.canonId);
+    fieldDefs.push(['被取代', `${canon ? `${canon['牌名'] || '未命名'}（${canon['卡片ID']}）` : replacedBy.canonId}（重複卡，不進牌池）`, 'replace']);
+  }
 
   // 牌力資訊（僅在使用者已啟用牌力排序、資料載入後顯示）
   if (ratingsMap) {

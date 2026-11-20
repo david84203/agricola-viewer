@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════
-   全站共用名單：禁卡表＋BGA 額外卡（Lu 1120 整合）
+   全站共用名單：禁卡表＋BGA 額外卡（Lu 1120 整合）；另附卡文覆寫、評分的共用讀取
    唯一來源＝Firestore settings/banlist、settings/bga_cards。
    讀到雲端就「完全採用」，不跟備援聯集——否則在禁卡管理解禁的卡會被寫死清單擋回去。
    雲端讀不到（離線、額度爆）才用下方備援清單。
@@ -85,11 +85,70 @@
   // BGA 卡＝A～E 牌組＋GM 在 Firestore 額外標記的卡
   const isBga = (card, extraIds) => BGA_DECKS.includes(card?.['牌組']) || !!extraIds?.has(card?.['卡片ID']);
 
+  // GM 在圖鑑改過的卡文（Firestore card_overrides）；讀不到就回空物件＝照 cards.json 原文
+  let ovPromise = null;
+  function loadCardOverrides() {
+    ovPromise ||= (async () => {
+      try {
+        const out = {};
+        let pageToken = null;
+        do {
+          let url = `${FS}/card_overrides?pageSize=300`;
+          if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+          const data = await fetch(url).then(r => r.json());
+          (data.documents || []).forEach(doc => {
+            const f = {};
+            Object.entries(doc.fields || {}).forEach(([k, v]) => { f[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? ''); });
+            out[decodeURIComponent(doc.name.split('/').pop())] = f;
+          });
+          pageToken = data.nextPageToken ?? null;
+        } while (pageToken);
+        return out;
+      } catch { return {}; }
+    })();
+    return ovPromise;
+  }
+  const applyOverrides = (cards, ov) => cards.map(c => (ov[c['卡片ID']] ? { ...c, ...ov[c['卡片ID']] } : c));
+
+  // 評分（ELO＋實戰輪抽次數）；與圖鑑、牌力排行共用同一把 v6 快取（2 小時）
+  const RATINGS_KEY = 'agricola_ratings_cache_v6';
+  const RATINGS_TTL = 2 * 60 * 60 * 1000;
+  let ratingsPromise = null;
+  function loadRatings() {
+    ratingsPromise ||= (async () => {
+      try {
+        const s = JSON.parse(localStorage.getItem(RATINGS_KEY));
+        if (s && Date.now() - s.cachedAt < RATINGS_TTL && s.data) return s.data;
+      } catch {}
+      const num = (f, k) => Number(f?.[k]?.integerValue ?? f?.[k]?.doubleValue ?? 0);
+      const map = {};
+      let pageToken = null;
+      do {
+        let url = `${FS}/agricola_ratings?pageSize=300`;
+        if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+        const data = await fetch(url).then(r => r.json());
+        (data.documents || []).forEach(doc => {
+          const f = doc.fields || {};
+          map[doc.name.split('/').pop()] = {
+            elo: Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
+            seenCount: num(f, 'seenCount'), pickCount: num(f, 'pickCount'), rankSeen: num(f, 'rankSeen'),
+            lugaSeen: num(f, 'lugaSeen'), lugaPick: num(f, 'lugaPick'), lugaDealt: num(f, 'lugaDealt'), lugaPickPosSum: num(f, 'lugaPickPosSum'),
+          };
+        });
+        pageToken = data.nextPageToken ?? null;
+      } while (pageToken);
+      writeCache(RATINGS_KEY, map);
+      return map;
+    })();
+    ratingsPromise.catch(() => { ratingsPromise = null; }); // 失敗下次可重試
+    return ratingsPromise;
+  }
+
   function clearCache() {
     try { localStorage.removeItem(BAN_KEY); localStorage.removeItem(BGA_KEY); } catch {}
     banPromise = null;
     bgaPromise = null;
   }
 
-  global.SiteLists = { BGA_DECKS, FALLBACK_BANNED_GROUPS, loadBannedGroups, loadBgaExtraIds, bannedIdSet, isBga, clearCache };
+  global.SiteLists = { BGA_DECKS, FALLBACK_BANNED_GROUPS, loadBannedGroups, loadBgaExtraIds, bannedIdSet, isBga, loadCardOverrides, applyOverrides, loadRatings, clearCache };
 })(typeof window !== 'undefined' ? window : globalThis);

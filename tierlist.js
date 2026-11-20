@@ -57,9 +57,12 @@ function isTierBanned(card) {
 
 // ── Duplicate exclusions ───────────────────────────
 // 與卡牌圖鑑同口徑：只排除「被取代」的那張（nonCanonicalKeys），正主保留
+let tierDupInfo = null;      // 卡片視窗顯示取代／被取代用
+let tierAllCards = [];       // 含被取代的重複卡（取代關係要找得到名字）
 async function loadDupExclusions(cards) {
   try {
-    return (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
+    tierDupInfo = await DuplicateCards.loadDuplicateInfo(cards);
+    return tierDupInfo.nonCanonicalKeys;
   } catch { return new Set(); }
 }
 
@@ -76,6 +79,7 @@ async function init() {
       window.CardImages?.load?.() || Promise.resolve(),
       fetch('./card-profile.json').then(r => r.json()).catch(() => ({})),
     ]);
+    tierAllCards = cards;
     allCards = cards.filter(c => !dupExcluded.has(getCardKey(c)));
     ratingsMap = ratings;
     tierRanks = CardTiers.compute(allCards, ratingsMap, isTierBanned);
@@ -559,26 +563,9 @@ function drawCrop(canvas, card, forceSheet = false, maxWidth = 0) {
 }
 
 // ── Modal ──────────────────────────────────────────
+// 卡片視窗走共用 CardModal（Lu 1120：各頁卡片視窗統一，含禁卡／BGA／取代關係／比較連結）
 function openModal(card) {
-  document.getElementById('modalTitle').textContent = card['牌名'] || '—';
-  document.getElementById('modalId').textContent = card['卡片ID'] || '';
-  CardModal.renderTypeBadge(document.getElementById('modalBadge'), card);
-  document.getElementById('modalDesc').textContent = card['說明'] || '—';
-
-  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
-  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']], card, (id) => { const c = allCards.find((x) => String(x['卡片ID']).trim() === id); if (c) openModal(c); });
-
-  const fieldsEl = document.getElementById('modalFields');
-  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
-
-  drawCrop(document.getElementById('modalCanvas'), card);
-  document.getElementById('modalOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  CardModal.open(card, { profileMap: cardProfileMap, allCards: tierAllCards, bannedIds: BANNED_IDS, bgaExtraIds, dupInfo: tierDupInfo, ratings: ratingsMap, tiers: tierRanks });
 }
 
 // ── Events ─────────────────────────────────────────
@@ -628,11 +615,6 @@ if (tierSearchClearBtn) {
   });
 }
 
-document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('modalOverlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ── Start ──────────────────────────────────────────
 init();

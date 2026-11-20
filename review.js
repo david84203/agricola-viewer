@@ -19,6 +19,7 @@ let BANNED_GROUPS = [];
 let bgaExtraIds = new Set(); // GM 額外標記的 BGA 卡（非 A～E 牌組）
 let BANNED_ID_MAP  = {};          // cardId → { label, eloPreset }
 let dupExcludedIds = new Set();   // 被取代的重複卡 ID（正主不在內）
+let reviewDupInfo = null;         // 卡片視窗顯示取代／被取代用
 
 const PLAYERS = ['A', 'B', 'C', 'D'];
 const PLAYER_COLORS = { A: 'dot-A', B: 'dot-B', C: 'dot-C', D: 'dot-D' };
@@ -350,7 +351,8 @@ async function loadBanlist() {
 // 回傳「被取代」的卡片 ID：用共用判斷（ID 或 ID＋圖片＋位置兩種配對都認），cards.json 內 ID 唯一
 async function loadDupExclusions(cards) {
   try {
-    const keys = (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
+    reviewDupInfo = await DuplicateCards.loadDuplicateInfo(cards);
+    const keys = reviewDupInfo.nonCanonicalKeys;
     return new Set(cards.filter(c => keys.has(DuplicateCards.getCardKey(c))).map(c => c['卡片ID']));
   } catch { return new Set(); }
 }
@@ -2390,8 +2392,11 @@ function openModal(card) {
   // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
   CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), cardProfileMap[card['卡片ID']], card, (id) => { const c = allCards.find((x) => String(x['卡片ID']).trim() === id); if (c) openModal(c); });
 
+  // 禁卡／BGA 徽章、比較連結、取代關係：與其他頁的共用卡片視窗同一套
+  const statusOpts = { allCards, bannedIds: new Set(Object.keys(BANNED_ID_MAP)), bgaExtraIds, dupInfo: reviewDupInfo };
+  CardModal.renderStatusBadges(document.querySelector('#modalOverlay .modal-sub-row'), card, statusOpts);
   const fieldsEl  = document.getElementById('modalFields');
-  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
+  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card).concat(CardModal.statusFields(card, statusOpts)));
 
   drawCrop(document.getElementById('modalCanvas'), card);
   document.getElementById('modalOverlay').classList.add('open');

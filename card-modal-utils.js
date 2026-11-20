@@ -737,6 +737,74 @@
     if (card) anchor.insertAdjacentElement('afterend', renderComments(card));
   }
 
+  // ── 狀態資訊（Lu 1120 整合：圖鑑以外的卡片視窗也看得到禁卡／BGA／取代關係／牌力）──
+  // opts.bannedIds(Set)、opts.bgaExtraIds(Set，搭配 site-lists.js)、opts.allCards、
+  // opts.dupInfo（DuplicateCards.loadDuplicateInfo 的結果）、
+  // opts.ratings（卡片ID → { elo, seenCount, rankSeen, lugaDealt, lugaPick, lugaPickPosSum }，要 v6 含實戰欄位）、
+  // opts.tiers（卡片ID → 'S' 或 CardTiers.compute 的 { tier }）。沒給的項目就不顯示。
+  const RATING_MIN_SEEN = 5;
+  function statusFields(card, opts = {}) {
+    const id = String(card['卡片ID'] ?? '').trim();
+    const out = [];
+    const all = opts.allCards || [];
+    const DC = window.DuplicateCards;
+    if (opts.dupInfo && DC) {
+      const key = DC.getCardKey(card);
+      const label = (c) => `${c['牌名'] || '未命名'}（${c['卡片ID']}）`;
+      const refs = new Set((opts.dupInfo.canonicalMap?.get(key) || []).flatMap((e) => e.replacedRefs || []));
+      const replaced = all.filter((c) => refs.has(DC.getCardKey(c))).map(label);
+      if (replaced.length) out.push(['取代卡牌', replaced.join('、'), 'replace']);
+      const by = opts.dupInfo.cardToPair?.get(key);
+      if (by) {
+        const canon = DC.resolveCardRef(all, by.canonId);
+        out.push(['被取代', `${canon ? label(canon) : by.canonId}（重複卡，不進牌池）`, 'replace']);
+      }
+    }
+    if (opts.ratings) {
+      const r = opts.ratings[id];
+      const enough = r && r.seenCount + (r.rankSeen || 0) >= RATING_MIN_SEEN;
+      if (opts.bannedIds?.has(id)) {
+        out.push(['牌力', '禁卡']);
+        if (enough) out.push(['ELO 分數', String(Math.round(r.elo))]);
+      } else if (enough) {
+        const t = opts.tiers?.get(id);
+        if (opts.tiers) out.push(['牌力 Tier', (t && t.tier) || (typeof t === 'string' ? t : '—')]);
+        out.push(['ELO 分數', String(Math.round(r.elo))]);
+      } else {
+        out.push(['ELO 分數', '樣本不足']);
+      }
+      out.push(['實戰輪抽', r?.lugaDealt
+        ? `發到 ${r.lugaDealt} 次・被選 ${r.lugaPick} 次${r.lugaPick ? `・平均第 ${(r.lugaPickPosSum / r.lugaPick).toFixed(1)} 手被拿` : '・都沒人拿'}`
+        : '尚無']);
+    }
+    return out;
+  }
+
+  // 在 .modal-sub-row 的卡片 ID 後面放禁卡／BGA 徽章＋「比較」連結（重開時先清掉上一張的）
+  function renderStatusBadges(subRow, card, opts = {}) {
+    if (!subRow) return;
+    const id = String(card['卡片ID'] ?? '').trim();
+    subRow.querySelectorAll('.cm-status-badge').forEach((n) => n.remove());
+    let link = subRow.querySelector('.modal-compare-link');
+    if (!link) {
+      link = document.createElement('a');
+      link.className = 'modal-compare-link';
+      link.title = '拿這張去跟別張卡並排比較';
+      link.textContent = '⚖ 比較';
+      subRow.appendChild(link);
+    }
+    link.href = `./compare.html?ids=${encodeURIComponent(id)}`;
+    const badges = [];
+    if (opts.bannedIds?.has(id)) badges.push(['modal-ban-badge', '禁卡']);
+    if (opts.bgaExtraIds && window.SiteLists?.isBga(card, opts.bgaExtraIds)) badges.push(['modal-bga-badge', 'BGA']);
+    badges.forEach(([cls, text]) => {
+      const s = document.createElement('span');
+      s.className = `${cls} cm-status-badge`;
+      s.textContent = text;
+      subRow.insertBefore(s, link);
+    });
+  }
+
   // ── 自帶 DOM 的卡片視窗（Lu 1115 第一波：文字列表、卡牌比較頁也要點得開完整卡片視窗）──
   // 跟卡牌圖鑑同一套樣式（style.css 的 .modal-*）；卡圖用 CardImages.getPath（頁面要先載 card-images.js）
   // opts.profileMap：卡片ID → card-profile；opts.allCards：連動名單換卡時用來找卡
@@ -772,9 +840,9 @@
     q('.modal-title').textContent = card['牌名'] || '—';
     q('.modal-id').textContent = id;
     renderTypeBadge(q('.modal-badge'), card);
-    renderFields(q('.modal-fields'), fieldDefs(card));
+    renderFields(q('.modal-fields'), fieldDefs(card).concat(statusFields(card, opts)));
     q('.modal-desc').textContent = card['說明'] || '—';
-    q('.modal-compare-link').href = `./compare.html?ids=${encodeURIComponent(id)}`;
+    renderStatusBadges(q('.modal-sub-row'), card, opts);
     const img = q('.modal-image-wrap img');
     img.style.display = 'none';
     img.removeAttribute('src');
@@ -794,6 +862,8 @@
     quick.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
+  // 目前開著哪張卡（沒開＝null）；頁面晚到的資料（評分）載完時用來判斷要不要重畫
+  const currentId = () => (quick && quick.classList.contains('open') ? quick.querySelector('.modal-id').textContent : null);
 
-  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile, open };
+  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile, statusFields, renderStatusBadges, open, currentId };
 })();

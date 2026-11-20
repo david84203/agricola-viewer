@@ -5,9 +5,6 @@
    ══════════════════════════════════════════════════ */
 (function () {
   const FS = 'https://firestore.googleapis.com/v1/projects/project-hub-410cd/databases/(default)/documents';
-  // 與 app.js／tierlist.js 共用同一把快取 key：看過圖鑑或排行的人零額外讀取
-  const RATINGS_CACHE_KEY = 'agricola_ratings_cache_v5';
-  const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000;
   const MIN_SEEN = 5;
   const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
   const MAX_SLOTS = 4;
@@ -25,57 +22,19 @@
   const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, '');
 
   // ── 資料載入 ──────────────────────────────────────
-  async function loadOverrides() {
-    try {
-      const out = {};
-      let pageToken = null;
-      do {
-        let url = `${FS}/card_overrides?pageSize=300`;
-        if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-        const data = await fetch(url).then((r) => r.json());
-        (data.documents || []).forEach((doc) => {
-          const f = {};
-          Object.entries(doc.fields || {}).forEach(([k, v]) => { f[k] = v.stringValue ?? String(v.integerValue ?? v.doubleValue ?? ''); });
-          out[decodeURIComponent(doc.name.split('/').pop())] = f;
-        });
-        pageToken = data.nextPageToken ?? null;
-      } while (pageToken);
-      return out;
-    } catch { return {}; }
-  }
+  const loadOverrides = () => SiteLists.loadCardOverrides();
 
   async function loadBanned() {
     return SiteLists.bannedIdSet(await SiteLists.loadBannedGroups());
   }
 
-  async function loadRatings() {
-    try {
-      const s = JSON.parse(localStorage.getItem(RATINGS_CACHE_KEY));
-      if (s && Date.now() - s.cachedAt < RATINGS_CACHE_TTL) return s.data;
-    } catch {}
-    const map = {};
-    let pageToken = null;
-    do {
-      let url = `${FS}/agricola_ratings?pageSize=300`;
-      if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-      const data = await fetch(url).then((r) => r.json());
-      (data.documents || []).forEach((doc) => {
-        const f = doc.fields || {};
-        map[doc.name.split('/').pop()] = {
-          elo: Number(f.elo?.integerValue ?? f.elo?.doubleValue ?? 1200),
-          seenCount: Number(f.seenCount?.integerValue ?? 0),
-          pickCount: Number(f.pickCount?.integerValue ?? 0),
-          rankSeen: Number(f.rankSeen?.integerValue ?? 0),
-        };
-      });
-      pageToken = data.nextPageToken ?? null;
-    } while (pageToken);
-    try { localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({ data: map, cachedAt: Date.now() })); } catch {}
-    return map;
-  }
+  // 與圖鑑同一把 v6 快取（含實戰輪抽欄位），卡片視窗的實戰統計才有資料
+  const loadRatings = () => SiteLists.loadRatings();
 
   // 三頁共用 tier-utils.js：職業／次發各自排、扣禁卡與被取代的重複卡
   let dupNonCanonicalKeys = new Set();
+  let dupInfo = null;
+  let bgaExtraIds = new Set();
   function buildRanks() {
     rankInfo = window.CardTiers.compute(cards, ratings,
       (c) => bannedIds.has(c['卡片ID']) || dupNonCanonicalKeys.has(window.DuplicateCards.getCardKey(c)));
@@ -294,7 +253,7 @@
       if (z) { $('cmpZoom').querySelector('img').src = z.dataset.zoom; $('cmpZoom').classList.add('open'); }
       // 牌名點開完整卡片視窗（Lu 1115 第一波）
       const o = e.target.closest('[data-open]');
-      if (o && byId.has(o.dataset.open)) window.CardModal?.open(byId.get(o.dataset.open), { profileMap: profiles, allCards: cards });
+      if (o && byId.has(o.dataset.open)) window.CardModal?.open(byId.get(o.dataset.open), { profileMap: profiles, allCards: cards, bannedIds, bgaExtraIds, dupInfo, ratings: Object.keys(ratings).length ? ratings : null, tiers: rankInfo });
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.cmp-search')) document.querySelectorAll('.cmp-suggest.open').forEach((b) => b.classList.remove('open'));
@@ -317,18 +276,20 @@
     slots = wanted.length >= 2 ? wanted : [...wanted, '', ''].slice(0, 2);
 
     try {
-      const [base, refCards, overrides, banned, profileData] = await Promise.all([
+      const [base, refCards, overrides, banned, profileData, , bga] = await Promise.all([
         fetch('./cards.json').then((r) => r.json()),
         fetch('./reference-cards.json').then((r) => r.json()).catch(() => []),
         loadOverrides(),
         loadBanned(),
         fetch('./card-profile.json').then((r) => r.json()).catch(() => ({})),
         window.CardImages?.load?.() || Promise.resolve(),
+        SiteLists.loadBgaExtraIds(),
       ]);
+      bgaExtraIds = bga;
       cards = base.map((c) => (overrides[c['卡片ID']] ? { ...c, ...overrides[c['卡片ID']] } : c)).concat(refCards);
       cards.forEach((c) => byId.set(c['卡片ID'], c));
       bannedIds = banned;
-      try { dupNonCanonicalKeys = (await window.DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys; } catch {}
+      try { dupInfo = await window.DuplicateCards.loadDuplicateInfo(cards); dupNonCanonicalKeys = dupInfo.nonCanonicalKeys; } catch {}
       profiles = profileData || {};
       slots = slots.map((id) => (id && byId.has(id) ? id : ''));
       while (slots.length < 2) slots.push('');

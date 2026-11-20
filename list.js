@@ -8,7 +8,11 @@ let activeType = 'all';
 let activeDeck = 'all';
 let searchQuery = '';
 
-const BANNED_IDS = new Set(['FL049','C093','C130','A127','I251','I260','I234','I255','C003*','B010*','906-8','A010','B021','A048','C031','A107','A151','C144*','C111','D158*','B146','C157','B101','D140','A154','舊版E158','舊版E170','舊版E155','I247','C058','B052','B018','舊版E17','舊版E29','I093','舊版E51']);
+// 與圖鑑同一套資料（Lu 1120）：禁卡／BGA 走 site-lists.js、卡文套 Firestore 覆寫、重複卡走 duplicate-utils.js
+let bannedIds = new Set();
+let bgaExtraIds = new Set();
+let dupInfo = null;           // DuplicateCards.loadDuplicateInfo 的結果
+let dupNonCanonical = new Set();
 
 // ── Column definitions ─────────────────────────────
 // key: unique key, label: header text, className: td class,
@@ -46,12 +50,16 @@ const COLUMNS = [
   },
   {
     key: 'banned',
-    label: '禁卡',
+    label: '標記',
     className: 'col-banned',
     defaultOn: true,
-    render: c => BANNED_IDS.has(c['卡片ID'])
-      ? '<span class="tag tag-ban">禁卡</span>'
-      : '—',
+    render: c => {
+      const tags = [];
+      if (bannedIds.has(c['卡片ID'])) tags.push('<span class="tag tag-ban">禁卡</span>');
+      if (dupNonCanonical.has(DuplicateCards.getCardKey(c))) tags.push('<span class="tag tag-dup" title="重複卡：已被另一張取代，不進牌池">被取代</span>');
+      if (SiteLists.isBga(c, bgaExtraIds)) tags.push('<span class="tag tag-bga">BGA</span>');
+      return tags.length ? tags.join(' ') : '—';
+    },
   },
   {
     key: 'needs',
@@ -148,8 +156,22 @@ COLUMNS.forEach(col => {
 
 // ── Load Data ──────────────────────────────────────
 async function loadCards() {
-  const res = await fetch('./cards.json?v=20260608');
-  allCards = await res.json();
+  const [base, overrides, groups, bga] = await Promise.all([
+    fetch('./cards.json?v=20260608').then(r => r.json()),
+    SiteLists.loadCardOverrides(),
+    SiteLists.loadBannedGroups(),
+    SiteLists.loadBgaExtraIds(),
+  ]);
+  allCards = SiteLists.applyOverrides(base, overrides);
+  bannedIds = SiteLists.bannedIdSet(groups);
+  bgaExtraIds = bga;
+  try { dupInfo = await DuplicateCards.loadDuplicateInfo(allCards); } catch { dupInfo = null; }
+  dupNonCanonical = dupInfo?.nonCanonicalKeys || new Set();
+  // 評分給卡片視窗的 Tier／ELO／實戰用：背景先載，不擋列表
+  listRatingsP = SiteLists.loadRatings().then(r => {
+    listTiers = CardTiers.compute(allCards, r, c => bannedIds.has(c['卡片ID']) || dupNonCanonical.has(DuplicateCards.getCardKey(c)));
+    return r;
+  }).catch(() => null);
   populateDeckFilter();
   document.getElementById('totalCount').textContent = allCards.length;
   buildColToggles();
@@ -295,14 +317,29 @@ function renderTable() {
 
 // ── Event Listeners ────────────────────────────────
 // 點列開完整卡片視窗（Lu 1115 第一波）；card-profile.json 第一次點才載
+// 評分還沒載完就先開，載完若視窗仍停在這張再補上 Tier／ELO／實戰（同圖鑑做法）
 let listProfileMapP = null;
+let listRatingsP = null;
+let listRatings = null;
+let listTiers = null;
+function openListCard(card, profileMap) {
+  const opts = { profileMap, allCards, bannedIds, bgaExtraIds, dupInfo, ratings: listRatings, tiers: listTiers };
+  CardModal.open(card, opts);
+  if (!listRatings && listRatingsP) {
+    listRatingsP.then(r => {
+      if (!r) return;
+      listRatings = r;
+      if (CardModal.currentId() === String(card['卡片ID'] ?? '').trim()) openListCard(card, profileMap);
+    });
+  }
+}
 document.getElementById('tableBody').addEventListener('click', async (e) => {
   const tr = e.target.closest('tr[data-i]');
   if (!tr || e.target.closest('a, button, input')) return;
   const card = filteredCards[Number(tr.dataset.i)];
   if (!card) return;
   listProfileMapP ||= fetch('./card-profile.json').then(r => r.json()).catch(() => ({}));
-  CardModal.open(card, { profileMap: await listProfileMapP, allCards });
+  openListCard(card, await listProfileMapP);
 });
 // Filter chips
 document.querySelectorAll('.chip').forEach(chip => {

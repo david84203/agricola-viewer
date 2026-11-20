@@ -41,10 +41,6 @@ let rankState = {
 async function rankInit() {
   document.getElementById('startRankBtn').addEventListener('click', startRankRound);
   document.getElementById('confirmRankBtn').addEventListener('click', confirmRanking);
-  document.getElementById('rankModalClose').addEventListener('click', closeRankModal);
-  document.getElementById('rankModalOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('rankModalOverlay')) closeRankModal();
-  });
   document.getElementById('rankResultNextBtn').addEventListener('click', closeRankResultAndContinue);
 
   // 先載禁卡表與重複卡清單，再過濾卡庫，避免 race（過濾時清單尚未就緒）
@@ -703,26 +699,9 @@ function rankDrawCrop(canvas, card, forceSheet = false) {
 }
 
 // ── Modal ─────────────────────────────────────────
+// 卡片視窗走共用 CardModal（Lu 1120：各頁卡片視窗統一，含禁卡／BGA 標記與比較連結）
 function openRankModal(card) {
-  document.getElementById('rankModalTitle').textContent = card['牌名'] || '—';
-  document.getElementById('rankModalId').textContent = card['卡片ID'] || '';
-  CardModal.renderTypeBadge(document.getElementById('rankModalBadge'), card);
-  document.getElementById('rankModalDesc').textContent = card['說明'] || card['效果'] || '';
-
-  // 卡片類型系統四行（類型／路線／代價／連動）；沒有資料就整區不渲染
-  CardModal.mountProfile(document.querySelector('.modal-desc-wrap'), rankCardProfileMap[card['卡片ID']], card, (id) => { const c = rankAllCards.find((x) => String(x['卡片ID']).trim() === id); if (c) openRankModal(c); });
-
-  const fieldsEl = document.getElementById('rankModalFields');
-  CardModal.renderFields(fieldsEl, CardModal.fieldDefs(card));
-
-  const canvas = document.getElementById('rankModalCanvas');
-  rankDrawCrop(canvas, card);
-
-  document.getElementById('rankModalOverlay').classList.add('open');
-}
-
-function closeRankModal() {
-  document.getElementById('rankModalOverlay').classList.remove('open');
+  CardModal.open(card, { profileMap: rankCardProfileMap, allCards: rankAllCards, bannedIds: rankBannedIds, bgaExtraIds: rankBgaExtraIds });
 }
 
 // ── 本輪 ELO 變動回饋 ──────────────────────────────
