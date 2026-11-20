@@ -964,6 +964,14 @@ body {
   cursor: help;
 }
 .modal-effects-wrap { margin-top: 6px; }
+/* 只有 GM／YOYO 看得到的區塊都掛這個小字，Lu 才分得出玩家看不看得到 */
+.gm-only-note {
+  font-size: .68rem;
+  font-weight: 400;
+  opacity: .75;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
 .modal-effects-body {
   font-size: .82rem;
   color: var(--text2);

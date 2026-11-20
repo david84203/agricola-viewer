@@ -708,8 +708,9 @@ function openModal(card) {
   const compareLink = document.getElementById('modalCompareLink');
   if (compareLink) compareLink.href = `./compare.html?ids=${encodeURIComponent(card['卡片ID'] || '')}`;
 
-  // 結構化卡效（純顯示；沒有編碼的卡完全不顯示）
-  const effRec = effectsById.get(card['卡片ID']);
+  // 結構化卡效（純顯示；GM/YOYO 專用，給核對判讀用；沒有編碼的卡完全不顯示）
+  const effRec = (typeof isImplStatusViewer === 'function' && isImplStatusViewer())
+    ? effectsById.get(card['卡片ID']) : null;
   const effBadge = document.getElementById('modalEffectsBadge');
   const effWrap = document.getElementById('modalEffectsWrap');
   if (effBadge) effBadge.style.display = effRec ? '' : 'none';

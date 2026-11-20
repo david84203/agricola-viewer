@@ -40,4 +40,5 @@ function renderImplStatusFilterControl() {
   // 標清單產生日：清單要在 agricola-online 重跑產生器才會更新，過舊要看得出來
   const label = wrap.querySelector('label');
   label.textContent = typeof onlineImplAt === 'string' && onlineImplAt ? `功能狀態（清單 ${onlineImplAt}）` : '功能狀態';
+  label.insertAdjacentHTML('beforeend', ' <span class="gm-only-note">僅 GM／YOYO 可見</span>');
 }
