@@ -66,16 +66,6 @@ function hasProfileAccess() { const r = getRole(); return r === 'rater' || r ===
 // 評分者不需要註冊（共用 PIN），玩家需要自行註冊帳號；
 // 為避免同一個 ID 被兩邊各自使用造成混淆，登入前互相檢查對方陣營是否已用過此 ID。
 
-// 此 ID 是否已是註冊過的玩家帳號
-async function isRegisteredPlayerId(id) {
-  try {
-    const res = await fetch(`${FIRESTORE_PLAYERS}/${encodeURIComponent(id)}`);
-    return res.status === 200;
-  } catch {
-    return false;
-  }
-}
-
 // 此 ID 是否曾以評分者身份留下場次紀錄（agricola_sessions 中 role 不是 'player' 的紀錄）
 async function isUsedAsRaterId(id) {
   try {

@@ -4,7 +4,7 @@
 (() => {
   const ITEMS = [
     ['index.html', '首頁'],
-    ['cards.html', '卡牌圖鑑', ['list.html']],
+    ['cards.html', '卡牌圖鑑', ['list.html', 'duplicates.html']],
     ['draft.html', '輪抽模擬'],
     ['review.html', '覆盤輪抽'],
     ['rank.html', '排序評分', [], 'rater'],

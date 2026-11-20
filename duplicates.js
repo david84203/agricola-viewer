@@ -34,6 +34,8 @@ async function init() {
   loadState();
   render();
   setupEvents();
+  // 所有人都讀雲端最新裁定（輪抽／圖鑑都照雲端），本機快取只當開頁瞬間的底稿
+  if (await loadStateFromFirestore()) render();
 }
 
 function loadState() {
@@ -518,42 +520,6 @@ function setupSearch(inputId, resultsId, onSelect) {
     });
   });
 }
-
-// ── Export for draft/tierlist ──────────────────────
-// Called by draft.js and tierlist.js to get excluded card IDs
-function getExcludedCardIds() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return new Set();
-    const s = JSON.parse(raw);
-    const excluded = new Set();
-
-    const fetchPairs = async () => {};  // pairs loaded separately by those pages
-
-    // We export a sync version: read state + basePairs from window if available
-    const pairs = window._dupBasePairs || [];
-    const custom = s.custom || [];
-    const dismissed = s.dismissed || [];
-    const picked = s.picked || {};
-
-    [...pairs, ...custom].forEach(pair => {
-      if (dismissed.includes(pair.id)) return;
-      const canon = picked[pair.id] || pair.defaultCanonical;
-      if (!canon) return;
-      pair.cards.forEach(ref => {
-        const card = resolveCardRef(ref);
-        if (card) {
-          if (!isCardCanonical(card, canon)) excluded.add(getCardRef(card));
-        } else if (ref !== canon) {
-          excluded.add(ref);
-        }
-      });
-    });
-    return excluded;
-  } catch { return new Set(); }
-}
-
-window.getExcludedCardIds = getExcludedCardIds;
 
 // ── Auth callback ──────────────────────────────────
 async function onAuthChange() {
