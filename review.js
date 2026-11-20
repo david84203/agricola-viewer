@@ -18,7 +18,7 @@ const BAN_ELO_PRESET = { '過強職業卡': 1300, '過強次要發展卡': 1300,
 let BANNED_GROUPS = [];
 let bgaExtraIds = new Set(); // GM 額外標記的 BGA 卡（非 A～E 牌組）
 let BANNED_ID_MAP  = {};          // cardId → { label, eloPreset }
-let dupExcludedIds = new Set();   // 重複卡 ID 集合
+let dupExcludedIds = new Set();   // 被取代的重複卡 ID（正主不在內）
 
 const PLAYERS = ['A', 'B', 'C', 'D'];
 const PLAYER_COLORS = { A: 'dot-A', B: 'dot-B', C: 'dot-C', D: 'dot-D' };
@@ -309,9 +309,10 @@ async function init() {
   }
 
 
+  const cardsP = fetch('./cards.json').then(r => r.json());
   const [data, dupInfo, , , , profileData] = await Promise.all([
-    fetch('./cards.json').then(r => r.json()),
-    loadDupExclusions(),
+    cardsP,
+    cardsP.then(loadDupExclusions),
     loadBanlist(),
     loadBgaIdMap(),
     window.CardImages?.load?.() || Promise.resolve(),
@@ -346,9 +347,11 @@ async function loadBanlist() {
   buildBannedIdMap();
 }
 
-async function loadDupExclusions() {
+// 回傳「被取代」的卡片 ID：用共用判斷（ID 或 ID＋圖片＋位置兩種配對都認），cards.json 內 ID 唯一
+async function loadDupExclusions(cards) {
   try {
-    return (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
+    const keys = (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
+    return new Set(cards.filter(c => keys.has(DuplicateCards.getCardKey(c))).map(c => c['卡片ID']));
   } catch { return new Set(); }
 }
 

@@ -48,7 +48,7 @@ async function rankInit() {
   document.getElementById('rankResultNextBtn').addEventListener('click', closeRankResultAndContinue);
 
   // 先載禁卡表與重複卡清單，再過濾卡庫，避免 race（過濾時清單尚未就緒）
-  await Promise.all([loadRankBanlist(), loadRankDupExclusions()]);
+  await loadRankBanlist();
   await loadRankCards();
 
   // 集訓模式：URL 帶 ?mode=elite 才啟用，正常快排完全不受影響
@@ -126,9 +126,10 @@ async function loadRankBanlist() {
   rankBgaExtraIds = bga;
 }
 
-async function loadRankDupExclusions() {
+// 回傳「被取代」那張的 key（ID＋圖片＋位置）；與圖鑑／Tier／覆盤同口徑，正主不會被誤排除
+async function loadRankDupExclusions(cards) {
   try {
-    rankDupExclusions = (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
+    rankDupExclusions = (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
   } catch { rankDupExclusions = new Set(); }
 }
 
@@ -190,13 +191,13 @@ async function loadRankCards() {
     ]);
     rankCardProfileMap = profileData || {};
     const data = await res.json();
+    await loadRankDupExclusions(data);
     rankAllCards = data.filter(c => {
       const id = c['卡片ID'];
       if (!id) return false;
       // 禁卡照常排除，但 BGA 卡（A~E＋GM 額外標記）的禁卡放行——它們出現在 BGA 覆盤對局，需要真實評分
       if (rankBannedIds.has(id) && !SiteLists.isBga(c, rankBgaExtraIds)) return false;
-      // 重複卡：純 ID 與複合 key 都要比對，跟輪抽一致
-      if (rankDupExclusions.has(id)) return false;
+      // 重複卡：只排除被取代的那張（key＝ID＋圖片＋位置），跟輪抽一致
       if (rankDupExclusions.has(rankGetCardKey(c))) return false;
       return c.card_type === 'occupation' || c.card_type === 'minor' || c.card_type === 'both';
     });

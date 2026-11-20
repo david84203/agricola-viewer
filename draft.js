@@ -101,9 +101,10 @@ let state = {
 let modalNav = { list: [], index: -1 };
 
 // ── Duplicate exclusions ───────────────────────────
-async function loadDupExclusions() {
+// 回傳「被取代」那張的 key（ID＋圖片＋位置）；與圖鑑／Tier／覆盤同口徑，正主不會被誤排除
+async function loadDupExclusions(cards) {
   try {
-    return (await DuplicateCards.loadDuplicateInfo()).excludedRefs;
+    return (await DuplicateCards.loadDuplicateInfo(cards)).nonCanonicalKeys;
   } catch { return new Set(); }
 }
 
@@ -205,14 +206,14 @@ async function loadRaterProgress() {
 
 // ── Init ───────────────────────────────────────────
 async function init() {
+  const cardsP = fetch('./cards.json').then(r => r.json());
   const [cardsData, dupExcluded] = await Promise.all([
-    fetch('./cards.json').then(r => r.json()),
-    loadDupExclusions(),
+    cardsP,
+    cardsP.then(loadDupExclusions),
     loadBanlist(),
     window.CardImages?.load?.() || Promise.resolve(),
   ]);
   allCards = cardsData.filter(c =>
-    !dupExcluded.has(c['卡片ID']) &&
     !dupExcluded.has(getCardKey(c)) &&
     !BANNED_IDS.has(c['卡片ID'])
   );
