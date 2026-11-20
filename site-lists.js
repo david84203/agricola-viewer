@@ -20,10 +20,11 @@
     { label: '擾亂戰局', ids: ['C093', 'C130', 'C003*', 'B022', 'K125', 'Ö03', 'Ö04', 'PI17', 'PI10', '5881-9', '6022-5'] },
   ];
 
-  function readCache(key) {
+  // anyAge：雲端讀不到時，過期的快取也比備援準
+  function readCache(key, anyAge = false) {
     try {
       const s = JSON.parse(localStorage.getItem(key));
-      return s && Date.now() - s.cachedAt < TTL && Array.isArray(s.data) ? s.data : null;
+      return s && (anyAge || Date.now() - s.cachedAt < TTL) && Array.isArray(s.data) ? s.data : null;
     } catch { return null; }
   }
 
@@ -47,7 +48,7 @@
     if (banPromise && !fresh) return banPromise;
     banPromise = (async () => {
       const cached = !fresh && readCache(BAN_KEY);
-      if (cached && cached.length) return cached;
+      if (cached) return cached;
       try {
         const doc = await fetchDoc('banlist');
         if (doc) {
@@ -55,10 +56,12 @@
             label: g.mapValue.fields.label.stringValue,
             ids: (g.mapValue.fields.ids?.arrayValue?.values || []).map(v => v.stringValue),
           }));
-          if (groups.length) { writeCache(BAN_KEY, groups); return groups; }
+          writeCache(BAN_KEY, groups); // 空清單＝全部解禁，也是合法結果
+          return groups;
         }
       } catch {}
-      return cached && cached.length ? cached : copyFallback();
+      const stale = readCache(BAN_KEY, true);
+      return stale || copyFallback();
     })();
     return banPromise;
   }
@@ -76,7 +79,7 @@
           return new Set(ids);
         }
       } catch {}
-      return new Set();
+      return new Set(readCache(BGA_KEY, true) || []);
     })();
     return bgaPromise;
   }
@@ -126,7 +129,9 @@
       do {
         let url = `${FS}/agricola_ratings?pageSize=300`;
         if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-        const data = await fetch(url).then(r => r.json());
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`評分讀取失敗 HTTP ${res.status}`); // 不把錯誤回應當空資料寫進快取
+        const data = await res.json();
         (data.documents || []).forEach(doc => {
           const f = doc.fields || {};
           map[doc.name.split('/').pop()] = {

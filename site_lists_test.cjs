@@ -57,6 +57,13 @@ const banDoc = ids => ({ fields: { groups: { arrayValue: { values: [
     assert.strictEqual(m.calls(), 2, 'fresh 要重抓');
     assert.ok(JSON.parse(m.store.agricola_banlist_cache).data[0].ids.includes('A127'), '寫入共用快取');
   }
+  // 3b. 圖鑑 fresh 讀取失敗 → 用既有快取（過期也行），不退回備援
+  {
+    const m = freshModule({ fail: true });
+    m.store.agricola_banlist_cache = JSON.stringify({ data: [{ label: 'x', ids: ['A127'] }], cachedAt: 0 });
+    const ids = m.SL.bannedIdSet(await m.SL.loadBannedGroups({ fresh: true }));
+    assert.deepStrictEqual([...ids], ['A127'], '斷線時沿用舊快取');
+  }
   // 4. 頁面不得再寫死禁卡陣列（全站只留 site-lists.js 一份備援）
   {
     const fs = require('fs');
