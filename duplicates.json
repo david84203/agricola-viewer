@@ -2358,5 +2358,15 @@
     ],
     "defaultCanonical": "Z325",
     "type": "effect"
+  },
+  {
+    "id": "n236",
+    "label": "幼畜市場／畜生市場",
+    "cards": [
+      "A009*",
+      "舊版E60"
+    ],
+    "defaultCanonical": "A009*",
+    "type": "effect"
   }
 ]
