@@ -43,7 +43,7 @@ async function fetchAll() {
   const docs = [];
   let token = '';
   for (let page = 0; page < 1000; page++) {
-    const mask = ['ranked', 'teamMode', 'playerCount', 'players', 'takeoverRecordOwners'].map((f) => `mask.fieldPaths=${f}`).join('&');
+    const mask = ['ranked', 'deckMode', 'teamMode', 'playerCount', 'players', 'takeoverRecordOwners'].map((f) => `mask.fieldPaths=${f}`).join('&');
     const url = `${BASE}?pageSize=300&${mask}${token ? '&pageToken=' + encodeURIComponent(token) : ''}`;
     const res = await fetch(url);
     if (!res.ok) die(`讀 match_results 失敗 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
@@ -78,6 +78,7 @@ async function fetchAll() {
   const acc = {}; // id -> { n, rankSum, top2 }
   const games = new Set();
   for (const d of docs) {
+    if (d.deckMode === 'powerDeck') { c.unranked++; continue; } // 強力牌組局不算任何統計（本來就 ranked:false，雙保險）
     if (d.ranked !== true) { c.unranked++; continue; }
     if (d.takeoverRecordOwners && Object.keys(d.takeoverRecordOwners).length) { c.unranked++; continue; } // 接棒局仍計成績（Lu 1108），但同座位兩人打，不進單卡樣本
     if (d.teamMode === 'double') { c.team++; continue; } // 舊局沒有欄位＝single

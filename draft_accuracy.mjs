@@ -288,6 +288,7 @@ const rows = [];
 const skipped = [];
 for (const m of matches) {
   const reason = (r) => { skipped.push({ roomCode: m.roomCode || m.__id, finishedAt: m.finishedAt, reason: r }); };
+  if (m.deckMode === 'powerDeck') { reason('強力牌組局（不算任何統計）'); continue; }
   if (!Array.isArray(m.draftLog) || !m.draftLog.length) { reason('沒有輪抽紀錄'); continue; }
   if (m.playerCount !== 4) { reason(`非四人局（${m.playerCount} 人）`); continue; }
   if (m.teamMode === 'double' && !includeDouble) { reason('雙打（名次是隊伍制，個人扣牌分不可比）'); continue; }
