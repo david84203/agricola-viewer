@@ -252,6 +252,9 @@
     style.textContent = `
       .card-profile-block { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
       .card-profile-row { display: flex; flex-direction: column; gap: 3px; }
+      .card-insight-block { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+      .card-insight-title { font-size: .7rem; color: var(--text3); letter-spacing: .06em; }
+      .card-insight-text { font-size: .85rem; color: var(--text2); line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; }
       .card-profile-label { font-size: .7rem; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
       .card-profile-value { font-size: .85rem; color: var(--text2); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; line-height: 1.5; }
       .card-profile-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border2); color: var(--text2); font-size: .78rem; }
@@ -723,17 +726,61 @@
   // 掛在 afterEl（通常是 .modal-desc-wrap）之後；每次開視窗先清掉上一次插入的區塊
   // card 有給才掛留言板（沒有卡片類型資料的卡也有留言板）
   // openCard(cardId)：頁面提供的「打開某張卡」函式，連動名單的牌名靠它換卡（沒傳就只顯示文字）
+  // ── 講評（Lu 1123：講解影片整理出的單卡短評，card-insights.json 形狀 { 卡片ID: 文字 }）──
+  // 第一次開卡片視窗才載入、整頁只載一次；載入失敗或壞檔＝當成空的，不顯示也不報錯
+  let cardInsights = null;
+  let cardInsightsPromise = null;
+  let insightTarget = null; // mountProfile 最後一次的 { afterEl, id }，資料晚到時只補給還停在同一張卡的視窗
+  function loadCardInsights() {
+    if (!cardInsightsPromise) {
+      cardInsightsPromise = Promise.resolve()
+        .then(() => fetch('./card-insights.json'))
+        .then((r) => (r.ok ? r.json() : {}))
+        .catch(() => ({}))
+        .then((j) => { cardInsights = j && typeof j === 'object' && !Array.isArray(j) ? j : {}; });
+    }
+    return cardInsightsPromise;
+  }
+  function placeInsight(afterEl, id) {
+    const text = cardInsights && typeof cardInsights[id] === 'string' ? cardInsights[id] : '';
+    if (!text.trim() || !afterEl.parentNode) return;
+    let anchor = afterEl;
+    for (let n = afterEl.nextElementSibling; n && /card-(profile|insight)-block/.test(n.className); n = n.nextElementSibling) {
+      if (/card-insight-block/.test(n.className)) return;
+      anchor = n;
+    }
+    const box = document.createElement('div');
+    box.className = 'card-insight-block';
+    const title = document.createElement('div');
+    title.className = 'card-insight-title';
+    title.textContent = '📝 講評';
+    const body = document.createElement('div');
+    body.className = 'card-insight-text';
+    body.textContent = text;
+    box.append(title, body);
+    anchor.insertAdjacentElement('afterend', box);
+  }
+
   let openCardById = null;
   function mountProfile(afterEl, entry, card, openCard) {
     if (!afterEl) return;
     openCardById = typeof openCard === 'function'
       ? (id) => { openCard(id); const box = afterEl.closest('.modal-box, .modal-content, .modal'); if (box) box.scrollTop = 0; }
       : null;
-    for (let next = afterEl.nextElementSibling; next && /card-(profile|comments)-block/.test(next.className); next = afterEl.nextElementSibling) next.remove();
+    for (let next = afterEl.nextElementSibling; next && /card-(profile|comments|insight)-block/.test(next.className); next = afterEl.nextElementSibling) next.remove();
     injectProfileStyles();
-    const block = renderProfile(entry, card ? String(card['卡片ID'] ?? '').trim() : '');
+    const id = card ? String(card['卡片ID'] ?? '').trim() : '';
+    const block = renderProfile(entry, id);
     let anchor = afterEl;
     if (block) { afterEl.insertAdjacentElement('afterend', block); anchor = block; }
+    const target = { afterEl, id };
+    insightTarget = target;
+    if (cardInsights) {
+      placeInsight(afterEl, id);
+      if (anchor.nextElementSibling && /card-insight-block/.test(anchor.nextElementSibling.className)) anchor = anchor.nextElementSibling;
+    } else {
+      loadCardInsights().then(() => { if (insightTarget === target) placeInsight(afterEl, id); });
+    }
     if (card) anchor.insertAdjacentElement('afterend', renderComments(card));
   }
 
