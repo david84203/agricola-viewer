@@ -566,26 +566,6 @@
       if (row) rows.push(row);
     }
 
-    // 實戰（1103）：LUGA 正式 4 人局（不含雙打）打出這張的紀錄；<5 局只報局數＋樣本不足
-    if (entry.match && entry.match.n > 0) {
-      const m = entry.match;
-      const row = profileRow('實戰', (valueEl) => {
-        const span = document.createElement('span');
-        span.className = 'card-profile-combo-item';
-        span.textContent = m.n >= 5
-          ? `出現 ${m.n} 局・平均第 ${m.avgRank.toFixed(1)} 名・前兩名 ${Math.round(m.top2 * 100)}%`
-          : `出現 ${m.n} 局・樣本不足`;
-        valueEl.appendChild(span);
-        // Lu 1115：標資料日期（每週一排程才更新；有新局才推，所以日期＝最後一次有新局的統計）
-        const at = document.createElement('span');
-        at.className = 'card-profile-match-at';
-        at.style.cssText = 'color:var(--text3);font-size:.85em;margin-left:6px';
-        valueEl.appendChild(at);
-        matchDate().then((d) => { if (d) at.textContent = `資料至 ${d}`; });
-      });
-      if (row) rows.push(row);
-    }
-
     if (!rows.length) return null;
 
     const block = document.createElement('div');
@@ -771,6 +751,7 @@
     injectProfileStyles();
     const id = card ? String(card['卡片ID'] ?? '').trim() : '';
     const block = renderProfile(entry, id);
+    renderMatchLine(afterEl.closest('.modal-inner')?.querySelector('.modal-image-wrap'), entry?.match);
     let anchor = afterEl;
     if (block) { afterEl.insertAdjacentElement('afterend', block); anchor = block; }
     const target = { afterEl, id };
@@ -789,6 +770,7 @@
   // opts.dupInfo（DuplicateCards.loadDuplicateInfo 的結果）、
   // opts.ratings（卡片ID → { elo, seenCount, rankSeen, lugaDealt, lugaPick, lugaPickPosSum }，要 v6 含實戰欄位）、
   // opts.tiers（卡片ID → 'S' 或 CardTiers.compute 的 { tier }）。沒給的項目就不顯示。
+  // ratings／tiers 由下方 ratingStats＋renderRatingPanel 顯示在卡圖上方，不進 statusFields。
   const RATING_MIN_SEEN = 5;
   function statusFields(card, opts = {}) {
     const id = String(card['卡片ID'] ?? '').trim();
@@ -807,24 +789,99 @@
         out.push(['被取代', `${canon ? label(canon) : by.canonId}（重複卡，不進牌池）`, 'replace']);
       }
     }
-    if (opts.ratings) {
-      const r = opts.ratings[id];
-      const enough = r && r.seenCount + (r.rankSeen || 0) >= RATING_MIN_SEEN;
-      if (opts.bannedIds?.has(id)) {
-        out.push(['牌力', '禁卡']);
-        if (enough) out.push(['ELO 分數', String(Math.round(r.elo))]);
-      } else if (enough) {
-        const t = opts.tiers?.get(id);
-        if (opts.tiers) out.push(['牌力 Tier', (t && t.tier) || (typeof t === 'string' ? t : '—')]);
-        out.push(['ELO 分數', String(Math.round(r.elo))]);
-      } else {
-        out.push(['ELO 分數', '樣本不足']);
-      }
-      out.push(['實戰輪抽', r?.lugaDealt
-        ? `發到 ${r.lugaDealt} 次・被選 ${r.lugaPick} 次${r.lugaPick ? `・平均第 ${(r.lugaPickPosSum / r.lugaPick).toFixed(1)} 手被拿` : '・都沒人拿'}`
-        : '尚無']);
-    }
     return out;
+  }
+
+  // ── 牌力數據（Lu 1123：Tier／ELO／實戰輪抽是站內統計，跟卡牌本身資訊分開，放卡圖上方）──
+  // r：該卡評分（可為 undefined＝評分已載完但這張沒資料）；tier：'S' 或 { tier }，沒傳＝這頁沒算 Tier
+  function ratingStats(r, { banned = false, tier } = {}) {
+    const enough = r && r.seenCount + (r.rankSeen || 0) >= RATING_MIN_SEEN;
+    const tierText = (tier && tier.tier) || (typeof tier === 'string' ? tier : '');
+    return {
+      tier: banned ? '禁卡' : (enough ? tierText : ''),
+      elo: enough ? String(Math.round(r.elo)) : (banned ? '' : '樣本不足'),
+      draft: r?.lugaDealt
+        ? `發到 ${r.lugaDealt} 次・被選 ${r.lugaPick} 次${r.lugaPick ? `・平均第 ${(r.lugaPickPosSum / r.lugaPick).toFixed(1)} 手被拿` : '・都沒人拿'}`
+        : '尚無',
+    };
+  }
+
+  // stats 傳 null＝評分還沒載完，先拿掉上一張的面板
+  function renderRatingPanel(imageWrap, stats) {
+    if (!imageWrap) return;
+    imageWrap.querySelector('.card-rating-main')?.remove();
+    if (!stats) { dropEmptyRatingPanel(imageWrap); return; }
+    const main = document.createElement('div');
+    main.className = 'card-rating-main';
+    const head = document.createElement('div');
+    // 排版同牌力排行的 Tier 列（左色條＋字母＋百分位）
+    const isBanned = stats.tier === '禁卡';
+    const hasLetter = /^[SABCDE]$/.test(stats.tier);
+    head.className = `card-rating-head rt-${isBanned ? 'banned' : hasLetter ? stats.tier.toLowerCase() : 'unrated'}`;
+    if (stats.tier) {
+      const tierEl = document.createElement('span');
+      tierEl.className = `card-rating-tier${isBanned ? ' is-banned' : ''}`;
+      tierEl.textContent = stats.tier;
+      head.appendChild(tierEl);
+    }
+    const range = hasLetter ? window.CardTiers?.RANGE_LABELS?.[stats.tier] : '';
+    if (range) {
+      const rangeEl = document.createElement('span');
+      rangeEl.className = 'card-rating-range';
+      rangeEl.textContent = range;
+      head.appendChild(rangeEl);
+    }
+    if (stats.elo) {
+      const eloEl = document.createElement('span');
+      eloEl.className = 'card-rating-elo';
+      eloEl.innerHTML = '<small>ELO</small> ';
+      eloEl.append(stats.elo);
+      head.appendChild(eloEl);
+    }
+    const draftEl = document.createElement('div');
+    draftEl.className = 'card-rating-draft';
+    draftEl.textContent = `實戰輪抽：${stats.draft}`;
+    main.append(head, draftEl);
+    ratingPanelEl(imageWrap).prepend(main);
+  }
+
+  function ratingPanelEl(imageWrap) {
+    let panel = imageWrap.querySelector('.card-rating-panel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.className = 'card-rating-panel';
+      imageWrap.prepend(panel);
+      imageWrap.classList.add('has-rating');
+    }
+    return panel;
+  }
+
+  function dropEmptyRatingPanel(imageWrap) {
+    const panel = imageWrap.querySelector('.card-rating-panel');
+    if (panel && !panel.children.length) {
+      panel.remove();
+      imageWrap.classList.remove('has-rating');
+    }
+  }
+
+  // 實戰（1103）：LUGA 正式 4 人局（不含雙打）打出這張的紀錄；<5 局只報局數＋樣本不足
+  // 資料來自 card-profile，沒載評分的頁面也有，所以跟 Tier／ELO 分開畫
+  function renderMatchLine(imageWrap, m) {
+    if (!imageWrap) return;
+    imageWrap.querySelector('.card-rating-match')?.remove();
+    if (!m || !(m.n > 0)) { dropEmptyRatingPanel(imageWrap); return; }
+    const line = document.createElement('div');
+    line.className = 'card-rating-draft card-rating-match';
+    line.textContent = m.n >= 5
+      ? `實戰對局：出現 ${m.n} 局・平均第 ${m.avgRank.toFixed(1)} 名・前兩名 ${Math.round(m.top2 * 100)}%`
+      : `實戰對局：出現 ${m.n} 局・樣本不足`;
+    // Lu 1115：標資料日期（每週一排程才更新；有新局才推，所以日期＝最後一次有新局的統計）
+    const at = document.createElement('span');
+    at.className = 'card-profile-match-at';
+    at.style.cssText = 'color:var(--text3);font-size:.85em;margin-left:6px';
+    line.appendChild(at);
+    matchDate().then((d) => { if (d) at.textContent = `資料至 ${d}`; });
+    ratingPanelEl(imageWrap).appendChild(line);
   }
 
   // 在 .modal-sub-row 的卡片 ID 後面放禁卡／BGA 徽章＋「比較」連結（重開時先清掉上一張的）
@@ -890,6 +947,9 @@
     renderFields(q('.modal-fields'), fieldDefs(card).concat(statusFields(card, opts)));
     q('.modal-desc').textContent = card['說明'] || '—';
     renderStatusBadges(q('.modal-sub-row'), card, opts);
+    renderRatingPanel(q('.modal-image-wrap'), opts.ratings
+      ? ratingStats(opts.ratings[id], { banned: opts.bannedIds?.has(id), tier: opts.tiers ? (opts.tiers.get(id) || '—') : undefined })
+      : null);
     const img = q('.modal-image-wrap img');
     img.style.display = 'none';
     img.removeAttribute('src');
@@ -912,5 +972,5 @@
   // 目前開著哪張卡（沒開＝null）；頁面晚到的資料（評分）載完時用來判斷要不要重畫
   const currentId = () => (quick && quick.classList.contains('open') ? quick.querySelector('.modal-id').textContent : null);
 
-  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile, statusFields, renderStatusBadges, open, currentId };
+  window.CardModal = { typeName, renderTypeBadge, fieldDefs, renderFields, renderEffects, renderProfile, mountProfile, statusFields, ratingStats, renderRatingPanel, renderStatusBadges, open, currentId };
 })();

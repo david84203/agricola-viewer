@@ -322,8 +322,7 @@ function renderBanSection(container, typeOk) {
 }
 
 function tierRangeLabel(tier) {
-  const pcts = ['前 8%', '8–25%', '25–60%', '60–82%', '82–95%', '95–100%'];
-  return pcts[TIERS.indexOf(tier)] || '';
+  return CardTiers.RANGE_LABELS[tier] || '';
 }
 
 // ── 全站場數（從 session log 用聚合 COUNT 算，非加總卡片展示數）──

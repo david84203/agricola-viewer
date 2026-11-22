@@ -11,6 +11,7 @@
 (function () {
   const TIERS = ['S', 'A', 'B', 'C', 'D', 'E'];
   const BOUNDS = [0.08, 0.25, 0.60, 0.82, 0.95, 1.01];
+  const RANGE_LABELS = { S: '前 8%', A: '8–25%', B: '25–60%', C: '60–82%', D: '82–95%', E: '95–100%' };
   const MIN_SEEN = 5;
   const POOL_LABEL = { occupation: '職業卡', minor: '次要發展卡' };
 
@@ -50,5 +51,5 @@
     return out;
   }
 
-  window.CardTiers = { TIERS, BOUNDS, MIN_SEEN, POOL_LABEL, score, poolOf, compute };
+  window.CardTiers = { TIERS, BOUNDS, RANGE_LABELS, MIN_SEEN, POOL_LABEL, score, poolOf, compute };
 })();

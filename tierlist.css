@@ -116,12 +116,12 @@
 }
 
 /* Tier colours */
-.tier-s    { background: rgba(255,200,50,.18);  color: #f5c842; border-left: 4px solid #f5c842; }
-.tier-a    { background: rgba(74,222,128,.14);  color: #4ade80; border-left: 4px solid #4ade80; }
-.tier-b    { background: rgba(96,165,250,.14);  color: #60a5fa; border-left: 4px solid #60a5fa; }
-.tier-c    { background: rgba(192,132,252,.14); color: #c084fc; border-left: 4px solid #c084fc; }
-.tier-d    { background: rgba(251,146,60,.14);  color: #fb923c; border-left: 4px solid #fb923c; }
-.tier-e    { background: rgba(248,113,113,.14); color: #f87171; border-left: 4px solid #f87171; }
+.tier-s    { background: var(--tier-s-bg); color: var(--tier-s); border-left: 4px solid var(--tier-s); }
+.tier-a    { background: var(--tier-a-bg); color: var(--tier-a); border-left: 4px solid var(--tier-a); }
+.tier-b    { background: var(--tier-b-bg); color: var(--tier-b); border-left: 4px solid var(--tier-b); }
+.tier-c    { background: var(--tier-c-bg); color: var(--tier-c); border-left: 4px solid var(--tier-c); }
+.tier-d    { background: var(--tier-d-bg); color: var(--tier-d); border-left: 4px solid var(--tier-d); }
+.tier-e    { background: var(--tier-e-bg); color: var(--tier-e); border-left: 4px solid var(--tier-e); }
 .tier-unrated { background: var(--surface); color: var(--text3); border-left: 4px solid var(--border); }
 
 /* ── Card Grid ── */

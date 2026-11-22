@@ -154,15 +154,15 @@
   width: 22px; height: 22px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: .7rem; font-weight: 700; flex-shrink: 0;
-  color: #fff;
+  color: var(--bg);
 }
-.tier-pip.tier-s { background: #c0392b; }
-.tier-pip.tier-a { background: #e67e22; }
-.tier-pip.tier-b { background: #27ae60; }
-.tier-pip.tier-c { background: #2980b9; }
-.tier-pip.tier-d { background: #7f8c8d; }
-.tier-pip.tier-e { background: #2c3e50; }
-.tier-pip.tier-\? { background: #3a4a5a; }
+.tier-pip.tier-s { background: var(--tier-s); }
+.tier-pip.tier-a { background: var(--tier-a); }
+.tier-pip.tier-b { background: var(--tier-b); }
+.tier-pip.tier-c { background: var(--tier-c); }
+.tier-pip.tier-d { background: var(--tier-d); }
+.tier-pip.tier-e { background: var(--tier-e); }
+.tier-pip.tier-\? { background: #3a4a5a; color: #fff; }
 
 /* ── Score chart ────────────────────────────────── */
 .score-chart-wrap { width: 100%; overflow-x: auto; }

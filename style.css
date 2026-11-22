@@ -17,6 +17,20 @@
   --blue:      #5b8dee;
   --purple:    #9b6dff;
 
+  /* Tier 配色＝遊戲稀有度（Lu 1123）；紅色保留給禁卡 */
+  --tier-s:    #f5b13d;
+  --tier-a:    #c084fc;
+  --tier-b:    #60a5fa;
+  --tier-c:    #4ade80;
+  --tier-d:    #b9835a;
+  --tier-e:    #8d9199;
+  --tier-s-bg: rgba(245,177,61,.18);
+  --tier-a-bg: rgba(192,132,252,.14);
+  --tier-b-bg: rgba(96,165,250,.14);
+  --tier-c-bg: rgba(74,222,128,.14);
+  --tier-d-bg: rgba(185,131,90,.16);
+  --tier-e-bg: rgba(141,145,153,.10);
+
   --text:      #f2e8d5;
   --text2:     #cbb898;
   --text3:     #968272;
@@ -566,12 +580,12 @@ body {
   color: var(--text);
   font-weight: 600;
 }
-.rating-tier-s .rating-tier { color: #f5c842; }
-.rating-tier-a .rating-tier { color: #4ade80; }
-.rating-tier-b .rating-tier { color: #60a5fa; }
-.rating-tier-c .rating-tier { color: #c084fc; }
-.rating-tier-d .rating-tier { color: #fb923c; }
-.rating-tier-e .rating-tier { color: #f87171; }
+.rating-tier-s .rating-tier { color: var(--tier-s); }
+.rating-tier-a .rating-tier { color: var(--tier-a); }
+.rating-tier-b .rating-tier { color: var(--tier-b); }
+.rating-tier-c .rating-tier { color: var(--tier-c); }
+.rating-tier-d .rating-tier { color: var(--tier-d); }
+.rating-tier-e .rating-tier { color: var(--tier-e); }
 .rating-na .rating-tier,
 .rating-banned .rating-tier { color: var(--text3); }
 
@@ -817,6 +831,40 @@ body {
   object-fit: contain;
   display: block;
 }
+.modal-image-wrap.has-rating {
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 0;
+}
+.modal-image-wrap.has-rating #modalCanvas { height: auto; min-height: 0; }
+.card-rating-panel {
+  width: calc(100% - 20px);
+  flex-shrink: 0;
+}
+/* 同牌力排行的 Tier 列：左色條＋字母＋百分位 */
+.card-rating-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-left: 4px solid;
+  border-radius: var(--radius-sm);
+}
+.rt-s { background: var(--tier-s-bg); color: var(--tier-s); }
+.rt-a { background: var(--tier-a-bg); color: var(--tier-a); }
+.rt-b { background: var(--tier-b-bg); color: var(--tier-b); }
+.rt-c { background: var(--tier-c-bg); color: var(--tier-c); }
+.rt-d { background: var(--tier-d-bg); color: var(--tier-d); }
+.rt-e { background: var(--tier-e-bg); color: var(--tier-e); }
+.rt-unrated { background: var(--surface); color: var(--text3); }
+.rt-banned { background: rgba(224,92,92,.16); color: var(--red); }
+.card-rating-tier { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 700; line-height: 1; }
+.card-rating-tier.is-banned { font-family: inherit; font-size: .95rem; }
+.card-rating-range { font-size: .78rem; opacity: .75; }
+.card-rating-elo { margin-left: auto; font-size: 1rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+.card-rating-elo small { font-size: .7rem; font-weight: 600; color: var(--text3); letter-spacing: .05em; }
+.card-rating-draft { margin-top: 6px; padding: 0 4px; font-size: .75rem; line-height: 1.5; color: var(--text2); }
 .modal-badge {
   font-size: .75rem;
   font-weight: 600;
@@ -1033,6 +1081,7 @@ body {
 @media (max-width: 700px) {
   .modal-inner { grid-template-columns: 1fr; }
   .modal-image-wrap { border-radius: var(--radius-lg) var(--radius-lg) 0 0; min-height: 200px; }
+  .card-rating-head { padding-right: 52px; } /* 讓開右上角關閉鈕 */
   .modal-fields { grid-template-columns: 1fr; }
   .header-inner { padding: 0 16px; }
   .main-container { padding: 20px 16px 40px; }
@@ -1097,6 +1146,8 @@ body {
     min-height: 160px;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
+  .modal-image-wrap.has-rating { max-height: none; }
+  .modal-image-wrap.has-rating #modalCanvas { width: auto; max-width: 100%; max-height: 200px; }
   .modal-info { padding: 18px 16px 28px; gap: 10px; }
   .modal-title { font-size: 1.2rem; }
   .modal-desc { font-size: .88rem; padding: 10px 12px; }

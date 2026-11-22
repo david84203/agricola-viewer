@@ -685,23 +685,13 @@ function openModal(card) {
     fieldDefs.push(['被取代', `${canon ? `${canon['牌名'] || '未命名'}（${canon['卡片ID']}）` : replacedBy.canonId}（重複卡，不進牌池）`, 'replace']);
   }
 
-  // 牌力資訊（僅在使用者已啟用牌力排序、資料載入後顯示）
+  // 牌力數據放卡圖上方，跟卡牌本身資訊分開（評分載完才顯示）
+  const ratingWrap = document.querySelector('#modalOverlay .modal-image-wrap');
   if (ratingsMap) {
     const rid = card['卡片ID'];
-    const rr = ratingsMap[rid];
-    if (isCardBannedById(rid)) {
-      fieldDefs.push(['牌力', '禁卡']);
-      if (rr && rr.seenCount + (rr.rankSeen || 0) >= RATING_MIN_SEEN) fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
-    } else if (rr && rr.seenCount + (rr.rankSeen || 0) >= RATING_MIN_SEEN) {
-      fieldDefs.push(['牌力 Tier', tierMap.get(rid) || '—']);
-      fieldDefs.push(['ELO 分數', String(Math.round(rr.elo))]);
-    } else {
-      fieldDefs.push(['ELO 分數', '樣本不足']);
-    }
-    fieldDefs.push(['實戰輪抽', rr?.lugaDealt
-      ? `發到 ${rr.lugaDealt} 次・被選 ${rr.lugaPick} 次${rr.lugaPick ? `・平均第 ${(rr.lugaPickPosSum / rr.lugaPick).toFixed(1)} 手被拿` : '・都沒人拿'}`
-      : '尚無']);
+    CardModal.renderRatingPanel(ratingWrap, CardModal.ratingStats(ratingsMap[rid], { banned: isCardBannedById(rid), tier: tierMap.get(rid) || '—' }));
   } else {
+    CardModal.renderRatingPanel(ratingWrap, null);
     // Lu 1111：點開卡片就要看得到 ELO，不必先切牌力排序；載完若視窗仍停在這張就重畫一次
     ensureRatings().then(() => {
       if (document.getElementById('modalOverlay').classList.contains('open')
